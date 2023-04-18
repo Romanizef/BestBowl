@@ -5,6 +5,12 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### DB ###
+db
+
+### Vaading generated ###
+frontend
+
 ### STS ###
 .apt_generated
 .classpath
