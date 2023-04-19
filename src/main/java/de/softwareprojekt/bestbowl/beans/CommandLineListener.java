@@ -1,6 +1,7 @@
 package de.softwareprojekt.bestbowl.beans;
 
 import de.softwareprojekt.bestbowl.BestBowlApplication;
+import de.softwareprojekt.bestbowl.utils.PDFUtils;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -36,6 +37,8 @@ public class CommandLineListener {
                         BestBowlApplication.shutdown();
                     } else if (command.equals("addAdminUser")) {
                         userManager.addNewUser("admin", "nimda", "-", UserRole.ADMIN);
+                    } else if (command.equals("demoPdf")) {
+                        PDFUtils.createDemoPdf();
                     }
                 } catch (Exception e) {
                     if (e.getMessage() != null) {
