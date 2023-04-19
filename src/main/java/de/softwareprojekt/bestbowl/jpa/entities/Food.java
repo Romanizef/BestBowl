@@ -6,6 +6,9 @@ import jakarta.persistence.Id;
 
 import java.io.Serializable;
 
+/**
+ * @author Marten Voß
+ */
 @Entity
 public class Food implements Serializable {
     private static final long serialVersionUID = 8272575838721537250L;

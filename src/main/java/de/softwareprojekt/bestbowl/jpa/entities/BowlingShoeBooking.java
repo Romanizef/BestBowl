@@ -8,6 +8,9 @@ import jakarta.persistence.ManyToOne;
 
 import java.io.Serializable;
 
+/**
+ * @author Marten Voß
+ */
 @Entity
 @IdClass(BowlingShoeBookingId.class)
 public class BowlingShoeBooking implements Serializable {

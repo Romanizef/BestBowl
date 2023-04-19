@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * @author Marten Voß
+ */
 @Component
 public class UserManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserManager.class);

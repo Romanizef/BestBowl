@@ -13,6 +13,9 @@ import java.util.Scanner;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
 
+/**
+ * @author Marten Voß
+ */
 @Component
 public class CommandLineListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandLineListener.class);

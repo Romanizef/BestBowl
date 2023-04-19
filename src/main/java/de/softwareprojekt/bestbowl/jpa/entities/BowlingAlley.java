@@ -6,6 +6,9 @@ import jakarta.persistence.Id;
 
 import java.io.Serializable;
 
+/**
+ * @author Marten Voß
+ */
 @Entity
 public class BowlingAlley implements Serializable {
     private static final long serialVersionUID = -5386396429886134586L;

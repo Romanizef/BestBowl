@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * @author Marten Voß
+ */
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Integer> {
     Optional<Client> findFirstByOrderById();

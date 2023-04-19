@@ -9,6 +9,9 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
+/**
+ * @author Marten Voß
+ */
 @Route("login")
 @PageTitle("Login")
 @AnonymousAllowed

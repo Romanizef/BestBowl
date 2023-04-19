@@ -6,6 +6,9 @@ import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * @author Marten Voß
+ */
 public class DrinkBookingId implements Serializable {
     private static final long serialVersionUID = 5181429790230031383L;
 

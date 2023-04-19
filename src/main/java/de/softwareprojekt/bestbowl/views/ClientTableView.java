@@ -21,6 +21,9 @@ import org.springframework.data.domain.PageRequest;
 import java.util.Locale;
 
 
+/**
+ * @author Marten Voß
+ */
 @Route(value = "clients", layout = MainView.class)
 @PageTitle("Clients")
 @PermitAll

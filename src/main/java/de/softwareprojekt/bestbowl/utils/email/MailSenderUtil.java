@@ -8,7 +8,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Properties;
 
-//Author: Matija Kopschek
+/**
+ * @author Matija Kopschek
+ */
 public class MailSenderUtil {
 
     protected Session mailSession; // Session which represents the connection with the E-Mail-Server

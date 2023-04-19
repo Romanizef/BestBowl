@@ -6,6 +6,9 @@ import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * @author Marten Voß
+ */
 public class BowlingShoeBookingId implements Serializable {
     private static final long serialVersionUID = 7549075836963205963L;
 

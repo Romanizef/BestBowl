@@ -20,6 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
+/**
+ * @author Marten Voß
+ */
 public class MainView extends AppLayout implements AppShellConfigurator {
     private final Tabs menu;
     private final H1 viewTitle;

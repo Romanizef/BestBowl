@@ -10,6 +10,9 @@ import jakarta.annotation.security.PermitAll;
 
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.showNotification;
 
+/**
+ * @author Marten Voß
+ */
 @Route(value = "demo", layout = MainView.class)
 @PageTitle("Demo Page")
 @RouteAlias(value = "", layout = MainView.class)

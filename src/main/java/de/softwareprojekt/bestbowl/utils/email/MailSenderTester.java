@@ -1,6 +1,8 @@
 package de.softwareprojekt.bestbowl.utils.email;
 
-//Author: Matija Kopschek
+/**
+ * @author Matija Kopschek
+ */
 public class MailSenderTester {
     public static void main(String[] args) {
 

@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
+/**
+ * @author Marten Voß
+ */
 public class Utils {
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
     private static final File WORKING_DIR_ROOT = new File("");

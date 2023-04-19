@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 
 import java.io.Serializable;
 
+/**
+ * @author Marten Voß
+ */
 @Entity
 public class Address implements Serializable {
     private static final long serialVersionUID = 2927541278047572706L;

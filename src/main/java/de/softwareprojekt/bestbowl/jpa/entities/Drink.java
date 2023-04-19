@@ -6,6 +6,9 @@ import jakarta.persistence.Id;
 
 import java.io.Serializable;
 
+/**
+ * @author Marten Voß
+ */
 @Entity
 public class Drink implements Serializable {
     private static final long serialVersionUID = 679638727317395915L;

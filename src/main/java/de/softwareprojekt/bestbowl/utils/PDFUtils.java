@@ -10,6 +10,10 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * @author Matija Kopschek
+ * @author Marten Voß
+ */
 public class PDFUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(PDFUtils.class);
 

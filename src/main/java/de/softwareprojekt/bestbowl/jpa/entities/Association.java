@@ -6,6 +6,9 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author Marten Voß
+ */
 @Entity
 public class Association implements Serializable {
     private static final long serialVersionUID = 3267080689333108719L;

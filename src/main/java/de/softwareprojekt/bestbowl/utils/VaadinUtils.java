@@ -3,6 +3,9 @@ package de.softwareprojekt.bestbowl.utils;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 
+/**
+ * @author Marten Voß
+ */
 public class VaadinUtils {
     private VaadinUtils() {
     }

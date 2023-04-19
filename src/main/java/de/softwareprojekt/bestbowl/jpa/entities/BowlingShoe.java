@@ -7,6 +7,9 @@ import jakarta.persistence.ManyToOne;
 
 import java.io.Serializable;
 
+/**
+ * @author Marten Voß
+ */
 @Entity
 public class BowlingShoe implements Serializable {
     private static final long serialVersionUID = 991398573020179381L;

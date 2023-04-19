@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
+/**
+ * @author Marten Voß
+ */
 public interface AssociationRepository extends JpaRepository<Association, Integer> {
     Optional<Association> findFirstByOrderById();
 }
