@@ -11,6 +11,12 @@ db
 
 ### Vaading generated ###
 frontend
+package.json
+package-lock.json
+tsconfig.json
+types.d.ts
+vite.config.ts
+vite.generated.ts
 
 ### STS ###
 .apt_generated
