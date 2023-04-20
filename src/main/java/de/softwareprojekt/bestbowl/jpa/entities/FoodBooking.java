@@ -27,6 +27,8 @@ public class FoodBooking implements Serializable {
 
     @ManyToOne
     private Food food;
+    private int amount;
+    private double price;
 
     private boolean active;
 
@@ -64,6 +66,22 @@ public class FoodBooking implements Serializable {
 
     public void setFood(Food food) {
         this.food = food;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public boolean isActive() {

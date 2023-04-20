@@ -35,14 +35,20 @@ public class CommandLineListener {
                     if (command == null) {
                         continue;
                     }
+
                     if (command.equals("shutdown")) {
                         LOGGER.info("shutting down ...");
                         BestBowlApplication.shutdown();
-                    } else if (command.equals("addAdminUser")) {
-                        userManager.addNewUser("admin", "nimda", "-", UserRole.ADMIN);
+                    } else if (command.equals("addUsers")) {
+                        userManager.addNewUser("admin", "admin", "1.1.2000", "-", UserRole.ADMIN);
+                        userManager.addNewUser("owner", "owner", "1.1.2000", "-", UserRole.OWNER);
+                        userManager.addNewUser("employee", "employee", "1.1.2000", "-", UserRole.EMPLOYEE);
+                        LOGGER.info("Users added");
                     } else if (command.equals("demoPdf")) {
                         PDFUtils.createDemoPdf();
+                        LOGGER.info("pdf created");
                     }
+
                 } catch (Exception e) {
                     if (e.getMessage() != null) {
                         LOGGER.error(e.getMessage());

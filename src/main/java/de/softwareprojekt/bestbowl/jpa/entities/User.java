@@ -1,6 +1,5 @@
 package de.softwareprojekt.bestbowl.jpa.entities;
 
-import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -23,7 +22,8 @@ public class User implements Serializable {
     private String name;
     private String email;
     private String encodedPassword;
-    private UserRole role;
+    private String securityQuestionAnswer;
+    private String role;
 
     private boolean active;
 
@@ -63,11 +63,19 @@ public class User implements Serializable {
         this.encodedPassword = encodedPassword;
     }
 
-    public UserRole getRole() {
+    public String getSecurityQuestionAnswer() {
+        return securityQuestionAnswer;
+    }
+
+    public void setSecurityQuestionAnswer(String securityQuestionAnswer) {
+        this.securityQuestionAnswer = securityQuestionAnswer;
+    }
+
+    public String getRole() {
         return role;
     }
 
-    public void setRole(UserRole role) {
+    public void setRole(String role) {
         this.role = role;
     }
 

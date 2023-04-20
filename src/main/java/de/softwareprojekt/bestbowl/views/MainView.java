@@ -33,10 +33,8 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         viewTitle.getStyle()
                 .set("font-size", "var(--lumo-font-size-l)")
                 .set("margin", "var(--lumo-space-m) var(--lumo-space-l)");
-        HorizontalLayout headerLayout = new HorizontalLayout();
-        headerLayout.setSizeFull();
-        headerLayout.setAlignItems(FlexComponent.Alignment.CENTER);
-        headerLayout.add(createHeaderContent());
+
+        HorizontalLayout headerLayout = createHeaderContent();
         if (securityService.getAuthenticatedUser() != null) {
             Button logoutButton = new Button("Logout", click -> securityService.logout());
             headerLayout.add(logoutButton);
@@ -62,7 +60,8 @@ public class MainView extends AppLayout implements AppShellConfigurator {
     private Tab[] createMenuItems() {
         return new Tab[]{
                 createTab("Demo", DemoView.class),
-                createTab("Clients", ClientTableView.class)
+                createTab("Clients", ClientTableView.class),
+                createTab("Admin", ExampleAdminOnlyView.class)
         };
     }
 
@@ -74,6 +73,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.add(new DrawerToggle());
         layout.add(viewTitle);
+        layout.expand(viewTitle);
         return layout;
     }
 

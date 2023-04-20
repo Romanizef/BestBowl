@@ -1,7 +1,6 @@
 package de.softwareprojekt.bestbowl.beans;
 
 import de.softwareprojekt.bestbowl.jpa.entities.User;
-import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +41,7 @@ public class UserManager {
                 UserDetails userDetails = org.springframework.security.core.userdetails.User
                         .withUsername(user.getName())
                         .password(user.getEncodedPassword())
-                        .roles(user.getRole().toString())
+                        .roles(user.getRole())
                         .build();
                 if (userDetailsManager.userExists(user.getName())) {
                     userDetailsManager.updateUser(userDetails);
@@ -61,15 +60,27 @@ public class UserManager {
      * @param email    e-mail of the user
      * @param userRole role of the user
      */
-    public void addNewUser(String name, String password, String email, UserRole userRole) {
+    public void addNewUser(String name, String password, String securityQuestionAnswer, String email, String userRole) {
         User user = new User();
         user.setName(name);
         user.setEncodedPassword(passwordEncoder.encode(password));
+        user.setSecurityQuestionAnswer(securityQuestionAnswer);
         user.setEmail(email);
         user.setRole(userRole);
         Repos.getUserRepository().save(user);
         updateUsersFromDb();
-        LOGGER.info("User: '" + name + "' added!");
+    }
+
+    /**
+     * Changes the password of the user to the new password
+     *
+     * @param user     the user to be changed
+     * @param password new password
+     */
+    public void changePassword(User user, String password) {
+        user.setEncodedPassword(passwordEncoder.encode(password));
+        Repos.getUserRepository().save(user);
+        updateUsersFromDb();
     }
 
     @Autowired

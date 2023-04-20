@@ -27,6 +27,8 @@ public class DrinkBooking implements Serializable {
 
     @ManyToOne
     private Drink drink;
+    private int amount;
+    private double price;
 
     private boolean active;
 
@@ -64,6 +66,22 @@ public class DrinkBooking implements Serializable {
 
     public void setDrink(Drink drink) {
         this.drink = drink;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public boolean isActive() {

@@ -54,4 +54,29 @@ public class Utils {
     public static String getWorkingDirPath() {
         return WORKING_DIR_ROOT.getAbsolutePath();
     }
+
+    /**
+     * Checks if the given String is not empty
+     *
+     * @param s string to be checked
+     * @return if the string is not null or empty
+     */
+    public static boolean isStringNotEmpty(String s) {
+        return s != null && s.length() != 0;
+    }
+
+    /**
+     * Checks if all the given strings are not empty
+     *
+     * @param strings array of strings
+     * @return if all strings are not null or empty value
+     */
+    public static boolean isStringNotEmpty(String... strings) {
+        for (String s : strings) {
+            if (!isStringNotEmpty(s)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
