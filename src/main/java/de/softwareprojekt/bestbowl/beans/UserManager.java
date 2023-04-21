@@ -83,6 +83,16 @@ public class UserManager {
         updateUsersFromDb();
     }
 
+    /**
+     * Encodes a password
+     *
+     * @param password password to be encoded
+     * @return encoded password
+     */
+    public String encodePassword(String password) {
+        return passwordEncoder.encode(password);
+    }
+
     @Autowired
     public void setUserDetailsManager(UserDetailsManager userDetailsManager) {
         this.userDetailsManager = userDetailsManager;

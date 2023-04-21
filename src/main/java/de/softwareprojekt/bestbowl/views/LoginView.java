@@ -5,6 +5,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.login.LoginForm;
+import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -30,7 +31,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.showNotification;
 @PageTitle("Login")
 @AnonymousAllowed
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
-    private final LoginForm login = new LoginForm();
+    private final LoginForm loginForm = new LoginForm();
     private final Dialog passwordResetDialog;
     private User selectedUserForPasswordReset = null;
     @Resource
@@ -42,9 +43,20 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         setJustifyContentMode(JustifyContentMode.CENTER);
         setAlignItems(Alignment.CENTER);
         passwordResetDialog = createPasswordResetDialog();
-        login.setAction("login");
-        login.addForgotPasswordListener(e -> passwordResetDialog.open());
-        add(new H1("BestBowl"), login);
+        LoginI18n loginI18n = LoginI18n.createDefault();
+        LoginI18n.Form loginI18nForm = loginI18n.getForm();
+        loginI18nForm.setTitle("Anmelden");
+        loginI18nForm.setUsername("Benutzername");
+        loginI18nForm.setPassword("Passwort");
+        loginI18nForm.setSubmit("Anmelden");
+        loginI18nForm.setForgotPassword("Passwort vergessen?");
+        LoginI18n.ErrorMessage loginI18nErrorMessage = loginI18n.getErrorMessage();
+        loginI18nErrorMessage.setTitle("Benutzername oder Passwort falsch");
+        loginI18nErrorMessage.setMessage("Überprüfe deine eingegebenen Daten und versuche es erneut.");
+        loginForm.setI18n(loginI18n);
+        loginForm.setAction("login");
+        loginForm.addForgotPasswordListener(e -> passwordResetDialog.open());
+        add(new H1("BestBowl"), loginForm);
     }
 
     @Override
@@ -53,20 +65,20 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
                 .getQueryParameters()
                 .getParameters()
                 .containsKey("error")) {
-            login.setError(true);
+            loginForm.setError(true);
         }
     }
 
     private Dialog createPasswordResetDialog() {
         Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Reset Password");
-        TextField userNameField = new TextField("Username");
-        TextField questionField = new TextField("Birthday");
-        PasswordField passwordField1 = new PasswordField("new password");
-        PasswordField passwordField2 = new PasswordField("confirm new password");
-        Button cancelButton = new Button("Cancel");
-        Button continueButton = new Button("Continue");
-        Button saveNewPasswordButton = new Button("Save");
+        dialog.setHeaderTitle("Passwort zurücksetzen");
+        TextField userNameField = new TextField("Nutzername");
+        TextField questionField = new TextField("Geburtstag");
+        PasswordField passwordField1 = new PasswordField("Neues Passwort");
+        PasswordField passwordField2 = new PasswordField("Neues Passwort wiederholen");
+        Button cancelButton = new Button("Abbrechen");
+        Button continueButton = new Button("Weiter");
+        Button saveNewPasswordButton = new Button("Sichern");
         continueButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveNewPasswordButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         VerticalLayout layout = new VerticalLayout();
@@ -89,7 +101,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
                 }
             }
             if (selectedUserForPasswordReset == null) {
-                showNotification("Not a valid user or a wrong answer");
+                showNotification("Benutzername oder Antwort falsch");
             } else {
                 userNameField.setValue("");
                 questionField.setValue("");
@@ -103,7 +115,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         });
         saveNewPasswordButton.addClickListener(e -> {
             if (selectedUserForPasswordReset == null) {
-                showNotification("no user selected");
+                showNotification("Kein Benutzer ausgewählt");
             } else {
                 String password1 = passwordField1.getValue();
                 String password2 = passwordField2.getValue();
@@ -113,9 +125,9 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
                     passwordField2.setValue("");
                     selectedUserForPasswordReset = null;
                     dialog.close();
-                    showNotification("password changed");
+                    showNotification("Passwort erfolgreich geändert");
                 } else {
-                    showNotification("passwords don´t match");
+                    showNotification("Passwörter müssen übereinstimmen");
                 }
             }
         });

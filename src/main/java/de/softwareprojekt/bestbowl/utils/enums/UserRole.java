@@ -10,4 +10,11 @@ public class UserRole {
 
     private UserRole() {
     }
+
+    /**
+     * @return a String Array containing all role values
+     */
+    public static String[] getAllValues() {
+        return new String[]{ADMIN, OWNER, EMPLOYEE};
+    }
 }
