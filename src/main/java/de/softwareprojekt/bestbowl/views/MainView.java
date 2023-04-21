@@ -24,7 +24,7 @@ import java.util.Optional;
  * @author Marten Voß
  * @author Matija Kopschek
  * @author Max Ziller
- * @Author Ali aus Mali
+ * @author Ali aus Mali
  */
 public class MainView extends AppLayout implements AppShellConfigurator {
     private final Tabs menu;
@@ -64,7 +64,8 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         return new Tab[]{
                 createTab("Demo", DemoView.class),
                 createTab("Clients", ClientTableView.class),
-                createTab("Admin", ExampleAdminOnlyView.class)
+                createTab("Admin", ExampleAdminOnlyView.class),
+                createTab("Rechnung", InvoiceView.class)
         };
     }
 
