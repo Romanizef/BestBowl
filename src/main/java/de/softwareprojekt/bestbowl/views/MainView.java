@@ -22,6 +22,9 @@ import java.util.Optional;
 
 /**
  * @author Marten Voß
+ * @author Matija Kopschek
+ * @author Max Ziller
+ * @Author Ali aus Mali
  */
 public class MainView extends AppLayout implements AppShellConfigurator {
     private final Tabs menu;
