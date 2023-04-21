@@ -72,7 +72,7 @@ public class MailSenderUtil {
         mimeMessage.setSubject(subject, "UTF-8"); // subject for email being set with UTF-8 encoding (e.g. Umlaute)
         mimeMessage.setText(mailText, "UTF-8"); // message for email being set with UTF-8 encoding (e.g. Umlaute)
         mimeMessage.setSentDate(new Date()); // current Date
-        //TODO Anh�nge
+        //TODO Anhänge
 
 
         mimeMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiverAddresses, false)); // Recipient is only one, no cc																							// person no cc
