@@ -18,8 +18,9 @@ public class Food implements Serializable {
     private int id;
 
     private String name;
-    private int amount;
     private double price;
+    private int stock;
+    private int reorderPoint;
 
     private boolean active;
 
@@ -43,12 +44,20 @@ public class Food implements Serializable {
         this.name = name;
     }
 
-    public int getAmount() {
-        return amount;
+    public int getStock() {
+        return stock;
     }
 
-    public void setAmount(int amount) {
-        this.amount = amount;
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
+
+    public int getReorderPoint() {
+        return reorderPoint;
+    }
+
+    public void setReorderPoint(int reorderPoint) {
+        this.reorderPoint = reorderPoint;
     }
 
     public double getPrice() {

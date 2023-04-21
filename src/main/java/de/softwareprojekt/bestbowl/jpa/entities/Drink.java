@@ -1,10 +1,9 @@
 package de.softwareprojekt.bestbowl.jpa.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * @author Marten Voß
@@ -18,9 +17,10 @@ public class Drink implements Serializable {
     private int id;
 
     private String name;
-    private int amount;
-    private int ml;
-    private double price;
+    @OneToMany(mappedBy = "drink", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<DrinkVariant> drinkVariants;
+    private int stockInMilliliters;
+    private int reorderPoint;
 
     private boolean active;
 
@@ -44,28 +44,28 @@ public class Drink implements Serializable {
         this.name = name;
     }
 
-    public int getAmount() {
-        return amount;
+    public Set<DrinkVariant> getDrinkVariants() {
+        return drinkVariants;
     }
 
-    public void setAmount(int amount) {
-        this.amount = amount;
+    public void setDrinkVariants(Set<DrinkVariant> drinkVariants) {
+        this.drinkVariants = drinkVariants;
     }
 
-    public int getMl() {
-        return ml;
+    public int getStockInMilliliters() {
+        return stockInMilliliters;
     }
 
-    public void setMl(int ml) {
-        this.ml = ml;
+    public void setStockInMilliliters(int stockInMilliliters) {
+        this.stockInMilliliters = stockInMilliliters;
     }
 
-    public double getPrice() {
-        return price;
+    public int getReorderPoint() {
+        return reorderPoint;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public void setReorderPoint(int reorderPoint) {
+        this.reorderPoint = reorderPoint;
     }
 
     public boolean isActive() {

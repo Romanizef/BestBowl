@@ -25,8 +25,7 @@ public class DrinkBooking implements Serializable {
     @Id
     private long timeStamp;
 
-    @ManyToOne
-    private Drink drink;
+    private String name;
     private int amount;
     private double price;
 
@@ -60,12 +59,12 @@ public class DrinkBooking implements Serializable {
         this.timeStamp = timeStamp;
     }
 
-    public Drink getDrink() {
-        return drink;
+    public String getName() {
+        return name;
     }
 
-    public void setDrink(Drink drink) {
-        this.drink = drink;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getAmount() {

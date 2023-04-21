@@ -25,8 +25,7 @@ public class FoodBooking implements Serializable {
     @Id
     private long timeStamp;
 
-    @ManyToOne
-    private Food food;
+    private String name;
     private int amount;
     private double price;
 
@@ -60,12 +59,12 @@ public class FoodBooking implements Serializable {
         this.timeStamp = timeStamp;
     }
 
-    public Food getFood() {
-        return food;
+    public String getName() {
+        return name;
     }
 
-    public void setFood(Food food) {
-        this.food = food;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getAmount() {

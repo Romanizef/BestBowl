@@ -13,7 +13,7 @@ public class DrinkBookingId implements Serializable {
     private static final long serialVersionUID = 5181429790230031383L;
 
     private Client client;
-    private BowlingAlley drink;
+    private BowlingAlley bowlingAlley;
     private long timeStamp;
 
     public DrinkBookingId() {
@@ -27,12 +27,12 @@ public class DrinkBookingId implements Serializable {
         this.client = client;
     }
 
-    public BowlingAlley getDrink() {
-        return drink;
+    public BowlingAlley getBowlingAlley() {
+        return bowlingAlley;
     }
 
-    public void setDrink(BowlingAlley drink) {
-        this.drink = drink;
+    public void setBowlingAlley(BowlingAlley bowlingAlley) {
+        this.bowlingAlley = bowlingAlley;
     }
 
     public long getTimeStamp() {
@@ -48,11 +48,11 @@ public class DrinkBookingId implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DrinkBookingId that = (DrinkBookingId) o;
-        return timeStamp == that.timeStamp && Objects.equals(client, that.client) && Objects.equals(drink, that.drink);
+        return timeStamp == that.timeStamp && Objects.equals(client, that.client) && Objects.equals(bowlingAlley, that.bowlingAlley);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(client, drink, timeStamp);
+        return Objects.hash(client, bowlingAlley, timeStamp);
     }
 }
