@@ -11,7 +11,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-
+import com.vaadin.flow.component.notification.Notification.Position;
 import jakarta.annotation.security.PermitAll;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
@@ -29,17 +29,15 @@ public final class InvoiceView extends VerticalLayout {
     private TabSheet tabs;
     private HorizontalLayout tabLayout;
     private HorizontalLayout buttonLayout;
-    private Button tabSubButton;
-    private Button tabAddButton;
-    private Button payButton;
-    private Button closeButton;
     private Notification errorNotification;
 
     public InvoiceView() {
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         Component tabComponent = tabConfig();
-        Component tabButtonComponent = tabButtonPlacement();
+        Component addButton = addTabAddButton();
+        Component subButton = addTabSubButton();
+        Component tabButtonComponent = tabButtonPlacement(addButton, subButton);
         Component footerComponent = createFooterComponent();
         add(tabComponent, tabButtonComponent, footerComponent);
     }
@@ -51,31 +49,29 @@ public final class InvoiceView extends VerticalLayout {
         tabs.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED,
                 TabSheetVariant.MATERIAL_BORDERED,
                 TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
-        tabs.add("Gesamtrechnung",
-                new Div(new Text("This is the Gesamtrechnung tab content")));
-
+        tabs.add("Gesamtrechnung", new Div(new Text("This is the Gesamtrechnung tab content")));
         tabLayout.add(tabs);
         return tabLayout;
     }
 
-    private final Component tabButtonPlacement() {
+    private final Component tabButtonPlacement(Component addButton, Component subButton) {
         buttonLayout = new HorizontalLayout();
         buttonLayout.setMaxWidth("100%");
-        buttonLayout.add(addTabAddButton(), addTabSubButton());
+        buttonLayout.add(addButton, subButton);
         return buttonLayout;
     }
 
     /**
+     * @param partialBill
      * @param tabs
      * @return
      */
     private final Button addTabAddButton() {
-        tabAddButton = new Button("Teilrechung hinzufügen");
+        Button tabAddButton = new Button("Teilrechung hinzufügen");
         tabAddButton.setIcon(new Icon(VaadinIcon.PLUS_CIRCLE));
         tabAddButton.addClickListener(event -> {
-            tabs.add("Teilrechnung",
-                    new Div(new Text("This is the Teilrechnung tab content")));
-            
+            tabs.setSelectedTab(tabs.add("Teilrechnung",
+                    new Div(new Text("This is the Teilrechnung tab content"))));
         });
         return tabAddButton;
     }
@@ -85,34 +81,31 @@ public final class InvoiceView extends VerticalLayout {
      * @return
      */
     private final Button addTabSubButton() {
-        tabSubButton = new Button("Teilrechung löschen");
+        Button tabSubButton = new Button("Teilrechung löschen");
         tabSubButton.setIcon(new Icon(VaadinIcon.MINUS_CIRCLE));
         tabSubButton.addClickListener(e -> {
             if (!tabs.getSelectedTab().getLabel().equals("Gesamtrechnung")) {
                 tabs.remove(tabs.getSelectedTab());
             } else {
-                showTabDeletionErrorNotification();
+                showTabDeletionErrorNotification();   
             }
         });
         return tabSubButton;
     }
 
-    private Notification showTabDeletionErrorNotification() {
+    private final Notification showTabDeletionErrorNotification() {
         errorNotification = new Notification();
+        errorNotification.setPosition(Position.BOTTOM_CENTER);
         errorNotification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+
         Div text = new Div(new Text("Gesamtrechnung nicht löschbar!"));
+        Icon icon = VaadinIcon.WARNING.create();
 
-        closeButton = new Button(new Icon("lumo", "cross"));
-        closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-        closeButton.getElement().setAttribute("aria-label", "Close");
-        closeButton.addClickListener(event -> {
-            errorNotification.close();
-        });
-
-        HorizontalLayout layout = new HorizontalLayout(text, closeButton);
+        HorizontalLayout layout = new HorizontalLayout(icon, text);
         layout.setAlignItems(Alignment.CENTER);
 
         errorNotification.add(layout);
+        errorNotification.setDuration(3000);
         errorNotification.open();
         return errorNotification;
     }
@@ -121,7 +114,7 @@ public final class InvoiceView extends VerticalLayout {
      * All Configurations of the pay button
      */
     private final Component createFooterComponent() {
-        payButton = new Button("Bezahlen");
+        Button payButton = new Button("Bezahlen");
         payButton.setIcon(new Icon(VaadinIcon.CART));
         payButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY,
                 ButtonVariant.LUMO_LARGE);
