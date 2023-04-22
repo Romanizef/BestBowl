@@ -38,7 +38,7 @@ public final class InvoiceView extends VerticalLayout {
         Component addButton = addTabAddButton();
         Component subButton = addTabSubButton();
         Component tabButtonComponent = tabButtonPlacement(addButton, subButton);
-        Component footerComponent = createFooterComponent();
+        Component footerComponent = createPayButton();
         add(tabComponent, tabButtonComponent, footerComponent);
     }
 
@@ -70,8 +70,7 @@ public final class InvoiceView extends VerticalLayout {
         Button tabAddButton = new Button("Teilrechung hinzufügen");
         tabAddButton.setIcon(new Icon(VaadinIcon.PLUS_CIRCLE));
         tabAddButton.addClickListener(event -> {
-            tabs.setSelectedTab(tabs.add("Teilrechnung",
-                    new Div(new Text("This is the Teilrechnung tab content"))));
+            tabs.setSelectedTab(tabs.add("Teilrechnung", createPartialPayButton()));
         });
         return tabAddButton;
     }
@@ -87,7 +86,7 @@ public final class InvoiceView extends VerticalLayout {
             if (!tabs.getSelectedTab().getLabel().equals("Gesamtrechnung")) {
                 tabs.remove(tabs.getSelectedTab());
             } else {
-                showTabDeletionErrorNotification();   
+                showTabDeletionErrorNotification();
             }
         });
         return tabSubButton;
@@ -113,11 +112,26 @@ public final class InvoiceView extends VerticalLayout {
     /**
      * All Configurations of the pay button
      */
-    private final Component createFooterComponent() {
+    private final Component createPayButton() {
         Button payButton = new Button("Bezahlen");
         payButton.setIcon(new Icon(VaadinIcon.CART));
         payButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY,
                 ButtonVariant.LUMO_LARGE);
+        payButton.setDisableOnClick(true);
+        payButton.addClickListener(clickEvent -> {
+            showNotification("Rechnung bezahlt");
+        });
+        return payButton;
+    }
+
+    /**
+     * All Configurations of the pay button
+     */
+    private final Component createPartialPayButton() {
+        Button payButton = new Button("Bezahlen");
+        payButton.setIcon(new Icon(VaadinIcon.CART));
+        payButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY,
+                ButtonVariant.LUMO_SMALL);
         payButton.setDisableOnClick(true);
         payButton.addClickListener(clickEvent -> {
             showNotification("Rechnung bezahlt");
