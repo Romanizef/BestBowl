@@ -57,7 +57,7 @@ public class UserManagementView extends VerticalLayout {
         add(newUserButton, gridLayout);
     }
 
-    private void updateEditLayoutVisibility() {
+    private void updateEditLayoutState() {
         if (selectedUser == null) {
             editLayout.getChildren().forEach(component -> {
                 if (component instanceof HasEnabled c) {
@@ -81,7 +81,7 @@ public class UserManagementView extends VerticalLayout {
             userGrid.deselectAll();
             selectedUser = new User();
             binder.readBean(selectedUser);
-            updateEditLayoutVisibility();
+            updateEditLayoutState();
         });
         return button;
     }
@@ -99,12 +99,12 @@ public class UserManagementView extends VerticalLayout {
         Grid<User> grid = new Grid<>(User.class);
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         grid.removeAllColumns();
-        Grid.Column<User> idColumn = grid.addColumn(User::getId).setHeader("ID");
+        Grid.Column<User> idColumn = grid.addColumn("id").setHeader("ID");
         Grid.Column<User> nameColumn = grid.addColumn("name").setHeader("Name");
         Grid.Column<User> emailColumn = grid.addColumn("email").setHeader("E-Mail");
         Grid.Column<User> answerColumn = grid.addColumn("securityQuestionAnswer").setHeader("Sicherheitsfragenantwort");
         Grid.Column<User> roleColumn = grid.addColumn("role").setHeader("Nutzerrolle");
-        Grid.Column<User> activeColumn = grid.addColumn("active").setHeader("Aktiv");
+        Grid.Column<User> activeColumn = grid.addColumn(user -> user.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setWidth("75%");
@@ -134,7 +134,7 @@ public class UserManagementView extends VerticalLayout {
                     binder.readBean(new User());
                 }
             }
-            updateEditLayoutVisibility();
+            updateEditLayoutState();
         });
         return grid;
     }

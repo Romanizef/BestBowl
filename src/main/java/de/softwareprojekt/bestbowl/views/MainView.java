@@ -45,7 +45,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         addToNavbar(headerLayout);
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
-        setDrawerOpened(false);
+        setDrawerOpened(true);
     }
 
     private static Tab createTab(String text, Class<? extends Component> navigationTarget) {
@@ -63,6 +63,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
     private Tab[] createMenuItems() {
         return new Tab[]{
                 createTab("Demo", DemoView.class),
+                createTab("Kunde suchen", ClientSearchView.class),
                 createTab("Rechnung", InvoiceView.class),
                 createTab("Nutzerverwaltung", UserManagementView.class),
                 createTab("Datenbank", DatabaseRedirectView.class)

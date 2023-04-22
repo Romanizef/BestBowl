@@ -30,6 +30,11 @@ public class Client implements Serializable {
         active = true;
     }
 
+    public void addAddress(Address address) {
+        this.address = address;
+        address.setClient(this);
+    }
+
     public int getId() {
         return id;
     }

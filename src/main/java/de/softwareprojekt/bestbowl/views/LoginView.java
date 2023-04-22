@@ -6,6 +6,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -71,19 +72,32 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
     private Dialog createPasswordResetDialog() {
         Dialog dialog = new Dialog();
+        dialog.setWidth("350px");
         dialog.setHeaderTitle("Passwort zurücksetzen");
-        TextField userNameField = new TextField("Nutzername");
-        TextField questionField = new TextField("Geburtstag");
-        PasswordField passwordField1 = new PasswordField("Neues Passwort");
-        PasswordField passwordField2 = new PasswordField("Neues Passwort wiederholen");
-        Button cancelButton = new Button("Abbrechen");
-        Button continueButton = new Button("Weiter");
-        Button saveNewPasswordButton = new Button("Sichern");
-        continueButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        saveNewPasswordButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        dialog.setCloseOnOutsideClick(false);
+        dialog.setCloseOnEsc(true);
         VerticalLayout layout = new VerticalLayout();
+        layout.setWidthFull();
+        TextField userNameField = new TextField("Nutzername");
+        userNameField.setWidthFull();
+        TextField questionField = new TextField("Geburtstag");
+        questionField.setWidthFull();
+        PasswordField passwordField1 = new PasswordField("Neues Passwort");
+        passwordField1.setWidthFull();
+        PasswordField passwordField2 = new PasswordField("Neues Passwort wiederholen");
+        passwordField2.setWidthFull();
         layout.add(userNameField, questionField, passwordField1, passwordField2);
         dialog.add(layout);
+        HorizontalLayout footerLayout = new HorizontalLayout();
+        footerLayout.setWidthFull();
+        Button cancelButton = new Button("Abbrechen");
+        Button continueButton = new Button("Weiter");
+        continueButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        Button saveNewPasswordButton = new Button("Sichern");
+        saveNewPasswordButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        footerLayout.add(cancelButton, continueButton, saveNewPasswordButton);
+        footerLayout.setFlexGrow(1, cancelButton, continueButton, saveNewPasswordButton);
+        dialog.getFooter().add(footerLayout);
         cancelButton.addClickListener(e -> {
             selectedUserForPasswordReset = null;
             dialog.close();
@@ -131,7 +145,6 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
                 }
             }
         });
-        dialog.getFooter().add(cancelButton, continueButton, saveNewPasswordButton);
         dialog.addOpenedChangeListener(e -> {
             selectedUserForPasswordReset = null;
             userNameField.setValue("");
