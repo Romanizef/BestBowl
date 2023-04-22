@@ -21,6 +21,9 @@ public class Client implements Serializable {
     @OneToOne(mappedBy = "client", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private Address address;
+    @OneToOne(mappedBy = "client", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private Statistic statistic;
     @ManyToOne
     private Association association;
 

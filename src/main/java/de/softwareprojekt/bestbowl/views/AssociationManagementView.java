@@ -32,7 +32,6 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderSt
 
 /**
  * @author Matija Kopschek
- * @author Martin Voß
  */
 @Route(value = "associationManagement", layout = MainView.class)
 @PageTitle("Vereinsverwaltung")
@@ -164,7 +163,7 @@ public class AssociationManagementView extends VerticalLayout{
         private final GridListDataView<Association> dataView;
         private String id;
         private String name;
-        private double discount;
+        private String discount;
         private boolean active;
 
         public AssociationFilter(GridListDataView<Association> dataView) {
@@ -175,9 +174,9 @@ public class AssociationManagementView extends VerticalLayout{
         public boolean test(Association association) {
             boolean matchesId = matches(String.valueOf(association.getId()), id);
             boolean matchesName = matches(association.getName(), name);
-            //boolean matchesDiscount = association.getDiscount() == discount;
+            boolean matchesDiscount = matches(String.valueOf(association.getDiscount()), discount);
             boolean matchesActive = association.isActive() == active;
-            return matchesId && matchesName  && matchesActive;
+            return matchesId && matchesDiscount && matchesName  && matchesActive;
         }
 
         private boolean matches(String value, String searchTerm) {
@@ -194,7 +193,7 @@ public class AssociationManagementView extends VerticalLayout{
             dataView.refreshAll();
         }
 
-        public void setDiscount(double discount) {
+        public void setDiscount(String discount) {
             this.discount = discount;
             dataView.refreshAll();
         }

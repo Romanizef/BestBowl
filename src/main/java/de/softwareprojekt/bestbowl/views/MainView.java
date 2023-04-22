@@ -67,6 +67,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
                 createTab("Rechnung", InvoiceView.class),
                 createTab("Nutzerverwaltung", UserManagementView.class),
                 createTab("Vereinsverwaltung", AssociationManagementView.class),
+                createTab("Statistiken", StatisticsView.class),
                 createTab("Datenbank", DatabaseRedirectView.class)
         };
     }
