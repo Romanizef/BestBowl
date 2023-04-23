@@ -1,5 +1,6 @@
 package de.softwareprojekt.bestbowl.views;
 
+import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import jakarta.annotation.security.RolesAllowed;
-import de.softwareprojekt.bestbowl.jpa.entities.Statistic;
-import de.softwareprojekt.bestbowl.jpa.repositories.StatisticsRepository;
 import de.softwareprojekt.bestbowl.utils.Utils;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 
@@ -36,15 +35,12 @@ public class StatisticsView extends VerticalLayout {
     private Statistic selectedStatistic = null;
     private final Binder<Statistic> binder = new Binder<>();
     private TextField searchField;
-    private final StatisticsRepository statisticsRepository;
 
-    @Autowired
-    public StatisticsView(StatisticsRepository statisticsRepository) {
-        this.statisticsRepository = statisticsRepository;
+    public StatisticsView() {
         setSizeFull();
         Component searchComponent = createSearchComponent();
         HorizontalLayout gridLayout = createGridLayout();
-        add(searchComponent, gridLayout);
+        add(searchComponent, gridLayout, createDownloadAsPDFButton());
     }
 
     private Component createSearchComponent() {
@@ -62,12 +58,15 @@ public class StatisticsView extends VerticalLayout {
         return searchLayout;
     }
 
+    /**
+     * TODO Tabelle bei jeder Bestellung updaten
+     */
     private void updateGridItems() {
         String searchString = searchField.getValue();
         if (Utils.isStringNotEmpty(searchString)) {
-            statisticGrid.setItems(statisticsRepository.findAllByAnyFieldContainingStringAndActive(searchString, true));
+            //statisticGrid.setItems(statisticsRepository.findAllByAnyFieldContainingStringAndActive(searchString, true));
         } else {
-            statisticGrid.setItems(statisticsRepository.findAllByActiveEquals(true));
+            //statisticGrid.setItems(statisticsRepository.findAllByActiveEquals(true));
         }
     }
 
@@ -79,17 +78,19 @@ public class StatisticsView extends VerticalLayout {
         return layout;
     }
 
+
+    /** TODO Daten aus record Statistike Klasse
+     * @return
+     */
     private Grid<Statistic> createGrid() {
         Grid<Statistic> grid = new Grid<>(Statistic.class);
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         grid.removeAllColumns();
-        grid.addColumn("id").setHeader("RechnungsID");
-        grid.addColumn("cID").setHeader("KundenID");
-        grid.addColumn("cLastName").setHeader("Kundenname");
-        grid.addColumn("date").setHeader("Datum");
-        grid.addColumn("total").setHeader("Summe");
-        grid.addColumn(statistic -> statistic.isActive() ? "Aktiv" : "Inaktiv")
-                .setHeader("Aktiv");
+        grid.addColumn(statistic -> statistic.id()).setHeader("ID");
+        grid.addColumn(statistic -> statistic.clientID()).setHeader("KundenID");
+        grid.addColumn(statistic -> statistic.clientLastName()).setHeader("Nachname");
+        grid.addColumn(statistic -> statistic.date()).setHeader("Datum");
+        grid.addColumn(statistic -> statistic.total()).setHeader("Summe");
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setSizeFull();
         grid.addSelectionListener(e -> {
@@ -104,12 +105,14 @@ public class StatisticsView extends VerticalLayout {
     private Button createDownloadAsPDFButton() {
         Button pdfButton = new Button("PDF");
         pdfButton.setIcon(new Icon(VaadinIcon.DOWNLOAD));
-        pdfButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        pdfButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
         pdfButton.addClickListener(e -> {
-            statisticGrid.deselectAll();
-            selectedStatistic = new Statistic();
-            binder.readBean(selectedStatistic);
+            //TODO pdf erstellen und downloaden
         });
         return pdfButton;
+    }
+
+    private record Statistic(int id, int clientID, String clientLastName, Date date, double total){
+
     }
 }
