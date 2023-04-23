@@ -46,20 +46,28 @@ public class StatisticsView extends VerticalLayout {
     private Component createSearchComponent() {
         HorizontalLayout searchLayout = new HorizontalLayout();
         searchLayout.setWidth("70%");
+        searchFieldConfig();
+        searchButtonConfig(searchLayout);
+        return searchLayout;
+    }
+
+    private void searchFieldConfig() {
         searchField = new TextField();
         searchField.setPlaceholder("Suche nach Kundennummer, Rechnungsnummer oder Nachname ...");
         searchField.setValueChangeMode(ValueChangeMode.EAGER);
         searchField.addValueChangeListener(e -> updateGridItems());
+    }
+
+    private void searchButtonConfig(HorizontalLayout searchLayout) {
         Button searchButton = new Button();
         searchButton.setIcon(VaadinIcon.SEARCH.create());
         searchButton.addClickListener(e -> updateGridItems());
         searchLayout.expand(searchField);
         searchLayout.add(searchField, searchButton);
-        return searchLayout;
     }
 
     /**
-     * TODO Tabelle bei jeder Bestellung updaten
+     * TODO Tabelle aktualisieren je nach Suchangabe
      */
     private void updateGridItems() {
         String searchString = searchField.getValue();
