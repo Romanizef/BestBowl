@@ -3,6 +3,7 @@ package de.softwareprojekt.bestbowl.jpa.entities;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -25,7 +26,13 @@ public class Drink implements Serializable {
     private boolean active;
 
     public Drink() {
+        drinkVariants = new HashSet<>();
         active = true;
+    }
+
+    public void addDrinkVariant(DrinkVariant drinkVariant) {
+        drinkVariants.add(drinkVariant);
+        drinkVariant.setDrink(this);
     }
 
     public int getId() {

@@ -18,6 +18,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteAlias;
 import de.softwareprojekt.bestbowl.jpa.entities.Association;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepository;
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 
 @Route(value = "clientSearch", layout = MainView.class)
+@RouteAlias(value = "", layout = MainView.class)
 @PageTitle("Kundensuche")
 @PermitAll
 public class ClientSearchView extends VerticalLayout {
@@ -169,11 +171,7 @@ public class ClientSearchView extends VerticalLayout {
         nextStepButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         nextStepButton.setWidth("55%");
         layout.add(selectedClientLabel, nextStepButton);
-        nextStepButton.addClickListener(e -> UI.getCurrent().navigate(DemoView.class).ifPresent(demoView -> {
-            if (selectedClient != null) {
-                demoView.setSelectedClient(selectedClient);
-            }
-        }));
+        nextStepButton.addClickListener(e -> UI.getCurrent().navigate(BowlingAlleyBookingView.class).ifPresent(bookingView -> bookingView.setSelectedClient(selectedClient)));
         return layout;
     }
 

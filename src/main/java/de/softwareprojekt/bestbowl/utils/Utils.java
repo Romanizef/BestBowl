@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Locale;
 
 /**
  * @author Marten Voß
@@ -78,5 +79,15 @@ public class Utils {
             }
         }
         return true;
+    }
+
+    /**
+     * Formats a double to 2 decimal places with german locale
+     *
+     * @param d double to be formatted
+     * @return the formatted string
+     */
+    public static String formatDouble(double d) {
+        return String.format(Locale.GERMANY, "%.2f", d);
     }
 }

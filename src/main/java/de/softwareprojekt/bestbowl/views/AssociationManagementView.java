@@ -1,7 +1,5 @@
 package de.softwareprojekt.bestbowl.views;
 
-import java.util.List;
-
 import com.vaadin.flow.component.HasEnabled;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -18,38 +16,40 @@ import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import de.softwareprojekt.bestbowl.jpa.entities.Association;
 import de.softwareprojekt.bestbowl.jpa.repositories.AssociationRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.Optional;
 
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderBoolean;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderString;
 
 /**
  * @author Matija Kopschek
+ * @author Marten Voß
  */
 @Route(value = "associationManagement", layout = MainView.class)
 @PageTitle("Vereinsverwaltung")
 @RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
-public class AssociationManagementView extends VerticalLayout{
-    private Grid<Association> associationGrid;
-    private Association selectedAssociation = null;
+public class AssociationManagementView extends VerticalLayout {
     private final Binder<Association> binder = new Binder<>();
-    private FormLayout editLayout;
     private final AssociationRepository associationRepository;
+    private Grid<Association> associationGrid;
+    private FormLayout editLayout;
+    private Association selectedAssociation = null;
 
     @Autowired
-    public AssociationManagementView(AssociationRepository associationRepository){
+    public AssociationManagementView(AssociationRepository associationRepository) {
         this.associationRepository = associationRepository;
         setSizeFull();
         Button newAssociationButton = createNewAssociationButton();
         HorizontalLayout gridLayout = createGridLayout();
         add(newAssociationButton, gridLayout);
+        updateEditLayoutState();
     }
 
     private void updateEditLayoutState() {
@@ -96,7 +96,7 @@ public class AssociationManagementView extends VerticalLayout{
         grid.removeAllColumns();
         Grid.Column<Association> idColumn = grid.addColumn("id").setHeader("ID");
         Grid.Column<Association> nameColumn = grid.addColumn("name").setHeader("Name");
-        //Grid.Column<Association> discountColumn = grid.addColumn("Discount").setHeader("Rabatt");
+        Grid.Column<Association> discountColumn = grid.addColumn("discount").setHeader("Rabatt");
         Grid.Column<Association> activeColumn = grid.addColumn(association -> association.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
@@ -110,7 +110,7 @@ public class AssociationManagementView extends VerticalLayout{
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(idColumn).setComponent(createFilterHeaderString("ID", associationFilter::setId));
         headerRow.getCell(nameColumn).setComponent(createFilterHeaderString("Name", associationFilter::setName));
-       // headerRow.getCell(discountColumn).setComponent(createFilterHeaderString("Discount", associationFilter::setDiscount));
+        headerRow.getCell(discountColumn).setComponent(createFilterHeaderString("Rabatt", associationFilter::setDiscount));
         headerRow.getCell(activeColumn).setComponent(createFilterHeaderBoolean(associationFilter::setActive, true));
         associationFilter.setActive(true);
 
@@ -136,9 +136,9 @@ public class AssociationManagementView extends VerticalLayout{
         TextField nameField = new TextField("Name");
         nameField.setWidthFull();
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-        TextField discount = new TextField("Rabatt");
-        discount.setWidthFull();
-        discount.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        TextField discountField = new TextField("Rabatt");
+        discountField.setWidthFull();
+        discountField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         HorizontalLayout checkboxLayout = new HorizontalLayout();
         checkboxLayout.setAlignItems(Alignment.CENTER);
         checkboxLayout.setWidthFull();
@@ -152,9 +152,9 @@ public class AssociationManagementView extends VerticalLayout{
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         buttonLayout.add(cancelButton, saveButton);
         buttonLayout.setFlexGrow(1, cancelButton, saveButton);
-        layout.add(nameField, discount, checkboxLayout, buttonLayout);
+        layout.add(nameField, discountField, checkboxLayout, buttonLayout);
         binder.bind(nameField, Association::getName, Association::setName);
-        //binder.bind(discount, Association::getDiscount, Association::setDiscount);
+        binder.bind(discountField, a -> String.valueOf(a.getDiscount()), (association, s) -> association.setDiscount(Double.parseDouble(s)));
         binder.bind(activeCheckbox, Association::isActive, Association::setActive);
         return layout;
     }
@@ -176,7 +176,7 @@ public class AssociationManagementView extends VerticalLayout{
             boolean matchesName = matches(association.getName(), name);
             boolean matchesDiscount = matches(String.valueOf(association.getDiscount()), discount);
             boolean matchesActive = association.isActive() == active;
-            return matchesId && matchesDiscount && matchesName  && matchesActive;
+            return matchesId && matchesDiscount && matchesName && matchesActive;
         }
 
         private boolean matches(String value, String searchTerm) {
