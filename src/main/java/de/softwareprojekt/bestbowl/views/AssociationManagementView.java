@@ -49,6 +49,7 @@ public class AssociationManagementView extends VerticalLayout {
         Button newAssociationButton = createNewAssociationButton();
         HorizontalLayout gridLayout = createGridLayout();
         add(newAssociationButton, gridLayout);
+        updateEditLayoutState();
     }
 
     private void updateEditLayoutState() {

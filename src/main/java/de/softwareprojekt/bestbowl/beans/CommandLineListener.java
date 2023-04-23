@@ -2,9 +2,7 @@ package de.softwareprojekt.bestbowl.beans;
 
 import com.github.javafaker.Faker;
 import de.softwareprojekt.bestbowl.BestBowlApplication;
-import de.softwareprojekt.bestbowl.jpa.entities.Address;
-import de.softwareprojekt.bestbowl.jpa.entities.Association;
-import de.softwareprojekt.bestbowl.jpa.entities.Client;
+import de.softwareprojekt.bestbowl.jpa.entities.*;
 import de.softwareprojekt.bestbowl.utils.PDFUtils;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import jakarta.annotation.PostConstruct;
@@ -14,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.util.*;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
@@ -53,11 +52,28 @@ public class CommandLineListener {
                         generateRandomClients(100);
                         LOGGER.info("Clients generated");
                     } else if (command.equals("generateRandomAssociations")) {
-                        LOGGER.info("Associations generated");
                         generateRandomAssociations(10);
+                        LOGGER.info("Associations generated");
                     } else if (command.equals("connectSomeClientsToAssociations")) {
                         connectRandomClientsAndAssociations(50);
                         LOGGER.info("random connections done");
+                    } else if (command.equals("generateRandomFoods")) {
+                        generateRandomFoods(4);
+                        LOGGER.info("Foods generated");
+                    } else if (command.equals("generateRandomDrinks")) {
+                        generateRandomDrinks(4);
+                        LOGGER.info("Drinks generated");
+                    } else if (command.equals("generateRandomShoes")) {
+                        generateRandomShoes(50);
+                        LOGGER.info("Shoes generated");
+                    } else if (command.equals("generateEverything")) {
+                        generateRandomClients(200);
+                        generateRandomAssociations(20);
+                        connectRandomClientsAndAssociations(100);
+                        generateRandomFoods(7);
+                        generateRandomDrinks(7);
+                        generateRandomShoes(100);
+                        LOGGER.info("everything generated");
                     } else if (command.equals("demoPdf")) {
                         PDFUtils.createDemoPdf();
                         LOGGER.info("pdf created");
@@ -130,10 +146,56 @@ public class CommandLineListener {
             if (client.getAssociation() == null) {
                 Association association = associationList.get(random.nextInt(associationList.size()));
                 association.addClient(client);
-                Repos.getClientRepository().save(client);
-                Repos.getAssociationRepository().save(association);
             }
         }
+        Repos.getAssociationRepository().saveAll(associationList);
+    }
+
+    private void generateRandomFoods(int count) {
+        List<Food> foodList = new ArrayList<>(count);
+        Faker faker = new Faker();
+        for (int i = 0; i < count; i++) {
+            Food food = new Food();
+            food.setName(faker.food().dish());
+            food.setPrice(faker.random().nextInt(3, 10));
+            food.setStock(faker.random().nextInt(5, 20));
+            food.setReorderPoint(3);
+            foodList.add(food);
+        }
+        Repos.getFoodRepository().saveAll(foodList);
+    }
+
+    private void generateRandomDrinks(int count) {
+        List<Drink> foodList = new ArrayList<>(count);
+        Faker faker = new Faker();
+        for (int i = 0; i < count; i++) {
+            Drink drink = new Drink();
+            drink.setName(faker.food().dish());
+            drink.setStockInMilliliters(faker.random().nextInt(15, 45) * 1000);
+            drink.setReorderPoint(5000);
+            double price = faker.random().nextInt(1, 3);
+            for (int j = 1; j <= 3; j++) {
+                DrinkVariant drinkVariant = new DrinkVariant();
+                drinkVariant.setMl(j * 250);
+                drinkVariant.setPrice(j * price);
+                drink.addDrinkVariant(drinkVariant);
+            }
+            foodList.add(drink);
+        }
+        Repos.getDrinkRepository().saveAll(foodList);
+    }
+
+    public void generateRandomShoes(int count) {
+        List<BowlingShoe> bowlingShoeList = new ArrayList<>(count);
+        Faker faker = new Faker();
+        long currentTime = System.currentTimeMillis();
+        for (int i = 0; i < count; i++) {
+            BowlingShoe bowlingShoe = new BowlingShoe();
+            bowlingShoe.setSize(faker.random().nextInt(30, 50));
+            bowlingShoe.setBoughtAt(currentTime - faker.random().nextInt(1, 100) * Duration.ofDays(1).toMillis());
+            bowlingShoeList.add(bowlingShoe);
+        }
+        Repos.getBowlingShoeRepository().saveAll(bowlingShoeList);
     }
 
     @Autowired
