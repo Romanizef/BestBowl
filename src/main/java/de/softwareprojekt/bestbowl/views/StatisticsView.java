@@ -1,10 +1,5 @@
 package de.softwareprojekt.bestbowl.views;
 
-import java.util.Date;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -15,25 +10,24 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
-import jakarta.annotation.security.RolesAllowed;
-import de.softwareprojekt.bestbowl.utils.Utils;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import jakarta.annotation.security.RolesAllowed;
+
+import java.util.Date;
+import java.util.Optional;
 
 /**
  * @author Matija Kopschek
  */
 @Route(value = "statistics", layout = MainView.class)
 @PageTitle("Statistiken")
-@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
+@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 public class StatisticsView extends VerticalLayout {
     private Grid<Statistic> statisticGrid;
     private Statistic selectedStatistic = null;
-    private final Binder<Statistic> binder = new Binder<>();
     private TextField searchField;
 
     public StatisticsView() {
@@ -66,16 +60,8 @@ public class StatisticsView extends VerticalLayout {
         searchLayout.add(searchField, searchButton);
     }
 
-    /**
-     * TODO Tabelle aktualisieren je nach Suchangabe
-     */
+    //TODO Tabelle aktualisieren je nach Suchangabe
     private void updateGridItems() {
-        String searchString = searchField.getValue();
-        if (Utils.isStringNotEmpty(searchString)) {
-            //statisticGrid.setItems(statisticsRepository.findAllByAnyFieldContainingStringAndActive(searchString, true));
-        } else {
-            //statisticGrid.setItems(statisticsRepository.findAllByActiveEquals(true));
-        }
     }
 
     private HorizontalLayout createGridLayout() {
@@ -86,25 +72,22 @@ public class StatisticsView extends VerticalLayout {
         return layout;
     }
 
-
-    /** TODO Daten aus record Statistike Klasse
-     * @return
-     */
+    //TODO Daten aus record Statistike Klasse
     private Grid<Statistic> createGrid() {
         Grid<Statistic> grid = new Grid<>(Statistic.class);
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         grid.removeAllColumns();
-        grid.addColumn(statistic -> statistic.id()).setHeader("ID");
-        grid.addColumn(statistic -> statistic.clientID()).setHeader("KundenID");
-        grid.addColumn(statistic -> statistic.clientLastName()).setHeader("Nachname");
-        grid.addColumn(statistic -> statistic.date()).setHeader("Datum");
-        grid.addColumn(statistic -> statistic.total()).setHeader("Summe");
+        grid.addColumn(Statistic::id).setHeader("ID");
+        grid.addColumn(Statistic::clientID).setHeader("KundenID");
+        grid.addColumn(Statistic::clientLastName).setHeader("Nachname");
+        grid.addColumn(Statistic::date).setHeader("Datum");
+        grid.addColumn(Statistic::total).setHeader("Summe");
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setSizeFull();
         grid.addSelectionListener(e -> {
             if (e.isFromClient()) {
-                Optional<Statistic> optionalClient = e.getFirstSelectedItem();
-                selectedStatistic = optionalClient.orElse(null);
+                Optional<Statistic> optionalStatistic = e.getFirstSelectedItem();
+                selectedStatistic = optionalStatistic.orElse(null);
             }
         });
         return grid;
@@ -120,7 +103,6 @@ public class StatisticsView extends VerticalLayout {
         return pdfButton;
     }
 
-    private record Statistic(int id, int clientID, String clientLastName, Date date, double total){
-
+    private record Statistic(int id, int clientID, String clientLastName, Date date, double total) {
     }
 }

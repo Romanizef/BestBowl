@@ -14,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
 
@@ -96,11 +93,28 @@ public class CommandLineListener {
     }
 
     private void generateRandomAssociations(int count) {
+        List<Association> existingAssociations = Repos.getAssociationRepository().findAll();
+        Set<String> existingNames = new HashSet<>();
+        existingAssociations.forEach(a -> existingNames.add(a.getName()));
+
         List<Association> associationList = new ArrayList<>(count);
         Faker faker = new Faker();
         for (int i = 0; i < count; i++) {
             Association association = new Association();
-            association.setName(faker.nation().language() + "-BowlingStars");
+            String name = null;
+            int counter = 0;
+            while (name == null && counter < 20) {
+                String s = faker.nation().language() + "-BowlingStars";
+                if (!existingNames.contains(s)) {
+                    name = s;
+                }
+                counter++;
+            }
+            if (name == null) {
+                continue;
+            }
+            existingNames.add(name);
+            association.setName(name);
             association.setDiscount(5);
             associationList.add(association);
         }
