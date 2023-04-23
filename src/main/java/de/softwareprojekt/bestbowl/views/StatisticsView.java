@@ -33,7 +33,6 @@ import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 public class StatisticsView extends VerticalLayout {
     private Grid<Statistic> statisticGrid;
     private Statistic selectedStatistic = null;
-    private final Binder<Statistic> binder = new Binder<>();
     private TextField searchField;
 
     public StatisticsView() {
