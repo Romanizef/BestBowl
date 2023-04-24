@@ -55,6 +55,7 @@ public class UserManagementView extends VerticalLayout {
         Button newUserButton = createNewUserButton();
         HorizontalLayout gridLayout = createGridLayout();
         add(newUserButton, gridLayout);
+        updateEditLayoutState();
     }
 
     private void updateEditLayoutState() {
