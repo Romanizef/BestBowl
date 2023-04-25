@@ -40,7 +40,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
  */
 @Route(value = "userManagement", layout = MainView.class)
 @PageTitle("Nutzerverwaltung")
-@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
+@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
 public class UserManagementView extends VerticalLayout {
     private final UserRepository userRepository;
     private final Binder<User> binder = new Binder<>();
@@ -107,7 +107,8 @@ public class UserManagementView extends VerticalLayout {
         Grid.Column<User> emailColumn = grid.addColumn("email").setHeader("E-Mail");
         Grid.Column<User> answerColumn = grid.addColumn("securityQuestionAnswer").setHeader("Sicherheitsfragenantwort");
         Grid.Column<User> roleColumn = grid.addColumn("role").setHeader("Nutzerrolle");
-        Grid.Column<User> activeColumn = grid.addColumn(user -> user.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
+        Grid.Column<User> activeColumn = grid.addColumn(user -> user.isActive() ? "Aktiv" : "Inaktiv")
+                .setHeader("Aktiv");
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setWidth("75%");
@@ -121,9 +122,11 @@ public class UserManagementView extends VerticalLayout {
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", userFilter::setId));
         headerRow.getCell(nameColumn).setComponent(createFilterHeaderString("Name", userFilter::setName));
         headerRow.getCell(emailColumn).setComponent(createFilterHeaderString("E-Mail", userFilter::setEmail));
-        headerRow.getCell(answerColumn).setComponent(createFilterHeaderString("Sicherheitsfragenantwort", userFilter::setSecurityQuestionAnswer));
+        headerRow.getCell(answerColumn).setComponent(
+                createFilterHeaderString("Sicherheitsfragenantwort", userFilter::setSecurityQuestionAnswer));
         headerRow.getCell(roleColumn).setComponent(createFilterHeaderString("Rolle", userFilter::setRole));
-        headerRow.getCell(activeColumn).setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", userFilter::setActive));
+        headerRow.getCell(activeColumn)
+                .setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", userFilter::setActive));
         userFilter.setActive(true);
 
         grid.addSelectionListener(e -> {
@@ -169,7 +172,8 @@ public class UserManagementView extends VerticalLayout {
         Checkbox activeCheckbox = new Checkbox("Aktiv");
         checkboxLayout.add(activeCheckbox);
 
-        layout.add(nameField, emailField, passwordField, securityQuestionAnswerField, roleCB, checkboxLayout, buttonLayoutConfig());
+        layout.add(nameField, emailField, passwordField, securityQuestionAnswerField, roleCB, checkboxLayout,
+                buttonLayoutConfig());
         binder.bind(nameField, User::getName, User::setName);
         binder.bind(emailField, User::getEmail, User::setEmail);
         binder.bind(passwordField, user -> "", (user, s) -> user.setEncodedPassword(userManager.encodePassword(s)));
