@@ -37,6 +37,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * @author Marten Voß
+ * @author Matija Kopschek
  */
 @Route(value = "userManagement", layout = MainView.class)
 @PageTitle("Nutzerverwaltung")
@@ -58,22 +59,6 @@ public class UserManagementView extends VerticalLayout {
         HorizontalLayout gridLayout = createGridLayout();
         add(newUserButton, gridLayout);
         updateEditLayoutState();
-    }
-
-    private void updateEditLayoutState() {
-        if (selectedUser == null) {
-            editLayout.getChildren().forEach(component -> {
-                if (component instanceof HasEnabled c) {
-                    c.setEnabled(false);
-                }
-            });
-        } else {
-            editLayout.getChildren().forEach(component -> {
-                if (component instanceof HasEnabled c) {
-                    c.setEnabled(true);
-                }
-            });
-        }
     }
 
     private Button createNewUserButton() {
@@ -151,24 +136,30 @@ public class UserManagementView extends VerticalLayout {
         TextField nameField = new TextField("Name");
         nameField.setWidthFull();
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
         TextField emailField = new TextField("E-Mail");
         emailField.setWidthFull();
         emailField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
         PasswordField passwordField = new PasswordField("Passwort");
         passwordField.setWidthFull();
         passwordField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
         TextField securityQuestionAnswerField = new TextField("Sicherheitsfragenantwort");
         securityQuestionAnswerField.setWidthFull();
         securityQuestionAnswerField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
         ComboBox<String> roleCB = new ComboBox<>("Nutzerrolle");
         roleCB.setWidthFull();
         roleCB.setAllowCustomValue(false);
         roleCB.setItems(UserRole.getAllValues());
         roleCB.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
+
         HorizontalLayout checkboxLayout = new HorizontalLayout();
         checkboxLayout.setAlignItems(Alignment.CENTER);
         checkboxLayout.setWidthFull();
         checkboxLayout.setHeight("50px");
+
         Checkbox activeCheckbox = new Checkbox("Aktiv");
         checkboxLayout.add(activeCheckbox);
 
@@ -205,13 +196,28 @@ public class UserManagementView extends VerticalLayout {
     }
 
     private Button cancelButtonConfig(Button cancelButton) {
-        cancelButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
         cancelButton.addClickListener(clickEvent -> {
             showNotification("Bearbeitung abgebrochen");
             disableEditLayout();
         });
         return cancelButton;
+    }
+
+    private void updateEditLayoutState() {
+        if (selectedUser == null) {
+            disableEditLayout();
+        } else {
+            enableEditLayout();
+        }
+    }
+
+    private void enableEditLayout() {
+        editLayout.getChildren().forEach(component -> {
+            if (component instanceof HasEnabled c) {
+                c.setEnabled(true);
+            }
+        });
     }
 
     private void disableEditLayout() {

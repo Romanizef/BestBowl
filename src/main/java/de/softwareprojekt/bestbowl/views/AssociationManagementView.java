@@ -122,16 +122,20 @@ public class AssociationManagementView extends VerticalLayout {
     private FormLayout createEditLayout() {
         FormLayout layout = new FormLayout();
         layout.setWidth("25%");
+
         TextField nameField = new TextField("Name");
         nameField.setWidthFull();
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
         TextField discountField = new TextField("Rabatt");
         discountField.setWidthFull();
         discountField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
         HorizontalLayout checkboxLayout = new HorizontalLayout();
         checkboxLayout.setAlignItems(Alignment.CENTER);
         checkboxLayout.setWidthFull();
         checkboxLayout.setHeight("50px");
+
         Checkbox activeCheckbox = new Checkbox("Aktiv");
         checkboxLayout.add(activeCheckbox);
         layout.add(nameField, discountField, checkboxLayout, buttonLayoutConfig());
@@ -165,7 +169,6 @@ public class AssociationManagementView extends VerticalLayout {
     }
 
     private Button cancelButtonConfig(Button cancelButton) {
-        cancelButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
         cancelButton.addClickListener(clickEvent -> {
             showNotification("Bearbeitung abgebrochen");
@@ -178,12 +181,16 @@ public class AssociationManagementView extends VerticalLayout {
         if (selectedAssociation == null) {
             disableEditLayout();
         } else {
-            editLayout.getChildren().forEach(component -> {
-                if (component instanceof HasEnabled c) {
-                    c.setEnabled(true);
-                }
-            });
+            enableEditLayout();
         }
+    }
+
+    private void enableEditLayout() {
+        editLayout.getChildren().forEach(component -> {
+            if (component instanceof HasEnabled c) {
+                c.setEnabled(true);
+            }
+        });
     }
 
     private void disableEditLayout() {
