@@ -9,6 +9,8 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -34,7 +36,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
  */
 @Route(value = "associationManagement", layout = MainView.class)
 @PageTitle("Vereinsverwaltung")
-@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
+@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
 public class AssociationManagementView extends VerticalLayout {
     private final Binder<Association> binder = new Binder<>();
     private final AssociationRepository associationRepository;
@@ -50,22 +52,6 @@ public class AssociationManagementView extends VerticalLayout {
         HorizontalLayout gridLayout = createGridLayout();
         add(newAssociationButton, gridLayout);
         updateEditLayoutState();
-    }
-
-    private void updateEditLayoutState() {
-        if (selectedAssociation == null) {
-            editLayout.getChildren().forEach(component -> {
-                if (component instanceof HasEnabled c) {
-                    c.setEnabled(false);
-                }
-            });
-        } else {
-            editLayout.getChildren().forEach(component -> {
-                if (component instanceof HasEnabled c) {
-                    c.setEnabled(true);
-                }
-            });
-        }
     }
 
     private Button createNewAssociationButton() {
@@ -97,7 +83,8 @@ public class AssociationManagementView extends VerticalLayout {
         Grid.Column<Association> idColumn = grid.addColumn("id").setHeader("ID");
         Grid.Column<Association> nameColumn = grid.addColumn("name").setHeader("Name");
         Grid.Column<Association> discountColumn = grid.addColumn("discount").setHeader("Rabatt");
-        Grid.Column<Association> activeColumn = grid.addColumn(association -> association.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
+        Grid.Column<Association> activeColumn = grid
+                .addColumn(association -> association.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setWidth("75%");
@@ -110,8 +97,10 @@ public class AssociationManagementView extends VerticalLayout {
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", associationFilter::setId));
         headerRow.getCell(nameColumn).setComponent(createFilterHeaderString("Name", associationFilter::setName));
-        headerRow.getCell(discountColumn).setComponent(createFilterHeaderString("Rabatt", associationFilter::setDiscount));
-        headerRow.getCell(activeColumn).setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", associationFilter::setActive));
+        headerRow.getCell(discountColumn)
+                .setComponent(createFilterHeaderString("Rabatt", associationFilter::setDiscount));
+        headerRow.getCell(activeColumn)
+                .setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", associationFilter::setActive));
         associationFilter.setActive(true);
 
         grid.addSelectionListener(e -> {
@@ -145,18 +134,64 @@ public class AssociationManagementView extends VerticalLayout {
         checkboxLayout.setHeight("50px");
         Checkbox activeCheckbox = new Checkbox("Aktiv");
         checkboxLayout.add(activeCheckbox);
-        HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.setWidthFull();
-        Button cancelButton = new Button("Abbrechen");
-        Button saveButton = new Button("Sichern");
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonLayout.add(cancelButton, saveButton);
-        buttonLayout.setFlexGrow(1, cancelButton, saveButton);
-        layout.add(nameField, discountField, checkboxLayout, buttonLayout);
+        layout.add(nameField, discountField, checkboxLayout, buttonLayoutConfig());
+
         binder.bind(nameField, Association::getName, Association::setName);
-        binder.bind(discountField, a -> String.valueOf(a.getDiscount()), (association, s) -> association.setDiscount(Double.parseDouble(s)));
+        binder.bind(discountField, a -> String.valueOf(a.getDiscount()),
+                (association, s) -> association.setDiscount(Double.parseDouble(s)));
         binder.bind(activeCheckbox, Association::isActive, Association::setActive);
         return layout;
+    }
+
+    private HorizontalLayout buttonLayoutConfig() {
+        HorizontalLayout buttonLayout = new HorizontalLayout();
+        buttonLayout.setWidthFull();
+        Button saveButton = new Button("Speichern");
+        Button cancelButton = new Button("Abbrechen");
+        buttonLayout.add(cancelButtonConfig(cancelButton), saveButtonConfig(saveButton));
+        buttonLayout.setFlexGrow(1, cancelButton, saveButton);
+        return buttonLayout;
+    }
+
+    private Button saveButtonConfig(Button saveButton) {
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
+        saveButton.addClickListener(clickEvent -> {
+            showNotification("Verein gespeichert");
+            disableEditLayout();
+            // TODO Verein in die Datenbank speichern
+        });
+        return saveButton;
+    }
+
+    private Button cancelButtonConfig(Button cancelButton) {
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
+        cancelButton.addClickListener(clickEvent -> {
+            showNotification("Bearbeitung abgebrochen");
+            disableEditLayout();
+        });
+        return cancelButton;
+    }
+
+    private void updateEditLayoutState() {
+        if (selectedAssociation == null) {
+            disableEditLayout();
+        } else {
+            editLayout.getChildren().forEach(component -> {
+                if (component instanceof HasEnabled c) {
+                    c.setEnabled(true);
+                }
+            });
+        }
+    }
+
+    private void disableEditLayout() {
+        editLayout.getChildren().forEach(component -> {
+            if (component instanceof HasEnabled c) {
+                c.setEnabled(false);
+            }
+        });
     }
 
     private static class AssociationFilter {

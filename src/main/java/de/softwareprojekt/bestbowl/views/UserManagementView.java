@@ -11,6 +11,8 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -166,14 +168,8 @@ public class UserManagementView extends VerticalLayout {
         checkboxLayout.setHeight("50px");
         Checkbox activeCheckbox = new Checkbox("Aktiv");
         checkboxLayout.add(activeCheckbox);
-        HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.setWidthFull();
-        Button cancelButton = new Button("Abbrechen");
-        Button saveButton = new Button("Sichern");
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonLayout.add(cancelButton, saveButton);
-        buttonLayout.setFlexGrow(1, cancelButton, saveButton);
-        layout.add(nameField, emailField, passwordField, securityQuestionAnswerField, roleCB, checkboxLayout, buttonLayout);
+
+        layout.add(nameField, emailField, passwordField, securityQuestionAnswerField, roleCB, checkboxLayout, buttonLayoutConfig());
         binder.bind(nameField, User::getName, User::setName);
         binder.bind(emailField, User::getEmail, User::setEmail);
         binder.bind(passwordField, user -> "", (user, s) -> user.setEncodedPassword(userManager.encodePassword(s)));
@@ -181,6 +177,45 @@ public class UserManagementView extends VerticalLayout {
         binder.bind(roleCB, User::getRole, User::setRole);
         binder.bind(activeCheckbox, User::isActive, User::setActive);
         return layout;
+    }
+
+    private HorizontalLayout buttonLayoutConfig() {
+        HorizontalLayout buttonLayout = new HorizontalLayout();
+        buttonLayout.setWidthFull();
+        Button saveButton = new Button("Speichern");
+        Button cancelButton = new Button("Abbrechen");
+        buttonLayout.add(cancelButtonConfig(cancelButton), saveButtonConfig(saveButton));
+        buttonLayout.setFlexGrow(1, cancelButton, saveButton);
+        return buttonLayout;
+    }
+
+    private Button saveButtonConfig(Button saveButton) {
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
+        saveButton.addClickListener(clickEvent -> {
+            showNotification("Nutzer gespeichert");
+            disableEditLayout();
+            // TODO Nutzer in die Datenbank speichern
+        });
+        return saveButton;
+    }
+
+    private Button cancelButtonConfig(Button cancelButton) {
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
+        cancelButton.addClickListener(clickEvent -> {
+            showNotification("Bearbeitung abgebrochen");
+            disableEditLayout();
+        });
+        return cancelButton;
+    }
+
+    private void disableEditLayout() {
+        editLayout.getChildren().forEach(component -> {
+            if (component instanceof HasEnabled c) {
+                c.setEnabled(false);
+            }
+        });
     }
 
     private static class UserFilter {
