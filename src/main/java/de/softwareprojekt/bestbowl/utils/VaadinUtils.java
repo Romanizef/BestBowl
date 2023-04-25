@@ -80,7 +80,7 @@ public class VaadinUtils {
      * @param displayValueFalse    text to be displayed for false
      * @return component to be used as a filter
      */
-    public static Component createFilterHeaderBoolean(Consumer<Boolean> filterChangeConsumer, String displayValueTrue, String displayValueFalse) {
+    public static Component createFilterHeaderBoolean(String displayValueTrue, String displayValueFalse, Consumer<Boolean> filterChangeConsumer) {
         ComboBox<String> comboBox = new ComboBox<>();
         comboBox.setAllowCustomValue(false);
         comboBox.setItems("*", displayValueTrue, displayValueFalse);

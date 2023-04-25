@@ -121,7 +121,7 @@ public class UserManagementView extends VerticalLayout {
         headerRow.getCell(emailColumn).setComponent(createFilterHeaderString("E-Mail", userFilter::setEmail));
         headerRow.getCell(answerColumn).setComponent(createFilterHeaderString("Sicherheitsfragenantwort", userFilter::setSecurityQuestionAnswer));
         headerRow.getCell(roleColumn).setComponent(createFilterHeaderString("Rolle", userFilter::setRole));
-        headerRow.getCell(activeColumn).setComponent(createFilterHeaderBoolean(userFilter::setActive, "Aktiv", "Inaktiv"));
+        headerRow.getCell(activeColumn).setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", userFilter::setActive));
         userFilter.setActive(true);
 
         grid.addSelectionListener(e -> {

@@ -111,7 +111,7 @@ public class AssociationManagementView extends VerticalLayout {
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", associationFilter::setId));
         headerRow.getCell(nameColumn).setComponent(createFilterHeaderString("Name", associationFilter::setName));
         headerRow.getCell(discountColumn).setComponent(createFilterHeaderString("Rabatt", associationFilter::setDiscount));
-        headerRow.getCell(activeColumn).setComponent(createFilterHeaderBoolean(associationFilter::setActive, "Aktiv", "Inaktiv"));
+        headerRow.getCell(activeColumn).setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", associationFilter::setActive));
         associationFilter.setActive(true);
 
         grid.addSelectionListener(e -> {
