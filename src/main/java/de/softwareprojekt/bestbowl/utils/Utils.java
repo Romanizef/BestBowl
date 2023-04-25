@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -90,6 +92,25 @@ public class Utils {
      */
     public static boolean matches(String value, String searchTerm) {
         return searchTerm == null || searchTerm.isEmpty() || value.toLowerCase().contains(searchTerm.toLowerCase());
+    }
+
+    /**
+     * Checks if the value contains any of the search terms and if so removes that search term from the list
+     *
+     * @param value       String that is checked
+     * @param searchTerms list of search terms
+     */
+    public static void matchAndRemoveIfContains(String value, List<String> searchTerms) {
+        if (!searchTerms.isEmpty()) {
+            Iterator<String> searchTermIterator = searchTerms.iterator();
+            while (searchTermIterator.hasNext()) {
+                String searchTerm = searchTermIterator.next();
+                if (matches(value, searchTerm)) {
+                    searchTermIterator.remove();
+                    return;
+                }
+            }
+        }
     }
 
     /**
