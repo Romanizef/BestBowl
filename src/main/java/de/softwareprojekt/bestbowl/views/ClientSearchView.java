@@ -22,11 +22,14 @@ import com.vaadin.flow.router.RouteAlias;
 import de.softwareprojekt.bestbowl.jpa.entities.Association;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepository;
-import de.softwareprojekt.bestbowl.utils.Utils;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
+
+import static de.softwareprojekt.bestbowl.utils.Utils.matches;
 
 @Route(value = "clientSearch", layout = MainView.class)
 @RouteAlias(value = "", layout = MainView.class)
@@ -113,7 +116,7 @@ public class ClientSearchView extends VerticalLayout {
         HorizontalLayout searchLayout = new HorizontalLayout();
         searchLayout.setWidth("70%");
         searchField = new TextField();
-        searchField.setPlaceholder("Suche nach Kundennummer, Name oder E-Mail ...");
+        searchField.setPlaceholder("Suche nach Kundennummer, Name, E-Mail oder Verein ...");
         searchField.setValueChangeMode(ValueChangeMode.EAGER);
         searchField.addValueChangeListener(e -> updateGridItems());
         Button searchButton = new Button();
@@ -155,11 +158,20 @@ public class ClientSearchView extends VerticalLayout {
 
     private void updateGridItems() {
         String searchString = searchField.getValue();
-        if (Utils.isStringNotEmpty(searchString)) {
-            clientGrid.setItems(clientRepository.findAllByAnyFieldContainingStringAndActive(searchString, true));
-        } else {
-            clientGrid.setItems(clientRepository.findAllByActiveEqualsOrderByLastName(true));
+        List<Client> clientList = clientRepository.findAllByActiveEqualsOrderByLastName(true);
+        Iterator<Client> clientIterator = clientList.iterator();
+        while (clientIterator.hasNext()) {
+            Client client = clientIterator.next();
+            boolean matchesId = matches(String.valueOf(client.getId()), searchString);
+            boolean matchesFirstName = matches(client.getFirstName(), searchString);
+            boolean matchesLastName = matches(client.getLastName(), searchString);
+            boolean matchesEmail = matches(client.getEmail(), searchString);
+            boolean matchesAssociationName = client.getAssociation() != null && matches(client.getAssociation().getName(), searchString);
+            if (!(matchesId || matchesFirstName || matchesLastName || matchesEmail || matchesAssociationName)) {
+                clientIterator.remove();
+            }
         }
+        clientGrid.setItems(clientList);
     }
 
     private Component createFooterComponent() {

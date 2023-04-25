@@ -25,8 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Optional;
 
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderBoolean;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderString;
+import static de.softwareprojekt.bestbowl.utils.Utils.matches;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * @author Matija Kopschek
@@ -108,10 +108,10 @@ public class AssociationManagementView extends VerticalLayout {
         AssociationFilter associationFilter = new AssociationFilter(dataView);
         grid.getHeaderRows().clear();
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(idColumn).setComponent(createFilterHeaderString("ID", associationFilter::setId));
+        headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", associationFilter::setId));
         headerRow.getCell(nameColumn).setComponent(createFilterHeaderString("Name", associationFilter::setName));
         headerRow.getCell(discountColumn).setComponent(createFilterHeaderString("Rabatt", associationFilter::setDiscount));
-        headerRow.getCell(activeColumn).setComponent(createFilterHeaderBoolean(associationFilter::setActive, true));
+        headerRow.getCell(activeColumn).setComponent(createFilterHeaderBoolean(associationFilter::setActive, "Aktiv", "Inaktiv"));
         associationFilter.setActive(true);
 
         grid.addSelectionListener(e -> {
@@ -164,7 +164,7 @@ public class AssociationManagementView extends VerticalLayout {
         private String id;
         private String name;
         private String discount;
-        private boolean active;
+        private Boolean active;
 
         public AssociationFilter(GridListDataView<Association> dataView) {
             this.dataView = dataView;
@@ -175,12 +175,8 @@ public class AssociationManagementView extends VerticalLayout {
             boolean matchesId = matches(String.valueOf(association.getId()), id);
             boolean matchesName = matches(association.getName(), name);
             boolean matchesDiscount = matches(String.valueOf(association.getDiscount()), discount);
-            boolean matchesActive = association.isActive() == active;
+            boolean matchesActive = active == null || active == association.isActive();
             return matchesId && matchesDiscount && matchesName && matchesActive;
-        }
-
-        private boolean matches(String value, String searchTerm) {
-            return searchTerm == null || searchTerm.isEmpty() || value.toLowerCase().contains(searchTerm.toLowerCase());
         }
 
         public void setId(String id) {
@@ -198,7 +194,7 @@ public class AssociationManagementView extends VerticalLayout {
             dataView.refreshAll();
         }
 
-        public void setActive(boolean active) {
+        public void setActive(Boolean active) {
             this.active = active;
             dataView.refreshAll();
         }

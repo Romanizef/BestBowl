@@ -82,6 +82,17 @@ public class Utils {
     }
 
     /**
+     * Checks if the search term is contained in the value
+     *
+     * @param value      string to be searched in
+     * @param searchTerm containing string
+     * @return true if the search term is empty or contained in the value
+     */
+    public static boolean matches(String value, String searchTerm) {
+        return searchTerm == null || searchTerm.isEmpty() || value.toLowerCase().contains(searchTerm.toLowerCase());
+    }
+
+    /**
      * Formats a double to 2 decimal places with german locale
      *
      * @param d double to be formatted

@@ -30,8 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Optional;
 
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderBoolean;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderString;
+import static de.softwareprojekt.bestbowl.utils.Utils.matches;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * @author Marten Voß
@@ -116,12 +116,12 @@ public class UserManagementView extends VerticalLayout {
         UserFilter userFilter = new UserFilter(dataView);
         grid.getHeaderRows().clear();
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(idColumn).setComponent(createFilterHeaderString("ID", userFilter::setId));
+        headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", userFilter::setId));
         headerRow.getCell(nameColumn).setComponent(createFilterHeaderString("Name", userFilter::setName));
         headerRow.getCell(emailColumn).setComponent(createFilterHeaderString("E-Mail", userFilter::setEmail));
         headerRow.getCell(answerColumn).setComponent(createFilterHeaderString("Sicherheitsfragenantwort", userFilter::setSecurityQuestionAnswer));
         headerRow.getCell(roleColumn).setComponent(createFilterHeaderString("Rolle", userFilter::setRole));
-        headerRow.getCell(activeColumn).setComponent(createFilterHeaderBoolean(userFilter::setActive, true));
+        headerRow.getCell(activeColumn).setComponent(createFilterHeaderBoolean(userFilter::setActive, "Aktiv", "Inaktiv"));
         userFilter.setActive(true);
 
         grid.addSelectionListener(e -> {
@@ -190,7 +190,7 @@ public class UserManagementView extends VerticalLayout {
         private String email;
         private String securityQuestionAnswer;
         private String role;
-        private boolean active;
+        private Boolean active;
 
         public UserFilter(GridListDataView<User> dataView) {
             this.dataView = dataView;
@@ -203,12 +203,8 @@ public class UserManagementView extends VerticalLayout {
             boolean matchesEmail = matches(user.getEmail(), email);
             boolean matchesAnswer = matches(user.getSecurityQuestionAnswer(), securityQuestionAnswer);
             boolean matchesRole = matches(user.getRole(), role);
-            boolean matchesActive = user.isActive() == active;
+            boolean matchesActive = active == null || active == user.isActive();
             return matchesId && matchesName && matchesEmail && matchesAnswer && matchesRole && matchesActive;
-        }
-
-        private boolean matches(String value, String searchTerm) {
-            return searchTerm == null || searchTerm.isEmpty() || value.toLowerCase().contains(searchTerm.toLowerCase());
         }
 
         public void setId(String id) {
@@ -236,7 +232,7 @@ public class UserManagementView extends VerticalLayout {
             dataView.refreshAll();
         }
 
-        public void setActive(boolean active) {
+        public void setActive(Boolean active) {
             this.active = active;
             dataView.refreshAll();
         }
