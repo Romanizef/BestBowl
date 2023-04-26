@@ -37,11 +37,10 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * @author Marten Voß
- * @author Matija Kopschek
  */
 @Route(value = "userManagement", layout = MainView.class)
 @PageTitle("Nutzerverwaltung")
-@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
+@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 public class UserManagementView extends VerticalLayout {
     private final UserRepository userRepository;
     private final Binder<User> binder = new Binder<>();
@@ -92,8 +91,7 @@ public class UserManagementView extends VerticalLayout {
         Grid.Column<User> emailColumn = grid.addColumn("email").setHeader("E-Mail");
         Grid.Column<User> answerColumn = grid.addColumn("securityQuestionAnswer").setHeader("Sicherheitsfragenantwort");
         Grid.Column<User> roleColumn = grid.addColumn("role").setHeader("Nutzerrolle");
-        Grid.Column<User> activeColumn = grid.addColumn(user -> user.isActive() ? "Aktiv" : "Inaktiv")
-                .setHeader("Aktiv");
+        Grid.Column<User> activeColumn = grid.addColumn(user -> user.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setWidth("75%");
@@ -107,11 +105,9 @@ public class UserManagementView extends VerticalLayout {
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", userFilter::setId));
         headerRow.getCell(nameColumn).setComponent(createFilterHeaderString("Name", userFilter::setName));
         headerRow.getCell(emailColumn).setComponent(createFilterHeaderString("E-Mail", userFilter::setEmail));
-        headerRow.getCell(answerColumn).setComponent(
-                createFilterHeaderString("Sicherheitsfragenantwort", userFilter::setSecurityQuestionAnswer));
+        headerRow.getCell(answerColumn).setComponent(createFilterHeaderString("Sicherheitsfragenantwort", userFilter::setSecurityQuestionAnswer));
         headerRow.getCell(roleColumn).setComponent(createFilterHeaderString("Rolle", userFilter::setRole));
-        headerRow.getCell(activeColumn)
-                .setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", userFilter::setActive));
+        headerRow.getCell(activeColumn).setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", userFilter::setActive));
         userFilter.setActive(true);
 
         grid.addSelectionListener(e -> {
@@ -120,12 +116,11 @@ public class UserManagementView extends VerticalLayout {
                 if (optionalUser.isPresent()) {
                     selectedUser = optionalUser.get();
                     binder.readBean(selectedUser);
+                    updateEditLayoutState();
                 } else {
-                    selectedUser = null;
-                    binder.readBean(new User());
+                    resetEditLayout();
                 }
             }
-            updateEditLayoutState();
         });
         return grid;
     }
@@ -133,6 +128,7 @@ public class UserManagementView extends VerticalLayout {
     private FormLayout createEditLayout() {
         FormLayout layout = new FormLayout();
         layout.setWidth("25%");
+
         TextField nameField = new TextField("Name");
         nameField.setWidthFull();
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
@@ -163,8 +159,7 @@ public class UserManagementView extends VerticalLayout {
         Checkbox activeCheckbox = new Checkbox("Aktiv");
         checkboxLayout.add(activeCheckbox);
 
-        layout.add(nameField, emailField, passwordField, securityQuestionAnswerField, roleCB, checkboxLayout,
-                buttonLayoutConfig());
+        layout.add(nameField, emailField, passwordField, securityQuestionAnswerField, roleCB, checkboxLayout, createSaveAndCancelButtonLayout());
         binder.bind(nameField, User::getName, User::setName);
         binder.bind(emailField, User::getEmail, User::setEmail);
         binder.bind(passwordField, user -> "", (user, s) -> user.setEncodedPassword(userManager.encodePassword(s)));
@@ -174,56 +169,47 @@ public class UserManagementView extends VerticalLayout {
         return layout;
     }
 
-    private HorizontalLayout buttonLayoutConfig() {
+    private HorizontalLayout createSaveAndCancelButtonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setWidthFull();
+
         Button saveButton = new Button("Speichern");
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
+
         Button cancelButton = new Button("Abbrechen");
-        buttonLayout.add(cancelButtonConfig(cancelButton), saveButtonConfig(saveButton));
+        cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
+
+        buttonLayout.add(cancelButton, saveButton);
         buttonLayout.setFlexGrow(1, cancelButton, saveButton);
+
+        saveButton.addClickListener(clickEvent -> {
+            // TODO Nutzer in die Datenbank speichern
+            resetEditLayout();
+            showNotification("Nutzer gespeichert");
+        });
+        cancelButton.addClickListener(clickEvent -> {
+            resetEditLayout();
+            showNotification("Bearbeitung abgebrochen");
+        });
         return buttonLayout;
     }
 
-    private Button saveButtonConfig(Button saveButton) {
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
-        saveButton.addClickListener(clickEvent -> {
-            showNotification("Nutzer gespeichert");
-            disableEditLayout();
-            // TODO Nutzer in die Datenbank speichern
-        });
-        return saveButton;
-    }
-
-    private Button cancelButtonConfig(Button cancelButton) {
-        cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
-        cancelButton.addClickListener(clickEvent -> {
-            showNotification("Bearbeitung abgebrochen");
-            disableEditLayout();
-        });
-        return cancelButton;
+    private void resetEditLayout() {
+        userGrid.deselectAll();
+        selectedUser = null;
+        binder.readBean(new User());
+        updateEditLayoutState();
     }
 
     private void updateEditLayoutState() {
-        if (selectedUser == null) {
-            disableEditLayout();
-        } else {
-            enableEditLayout();
-        }
+        setEditLayoutEnabled(selectedUser != null);
     }
 
-    private void enableEditLayout() {
+    private void setEditLayoutEnabled(boolean enabled) {
         editLayout.getChildren().forEach(component -> {
             if (component instanceof HasEnabled c) {
-                c.setEnabled(true);
-            }
-        });
-    }
-
-    private void disableEditLayout() {
-        editLayout.getChildren().forEach(component -> {
-            if (component instanceof HasEnabled c) {
-                c.setEnabled(false);
+                c.setEnabled(enabled);
             }
         });
     }
