@@ -170,7 +170,7 @@ public class CommandLineListener {
         Faker faker = new Faker();
         for (int i = 0; i < count; i++) {
             Drink drink = new Drink();
-            drink.setName(faker.food().dish());
+            drink.setName(faker.beer().yeast());
             drink.setStockInMilliliters(faker.random().nextInt(15, 45) * 1000);
             drink.setReorderPoint(5000);
             double price = faker.random().nextInt(1, 3);
