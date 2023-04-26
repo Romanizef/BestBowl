@@ -11,6 +11,8 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -30,15 +32,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Optional;
 
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderBoolean;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderString;
+import static de.softwareprojekt.bestbowl.utils.Utils.matches;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * @author Marten Voß
+ * @author Matija Kopschek
  */
 @Route(value = "userManagement", layout = MainView.class)
 @PageTitle("Nutzerverwaltung")
-@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
+@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
 public class UserManagementView extends VerticalLayout {
     private final UserRepository userRepository;
     private final Binder<User> binder = new Binder<>();
@@ -56,22 +59,6 @@ public class UserManagementView extends VerticalLayout {
         HorizontalLayout gridLayout = createGridLayout();
         add(newUserButton, gridLayout);
         updateEditLayoutState();
-    }
-
-    private void updateEditLayoutState() {
-        if (selectedUser == null) {
-            editLayout.getChildren().forEach(component -> {
-                if (component instanceof HasEnabled c) {
-                    c.setEnabled(false);
-                }
-            });
-        } else {
-            editLayout.getChildren().forEach(component -> {
-                if (component instanceof HasEnabled c) {
-                    c.setEnabled(true);
-                }
-            });
-        }
     }
 
     private Button createNewUserButton() {
@@ -105,7 +92,8 @@ public class UserManagementView extends VerticalLayout {
         Grid.Column<User> emailColumn = grid.addColumn("email").setHeader("E-Mail");
         Grid.Column<User> answerColumn = grid.addColumn("securityQuestionAnswer").setHeader("Sicherheitsfragenantwort");
         Grid.Column<User> roleColumn = grid.addColumn("role").setHeader("Nutzerrolle");
-        Grid.Column<User> activeColumn = grid.addColumn(user -> user.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
+        Grid.Column<User> activeColumn = grid.addColumn(user -> user.isActive() ? "Aktiv" : "Inaktiv")
+                .setHeader("Aktiv");
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setWidth("75%");
@@ -116,12 +104,14 @@ public class UserManagementView extends VerticalLayout {
         UserFilter userFilter = new UserFilter(dataView);
         grid.getHeaderRows().clear();
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(idColumn).setComponent(createFilterHeaderString("ID", userFilter::setId));
+        headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", userFilter::setId));
         headerRow.getCell(nameColumn).setComponent(createFilterHeaderString("Name", userFilter::setName));
         headerRow.getCell(emailColumn).setComponent(createFilterHeaderString("E-Mail", userFilter::setEmail));
-        headerRow.getCell(answerColumn).setComponent(createFilterHeaderString("Sicherheitsfragenantwort", userFilter::setSecurityQuestionAnswer));
+        headerRow.getCell(answerColumn).setComponent(
+                createFilterHeaderString("Sicherheitsfragenantwort", userFilter::setSecurityQuestionAnswer));
         headerRow.getCell(roleColumn).setComponent(createFilterHeaderString("Rolle", userFilter::setRole));
-        headerRow.getCell(activeColumn).setComponent(createFilterHeaderBoolean(userFilter::setActive, true));
+        headerRow.getCell(activeColumn)
+                .setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", userFilter::setActive));
         userFilter.setActive(true);
 
         grid.addSelectionListener(e -> {
@@ -146,34 +136,35 @@ public class UserManagementView extends VerticalLayout {
         TextField nameField = new TextField("Name");
         nameField.setWidthFull();
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
         TextField emailField = new TextField("E-Mail");
         emailField.setWidthFull();
         emailField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
         PasswordField passwordField = new PasswordField("Passwort");
         passwordField.setWidthFull();
         passwordField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
         TextField securityQuestionAnswerField = new TextField("Sicherheitsfragenantwort");
         securityQuestionAnswerField.setWidthFull();
         securityQuestionAnswerField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
         ComboBox<String> roleCB = new ComboBox<>("Nutzerrolle");
         roleCB.setWidthFull();
         roleCB.setAllowCustomValue(false);
         roleCB.setItems(UserRole.getAllValues());
         roleCB.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
+
         HorizontalLayout checkboxLayout = new HorizontalLayout();
         checkboxLayout.setAlignItems(Alignment.CENTER);
         checkboxLayout.setWidthFull();
         checkboxLayout.setHeight("50px");
+
         Checkbox activeCheckbox = new Checkbox("Aktiv");
         checkboxLayout.add(activeCheckbox);
-        HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.setWidthFull();
-        Button cancelButton = new Button("Abbrechen");
-        Button saveButton = new Button("Sichern");
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonLayout.add(cancelButton, saveButton);
-        buttonLayout.setFlexGrow(1, cancelButton, saveButton);
-        layout.add(nameField, emailField, passwordField, securityQuestionAnswerField, roleCB, checkboxLayout, buttonLayout);
+
+        layout.add(nameField, emailField, passwordField, securityQuestionAnswerField, roleCB, checkboxLayout,
+                buttonLayoutConfig());
         binder.bind(nameField, User::getName, User::setName);
         binder.bind(emailField, User::getEmail, User::setEmail);
         binder.bind(passwordField, user -> "", (user, s) -> user.setEncodedPassword(userManager.encodePassword(s)));
@@ -183,6 +174,60 @@ public class UserManagementView extends VerticalLayout {
         return layout;
     }
 
+    private HorizontalLayout buttonLayoutConfig() {
+        HorizontalLayout buttonLayout = new HorizontalLayout();
+        buttonLayout.setWidthFull();
+        Button saveButton = new Button("Speichern");
+        Button cancelButton = new Button("Abbrechen");
+        buttonLayout.add(cancelButtonConfig(cancelButton), saveButtonConfig(saveButton));
+        buttonLayout.setFlexGrow(1, cancelButton, saveButton);
+        return buttonLayout;
+    }
+
+    private Button saveButtonConfig(Button saveButton) {
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
+        saveButton.addClickListener(clickEvent -> {
+            showNotification("Nutzer gespeichert");
+            disableEditLayout();
+            // TODO Nutzer in die Datenbank speichern
+        });
+        return saveButton;
+    }
+
+    private Button cancelButtonConfig(Button cancelButton) {
+        cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
+        cancelButton.addClickListener(clickEvent -> {
+            showNotification("Bearbeitung abgebrochen");
+            disableEditLayout();
+        });
+        return cancelButton;
+    }
+
+    private void updateEditLayoutState() {
+        if (selectedUser == null) {
+            disableEditLayout();
+        } else {
+            enableEditLayout();
+        }
+    }
+
+    private void enableEditLayout() {
+        editLayout.getChildren().forEach(component -> {
+            if (component instanceof HasEnabled c) {
+                c.setEnabled(true);
+            }
+        });
+    }
+
+    private void disableEditLayout() {
+        editLayout.getChildren().forEach(component -> {
+            if (component instanceof HasEnabled c) {
+                c.setEnabled(false);
+            }
+        });
+    }
+
     private static class UserFilter {
         private final GridListDataView<User> dataView;
         private String id;
@@ -190,7 +235,7 @@ public class UserManagementView extends VerticalLayout {
         private String email;
         private String securityQuestionAnswer;
         private String role;
-        private boolean active;
+        private Boolean active;
 
         public UserFilter(GridListDataView<User> dataView) {
             this.dataView = dataView;
@@ -203,12 +248,8 @@ public class UserManagementView extends VerticalLayout {
             boolean matchesEmail = matches(user.getEmail(), email);
             boolean matchesAnswer = matches(user.getSecurityQuestionAnswer(), securityQuestionAnswer);
             boolean matchesRole = matches(user.getRole(), role);
-            boolean matchesActive = user.isActive() == active;
+            boolean matchesActive = active == null || active == user.isActive();
             return matchesId && matchesName && matchesEmail && matchesAnswer && matchesRole && matchesActive;
-        }
-
-        private boolean matches(String value, String searchTerm) {
-            return searchTerm == null || searchTerm.isEmpty() || value.toLowerCase().contains(searchTerm.toLowerCase());
         }
 
         public void setId(String id) {
@@ -236,7 +277,7 @@ public class UserManagementView extends VerticalLayout {
             dataView.refreshAll();
         }
 
-        public void setActive(boolean active) {
+        public void setActive(Boolean active) {
             this.active = active;
             dataView.refreshAll();
         }

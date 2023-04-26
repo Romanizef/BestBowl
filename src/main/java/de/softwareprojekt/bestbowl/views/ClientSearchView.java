@@ -22,11 +22,12 @@ import com.vaadin.flow.router.RouteAlias;
 import de.softwareprojekt.bestbowl.jpa.entities.Association;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepository;
-import de.softwareprojekt.bestbowl.utils.Utils;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
+import java.util.*;
+
+import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
 
 @Route(value = "clientSearch", layout = MainView.class)
 @RouteAlias(value = "", layout = MainView.class)
@@ -113,7 +114,7 @@ public class ClientSearchView extends VerticalLayout {
         HorizontalLayout searchLayout = new HorizontalLayout();
         searchLayout.setWidth("70%");
         searchField = new TextField();
-        searchField.setPlaceholder("Suche nach Kundennummer, Name oder E-Mail ...");
+        searchField.setPlaceholder("Suche nach Kundennummer, Name, E-Mail oder Verein ...");
         searchField.setValueChangeMode(ValueChangeMode.EAGER);
         searchField.addValueChangeListener(e -> updateGridItems());
         Button searchButton = new Button();
@@ -154,12 +155,28 @@ public class ClientSearchView extends VerticalLayout {
     }
 
     private void updateGridItems() {
-        String searchString = searchField.getValue();
-        if (Utils.isStringNotEmpty(searchString)) {
-            clientGrid.setItems(clientRepository.findAllByAnyFieldContainingStringAndActive(searchString, true));
-        } else {
-            clientGrid.setItems(clientRepository.findAllByActiveEqualsOrderByLastName(true));
+        List<Client> clientList = clientRepository.findAllByActiveEqualsOrderByLastName(true);
+        String searchFieldValue = searchField.getValue();
+        String[] searchTerms;
+        if (searchFieldValue != null) {
+            searchTerms = searchFieldValue.trim().split(" ");
+            Iterator<Client> clientIterator = clientList.iterator();
+            while (clientIterator.hasNext()) {
+                Client client = clientIterator.next();
+                List<String> searchTermsCopy = new ArrayList<>(Arrays.stream(searchTerms).toList());
+                matchAndRemoveIfContains(String.valueOf(client.getId()), searchTermsCopy);
+                matchAndRemoveIfContains(client.getFirstName(), searchTermsCopy);
+                matchAndRemoveIfContains(client.getLastName(), searchTermsCopy);
+                matchAndRemoveIfContains(client.getEmail(), searchTermsCopy);
+                if (client.getAssociation() != null) {
+                    matchAndRemoveIfContains(client.getAssociation().getName(), searchTermsCopy);
+                }
+                if (!searchTermsCopy.isEmpty()) {
+                    clientIterator.remove();
+                }
+            }
         }
+        clientGrid.setItems(clientList);
     }
 
     private Component createFooterComponent() {
