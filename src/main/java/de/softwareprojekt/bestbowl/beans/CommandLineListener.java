@@ -3,6 +3,7 @@ package de.softwareprojekt.bestbowl.beans;
 import com.github.javafaker.Faker;
 import de.softwareprojekt.bestbowl.BestBowlApplication;
 import de.softwareprojekt.bestbowl.jpa.entities.*;
+import de.softwareprojekt.bestbowl.utils.DuplicateChecker;
 import de.softwareprojekt.bestbowl.utils.PDFUtils;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import jakarta.annotation.PostConstruct;
@@ -13,7 +14,11 @@ import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
 
@@ -109,30 +114,18 @@ public class CommandLineListener {
     }
 
     private void generateRandomAssociations(int count) {
-        List<Association> existingAssociations = Repos.getAssociationRepository().findAll();
-        Set<String> existingNames = new HashSet<>();
-        existingAssociations.forEach(a -> existingNames.add(a.getName()));
+        List<Association> existingAssociationList = Repos.getAssociationRepository().findAll();
+        DuplicateChecker duplicateChecker = new DuplicateChecker(existingAssociationList.stream().map(Association::getName).collect(Collectors.toSet()));
 
         List<Association> associationList = new ArrayList<>(count);
         Faker faker = new Faker();
         for (int i = 0; i < count; i++) {
-            Association association = new Association();
-            String name = null;
-            int counter = 0;
-            while (name == null && counter < 20) {
-                String s = faker.nation().language() + "-BowlingStars";
-                if (!existingNames.contains(s)) {
-                    name = s;
-                }
-                counter++;
-            }
-            if (name == null) {
-                continue;
-            }
-            existingNames.add(name);
-            association.setName(name);
-            association.setDiscount(5);
-            associationList.add(association);
+            duplicateChecker.generateNewValue(() -> faker.nation().language() + "-BowlingStars").ifPresent(name -> {
+                Association association = new Association();
+                association.setName(name);
+                association.setDiscount(5);
+                associationList.add(association);
+            });
         }
         Repos.getAssociationRepository().saveAll(associationList);
     }
@@ -152,35 +145,45 @@ public class CommandLineListener {
     }
 
     private void generateRandomFoods(int count) {
+        List<Food> existingFoodList = Repos.getFoodRepository().findAll();
+        DuplicateChecker duplicateChecker = new DuplicateChecker(existingFoodList.stream().map(Food::getName).collect(Collectors.toSet()));
+
         List<Food> foodList = new ArrayList<>(count);
         Faker faker = new Faker();
         for (int i = 0; i < count; i++) {
-            Food food = new Food();
-            food.setName(faker.food().dish());
-            food.setPrice(faker.random().nextInt(3, 10));
-            food.setStock(faker.random().nextInt(5, 20));
-            food.setReorderPoint(3);
-            foodList.add(food);
+            duplicateChecker.generateNewValue(() -> faker.food().dish()).ifPresent(name -> {
+                Food food = new Food();
+                food.setName(name);
+                food.setPrice(faker.random().nextInt(3, 10));
+                food.setStock(faker.random().nextInt(5, 20));
+                food.setReorderPoint(3);
+                foodList.add(food);
+            });
         }
         Repos.getFoodRepository().saveAll(foodList);
     }
 
     private void generateRandomDrinks(int count) {
+        List<Drink> existingDrinkList = Repos.getDrinkRepository().findAll();
+        DuplicateChecker duplicateChecker = new DuplicateChecker(existingDrinkList.stream().map(Drink::getName).collect(Collectors.toSet()));
+
         List<Drink> foodList = new ArrayList<>(count);
         Faker faker = new Faker();
         for (int i = 0; i < count; i++) {
-            Drink drink = new Drink();
-            drink.setName(faker.beer().yeast());
-            drink.setStockInMilliliters(faker.random().nextInt(15, 45) * 1000);
-            drink.setReorderPoint(5000);
-            double price = faker.random().nextInt(1, 3);
-            for (int j = 1; j <= 3; j++) {
-                DrinkVariant drinkVariant = new DrinkVariant();
-                drinkVariant.setMl(j * 250);
-                drinkVariant.setPrice(j * price);
-                drink.addDrinkVariant(drinkVariant);
-            }
-            foodList.add(drink);
+            duplicateChecker.generateNewValue(() -> faker.beer().yeast()).ifPresent(name -> {
+                Drink drink = new Drink();
+                drink.setName(name);
+                drink.setStockInMilliliters(faker.random().nextInt(15, 45) * 1000);
+                drink.setReorderPoint(5000);
+                double price = faker.random().nextInt(1, 3);
+                for (int j = 1; j <= 3; j++) {
+                    DrinkVariant drinkVariant = new DrinkVariant();
+                    drinkVariant.setMl(j * 250);
+                    drinkVariant.setPrice(j * price);
+                    drink.addDrinkVariant(drinkVariant);
+                }
+                foodList.add(drink);
+            });
         }
         Repos.getDrinkRepository().saveAll(foodList);
     }

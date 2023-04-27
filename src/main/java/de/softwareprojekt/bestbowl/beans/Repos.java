@@ -21,6 +21,7 @@ public class Repos {
     private ClientRepository clientRepository;
     private DrinkBookingRepository drinkBookingRepository;
     private DrinkRepository drinkRepository;
+    private DrinkVariantRepository drinkVariantRepository;
     private FoodBookingRepository foodBookingRepository;
     private FoodRepository foodRepository;
     private UserRepository userRepository;
@@ -113,6 +114,15 @@ public class Repos {
     @Autowired
     public void setDrinkRepository(DrinkRepository drinkRepository) {
         this.drinkRepository = drinkRepository;
+    }
+
+    public static DrinkVariantRepository getDrinkVariantRepository() {
+        return instance.drinkVariantRepository;
+    }
+
+    @Autowired
+    public void setDrinkVariantRepository(DrinkVariantRepository drinkVariantRepository) {
+        this.drinkVariantRepository = drinkVariantRepository;
     }
 
     public static FoodBookingRepository getFoodBookingRepository() {
