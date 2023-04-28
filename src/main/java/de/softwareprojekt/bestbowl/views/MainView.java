@@ -15,10 +15,13 @@ import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
+import de.softwareprojekt.bestbowl.BestBowlApplication;
 import de.softwareprojekt.bestbowl.beans.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
+
+import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
 
 /**
  * @author Marten Voß
@@ -38,6 +41,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
                 .set("margin", "var(--lumo-space-m) var(--lumo-space-l)");
 
         HorizontalLayout headerLayout = createHeaderContent();
+        headerLayout.add(new Button("Shutdown", e -> startThread(BestBowlApplication::shutdown, "shutdown", true)));
         if (securityService.getAuthenticatedUser() != null) {
             Button logoutButton = new Button("Logout", click -> securityService.logout());
             headerLayout.add(logoutButton);
@@ -66,6 +70,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
                 createTab("Bahn buchen", BowlingAlleyBookingView.class),
                 createTab("Rechnung", InvoiceView.class),
                 createTab("Nutzerverwaltung", UserManagementView.class),
+                createTab("Kundenverwaltung", ClientManagementView.class),
                 createTab("Vereinsverwaltung", AssociationManagementView.class),
                 createTab("Statistiken", StatisticsView.class),
                 createTab("Artikelverwaltung", ArticleManagementView.class),

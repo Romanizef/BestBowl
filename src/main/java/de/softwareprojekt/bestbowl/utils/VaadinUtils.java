@@ -8,8 +8,15 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.function.SerializableComparator;
+import de.softwareprojekt.bestbowl.beans.Repos;
+import de.softwareprojekt.bestbowl.jpa.entities.Association;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -96,6 +103,30 @@ public class VaadinUtils {
                 filterChangeConsumer.accept(null);
             }
         });
+        return comboBox;
+    }
+
+    /**
+     * Creates a ComboBox with all associations in the dropdown
+     *
+     * @param label Name of the ComboBox
+     * @return ComboBox
+     */
+    public static ComboBox<Association> createAssociationCB(String label) {
+        ComboBox<Association> comboBox = new ComboBox<>(label);
+
+        List<Association> associationList = Repos.getAssociationRepository().findAll();
+        Set<Association> associationSet = new HashSet<>(associationList.size() + 1);
+        associationSet.add(Association.NO_ASSOCIATION);
+        associationSet.addAll(associationList);
+        ListDataProvider<Association> dataProvider = new ListDataProvider<>(associationSet);
+        dataProvider.setSortComparator((SerializableComparator<Association>) (o1, o2) -> o1.getName().compareTo(o2.getName()));
+
+        comboBox.setItems(dataProvider);
+        comboBox.setValue(Association.NO_ASSOCIATION);
+        comboBox.setAllowCustomValue(false);
+        comboBox.setItemLabelGenerator(Association::getName);
+
         return comboBox;
     }
 }

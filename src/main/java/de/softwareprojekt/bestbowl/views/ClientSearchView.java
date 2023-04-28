@@ -15,10 +15,13 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+import de.softwareprojekt.bestbowl.jpa.entities.Address;
 import de.softwareprojekt.bestbowl.jpa.entities.Association;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepository;
@@ -28,6 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.*;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createAssociationCB;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.showNotification;
 
 @Route(value = "clientSearch", layout = MainView.class)
 @RouteAlias(value = "", layout = MainView.class)
@@ -35,6 +40,7 @@ import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
 @PermitAll
 public class ClientSearchView extends VerticalLayout {
     private final ClientRepository clientRepository;
+    private final Binder<Client> binder = new Binder<>();
     private final Dialog newClientDialog;
     private TextField searchField;
     private Grid<Client> clientGrid;
@@ -56,6 +62,7 @@ public class ClientSearchView extends VerticalLayout {
         add(headerComponent, searchComponent, newClientComponent, clientGrid, footerComponent);
         updateGridItems();
         updateFooterComponents();
+        resetDialog();
     }
 
     private Dialog createNewClientDialog() {
@@ -84,7 +91,7 @@ public class ClientSearchView extends VerticalLayout {
         TextField cityField = new TextField("Stadt");
         cityLayout.add(postCodeField, cityField);
         cityLayout.setFlexGrow(1, cityField);
-        ComboBox<Association> associationCB = new ComboBox<>("Verein");
+        ComboBox<Association> associationCB = createAssociationCB("Verein");
         associationCB.setWidthFull();
         layout.add(firstNameField, lastNameField, emailField, streetLayout, cityLayout, associationCB);
         dialog.add(layout);
@@ -96,14 +103,70 @@ public class ClientSearchView extends VerticalLayout {
         footerLayout.add(cancelButton, saveButton);
         footerLayout.setFlexGrow(1, cancelButton, saveButton);
         dialog.getFooter().add(footerLayout);
-        cancelButton.addClickListener(e -> {
-            dialog.close();
-        });
+
+        cancelButton.addClickListener(e -> dialog.close());
         saveButton.addClickListener(e -> {
+            try {
+                binder.writeBean(selectedClient);
+                clientRepository.save(selectedClient);
+                dialog.close();
+                clientGrid.getListDataView().addItem(selectedClient);
+                clientGrid.deselectAll();
+                clientGrid.select(selectedClient);
+                updateFooterComponents();
+                showNotification("Kunde angelegt");
+            } catch (ValidationException ex) {
+                showNotification("Füllen Sie alle Felder aus!");
+            }
         });
         dialog.addOpenedChangeListener(e -> {
+            if (e.isOpened()) {
+                resetDialog();
+            }
         });
+
+        binder.bind(firstNameField, Client::getFirstName, Client::setFirstName);
+        binder.bind(lastNameField, Client::getLastName, Client::setLastName);
+        binder.bind(emailField, Client::getEmail, Client::setEmail);
+        binder.bind(streetField, client -> client.getAddress().getStreet(), ((client, s) -> client.getAddress().setStreet(s)));
+        binder.bind(houseNrField, client -> client.getAddress().getHouseNr(),
+                ((client, i) -> client.getAddress().setHouseNr(Objects.requireNonNullElse(i, 0))));
+        binder.bind(postCodeField, client -> client.getAddress().getPostCode(),
+                ((client, i) -> client.getAddress().setPostCode(Objects.requireNonNullElse(i, 0))));
+        binder.bind(cityField, client -> client.getAddress().getCity(), ((client, s) -> client.getAddress().setCity(s)));
+        binder.bind(associationCB,
+                client -> client.getAssociation() == null ? Association.NO_ASSOCIATION : client.getAssociation(),
+                ((client, association) -> {
+                    if (association.equals(Association.NO_ASSOCIATION)) {
+                        client.setAssociation(null);
+                    } else {
+                        client.setAssociation(association);
+                    }
+                }));
         return dialog;
+    }
+
+    private void resetDialog() {
+        clientGrid.deselectAll();
+        updateFooterComponents();
+
+        selectedClient = new Client();
+        selectedClient.addAddress(new Address());
+        binder.readBean(selectedClient);
+
+        newClientDialog.getChildren().forEach(component -> {
+            if (component instanceof VerticalLayout verticalLayout) {
+                verticalLayout.getChildren().forEach(component1 -> {
+                    if (component1 instanceof HorizontalLayout horizontalLayout) {
+                        horizontalLayout.getChildren().forEach(component2 -> {
+                            if (component2 instanceof IntegerField i) {
+                                i.setValue(null);
+                            }
+                        });
+                    }
+                });
+            }
+        });
     }
 
     private Component createHeader() {

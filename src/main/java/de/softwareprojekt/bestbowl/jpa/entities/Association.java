@@ -11,7 +11,14 @@ import java.util.Set;
  */
 @Entity
 public class Association implements Serializable {
+    public static final Association NO_ASSOCIATION;
     private static final long serialVersionUID = 3267080689333108719L;
+
+    static {
+        NO_ASSOCIATION = new Association();
+        NO_ASSOCIATION.setId(-1);
+        NO_ASSOCIATION.setName("-");
+    }
 
     @Id
     @GeneratedValue
