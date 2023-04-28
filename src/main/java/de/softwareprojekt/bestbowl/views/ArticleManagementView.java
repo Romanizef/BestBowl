@@ -4,6 +4,7 @@ package de.softwareprojekt.bestbowl.views;
 import com.vaadin.flow.component.HasEnabled;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -17,18 +18,22 @@ import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
 import de.softwareprojekt.bestbowl.jpa.entities.Food;
 import de.softwareprojekt.bestbowl.jpa.entities.Drink;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.DrinkVariantRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.FoodRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.DrinkRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.views.form.FoodForm;
 import de.softwareprojekt.bestbowl.views.form.DrinkForm;
+import de.softwareprojekt.bestbowl.views.form.ShoeForm;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.swing.text.StyledEditorKit;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,33 +50,42 @@ public class ArticleManagementView extends VerticalLayout {
     private final FoodRepository foodRepository;
     private final DrinkRepository drinkRepository;
     private final DrinkVariantRepository drinkVariantRepository;
+    private final BowlingShoeRepository bowlingShoeRepository;
     private final Binder<Food> foodBinder = new Binder<>();
     private final Binder<Drink> drinkBinder = new Binder<>();
     private final Binder<DrinkVariant> drinkVariantBinder = new Binder<>();
+    private final Binder<BowlingShoe> shoeBinder = new Binder<>();
     private Grid<Food> foodGrid;
     private Grid<Drink> drinkGrid;
     private Grid<DrinkVariant> drinkVariantGrid;
+    private Grid<BowlingShoe> shoeGrid;
     private final VerticalLayout foodTabSheet = new VerticalLayout();
     private final VerticalLayout drinkTabSheet = new VerticalLayout();
+    private final VerticalLayout shoeTabSheet = new VerticalLayout();
     private FoodForm foodForm;
     private DrinkForm drinkForm;
+    private ShoeForm shoeForm;
 
     private FormLayout editFoodForm;
     private FormLayout editDrinkForm;
+    private FormLayout editShoeForm;
     private Food selectedFood = null;
     private Drink selectedDrink = null;
-    private DrinkVariant selectedDrinkVariant = null;
+    private BowlingShoe selectedShoe = null;
 
 
-    private final VerticalLayout shoeTabSheet = new VerticalLayout();
+
+
 
 
     @Autowired
     public ArticleManagementView(FoodRepository foodRepository, DrinkRepository drinkRepository,
-                                 DrinkVariantRepository drinkVariantRepository) {
+                                 DrinkVariantRepository drinkVariantRepository,
+                                 BowlingShoeRepository bowlingShoeRepository) {
         this.foodRepository = foodRepository;
         this.drinkRepository = drinkRepository;
         this.drinkVariantRepository = drinkVariantRepository;
+        this.bowlingShoeRepository = bowlingShoeRepository;
         setSizeFull();
         TabSheet tabSheet = new TabSheet();
         tabSheet.setSizeFull();
@@ -95,8 +109,11 @@ public class ArticleManagementView extends VerticalLayout {
         drinkTabSheet.add(newDrinkButton, drinkGridFormLayout, drinkVariantGrid);
         updateEditDrinkLayoutState();
 
+        Button newShoeButton = createNewShoeButton();
+        HorizontalLayout shoeGridFormLayout = createShoeGridFormLayout();
         shoeTabSheet.setSizeFull();
-        shoeTabSheet.add(new H1("Test2"));
+        shoeTabSheet.add(newShoeButton, shoeGridFormLayout);
+        updateEditShoeLayoutState();
     }
 
     private Button createNewFoodButton() {
@@ -125,6 +142,19 @@ public class ArticleManagementView extends VerticalLayout {
         return button;
     }
 
+    private Button createNewShoeButton() {
+        Button button = new Button("Neue Schuhe hinzufügen");
+        button.setWidthFull();
+        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        button.addClickListener(e -> {
+            shoeGrid.deselectAll();
+            selectedShoe = new BowlingShoe();
+            shoeBinder.readBean(selectedShoe);
+            updateEditShoeLayoutState();
+        });
+        return button;
+    }
+
     private void updateEditFoodLayoutState() {
         if (selectedFood == null) {
             editFoodForm.getChildren().forEach(component -> {
@@ -142,7 +172,7 @@ public class ArticleManagementView extends VerticalLayout {
     }
 
     private void updateEditDrinkLayoutState() {
-        if (selectedDrink == null && selectedDrinkVariant == null) {
+        if (selectedDrink == null) {
             editDrinkForm.getChildren().forEach(component -> {
                 if (component instanceof HasEnabled c) {
                     c.setEnabled(false);
@@ -150,6 +180,22 @@ public class ArticleManagementView extends VerticalLayout {
             });
         } else {
             editDrinkForm.getChildren().forEach(component -> {
+                if (component instanceof HasEnabled c) {
+                    c.setEnabled(true);
+                }
+            });
+        }
+    }
+
+    private void updateEditShoeLayoutState() {
+        if (selectedShoe == null) {
+            editShoeForm.getChildren().forEach(component -> {
+                if (component instanceof HasEnabled c) {
+                    c.setEnabled(false);
+                }
+            });
+        } else {
+            editShoeForm.getChildren().forEach(component -> {
                 if (component instanceof HasEnabled c) {
                     c.setEnabled(true);
                 }
@@ -174,6 +220,16 @@ public class ArticleManagementView extends VerticalLayout {
         drinkGrid = createDrinkGrid();
         editDrinkForm = drinkForm;
         layout.add(drinkGrid, drinkForm);
+        return layout;
+    }
+
+    private HorizontalLayout createShoeGridFormLayout() {
+        HorizontalLayout layout = new HorizontalLayout();
+        shoeForm = new ShoeForm(shoeBinder);
+        layout.setSizeFull();
+        shoeGrid = createShoeGrid();
+        editShoeForm = shoeForm;
+        layout.add(shoeGrid, shoeForm);
         return layout;
     }
 
@@ -288,6 +344,45 @@ public class ArticleManagementView extends VerticalLayout {
             updateEditDrinkLayoutState();
         });
         return drinkGrid;
+    }
+
+    private Grid<BowlingShoe> createShoeGrid() {
+        Grid<BowlingShoe> shoeGrid = new Grid<>(BowlingShoe.class);
+        shoeGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        shoeGrid.removeAllColumns();
+        Grid.Column<BowlingShoe> idColumn = shoeGrid.addColumn(BowlingShoe::getId).setHeader("ID");
+        Grid.Column<BowlingShoe> boughtColumn = shoeGrid.addColumn("boughtAt").setHeader("Kaufdatum");
+        Grid.Column<BowlingShoe> sizeColumn = shoeGrid.addColumn("size").setHeader("Größe");
+        Grid.Column<BowlingShoe> activeColumn = shoeGrid.addColumn("active").setHeader("Aktiv");
+        shoeGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
+        shoeGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+        shoeGrid.setWidth("75%");
+        shoeGrid.setHeight("100%");
+        List<BowlingShoe> shoeList = bowlingShoeRepository.findAll();
+        GridListDataView<BowlingShoe> dataView = shoeGrid.setItems(shoeList);
+        ShoeFilter shoeFilter = new ShoeFilter(dataView);
+        shoeGrid.getHeaderRows().clear();
+        HeaderRow headerRow = shoeGrid.appendHeaderRow();
+        headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", shoeFilter::setId));
+        //headerRow.getCell(boughtColumn).setComponent(createFilterHeaderString("Kaufdatum", shoeFilter::boughtAt));
+        headerRow.getCell(sizeColumn).setComponent(createFilterHeaderInteger("Größe",shoeFilter::setSize));
+        headerRow.getCell(activeColumn)
+                .setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", shoeFilter::setActive));
+        shoeFilter.setActive(true);
+        shoeGrid.addSelectionListener(e -> {
+            if (e.isFromClient()) {
+                Optional<BowlingShoe> optionalBowlingShoe = e.getFirstSelectedItem();
+                if (optionalBowlingShoe.isPresent()) {
+                    selectedShoe = optionalBowlingShoe.get();
+                    shoeBinder.readBean(selectedShoe);
+                } else {
+                    selectedShoe = null;
+                    shoeBinder.readBean(new BowlingShoe());
+                }
+            }
+            updateEditShoeLayoutState();
+        });
+        return shoeGrid;
     }
 
     private static class FoodFilter {
@@ -449,5 +544,56 @@ public class ArticleManagementView extends VerticalLayout {
             dataView.refreshAll();
         }
 
+    }
+
+    private static class ShoeFilter {
+        private final GridListDataView<BowlingShoe> dataView;
+        private String id;
+        private DatePicker boughtAt;
+        //private String boughtAt;
+        private String size;
+
+        private boolean active;
+
+        public ShoeFilter(GridListDataView<BowlingShoe> dataView) {
+            this.dataView = dataView;
+            this.dataView.addFilter(this::test);
+        }
+
+        public boolean test(BowlingShoe shoe) {
+            boolean matchesId = matches(String.valueOf(shoe.getId()), id);
+           // boolean matchesBoughtAt = matches(boughtAt);
+            boolean matchesSize = matches(String.valueOf(shoe.getSize()), size);
+            boolean matchesActive = shoe.isActive() == active;
+            return matchesId && matchesSize && matchesActive;
+        }
+
+        /*
+        Filterregel noch nicht geschrieben
+        */
+
+        private boolean matches(String value, String searchTerm) {
+            return searchTerm == null || searchTerm.isEmpty() || value.toLowerCase().contains(searchTerm.toLowerCase());
+        }
+
+        public void setId(String id) {
+            this.id = id;
+            dataView.refreshAll();
+        }
+
+        public void setBoughtAt(DatePicker boughtAt) {
+            this.boughtAt = boughtAt;
+            dataView.refreshAll();
+        }
+
+        public void setSize(String size) {
+            this.size = size;
+            dataView.refreshAll();
+        }
+
+        public void setActive(boolean active) {
+            this.active = active;
+            dataView.refreshAll();
+        }
     }
 }
