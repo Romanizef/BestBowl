@@ -27,7 +27,7 @@ import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
  * @author Marten Voß
  * @author Matija Kopschek
  * @author Max Ziller
- * @author Ali Cicek
+ * @author Ali aus Mali, chillt am Strand in Bali und drinkt ne ganze Bacardi
  */
 public class MainView extends AppLayout implements AppShellConfigurator {
     private final Tabs menu;
