@@ -47,22 +47,23 @@ public class ArticleManagementView extends VerticalLayout {
     private final DrinkVariantRepository drinkVariantRepository;
     private final Binder<Food> foodBinder = new Binder<>();
     private final Binder<Drink> drinkBinder = new Binder<>();
+    private final Binder<DrinkVariant> drinkVariantBinder = new Binder<>();
     private Grid<Food> foodGrid;
     private Grid<Drink> drinkGrid;
     private Grid<DrinkVariant> drinkVariantGrid;
-    VerticalLayout foodTabSheet = new VerticalLayout();
-    VerticalLayout drinkTabSheet = new VerticalLayout();
-    FoodForm foodForm;
-    DrinkForm drinkForm;
+    private final VerticalLayout foodTabSheet = new VerticalLayout();
+    private final VerticalLayout drinkTabSheet = new VerticalLayout();
+    private FoodForm foodForm;
+    private DrinkForm drinkForm;
 
-    Drink drink;
     private FormLayout editFoodForm;
     private FormLayout editDrinkForm;
     private Food selectedFood = null;
     private Drink selectedDrink = null;
+    private DrinkVariant selectedDrinkVariant = null;
 
 
-    VerticalLayout shoeTabSheet = new VerticalLayout();
+    private final VerticalLayout shoeTabSheet = new VerticalLayout();
 
 
     @Autowired
@@ -88,17 +89,15 @@ public class ArticleManagementView extends VerticalLayout {
         updateEditFoodLayoutState();
 
         Button newDrinkButton = createNewDrinkButton();
-       // HorizontalLayout drinkGridFormLayout = createDrinkGridFormLayout();
-        VerticalLayout drinkGridFormLayout = drinkLayout();
+        HorizontalLayout drinkGridFormLayout = createDrinkGridFormLayout();
+        drinkVariantGrid = createDrinkVariantGrid();
         drinkTabSheet.setSizeFull();
-        //drinkTabSheet.add(newDrinkButton, drinkGridFormLayout);
-        drinkTabSheet.add(newDrinkButton, drinkGridFormLayout);
+        drinkTabSheet.add(newDrinkButton, drinkGridFormLayout, drinkVariantGrid);
         updateEditDrinkLayoutState();
 
         shoeTabSheet.setSizeFull();
         shoeTabSheet.add(new H1("Test2"));
     }
-
 
     private Button createNewFoodButton() {
         Button button = new Button("Neue Speise hinzufügen");
@@ -143,7 +142,7 @@ public class ArticleManagementView extends VerticalLayout {
     }
 
     private void updateEditDrinkLayoutState() {
-        if (selectedDrink == null) {
+        if (selectedDrink == null && selectedDrinkVariant == null) {
             editDrinkForm.getChildren().forEach(component -> {
                 if (component instanceof HasEnabled c) {
                     c.setEnabled(false);
@@ -160,7 +159,7 @@ public class ArticleManagementView extends VerticalLayout {
 
     private HorizontalLayout createFoodGridFormLayout() {
         HorizontalLayout layout = new HorizontalLayout();
-        foodForm = new FoodForm();
+        foodForm = new FoodForm(foodBinder);
         layout.setSizeFull();
         foodGrid = createFoodGrid();
         editFoodForm = foodForm;
@@ -170,7 +169,7 @@ public class ArticleManagementView extends VerticalLayout {
 
     private HorizontalLayout createDrinkGridFormLayout() {
         HorizontalLayout layout = new HorizontalLayout();
-        drinkForm = new DrinkForm();
+        drinkForm = new DrinkForm(drinkVariantBinder, drinkBinder);
         layout.setSizeFull();
         drinkGrid = createDrinkGrid();
         editDrinkForm = drinkForm;
@@ -221,14 +220,6 @@ public class ArticleManagementView extends VerticalLayout {
         return foodGrid;
     }
 
-    private VerticalLayout drinkLayout(){
-        VerticalLayout layout = new VerticalLayout();
-        HorizontalLayout drinkGridFormLayout = createDrinkGridFormLayout();
-        layout.setSizeFull();
-        drinkVariantGrid = createDrinkVariantGrid();
-        layout.add(drinkGridFormLayout, drinkVariantGrid);
-        return layout;
-    }
     private Grid<DrinkVariant> createDrinkVariantGrid() {
         Grid<DrinkVariant> drinkVariantGrid = new Grid<>(DrinkVariant.class);
         drinkVariantGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
@@ -251,7 +242,8 @@ public class ArticleManagementView extends VerticalLayout {
         HeaderRow headerRow = drinkVariantGrid.appendHeaderRow();
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", drinkVariantFilter::setId));
         //headerRow.getCell(drinkVariantGrid).setComponent(createFilterHeaderString("Getränk", drinkVariantFilter::setName));
-        headerRow.getCell(mlColumn).setComponent(createFilterHeaderInteger("Milliliter", drinkVariantFilter::setMl));
+        //Filter Feld für GetränkeVariante funktioniert so noch nicht
+        headerRow.getCell(mlColumn).setComponent(createFilterHeaderInteger("Variante", drinkVariantFilter::setMl));
         headerRow.getCell(priceColumn).setComponent(createFilterHeaderInteger("Preis", drinkVariantFilter::setPrice));
 
         return drinkVariantGrid;
@@ -413,7 +405,7 @@ public class ArticleManagementView extends VerticalLayout {
     private static class DrinkVariantFilter {
         private final GridListDataView<DrinkVariant> dataView;
         private String id;
-        private String name;
+        private String name; //siehe Methode Zeile 439
         private String milliliter;
         private String price;
 
@@ -425,7 +417,7 @@ public class ArticleManagementView extends VerticalLayout {
 
         public boolean test(DrinkVariant drinkVariant) {
             boolean matchesId = matches(String.valueOf(drinkVariant.getId()), id);
-            boolean matchesDrink = matches(String.valueOf(drinkVariant.getDrink()), name);
+            boolean matchesDrink = matches(String.valueOf(drinkVariant.getDrink()), name); //Filter funktioniert noch nicht
             boolean matchesMilliliter = matches(String.valueOf(drinkVariant.getMl()), milliliter);
             boolean matchesPrice = matches(String.valueOf(drinkVariant.getPrice()), price);
             return matchesId && matchesDrink && matchesMilliliter && matchesPrice;
@@ -440,10 +432,12 @@ public class ArticleManagementView extends VerticalLayout {
             dataView.refreshAll();
         }
 
-        public void setName(String name) {
+        /*public void setName(String name) {
             this.name = name;
             dataView.refreshAll();
         }
+        //Da das Filter Feld für GetränkeVariante noch nicht funktioniert ist diese Methode auskommentiert
+         */
 
         public void setMl(String milliliter) {
             this.milliliter = milliliter;

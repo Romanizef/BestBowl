@@ -5,34 +5,38 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.ComboBoxVariant;
 import  com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import de.softwareprojekt.bestbowl.jpa.entities.Drink;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
+import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 
 /**
  * @author Max Ziller
  */
 
 public class DrinkForm extends FormLayout{
-    private final Binder<Drink> drinkBinder = new Binder<>();
-    private final Binder<DrinkVariant> drinkVariantBinder = new Binder<>();
+
     TextField nameField = new TextField("Name");
-    NumberField stockField = new NumberField("Bestand");
-    NumberField reorderPointField = new NumberField("Meldebestand");
+    IntegerField stockField = new IntegerField("Bestand");
+    IntegerField reorderPointField = new IntegerField("Meldebestand");
     NumberField priceField = new NumberField("Preis");
+    ComboBox<String> varianteCB = new ComboBox<>("Variante");
     Checkbox activeCheckbox = new Checkbox("Artikel aktivieren");
     Button saveButton = new Button("Sichern");
     Button cancelButton = new Button("Abbrechen");
 
-    public DrinkForm(){
+    public DrinkForm(Binder<DrinkVariant> drinkVariantBinder,Binder<Drink> drinkBinder){
         setWidth("25%");
         nameField.setWidthFull();
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
@@ -42,6 +46,10 @@ public class DrinkForm extends FormLayout{
         reorderPointField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         priceField.setWidthFull();
         priceField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        varianteCB.setWidthFull();
+        varianteCB.setAllowCustomValue(false);
+        varianteCB.setItems("Smal", "Medium", "Large"); /* soll die verschiedenen Getränkegrößen repräsentieren */
+        varianteCB.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
 
         HorizontalLayout checkboxLayout = new HorizontalLayout();
         checkboxLayout.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -50,13 +58,13 @@ public class DrinkForm extends FormLayout{
         checkboxLayout.add(activeCheckbox);
 
 
-        add(nameField, stockField, reorderPointField, priceField, checkboxLayout,
+        add(nameField, stockField, reorderPointField, varianteCB, priceField, checkboxLayout,
                 createButtonLayout());
 
         drinkBinder.bind(nameField, Drink::getName, Drink::setName);
-        // binder.bind(stockField, Drink::stockInMilliliters, Drink::stockInMilliliters);
-        //binder.bind(reorderPointField,Drink::getReorderPoint, Drink::setReorderPoint);
-        drinkVariantBinder.bind(priceField, DrinkVariant::getPrice, DrinkVariant::setPrice);
+        drinkBinder.bind(stockField, Drink::getStockInMilliliters, Drink::setStockInMilliliters);
+        drinkBinder.bind(reorderPointField,Drink::getReorderPoint, Drink::setReorderPoint);
+        drinkVariantBinder.bind(priceField, DrinkVariant::getPrice, DrinkVariant::setPrice); /*Binder funktioniert noch nicht*/
         drinkBinder.bind(activeCheckbox, Drink::isActive, Drink::setActive);
     }
 

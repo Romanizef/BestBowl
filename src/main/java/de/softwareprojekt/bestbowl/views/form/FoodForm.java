@@ -8,28 +8,29 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import  com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import de.softwareprojekt.bestbowl.jpa.entities.Food;
 import de.softwareprojekt.bestbowl.jpa.entities.User;
+import de.softwareprojekt.bestbowl.views.ArticleManagementView;
 
 /**
  * @author Max Ziller
  */
 
 public class FoodForm extends FormLayout{
-    private final Binder<Food> binder = new Binder<>();
     TextField nameField = new TextField("Name");
-    NumberField stockField = new NumberField("Bestand");
-    NumberField reorderPointField = new NumberField("Meldebestand");
+    IntegerField stockField = new IntegerField("Bestand");
+    IntegerField reorderPointField = new IntegerField("Meldebestand");
     NumberField priceField = new NumberField("Preis");
     Checkbox activeCheckbox = new Checkbox("Artikel aktivieren");
     Button saveButton = new Button("Sichern");
     Button cancelButton = new Button("Abbrechen");
 
-    public FoodForm(){
+    public FoodForm(Binder<Food> foodBinder){
         setWidth("25%");
         nameField.setWidthFull();
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
@@ -50,11 +51,11 @@ public class FoodForm extends FormLayout{
         add(nameField, stockField, reorderPointField, priceField, checkboxLayout,
             createButtonLayout());
 
-        binder.bind(nameField, Food::getName, Food::setName);
-       // binder.bind(stockField, Food::getStock, Food::setStock);
-        //binder.bind(reorderPointField,Food::getReorderPoint, Food::setReorderPoint);
-        binder.bind(priceField, Food::getPrice, Food::setPrice);
-        binder.bind(activeCheckbox, Food::isActive, Food::setActive);
+        foodBinder.bind(nameField, Food::getName, Food::setName);
+        foodBinder.bind(stockField, Food::getStock, Food::setStock);
+        foodBinder.bind(reorderPointField, Food::getReorderPoint, Food::setReorderPoint);
+        foodBinder.bind(priceField, Food::getPrice, Food::setPrice);
+        foodBinder.bind(activeCheckbox, Food::isActive, Food::setActive);
     }
 
     private Component createButtonLayout(){
