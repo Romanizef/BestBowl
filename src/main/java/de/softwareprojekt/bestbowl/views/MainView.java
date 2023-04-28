@@ -27,7 +27,7 @@ import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
  * @author Marten Voß
  * @author Matija Kopschek
  * @author Max Ziller
- * @author Ali aus Mali
+ * @author Ali Cicek
  */
 public class MainView extends AppLayout implements AppShellConfigurator {
     private final Tabs menu;
@@ -69,11 +69,11 @@ public class MainView extends AppLayout implements AppShellConfigurator {
                 createTab("Kunde suchen", ClientSearchView.class),
                 createTab("Bahn buchen", BowlingAlleyBookingView.class),
                 createTab("Rechnung", InvoiceView.class),
-                createTab("Nutzerverwaltung", UserManagementView.class),
                 createTab("Kundenverwaltung", ClientManagementView.class),
                 createTab("Vereinsverwaltung", AssociationManagementView.class),
-                createTab("Statistiken", StatisticsView.class),
                 createTab("Artikelverwaltung", ArticleManagementView.class),
+                createTab("Nutzerverwaltung", UserManagementView.class),
+                createTab("Statistiken", StatisticsView.class),
                 createTab("Datenbank", DatabaseRedirectView.class)
         };
     }

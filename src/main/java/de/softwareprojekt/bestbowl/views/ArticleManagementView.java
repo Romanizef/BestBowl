@@ -1,7 +1,6 @@
 package de.softwareprojekt.bestbowl.views;
 
 
-import com.vaadin.flow.component.HasEnabled;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -10,7 +9,6 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
-import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
@@ -19,21 +17,20 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoe;
+import de.softwareprojekt.bestbowl.jpa.entities.Drink;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
 import de.softwareprojekt.bestbowl.jpa.entities.Food;
-import de.softwareprojekt.bestbowl.jpa.entities.Drink;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.DrinkRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.DrinkVariantRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.FoodRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.DrinkRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
-import de.softwareprojekt.bestbowl.views.form.FoodForm;
 import de.softwareprojekt.bestbowl.views.form.DrinkForm;
+import de.softwareprojekt.bestbowl.views.form.FoodForm;
 import de.softwareprojekt.bestbowl.views.form.ShoeForm;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.swing.text.StyledEditorKit;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,8 +40,8 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
  * @author Max Ziller
  */
 
-@Route(value = "Artikel-Management", layout = MainView.class)
-@PageTitle("Artikel Management")
+@Route(value = "articleManagement", layout = MainView.class)
+@PageTitle("Artikelverwaltung")
 @RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 public class ArticleManagementView extends VerticalLayout {
     private final FoodRepository foodRepository;
@@ -55,13 +52,13 @@ public class ArticleManagementView extends VerticalLayout {
     private final Binder<Drink> drinkBinder = new Binder<>();
     private final Binder<DrinkVariant> drinkVariantBinder = new Binder<>();
     private final Binder<BowlingShoe> shoeBinder = new Binder<>();
+    private final VerticalLayout foodTabSheet = new VerticalLayout();
+    private final VerticalLayout drinkTabSheet = new VerticalLayout();
+    private final VerticalLayout shoeTabSheet = new VerticalLayout();
     private Grid<Food> foodGrid;
     private Grid<Drink> drinkGrid;
     private Grid<DrinkVariant> drinkVariantGrid;
     private Grid<BowlingShoe> shoeGrid;
-    private final VerticalLayout foodTabSheet = new VerticalLayout();
-    private final VerticalLayout drinkTabSheet = new VerticalLayout();
-    private final VerticalLayout shoeTabSheet = new VerticalLayout();
     private FoodForm foodForm;
     private DrinkForm drinkForm;
     private ShoeForm shoeForm;
@@ -72,10 +69,6 @@ public class ArticleManagementView extends VerticalLayout {
     private Food selectedFood = null;
     private Drink selectedDrink = null;
     private BowlingShoe selectedShoe = null;
-
-
-
-
 
 
     @Autowired
@@ -156,50 +149,23 @@ public class ArticleManagementView extends VerticalLayout {
     }
 
     private void updateEditFoodLayoutState() {
+        setChildrenEnabled(foodForm.getChildren(), selectedFood != null);
         if (selectedFood == null) {
-            editFoodForm.getChildren().forEach(component -> {
-                if (component instanceof HasEnabled c) {
-                    c.setEnabled(false);
-                }
-            });
-        } else {
-            editFoodForm.getChildren().forEach(component -> {
-                if (component instanceof HasEnabled c) {
-                    c.setEnabled(true);
-                }
-            });
+            setValueForIntegerFieldChildren(foodForm.getChildren(), null);
         }
     }
 
     private void updateEditDrinkLayoutState() {
+        setChildrenEnabled(drinkForm.getChildren(), selectedDrink != null);
         if (selectedDrink == null) {
-            editDrinkForm.getChildren().forEach(component -> {
-                if (component instanceof HasEnabled c) {
-                    c.setEnabled(false);
-                }
-            });
-        } else {
-            editDrinkForm.getChildren().forEach(component -> {
-                if (component instanceof HasEnabled c) {
-                    c.setEnabled(true);
-                }
-            });
+            setValueForIntegerFieldChildren(drinkForm.getChildren(), null);
         }
     }
 
     private void updateEditShoeLayoutState() {
+        setChildrenEnabled(editShoeForm.getChildren(), selectedShoe != null);
         if (selectedShoe == null) {
-            editShoeForm.getChildren().forEach(component -> {
-                if (component instanceof HasEnabled c) {
-                    c.setEnabled(false);
-                }
-            });
-        } else {
-            editShoeForm.getChildren().forEach(component -> {
-                if (component instanceof HasEnabled c) {
-                    c.setEnabled(true);
-                }
-            });
+            setValueForIntegerFieldChildren(shoeForm.getChildren(), null);
         }
     }
 
@@ -304,6 +270,7 @@ public class ArticleManagementView extends VerticalLayout {
 
         return drinkVariantGrid;
     }
+
     private Grid<Drink> createDrinkGrid() {
         Grid<Drink> drinkGrid = new Grid<>(Drink.class);
         drinkGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
@@ -365,7 +332,7 @@ public class ArticleManagementView extends VerticalLayout {
         HeaderRow headerRow = shoeGrid.appendHeaderRow();
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", shoeFilter::setId));
         //headerRow.getCell(boughtColumn).setComponent(createFilterHeaderString("Kaufdatum", shoeFilter::boughtAt));
-        headerRow.getCell(sizeColumn).setComponent(createFilterHeaderInteger("Größe",shoeFilter::setSize));
+        headerRow.getCell(sizeColumn).setComponent(createFilterHeaderInteger("Größe", shoeFilter::setSize));
         headerRow.getCell(activeColumn)
                 .setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", shoeFilter::setActive));
         shoeFilter.setActive(true);
@@ -562,7 +529,7 @@ public class ArticleManagementView extends VerticalLayout {
 
         public boolean test(BowlingShoe shoe) {
             boolean matchesId = matches(String.valueOf(shoe.getId()), id);
-           // boolean matchesBoughtAt = matches(boughtAt);
+            // boolean matchesBoughtAt = matches(boughtAt);
             boolean matchesSize = matches(String.valueOf(shoe.getSize()), size);
             boolean matchesActive = shoe.isActive() == active;
             return matchesId && matchesSize && matchesActive;

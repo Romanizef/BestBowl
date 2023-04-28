@@ -1,6 +1,5 @@
 package de.softwareprojekt.bestbowl.views;
 
-import com.vaadin.flow.component.HasEnabled;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -203,15 +202,7 @@ public class UserManagementView extends VerticalLayout {
     }
 
     private void updateEditLayoutState() {
-        setEditLayoutEnabled(selectedUser != null);
-    }
-
-    private void setEditLayoutEnabled(boolean enabled) {
-        editLayout.getChildren().forEach(component -> {
-            if (component instanceof HasEnabled c) {
-                c.setEnabled(enabled);
-            }
-        });
+        setChildrenEnabled(editLayout.getChildren(), selectedUser != null);
     }
 
     private static class UserFilter {

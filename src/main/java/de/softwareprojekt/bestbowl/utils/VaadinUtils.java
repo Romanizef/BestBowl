@@ -1,6 +1,8 @@
 package de.softwareprojekt.bestbowl.utils;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.HasEnabled;
+import com.vaadin.flow.component.HasOrderedComponents;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.ComboBoxVariant;
 import com.vaadin.flow.component.notification.Notification;
@@ -18,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * @author Marten Voß
@@ -128,5 +131,39 @@ public class VaadinUtils {
         comboBox.setItemLabelGenerator(Association::getName);
 
         return comboBox;
+    }
+
+    /**
+     * Recursively set the enabled flag for all child components
+     *
+     * @param children stream of child components
+     * @param enabled  new value for enabled
+     */
+    public static void setChildrenEnabled(Stream<Component> children, boolean enabled) {
+        children.forEach(component -> {
+            if (component instanceof HasOrderedComponents parent) {
+                setChildrenEnabled(parent.getChildren(), enabled);
+            }
+            if (component instanceof HasEnabled child) {
+                child.setEnabled(enabled);
+            }
+        });
+    }
+
+    /**
+     * Recursively set the value for all IntegerField child components
+     *
+     * @param children stream of all child elements
+     * @param value    new value for all IntegerFields
+     */
+    public static void setValueForIntegerFieldChildren(Stream<Component> children, Integer value) {
+        children.forEach(component -> {
+            if (component instanceof HasOrderedComponents parent) {
+                setValueForIntegerFieldChildren(parent.getChildren(), value);
+            }
+            if (component instanceof IntegerField child) {
+                child.setValue(value);
+            }
+        });
     }
 }

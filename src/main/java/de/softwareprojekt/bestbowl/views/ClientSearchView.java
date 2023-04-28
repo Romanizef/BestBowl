@@ -31,8 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.*;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createAssociationCB;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.showNotification;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 @Route(value = "clientSearch", layout = MainView.class)
 @RouteAlias(value = "", layout = MainView.class)
@@ -154,19 +153,7 @@ public class ClientSearchView extends VerticalLayout {
         selectedClient.addAddress(new Address());
         binder.readBean(selectedClient);
 
-        newClientDialog.getChildren().forEach(component -> {
-            if (component instanceof VerticalLayout verticalLayout) {
-                verticalLayout.getChildren().forEach(component1 -> {
-                    if (component1 instanceof HorizontalLayout horizontalLayout) {
-                        horizontalLayout.getChildren().forEach(component2 -> {
-                            if (component2 instanceof IntegerField i) {
-                                i.setValue(null);
-                            }
-                        });
-                    }
-                });
-            }
-        });
+        setValueForIntegerFieldChildren(newClientDialog.getChildren(), null);
     }
 
     private Component createHeader() {
