@@ -49,9 +49,9 @@ public class CommandLineListener {
                         LOGGER.info("shutting down ...");
                         BestBowlApplication.shutdown();
                     } else if (command.equals("addUsers")) {
-                        userManager.addNewUser("admin", "admin", "1.1.2000", "-", UserRole.ADMIN);
-                        userManager.addNewUser("owner", "owner", "1.1.2000", "-", UserRole.OWNER);
-                        userManager.addNewUser("employee", "employee", "1.1.2000", "-", UserRole.EMPLOYEE);
+                        userManager.addNewUser("admin", "admin", "23.5.1993", "admin@bestbowl.de", UserRole.ADMIN);
+                        userManager.addNewUser("owner", "owner", "7.3.1986", "owner@bestbowl.de", UserRole.OWNER);
+                        userManager.addNewUser("employee", "employee", "19.10.2001", "employee@bestbowl.de", UserRole.EMPLOYEE);
                         LOGGER.info("Users added");
                     } else if (command.equals("generateRandomClients")) {
                         generateRandomClients(100);

@@ -67,7 +67,6 @@ public class MainView extends AppLayout implements AppShellConfigurator {
     private Tab[] createMenuItems() {
         return new Tab[]{
                 createTab("Kunde suchen", ClientSearchView.class),
-                createTab("Bahn buchen", BowlingAlleyBookingView.class),
                 createTab("Rechnung", InvoiceView.class),
                 createTab("Kundenverwaltung", ClientManagementView.class),
                 createTab("Vereinsverwaltung", AssociationManagementView.class),

@@ -51,6 +51,7 @@ public class UserManagementView extends VerticalLayout {
     private Grid<User> userGrid;
     private FormLayout editLayout;
     private User selectedUser = null;
+    private boolean editingNewUser = false;
     @Resource
     private UserManager userManager;
 
@@ -73,6 +74,7 @@ public class UserManagementView extends VerticalLayout {
             userGrid.deselectAll();
             selectedUser = new User();
             binder.readBean(selectedUser);
+            editingNewUser = true;
             updateEditLayoutState();
         });
         return button;
@@ -113,7 +115,6 @@ public class UserManagementView extends VerticalLayout {
         headerRow.getCell(answerColumn).setComponent(createFilterHeaderString("Sicherheitsfragenantwort", userFilter::setSecurityQuestionAnswer));
         headerRow.getCell(roleColumn).setComponent(createFilterHeaderString("Rolle", userFilter::setRole));
         headerRow.getCell(activeColumn).setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", userFilter::setActive));
-        userFilter.setActive(true);
 
         grid.addSelectionListener(e -> {
             if (e.isFromClient()) {
@@ -121,6 +122,7 @@ public class UserManagementView extends VerticalLayout {
                 if (optionalUser.isPresent()) {
                     selectedUser = optionalUser.get();
                     binder.readBean(selectedUser);
+                    editingNewUser = false;
                     updateEditLayoutState();
                 } else {
                     resetEditLayout();
@@ -185,21 +187,18 @@ public class UserManagementView extends VerticalLayout {
                     return;
                 }
                 if (writeBean()) {
-                    saveAndUpdateUserManager();
+                    saveToDbAndUpdateUserManager();
                 }
             } else {
                 //saving without password change
                 String encodedPw = selectedUser.getEncodedPassword();
                 if (writeBean()) {
                     selectedUser.setEncodedPassword(encodedPw);
-                    saveAndUpdateUserManager();
+                    saveToDbAndUpdateUserManager();
                 }
             }
         });
-        cancelButton.addClickListener(clickEvent -> {
-            resetEditLayout();
-            showNotification("Bearbeitung abgebrochen");
-        });
+        cancelButton.addClickListener(clickEvent -> resetEditLayout());
 
         layout.add(nameField, emailField, passwordField, securityQuestionAnswerField, roleCB, checkboxLayout, buttonLayout);
 
@@ -223,8 +222,13 @@ public class UserManagementView extends VerticalLayout {
         return false;
     }
 
-    private void saveAndUpdateUserManager() {
+    private void saveToDbAndUpdateUserManager() {
         userRepository.save(selectedUser);
+        if (editingNewUser) {
+            userGrid.getListDataView().addItem(selectedUser);
+        } else {
+            userGrid.getListDataView().refreshItem(selectedUser);
+        }
         userManager.updateUsersFromDb();
         resetEditLayout();
         showNotification("Nutzer gespeichert");

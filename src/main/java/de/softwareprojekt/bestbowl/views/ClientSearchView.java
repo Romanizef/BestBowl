@@ -25,6 +25,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.Address;
 import de.softwareprojekt.bestbowl.jpa.entities.Association;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepository;
+import de.softwareprojekt.bestbowl.utils.validators.ClientValidator;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -105,8 +106,7 @@ public class ClientSearchView extends VerticalLayout {
 
         cancelButton.addClickListener(e -> dialog.close());
         saveButton.addClickListener(e -> {
-            try {
-                binder.writeBean(selectedClient);
+            if (writeBean()) {
                 clientRepository.save(selectedClient);
                 dialog.close();
                 clientGrid.getListDataView().addItem(selectedClient);
@@ -114,8 +114,6 @@ public class ClientSearchView extends VerticalLayout {
                 clientGrid.select(selectedClient);
                 updateFooterComponents();
                 showNotification("Kunde angelegt");
-            } catch (ValidationException ex) {
-                showNotification("Füllen Sie alle Felder aus!");
             }
         });
         dialog.addOpenedChangeListener(e -> {
@@ -124,6 +122,7 @@ public class ClientSearchView extends VerticalLayout {
             }
         });
 
+        binder.withValidator(new ClientValidator());
         binder.bind(firstNameField, Client::getFirstName, Client::setFirstName);
         binder.bind(lastNameField, Client::getLastName, Client::setLastName);
         binder.bind(emailField, Client::getEmail, Client::setEmail);
@@ -143,6 +142,16 @@ public class ClientSearchView extends VerticalLayout {
                     }
                 }));
         return dialog;
+    }
+
+    private boolean writeBean() {
+        try {
+            binder.writeBean(selectedClient);
+            return true;
+        } catch (ValidationException e) {
+            e.getValidationErrors().forEach(error -> showNotification(error.getErrorMessage(), 7_000));
+        }
+        return false;
     }
 
     private void resetDialog() {

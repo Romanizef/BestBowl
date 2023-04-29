@@ -18,6 +18,7 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.jpa.entities.Address;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
 import static de.softwareprojekt.bestbowl.utils.Utils.matches;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
@@ -44,6 +46,7 @@ public class ClientManagementView extends VerticalLayout {
     private Grid<Client> clientGrid;
     private FormLayout editLayout;
     private Client selectedClient = null;
+    private boolean editingNewClient = false;
 
     @Autowired
     public ClientManagementView(ClientRepository clientRepository) {
@@ -65,6 +68,7 @@ public class ClientManagementView extends VerticalLayout {
             client.addAddress(new Address());
             selectedClient = client;
             binder.readBean(selectedClient);
+            editingNewClient = true;
             updateEditLayoutState();
         });
         return button;
@@ -113,7 +117,6 @@ public class ClientManagementView extends VerticalLayout {
         headerRow.getCell(postCodeColumn).setComponent(createFilterHeaderInteger("PLZ", clientFilter::setPostCode));
         headerRow.getCell(cityColumn).setComponent(createFilterHeaderString("Stadt", clientFilter::setCity));
         headerRow.getCell(activeColumn).setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", clientFilter::setActive));
-        clientFilter.setActive(true);
 
         grid.addSelectionListener(e -> {
             if (e.isFromClient()) {
@@ -121,6 +124,7 @@ public class ClientManagementView extends VerticalLayout {
                 if (optionalClient.isPresent()) {
                     selectedClient = optionalClient.get();
                     binder.readBean(selectedClient);
+                    editingNewClient = false;
                     updateEditLayoutState();
                 } else {
                     resetEditLayout();
@@ -174,8 +178,28 @@ public class ClientManagementView extends VerticalLayout {
         Checkbox activeCheckbox = new Checkbox("Aktiv");
         checkboxLayout.add(activeCheckbox);
 
+        HorizontalLayout buttonLayout = new HorizontalLayout();
+        buttonLayout.setWidthFull();
+
+        Button saveButton = new Button("Speichern");
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
+
+        Button cancelButton = new Button("Abbrechen");
+        cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
+
+        buttonLayout.add(cancelButton, saveButton);
+        buttonLayout.setFlexGrow(1, cancelButton, saveButton);
+
+        saveButton.addClickListener(clickEvent -> {
+            if (writeBean()) {
+                saveToDb();
+            }
+        });
+        cancelButton.addClickListener(clickEvent -> resetEditLayout());
+
         layout.add(firstNameField, lastNameField, emailField, associationCB, streetField, houseNrField,
-                postCodeField, cityField, checkboxLayout, createSaveAndCancelButtonLayout());
+                postCodeField, cityField, checkboxLayout, buttonLayout);
 
         binder.bind(firstNameField, Client::getFirstName, Client::setFirstName);
         binder.bind(lastNameField, Client::getLastName, Client::setLastName);
@@ -199,30 +223,25 @@ public class ClientManagementView extends VerticalLayout {
         return layout;
     }
 
-    private HorizontalLayout createSaveAndCancelButtonLayout() {
-        HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.setWidthFull();
+    private boolean writeBean() {
+        try {
+            binder.writeBean(selectedClient);
+            return true;
+        } catch (ValidationException e) {
+            e.getValidationErrors().forEach(error -> showNotification(error.getErrorMessage(), 7_000));
+        }
+        return false;
+    }
 
-        Button saveButton = new Button("Speichern");
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
-
-        Button cancelButton = new Button("Abbrechen");
-        cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
-
-        buttonLayout.add(cancelButton, saveButton);
-        buttonLayout.setFlexGrow(1, cancelButton, saveButton);
-
-        saveButton.addClickListener(clickEvent -> {
-            // TODO Kunde in die Datenbank speichern
-            resetEditLayout();
-            showNotification("Kunde gespeichert");
-        });
-        cancelButton.addClickListener(clickEvent -> {
-            resetEditLayout();
-            showNotification("Bearbeitung abgebrochen");
-        });
-        return buttonLayout;
+    private void saveToDb() {
+        clientRepository.save(selectedClient);
+        if (editingNewClient) {
+            clientGrid.getListDataView().addItem(selectedClient);
+        } else {
+            clientGrid.getListDataView().refreshItem(selectedClient);
+        }
+        resetEditLayout();
+        showNotification("Kunde gespeichert");
     }
 
     private void resetEditLayout() {
@@ -264,7 +283,8 @@ public class ClientManagementView extends VerticalLayout {
             boolean matchesFirstName = matches(client.getFirstName(), firstName);
             boolean matchesLastName = matches(client.getLastName(), lastName);
             boolean matchesEmail = matches(client.getEmail(), email);
-            boolean matchesAssociationName = client.getAssociation() != null && matches(client.getAssociation().getName(), associationName);
+            boolean matchesAssociationName = !isStringNotEmpty(associationName) ||
+                    client.getAssociation() != null && matches(client.getAssociation().getName(), associationName);
             boolean matchesStreet = matches(client.getAddress().getStreet(), street);
             boolean matchesHouseNr = matches(String.valueOf(client.getAddress().getHouseNr()), houseNr);
             boolean matchesPostCode = matches(String.valueOf(client.getAddress().getPostCode()), postCode);
