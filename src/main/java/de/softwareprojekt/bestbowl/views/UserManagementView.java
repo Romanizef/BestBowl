@@ -18,12 +18,16 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.spring.security.AuthenticationContext;
 import de.softwareprojekt.bestbowl.beans.UserManager;
 import de.softwareprojekt.bestbowl.jpa.entities.User;
 import de.softwareprojekt.bestbowl.jpa.repositories.UserRepository;
+import de.softwareprojekt.bestbowl.utils.Utils;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.utils.validators.UserValidator;
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +46,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 @RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 public class UserManagementView extends VerticalLayout {
     private final UserRepository userRepository;
+    private final transient AuthenticationContext authenticationContext;
     private final Binder<User> binder = new Binder<>();
     private Grid<User> userGrid;
     private FormLayout editLayout;
@@ -50,8 +55,9 @@ public class UserManagementView extends VerticalLayout {
     private UserManager userManager;
 
     @Autowired
-    public UserManagementView(UserRepository userRepository) {
+    public UserManagementView(UserRepository userRepository, AuthenticationContext authenticationContext) {
         this.userRepository = userRepository;
+        this.authenticationContext = authenticationContext;
         setSizeFull();
         Button newUserButton = createNewUserButton();
         HorizontalLayout gridLayout = createGridLayout();
@@ -158,17 +164,6 @@ public class UserManagementView extends VerticalLayout {
         Checkbox activeCheckbox = new Checkbox("Aktiv");
         checkboxLayout.add(activeCheckbox);
 
-        layout.add(nameField, emailField, passwordField, securityQuestionAnswerField, roleCB, checkboxLayout, createSaveAndCancelButtonLayout());
-        binder.bind(nameField, User::getName, User::setName);
-        binder.bind(emailField, User::getEmail, User::setEmail);
-        binder.bind(passwordField, user -> "", (user, s) -> user.setEncodedPassword(userManager.encodePassword(s)));
-        binder.bind(securityQuestionAnswerField, User::getSecurityQuestionAnswer, User::setSecurityQuestionAnswer);
-        binder.bind(roleCB, User::getRole, User::setRole);
-        binder.bind(activeCheckbox, User::isActive, User::setActive);
-        return layout;
-    }
-
-    private HorizontalLayout createSaveAndCancelButtonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setWidthFull();
 
@@ -183,15 +178,56 @@ public class UserManagementView extends VerticalLayout {
         buttonLayout.setFlexGrow(1, cancelButton, saveButton);
 
         saveButton.addClickListener(clickEvent -> {
-            // TODO Nutzer in die Datenbank speichern
-            resetEditLayout();
-            showNotification("Nutzer gespeichert");
+            if (Utils.isStringNotEmpty(passwordField.getValue())) {
+                //saving with a password change
+                if (!isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
+                    showNotification("Das Passwort eines Nutzers kann nur als Admin geändert werden");
+                    return;
+                }
+                if (writeBean()) {
+                    saveAndUpdateUserManager();
+                }
+            } else {
+                //saving without password change
+                String encodedPw = selectedUser.getEncodedPassword();
+                if (writeBean()) {
+                    selectedUser.setEncodedPassword(encodedPw);
+                    saveAndUpdateUserManager();
+                }
+            }
         });
         cancelButton.addClickListener(clickEvent -> {
             resetEditLayout();
             showNotification("Bearbeitung abgebrochen");
         });
-        return buttonLayout;
+
+        layout.add(nameField, emailField, passwordField, securityQuestionAnswerField, roleCB, checkboxLayout, buttonLayout);
+
+        binder.withValidator(new UserValidator());
+        binder.bind(nameField, User::getName, User::setName);
+        binder.bind(emailField, User::getEmail, User::setEmail);
+        binder.bind(passwordField, user -> "", (user, s) -> user.setEncodedPassword(userManager.encodePassword(s)));
+        binder.bind(securityQuestionAnswerField, User::getSecurityQuestionAnswer, User::setSecurityQuestionAnswer);
+        binder.bind(roleCB, User::getRole, User::setRole);
+        binder.bind(activeCheckbox, User::isActive, User::setActive);
+        return layout;
+    }
+
+    private boolean writeBean() {
+        try {
+            binder.writeBean(selectedUser);
+            return true;
+        } catch (ValidationException e) {
+            e.getValidationErrors().forEach(error -> showNotification(error.getErrorMessage(), 7_000));
+        }
+        return false;
+    }
+
+    private void saveAndUpdateUserManager() {
+        userRepository.save(selectedUser);
+        userManager.updateUsersFromDb();
+        resetEditLayout();
+        showNotification("Nutzer gespeichert");
     }
 
     private void resetEditLayout() {

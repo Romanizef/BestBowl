@@ -13,11 +13,15 @@ import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.SerializableComparator;
+import com.vaadin.flow.spring.security.AuthenticationContext;
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.Association;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -36,6 +40,16 @@ public class VaadinUtils {
      */
     public static void showNotification(String text) {
         Notification notification = Notification.show(text, 3000, Notification.Position.MIDDLE);
+        notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
+    }
+
+    /**
+     * Displays a message for the given duration in the screen center.
+     *
+     * @param text the text to be displayed
+     */
+    public static void showNotification(String text, int durationInMs) {
+        Notification notification = Notification.show(text, durationInMs, Notification.Position.MIDDLE);
         notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
     }
 
@@ -165,5 +179,23 @@ public class VaadinUtils {
                 child.setValue(value);
             }
         });
+    }
+
+    /**
+     * @param authenticationContext current authentication context
+     * @param role                  role to be checked
+     * @return if the current user has that role
+     */
+    public static boolean isCurrentUserInRole(AuthenticationContext authenticationContext, String role) {
+        Optional<UserDetails> user = authenticationContext.getAuthenticatedUser(UserDetails.class);
+        if (user.isPresent()) {
+            UserDetails userDetails = user.get();
+            for (GrantedAuthority authority : userDetails.getAuthorities()) {
+                if (authority.getAuthority().toLowerCase().contains(role.toLowerCase())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

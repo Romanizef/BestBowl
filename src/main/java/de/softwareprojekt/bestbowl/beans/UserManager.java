@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,6 +20,7 @@ import java.util.List;
 @Component
 public class UserManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserManager.class);
+    private final List<String> currentUserNameList = new ArrayList<>();
     private UserDetailsManager userDetailsManager;
     private PasswordEncoder passwordEncoder;
 
@@ -36,6 +38,10 @@ public class UserManager {
      */
     public void updateUsersFromDb() {
         List<User> userList = Repos.getUserRepository().findAll();
+
+        currentUserNameList.forEach(s -> userDetailsManager.deleteUser(s));
+        currentUserNameList.clear();
+
         for (User user : userList) {
             if (user.isActive()) {
                 UserDetails userDetails = org.springframework.security.core.userdetails.User
@@ -43,11 +49,8 @@ public class UserManager {
                         .password(user.getEncodedPassword())
                         .roles(user.getRole())
                         .build();
-                if (userDetailsManager.userExists(user.getName())) {
-                    userDetailsManager.updateUser(userDetails);
-                } else {
-                    userDetailsManager.createUser(userDetails);
-                }
+                currentUserNameList.add(user.getName());
+                userDetailsManager.createUser(userDetails);
             }
         }
     }

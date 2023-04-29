@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * @author Marten Voß
@@ -14,6 +15,7 @@ import java.util.Locale;
 public class Utils {
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
     private static final File WORKING_DIR_ROOT = new File("");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
 
     private Utils() {
     }
@@ -65,7 +67,7 @@ public class Utils {
      * @return if the string is not null or empty
      */
     public static boolean isStringNotEmpty(String s) {
-        return s != null && s.length() != 0;
+        return s != null && !s.isEmpty();
     }
 
     /**
@@ -81,6 +83,26 @@ public class Utils {
             }
         }
         return true;
+    }
+
+    /**
+     * @param s         string to be checked
+     * @param minLength minimum length of the string
+     * @return if s != null and length >= minLength
+     */
+    public static boolean isStringMinNChars(String s, int minLength) {
+        return s != null && s.length() >= minLength;
+    }
+
+    /**
+     * @param s string to be checked
+     * @return if the string is a valid email address
+     */
+    public static boolean isStringValidEmail(String s) {
+        if (isStringNotEmpty(s)) {
+            return EMAIL_PATTERN.matcher(s).matches();
+        }
+        return false;
     }
 
     /**
