@@ -42,6 +42,7 @@ public class ClientSearchView extends VerticalLayout {
     private final ClientRepository clientRepository;
     private final Binder<Client> binder = new Binder<>();
     private final Dialog newClientDialog;
+    private Label validationErrorLabel;
     private TextField searchField;
     private Grid<Client> clientGrid;
     private Button nextStepButton;
@@ -70,6 +71,7 @@ public class ClientSearchView extends VerticalLayout {
         dialog.setHeaderTitle("Neuen Kunden anlegen");
         dialog.setCloseOnOutsideClick(false);
         dialog.setCloseOnEsc(true);
+
         VerticalLayout layout = new VerticalLayout();
         TextField firstNameField = new TextField("Vorname");
         firstNameField.setWidthFull();
@@ -93,8 +95,9 @@ public class ClientSearchView extends VerticalLayout {
         cityLayout.setFlexGrow(1, cityField);
         ComboBox<Association> associationCB = createAssociationCB("Verein");
         associationCB.setWidthFull();
-        layout.add(firstNameField, lastNameField, emailField, streetLayout, cityLayout, associationCB);
+        layout.add(firstNameField, lastNameField, emailField, streetLayout, cityLayout, associationCB, createValidationLabelLayout());
         dialog.add(layout);
+
         HorizontalLayout footerLayout = new HorizontalLayout();
         footerLayout.setWidthFull();
         Button cancelButton = new Button("Abbrechen");
@@ -144,12 +147,28 @@ public class ClientSearchView extends VerticalLayout {
         return dialog;
     }
 
+    private VerticalLayout createValidationLabelLayout() {
+        VerticalLayout validationLabelLayout = new VerticalLayout();
+        validationLabelLayout.setWidthFull();
+        validationLabelLayout.setPadding(false);
+        validationLabelLayout.setMargin(false);
+        validationLabelLayout.setAlignItems(Alignment.CENTER);
+
+        validationErrorLabel = new Label();
+        validationErrorLabel.getStyle().set("color", "red");
+
+        validationLabelLayout.add(validationErrorLabel);
+        return validationLabelLayout;
+    }
+
     private boolean writeBean() {
         try {
             binder.writeBean(selectedClient);
             return true;
         } catch (ValidationException e) {
-            e.getValidationErrors().forEach(error -> showNotification(error.getErrorMessage(), 7_000));
+            if (!e.getValidationErrors().isEmpty()) {
+                validationErrorLabel.setText(e.getValidationErrors().get(0).getErrorMessage());
+            }
         }
         return false;
     }
@@ -161,6 +180,8 @@ public class ClientSearchView extends VerticalLayout {
         selectedClient = new Client();
         selectedClient.addAddress(new Address());
         binder.readBean(selectedClient);
+
+        validationErrorLabel.setText("");
 
         setValueForIntegerFieldChildren(newClientDialog.getChildren(), null);
     }

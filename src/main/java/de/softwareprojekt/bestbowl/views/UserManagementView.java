@@ -10,6 +10,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -50,6 +51,7 @@ public class UserManagementView extends VerticalLayout {
     private final Binder<User> binder = new Binder<>();
     private Grid<User> userGrid;
     private FormLayout editLayout;
+    private Label validationErrorLabel;
     private User selectedUser = null;
     private boolean editingNewUser = false;
     @Resource
@@ -162,7 +164,6 @@ public class UserManagementView extends VerticalLayout {
         checkboxLayout.setAlignItems(Alignment.CENTER);
         checkboxLayout.setWidthFull();
         checkboxLayout.setHeight("50px");
-
         Checkbox activeCheckbox = new Checkbox("Aktiv");
         checkboxLayout.add(activeCheckbox);
 
@@ -178,6 +179,9 @@ public class UserManagementView extends VerticalLayout {
 
         buttonLayout.add(cancelButton, saveButton);
         buttonLayout.setFlexGrow(1, cancelButton, saveButton);
+
+        layout.add(nameField, emailField, passwordField, securityQuestionAnswerField, roleCB, checkboxLayout,
+                createValidationLabelLayout(), buttonLayout);
 
         saveButton.addClickListener(clickEvent -> {
             if (Utils.isStringNotEmpty(passwordField.getValue())) {
@@ -200,8 +204,6 @@ public class UserManagementView extends VerticalLayout {
         });
         cancelButton.addClickListener(clickEvent -> resetEditLayout());
 
-        layout.add(nameField, emailField, passwordField, securityQuestionAnswerField, roleCB, checkboxLayout, buttonLayout);
-
         binder.withValidator(new UserValidator());
         binder.bind(nameField, User::getName, User::setName);
         binder.bind(emailField, User::getEmail, User::setEmail);
@@ -212,12 +214,28 @@ public class UserManagementView extends VerticalLayout {
         return layout;
     }
 
+    private VerticalLayout createValidationLabelLayout() {
+        VerticalLayout validationLabelLayout = new VerticalLayout();
+        validationLabelLayout.setWidthFull();
+        validationLabelLayout.setPadding(false);
+        validationLabelLayout.setMargin(false);
+        validationLabelLayout.setAlignItems(Alignment.CENTER);
+
+        validationErrorLabel = new Label();
+        validationErrorLabel.getStyle().set("color", "red");
+
+        validationLabelLayout.add(validationErrorLabel);
+        return validationLabelLayout;
+    }
+
     private boolean writeBean() {
         try {
             binder.writeBean(selectedUser);
             return true;
         } catch (ValidationException e) {
-            e.getValidationErrors().forEach(error -> showNotification(error.getErrorMessage(), 7_000));
+            if (!e.getValidationErrors().isEmpty()) {
+                validationErrorLabel.setText(e.getValidationErrors().get(0).getErrorMessage());
+            }
         }
         return false;
     }
@@ -242,6 +260,7 @@ public class UserManagementView extends VerticalLayout {
     }
 
     private void updateEditLayoutState() {
+        validationErrorLabel.setText("");
         setChildrenEnabled(editLayout.getChildren(), selectedUser != null);
     }
 

@@ -10,6 +10,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -26,6 +27,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.Association;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.utils.validators.ClientValidator;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -45,6 +47,7 @@ public class ClientManagementView extends VerticalLayout {
     private final Binder<Client> binder = new Binder<>();
     private Grid<Client> clientGrid;
     private FormLayout editLayout;
+    private Label validationErrorLabel;
     private Client selectedClient = null;
     private boolean editingNewClient = false;
 
@@ -174,7 +177,6 @@ public class ClientManagementView extends VerticalLayout {
         checkboxLayout.setAlignItems(Alignment.CENTER);
         checkboxLayout.setWidthFull();
         checkboxLayout.setHeight("50px");
-
         Checkbox activeCheckbox = new Checkbox("Aktiv");
         checkboxLayout.add(activeCheckbox);
 
@@ -191,6 +193,9 @@ public class ClientManagementView extends VerticalLayout {
         buttonLayout.add(cancelButton, saveButton);
         buttonLayout.setFlexGrow(1, cancelButton, saveButton);
 
+        layout.add(firstNameField, lastNameField, emailField, associationCB, streetField, houseNrField,
+                postCodeField, cityField, checkboxLayout, createValidationLabelLayout(), buttonLayout);
+
         saveButton.addClickListener(clickEvent -> {
             if (writeBean()) {
                 saveToDb();
@@ -198,9 +203,7 @@ public class ClientManagementView extends VerticalLayout {
         });
         cancelButton.addClickListener(clickEvent -> resetEditLayout());
 
-        layout.add(firstNameField, lastNameField, emailField, associationCB, streetField, houseNrField,
-                postCodeField, cityField, checkboxLayout, buttonLayout);
-
+        binder.withValidator(new ClientValidator());
         binder.bind(firstNameField, Client::getFirstName, Client::setFirstName);
         binder.bind(lastNameField, Client::getLastName, Client::setLastName);
         binder.bind(emailField, Client::getEmail, Client::setEmail);
@@ -223,12 +226,28 @@ public class ClientManagementView extends VerticalLayout {
         return layout;
     }
 
+    private VerticalLayout createValidationLabelLayout() {
+        VerticalLayout validationLabelLayout = new VerticalLayout();
+        validationLabelLayout.setWidthFull();
+        validationLabelLayout.setPadding(false);
+        validationLabelLayout.setMargin(false);
+        validationLabelLayout.setAlignItems(Alignment.CENTER);
+
+        validationErrorLabel = new Label();
+        validationErrorLabel.getStyle().set("color", "red");
+
+        validationLabelLayout.add(validationErrorLabel);
+        return validationLabelLayout;
+    }
+
     private boolean writeBean() {
         try {
             binder.writeBean(selectedClient);
             return true;
         } catch (ValidationException e) {
-            e.getValidationErrors().forEach(error -> showNotification(error.getErrorMessage(), 7_000));
+            if (!e.getValidationErrors().isEmpty()) {
+                validationErrorLabel.setText(e.getValidationErrors().get(0).getErrorMessage());
+            }
         }
         return false;
     }
@@ -257,6 +276,7 @@ public class ClientManagementView extends VerticalLayout {
     }
 
     private void updateEditLayoutState() {
+        validationErrorLabel.setText("");
         setChildrenEnabled(editLayout.getChildren(), selectedClient != null);
     }
 
