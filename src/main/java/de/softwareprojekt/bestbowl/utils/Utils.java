@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -143,5 +145,33 @@ public class Utils {
      */
     public static String formatDouble(double d) {
         return String.format(Locale.GERMANY, "%.2f", d);
+    }
+
+    /**
+     * @param ms unix timestamp
+     * @return date string with day, month, year, hour and minute
+     */
+    public static String toDateString(Long ms) {
+        return toDateString(ms, "dd.MM.yyyy HH:mm");
+    }
+
+    /**
+     * @param ms     unix timestamp
+     * @param format format of the date parsable by SimpleDateFormat
+     * @return formatted date string
+     */
+    private static String toDateString(Long ms, String format) {
+        String s;
+        if (ms != null) {
+            try {
+                Date date = new Date(ms);
+                s = new SimpleDateFormat(format).format(date);
+            } catch (NumberFormatException ex) {
+                s = "NaN";
+            }
+        } else {
+            s = "-";
+        }
+        return s;
     }
 }
