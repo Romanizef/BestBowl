@@ -30,12 +30,12 @@ public class FoodPanel implements PanelInterface {
         foodField.setLabel("Speisename");
 
         kachelLayout.add(foodField);
-
+        addCSS();
         return kachelLayout;
     }
 
-/*     private void addCSS() {
+     private void addCSS() {
         kachelLayout.getStyle().set("border", "1px solid #1b7513");
         kachelLayout.getStyle().set("background-color", "#2dbf21");
-    } */
+    }
 }
