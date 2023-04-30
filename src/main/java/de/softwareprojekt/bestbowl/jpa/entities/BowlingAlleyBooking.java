@@ -31,6 +31,10 @@ public class BowlingAlleyBooking implements Serializable {
         active = true;
     }
 
+    public long getDuration() {
+        return endTime + 1 - startTime;
+    }
+
     public int getId() {
         return id;
     }

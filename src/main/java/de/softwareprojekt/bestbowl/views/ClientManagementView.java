@@ -39,11 +39,14 @@ import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
 import static de.softwareprojekt.bestbowl.utils.Utils.matches;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
+/**
+ * @author Marten Voß
+ */
 @Route(value = "clientManagement", layout = MainView.class)
 @PageTitle("Kundenverwaltung")
 @RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 public class ClientManagementView extends VerticalLayout {
-    private final ClientRepository clientRepository;
+    private final transient ClientRepository clientRepository;
     private final Binder<Client> binder = new Binder<>();
     private Grid<Client> clientGrid;
     private FormLayout editLayout;

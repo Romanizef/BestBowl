@@ -36,7 +36,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     private final Dialog passwordResetDialog;
     private User selectedUserForPasswordReset = null;
     @Resource
-    private UserManager userManager;
+    private transient UserManager userManager;
 
     public LoginView() {
         addClassName("login-view");

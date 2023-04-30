@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -169,5 +170,41 @@ public class Utils {
         } catch (NumberFormatException ex) {
             return "NaN";
         }
+    }
+
+    /**
+     * @param durationInMs duration in ms
+     * @return hours rounded to 2 decimal places
+     */
+    public static String toHoursString(long durationInMs) {
+        return Utils.formatDouble(java.time.Duration.ofMillis(durationInMs).toMinutes() / (double) 60) + " Std.";
+    }
+
+    /**
+     * @return a LocalDateTime of the current time with the minute rounded to the next 1/4 hour
+     */
+    public static LocalDateTime getCurrentDateTimeRounded() {
+        LocalDateTime localDateTime = LocalDateTime.now().withNano(0).withSecond(0);
+        int newMinute = localDateTime.getMinute() + (75 - localDateTime.getMinute()) % 15;
+        if (newMinute == 60) {
+            return localDateTime.withMinute(0).plusHours(1);
+        } else {
+            return localDateTime.withMinute(newMinute);
+        }
+    }
+
+    /**
+     * @return a LocalDateTime of the current date with hour set to 5
+     */
+    public static LocalDateTime getCurrentDateTimeOfDayStart() {
+        return setLocalDateTimeToDayStart(LocalDateTime.now());
+    }
+
+    /**
+     * @param localDateTime LocalDateTime to be changed
+     * @return the LocalDateTime with nano, second, minute set to 0 and hour to 5
+     */
+    public static LocalDateTime setLocalDateTimeToDayStart(LocalDateTime localDateTime) {
+        return localDateTime.withNano(0).withSecond(0).withMinute(0).withHour(5);
     }
 }

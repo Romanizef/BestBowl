@@ -35,6 +35,10 @@ public class Client implements Serializable {
         address.setClient(this);
     }
 
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+
     public int getId() {
         return id;
     }

@@ -79,6 +79,9 @@ public class CommandLineListener {
                         generateRandomDrinks(7);
                         generateRandomShoes(100);
                         LOGGER.info("everything generated");
+                    } else if (command.equals("generateBowlingAlleys")) {
+                        generateBowlingAlleys();
+                        LOGGER.info("BowlingAlleys generated");
                     } else if (command.equals("demoPdf")) {
                         PDFUtils.createDemoPdf();
                         LOGGER.info("pdf created");
@@ -199,6 +202,16 @@ public class CommandLineListener {
             bowlingShoeList.add(bowlingShoe);
         }
         Repos.getBowlingShoeRepository().saveAll(bowlingShoeList);
+    }
+
+    public void generateBowlingAlleys() {
+        List<BowlingAlley> bowlingAlleyList = new ArrayList<>(10);
+        for (int i = 0; i < 10; i++) {
+            BowlingAlley bowlingAlley = new BowlingAlley();
+            bowlingAlley.setId(i + 1);
+            bowlingAlleyList.add(bowlingAlley);
+        }
+        Repos.getBowlingAlleyRepository().saveAll(bowlingAlleyList);
     }
 
     @Autowired

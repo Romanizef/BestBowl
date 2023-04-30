@@ -46,7 +46,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 @PageTitle("Nutzerverwaltung")
 @RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 public class UserManagementView extends VerticalLayout {
-    private final UserRepository userRepository;
+    private final transient UserRepository userRepository;
     private final transient AuthenticationContext authenticationContext;
     private final Binder<User> binder = new Binder<>();
     private Grid<User> userGrid;
@@ -55,7 +55,7 @@ public class UserManagementView extends VerticalLayout {
     private User selectedUser = null;
     private boolean editingNewUser = false;
     @Resource
-    private UserManager userManager;
+    private transient UserManager userManager;
 
     @Autowired
     public UserManagementView(UserRepository userRepository, AuthenticationContext authenticationContext) {

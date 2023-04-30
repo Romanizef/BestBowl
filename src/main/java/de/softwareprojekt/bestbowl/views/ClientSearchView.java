@@ -34,17 +34,20 @@ import java.util.*;
 import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
+/**
+ * @author Marten Voß
+ */
 @Route(value = "clientSearch", layout = MainView.class)
 @RouteAlias(value = "", layout = MainView.class)
 @PageTitle("Kundensuche")
 @PermitAll
 public class ClientSearchView extends VerticalLayout {
-    private final ClientRepository clientRepository;
+    private final transient ClientRepository clientRepository;
     private final Binder<Client> binder = new Binder<>();
     private final Dialog newClientDialog;
+    private final Grid<Client> clientGrid;
     private Label validationErrorLabel;
     private TextField searchField;
-    private Grid<Client> clientGrid;
     private Button nextStepButton;
     private Label selectedClientLabel;
     private Client selectedClient = null;
