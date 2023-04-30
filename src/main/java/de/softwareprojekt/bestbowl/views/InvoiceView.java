@@ -49,15 +49,9 @@ public final class InvoiceView extends VerticalLayout {
         tabs.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED,
                 TabSheetVariant.MATERIAL_BORDERED,
                 TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
-        tabs.add("Gesamtrechnung", createMainTab());
+        tabs.add("Gesamtrechnung", new Div(new Text("This is the Gesamtrechnung tab content")));
         tabLayout.add(tabs);
         return tabLayout;
-    }
-
-    private Component createMainTab() {
-        //TODO 
-
-        return null;
     }
 
     private final Component tabButtonPlacement(Component addButton, Component subButton) {
