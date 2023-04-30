@@ -62,6 +62,7 @@ public class DrinkPanel extends HorizontalLayout {
 
     private void addCSS() {
         getStyle().set("border", "2px solid #338CFF");
+
         getStyle().set("background-color","#338CFF04" );
         getStyle().set("padding", "10px");
         getStyle().set("border-radius", "10px");
