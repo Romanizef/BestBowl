@@ -1,91 +1,92 @@
 package de.softwareprojekt.bestbowl.views;
 
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
+import com.vaadin.flow.component.tabs.TabSheetVariant;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.softwareprojekt.bestbowl.jpa.repositories.DrinkBookingRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.DrinkRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.FoodBookingRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.FoodRepository;
-import de.softwareprojekt.bestbowl.views.extrasElements.ButtonLayout;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
+import de.softwareprojekt.bestbowl.views.extrasElements.ShoePanel;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.contextmenu.SubMenu;
-
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.router.Route;
 
-/*
-*   @author Ali Cicek
+/**
+ * @author Matija Kopschek
+ * @author Ali aus Mali
  */
-
 @Route(value = "extras", layout = MainView.class)
 @PageTitle("Extras")
 @PermitAll
-
-public class ExtrasView  extends VerticalLayout {
-
-
-    private MenuBar bahnMenubar;
-
-    private ButtonLayout bahnLayout;
-
-
+public class ExtrasView extends VerticalLayout {
+    private HorizontalLayout alleyLayout;
+    private HorizontalLayout tabLayout;
+    private TabSheet tabs;
+    private ShoePanel shoePanel;
 
     @Autowired
     public ExtrasView() {
-
         setSizeFull();
         setAlignItems(Alignment.CENTER);
-
-
-
-        Button b = new Button("TEst");
-        add( b, layout);
+        Component alleyComponent = createBahnComponent();
+        shoePanel = new ShoePanel();
+        Component articlePanelComponent = createArticlePanelComponent();
+        add(alleyComponent, articlePanelComponent);
     }
 
-    public Layout createBahnLayout(){
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.setPadding(true);
-        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        layout.add(new Button("Button 1"));
-        layout.add(new Button("Button 2"));
-        layout.add(new Button("Button 3"));
+    private Component createArticlePanelComponent() {
+        tabs = new TabSheet();
+        tabLayout = new HorizontalLayout();
+        tabLayout.setMaxWidth("100%");
+        tabs.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED,
+                TabSheetVariant.MATERIAL_BORDERED,
+                TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
+        tabs.add("Getränke", new Div(new Text("This is the Getränke tab content")));
+        tabs.add("Speisen", new Div(new Text("This is the Speise tab content")));
+        tabs.add("Schuhe", shoePanel.addShoePanelComponent());
+        tabLayout.add(tabs);
+        return tabLayout;
     }
 
+    private final Component createBahnComponent() {
+        alleyLayout = new HorizontalLayout();
 
-/*
-* DrinkRepository drinkRepository, DrinkBookingRepository drinkBookingRepository, FoodRepository foodRepository, FoodBookingRepository foodBookingRepository
-*   this.drinkRepository = drinkRepository;
-        this.drinkBookingRepository = drinkBookingRepository;
-        this.foodRepository = foodRepository;
-        this.foodBookingRepository = foodBookingRepository;
-*
-*     private final DrinkRepository drinkRepository;
+        alleyLayout.setPadding(true);
+        alleyLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        alleyLayout.add(new Button("Bahn 1"));
+        alleyLayout.add(new Button("Bahn 2"));
+        alleyLayout.add(new Button("Bahn 3"));
+        return alleyLayout;
+    }
 
-    private final DrinkBookingRepository drinkBookingRepository;
-
-    private final FoodRepository foodRepository;
-
-    private final FoodBookingRepository foodBookingRepository;
-*
-*
-*
-* */
-
-
-
-
-
+    /*
+     * DrinkRepository drinkRepository, DrinkBookingRepository
+     * drinkBookingRepository, FoodRepository foodRepository, FoodBookingRepository
+     * foodBookingRepository
+     * this.drinkRepository = drinkRepository;
+     * this.drinkBookingRepository = drinkBookingRepository;
+     * this.foodRepository = foodRepository;
+     * this.foodBookingRepository = foodBookingRepository;
+     *
+     * private final DrinkRepository drinkRepository;
+     * 
+     * private final DrinkBookingRepository drinkBookingRepository;
+     * 
+     * private final FoodRepository foodRepository;
+     * 
+     * private final FoodBookingRepository foodBookingRepository;
+     *
+     *
+     *
+     */
 }
