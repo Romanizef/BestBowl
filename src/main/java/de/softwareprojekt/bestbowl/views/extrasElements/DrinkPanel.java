@@ -7,6 +7,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import de.softwareprojekt.bestbowl.jpa.entities.Drink;
+import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
 
 import java.util.ArrayList;
@@ -32,11 +33,23 @@ public class DrinkPanel extends HorizontalLayout {
         for (DrinkVariant drinkVariant : drinkVariantList) {
             variantLayout.add(createIntegerField(drinkVariant));
         }
+    }
+
+    public DrinkPanel(DrinkBooking drinkBooking) {
+        Label label = new Label(drinkBooking.getName());
+        label.setMinWidth("250px");
+        label.setMaxWidth("250px");
+
+        IntegerField integerField = new IntegerField();
+        integerField.setValue(drinkBooking.getAmount());
+        integerField.setStepButtonsVisible(true);
+        integerField.setMin(0);
+        integerField.setMax(drinkBooking.getAmount());
 
         setWidthFull();
         addCSS();
         setAlignItems(Alignment.CENTER);
-        add(label, variantLayout);
+        add(label, integerField);
     }
 
     public IntegerField createIntegerField(DrinkVariant drinkVariant) {
@@ -46,7 +59,6 @@ public class DrinkPanel extends HorizontalLayout {
         mlField.setMin(0);
         mlField.setSuffixComponent(new Span(drinkVariant.getMl() + "ml"));
         mlField.setMax(drinkVariant.getDrink().getStockInMilliliters() / drinkVariant.getMl());
-
 
         mlField.addValueChangeListener(e -> {
         });

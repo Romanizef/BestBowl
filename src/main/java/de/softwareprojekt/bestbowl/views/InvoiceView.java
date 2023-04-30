@@ -7,6 +7,10 @@ import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import de.softwareprojekt.bestbowl.beans.Repos;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
+import de.softwareprojekt.bestbowl.views.extrasElements.DrinkPanel;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -19,6 +23,8 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.showNotification;
 
+import java.util.List;
+
 /**
  * @author Matija Kopschek
  */
@@ -30,6 +36,7 @@ public final class InvoiceView extends VerticalLayout {
     private HorizontalLayout tabLayout;
     private HorizontalLayout buttonLayout;
     private Notification errorNotification;
+    private BowlingAlleyBooking bowlingAlleyBooking;
 
     public InvoiceView() {
         setSizeFull();
@@ -42,6 +49,7 @@ public final class InvoiceView extends VerticalLayout {
         add(tabComponent, tabButtonComponent, footerComponent);
     }
 
+    // TODO Tabs erst erstellen wenn alles andere fertig
     private final Component tabConfig() {
         tabs = new TabSheet();
         tabLayout = new HorizontalLayout();
@@ -49,9 +57,32 @@ public final class InvoiceView extends VerticalLayout {
         tabs.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED,
                 TabSheetVariant.MATERIAL_BORDERED,
                 TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
-        tabs.add("Gesamtrechnung", new Div(new Text("This is the Gesamtrechnung tab content")));
+        tabs.add("Gesamtrechnung", null);
         tabLayout.add(tabs);
         return tabLayout;
+    }
+
+    private Component createCompleteInvoice() {
+        VerticalLayout verticalLayout = new VerticalLayout();
+        if (bowlingAlleyBooking != null) {
+            List<DrinkBooking> drinkBookingList = Repos.getDrinkBookingRepository()
+                    .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
+                            bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
+
+            verticalLayout.setAlignItems(Alignment.CENTER);
+            verticalLayout.setWidthFull();
+
+            for (DrinkBooking drinkBooking : drinkBookingList) {
+                verticalLayout.add(new DrinkPanel(drinkBooking));
+            }
+        }
+        return verticalLayout;
+    }
+
+    // TODO ExtrasView ruft Methode auf und übergibt Daten
+    private void setBowlingAlleyBooking(BowlingAlleyBooking bowlingAlleyBooking) {
+        this.bowlingAlleyBooking = bowlingAlleyBooking;
+        // TODO createCompleteInvoice aufrufen
     }
 
     private final Component tabButtonPlacement(Component addButton, Component subButton) {
@@ -70,7 +101,9 @@ public final class InvoiceView extends VerticalLayout {
         Button tabAddButton = new Button("Teilrechung hinzufügen");
         tabAddButton.setIcon(new Icon(VaadinIcon.PLUS_CIRCLE));
         tabAddButton.addClickListener(event -> {
-            tabs.setSelectedTab(tabs.add("Teilrechnung", createPartialPayButton()));
+            if (bowlingAlleyBooking != null) {
+                tabs.setSelectedTab(tabs.add("Teilrechnung", createPartialPayButton()));
+            }
         });
         return tabAddButton;
     }
@@ -120,6 +153,7 @@ public final class InvoiceView extends VerticalLayout {
         payButton.setDisableOnClick(true);
         payButton.addClickListener(clickEvent -> {
             showNotification("Rechnung bezahlt");
+            // TODO pdf erstellen und per EMail versenden
         });
         return payButton;
     }
@@ -135,6 +169,8 @@ public final class InvoiceView extends VerticalLayout {
         payButton.setDisableOnClick(true);
         payButton.addClickListener(clickEvent -> {
             showNotification("Rechnung bezahlt");
+            // TODO Summe wird geupdated
+            // TODO Alle Elemente sperren Children nochmal Angucken bei anderen Verwaltungen
         });
         return payButton;
     }
