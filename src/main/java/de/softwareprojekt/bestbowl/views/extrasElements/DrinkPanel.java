@@ -6,18 +6,22 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
 
-public class DrinkPanel implements Panel{
+/**
+ * @author Matija Kopschek
+ * @author Ali aus Mali
+ */
+public class DrinkPanel implements PanelInterface {
     private FormLayout kachelLayout;
     private Grid<DrinkBooking> shoeGrid;
 
     public DrinkPanel() {
-        
+
     }
 
     public FormLayout addPanelComponent() {
 
         kachelLayout = new FormLayout();
-        kachelLayout.setResponsiveSteps(new ResponsiveStep("0", 2));
+        kachelLayout.setResponsiveSteps(new ResponsiveStep("0", 1));
 
         IntegerField shoeSizeField = new IntegerField();
         shoeSizeField.setValue(2);
