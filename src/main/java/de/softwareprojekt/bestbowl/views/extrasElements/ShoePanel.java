@@ -7,6 +7,10 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
 
+/**
+ * @author Matija Kopschek
+ * @author Ali aus Mali
+ */
 public class ShoePanel {
     private FormLayout kachelLayout;
     private Grid<BowlingShoeBooking> shoeGrid;
@@ -15,13 +19,12 @@ public class ShoePanel {
 
     }
 
-    public FormLayout addShoePanelComponent() {
-
+    public FormLayout addPanelComponent() {
         kachelLayout = new FormLayout();
         kachelLayout.setResponsiveSteps(new ResponsiveStep("0", 2));
 
         IntegerField shoeSizeField = new IntegerField();
-        shoeSizeField.setValue(0);
+        shoeSizeField.setValue(35);
         shoeSizeField.setStepButtonsVisible(true);
         shoeSizeField.setMin(35);
         shoeSizeField.setMax(45);
@@ -34,7 +37,7 @@ public class ShoePanel {
         shoeAmountField.setValue(0);
         shoeAmountField.setStepButtonsVisible(true);
         shoeAmountField.setMin(0);
-        shoeAmountField.setMax(10); //TODO Lagerbestand muss aus der DB ausgelesen werden und als max gesetzt
+        shoeAmountField.setMax(10); // TODO Lagerbestand muss aus der DB ausgelesen werden und als max gesetzt
 
         kachelLayout.addFormItem(shoeAmountField, "Menge: ");
 

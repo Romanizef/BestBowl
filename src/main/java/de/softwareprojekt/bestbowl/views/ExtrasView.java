@@ -6,13 +6,17 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
+import de.softwareprojekt.bestbowl.views.extrasElements.FoodPanel;
 import de.softwareprojekt.bestbowl.views.extrasElements.ShoePanel;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +37,7 @@ public class ExtrasView extends VerticalLayout {
     private HorizontalLayout tabLayout;
     private TabSheet tabs;
     private ShoePanel shoePanel;
+    private FoodPanel foodPanel;
 
     @Autowired
     public ExtrasView() {
@@ -40,6 +45,7 @@ public class ExtrasView extends VerticalLayout {
         setAlignItems(Alignment.CENTER);
         Component alleyComponent = createBahnComponent();
         shoePanel = new ShoePanel();
+        foodPanel = new FoodPanel();
         Component articlePanelComponent = createArticlePanelComponent();
         add(alleyComponent, articlePanelComponent);
     }
@@ -48,21 +54,25 @@ public class ExtrasView extends VerticalLayout {
         tabs = new TabSheet();
         tabLayout = new HorizontalLayout();
         tabLayout.setMaxWidth("100%");
+        Tab drink = new Tab(VaadinIcon.COFFEE.create(), new Span("Getränke"));
+        Tab food = new Tab(VaadinIcon.CROSS_CUTLERY.create(), new Span("Speisen"));
+        Tab shoe = new Tab(VaadinIcon.BELL.create(), new Span("Schuhe"));
+
         tabs.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED,
                 TabSheetVariant.MATERIAL_BORDERED,
                 TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
-        tabs.add("Getränke", new Div(new Text("This is the Getränke tab content")));
-        tabs.add("Speisen", new Div(new Text("This is the Speise tab content")));
-        tabs.add("Schuhe", shoePanel.addShoePanelComponent());
+        tabs.add(drink, new Div(new Text("This is the Getränke tab content")));
+        tabs.add(food, foodPanel.addPanelComponent());
+        tabs.add(shoe, shoePanel.addPanelComponent());
         tabLayout.add(tabs);
         return tabLayout;
     }
 
     private final Component createBahnComponent() {
         alleyLayout = new HorizontalLayout();
-
         alleyLayout.setPadding(true);
         alleyLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        // ToDo Buttons Einzeln erzeugen
         alleyLayout.add(new Button("Bahn 1"));
         alleyLayout.add(new Button("Bahn 2"));
         alleyLayout.add(new Button("Bahn 3"));
