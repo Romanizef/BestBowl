@@ -15,7 +15,6 @@ public class FoodPanel implements Panel {
     }
 
     public FormLayout addPanelComponent() {
-
         kachelLayout = new FormLayout();
         kachelLayout.setResponsiveSteps(new ResponsiveStep("0", 2));
 
@@ -27,13 +26,13 @@ public class FoodPanel implements Panel {
         shoeSizeField.addValueChangeListener(e -> {
 
         });
-        kachelLayout.addFormItem(shoeSizeField, "Größe: ");
+        kachelLayout.addFormItem(shoeSizeField, "Name: ");
 
         IntegerField shoeAmountField = new IntegerField();
         shoeAmountField.setValue(2);
         shoeAmountField.setStepButtonsVisible(true);
         shoeAmountField.setMin(0);
-        shoeAmountField.setMax(9);
+        shoeAmountField.setMax(9);  //TODO Lagerbestand muss aus der DB ausgelesen werden und als max gesetzt
 
         kachelLayout.addFormItem(shoeAmountField, "Menge: ");
 

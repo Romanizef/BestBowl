@@ -21,20 +21,20 @@ public class ShoePanel {
         kachelLayout.setResponsiveSteps(new ResponsiveStep("0", 2));
 
         IntegerField shoeSizeField = new IntegerField();
-        shoeSizeField.setValue(2);
+        shoeSizeField.setValue(0);
         shoeSizeField.setStepButtonsVisible(true);
-        shoeSizeField.setMin(0);
-        shoeSizeField.setMax(9);
+        shoeSizeField.setMin(35);
+        shoeSizeField.setMax(45);
         shoeSizeField.addValueChangeListener(e -> {
 
         });
         kachelLayout.addFormItem(shoeSizeField, "Größe: ");
 
         IntegerField shoeAmountField = new IntegerField();
-        shoeAmountField.setValue(2);
+        shoeAmountField.setValue(0);
         shoeAmountField.setStepButtonsVisible(true);
         shoeAmountField.setMin(0);
-        shoeAmountField.setMax(9);
+        shoeAmountField.setMax(10); //TODO Lagerbestand muss aus der DB ausgelesen werden und als max gesetzt
 
         kachelLayout.addFormItem(shoeAmountField, "Menge: ");
 
