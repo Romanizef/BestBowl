@@ -49,7 +49,7 @@ public final class InvoiceView extends VerticalLayout {
         tabs.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED,
                 TabSheetVariant.MATERIAL_BORDERED,
                 TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
-        tabs.add("Gesamtrechnung", new Div(new Text("This is the Gesamtrechnung tab content")));
+        tabs.add("Gesamtrechnung", new Div(new Text("This is the Gesamtrechnung tab content"))); //ToDo Panel müssen hier rein
         tabLayout.add(tabs);
         return tabLayout;
     }
@@ -70,7 +70,7 @@ public final class InvoiceView extends VerticalLayout {
         Button tabAddButton = new Button("Teilrechung hinzufügen");
         tabAddButton.setIcon(new Icon(VaadinIcon.PLUS_CIRCLE));
         tabAddButton.addClickListener(event -> {
-            tabs.setSelectedTab(tabs.add("Teilrechnung", createPartialPayButton()));
+            tabs.setSelectedTab(tabs.add("Teilrechnung", createPartialPayButton())); //ToDo Panel kommen von Extras für Rechnung
         });
         return tabAddButton;
     }

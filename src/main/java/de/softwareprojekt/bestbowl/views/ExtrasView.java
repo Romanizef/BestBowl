@@ -16,6 +16,9 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.Drink;
+import de.softwareprojekt.bestbowl.jpa.repositories.DrinkRepository;
+import de.softwareprojekt.bestbowl.views.extrasElements.DrinkPanel;
 import de.softwareprojekt.bestbowl.views.extrasElements.FoodPanel;
 import de.softwareprojekt.bestbowl.views.extrasElements.ShoePanel;
 import jakarta.annotation.security.PermitAll;
@@ -25,6 +28,8 @@ import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
+import java.util.List;
+
 /**
  * @author Matija Kopschek
  * @author Ali aus Mali
@@ -33,14 +38,19 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 @PageTitle("Extras")
 @PermitAll
 public class ExtrasView extends VerticalLayout {
+
+    private final DrinkRepository drinkRepository;
     private HorizontalLayout alleyLayout;
     private HorizontalLayout tabLayout;
     private TabSheet tabs;
     private ShoePanel shoePanel;
     private FoodPanel foodPanel;
 
+
+
     @Autowired
-    public ExtrasView() {
+    public ExtrasView(DrinkRepository drinkRepository) {
+        this.drinkRepository = drinkRepository;
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         Component alleyComponent = createBahnComponent();
@@ -53,7 +63,6 @@ public class ExtrasView extends VerticalLayout {
     private Component createArticlePanelComponent() {
         tabs = new TabSheet();
         tabLayout = new HorizontalLayout();
-        tabLayout.setMaxWidth("100%");
         Tab drink = new Tab(VaadinIcon.COFFEE.create(), new Span("Getränke"));
         Tab food = new Tab(VaadinIcon.CROSS_CUTLERY.create(), new Span("Speisen"));
         Tab shoe = new Tab(VaadinIcon.BELL.create(), new Span("Schuhe"));
@@ -61,11 +70,24 @@ public class ExtrasView extends VerticalLayout {
         tabs.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED,
                 TabSheetVariant.MATERIAL_BORDERED,
                 TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
-        tabs.add(drink, new Div(new Text("This is the Getränke tab content")));
+        tabs.add(drink, createDrinkPanel());
         tabs.add(food, foodPanel.addPanelComponent());
         tabs.add(shoe, shoePanel.addPanelComponent());
         tabLayout.add(tabs);
         return tabLayout;
+    }
+
+    private Component createDrinkPanel() {
+        VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.setAlignItems(Alignment.CENTER);
+        verticalLayout.setWidthFull();
+        List<Drink> drinkList = drinkRepository.findAll();
+
+        for (Drink drink: drinkList) {
+            verticalLayout.add(new DrinkPanel(drink));
+        }
+
+        return verticalLayout;
     }
 
     private final Component createBahnComponent() {
