@@ -4,7 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-
 import java.io.Serializable;
 
 /**
@@ -19,11 +18,11 @@ public class BowlingShoe implements Serializable {
     private int id;
 
     private long boughtAt;
-    private int size;
     @ManyToOne
     private Client client;
-
+    private int stock;
     private boolean active;
+    private int size;
 
     public BowlingShoe() {
         active = true;
@@ -37,14 +36,6 @@ public class BowlingShoe implements Serializable {
         this.id = id;
     }
 
-    public long getBoughtAt() {
-        return boughtAt;
-    }
-
-    public void setBoughtAt(long boughtAt) {
-        this.boughtAt = boughtAt;
-    }
-
     public int getSize() {
         return size;
     }
@@ -53,12 +44,29 @@ public class BowlingShoe implements Serializable {
         this.size = size;
     }
 
+    public long getBoughtAt() {
+        return boughtAt;
+    }
+
+    public void setBoughtAt(long boughtAt) {
+        this.boughtAt = boughtAt;
+    }
+
     public Client getClient() {
         return client;
     }
 
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
     }
 
     public boolean isActive() {

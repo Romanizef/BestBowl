@@ -68,7 +68,6 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         return new Tab[]{
                 createTab("Kunde suchen", ClientSearchView.class),
                 createTab("Extras bestellen",ExtrasView.class ),
-                createTab("Rechnung", InvoiceView.class),
                 createTab("Kundenverwaltung", ClientManagementView.class),
                 createTab("Vereinsverwaltung", AssociationManagementView.class),
                 createTab("Artikelverwaltung", ArticleManagementView.class),

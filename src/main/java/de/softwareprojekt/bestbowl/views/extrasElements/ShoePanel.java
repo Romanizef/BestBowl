@@ -6,17 +6,50 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoe;
+
+import com.vaadin.flow.component.html.Label;
 
 /**
  * @author Matija Kopschek
  * @author Ali aus Mali
  */
-public class ShoePanel {
+public class ShoePanel extends HorizontalLayout {
     private FormLayout kachelLayout;
     private Grid<BowlingShoeBooking> shoeGrid;
 
     public ShoePanel() {
 
+    }
+
+    public ShoePanel(BowlingShoeBooking bowlingShoeBooking) {
+        Label label = new Label("" + bowlingShoeBooking.getBowlingShoe().getSize());
+        label.setMinWidth("250px");
+        label.setMaxWidth("250px");
+
+        IntegerField shoeAmountField = new IntegerField();
+        shoeAmountField.setValue(bowlingShoeBooking.getAmount());
+        shoeAmountField.setStepButtonsVisible(true);
+        shoeAmountField.setMin(0);
+        shoeAmountField.setMax(bowlingShoeBooking.getAmount());
+
+        setWidthFull();
+        // addCSS();
+        setAlignItems(Alignment.CENTER);
+        add(label, shoeAmountField);
+    }
+
+    public IntegerField createIntegerField(BowlingShoe bowlingShoe, BowlingShoeBooking bowlingShoeBooking) {
+        IntegerField sizeField = new IntegerField();
+        sizeField.setValue(0);
+        sizeField.setStepButtonsVisible(true);
+        sizeField.setMin(0);
+        sizeField.setMax(bowlingShoe.getStock() / bowlingShoeBooking.getAmount());
+
+        sizeField.addValueChangeListener(e -> {
+            // TODO
+        });
+        return sizeField;
     }
 
     public FormLayout addPanelComponent() {

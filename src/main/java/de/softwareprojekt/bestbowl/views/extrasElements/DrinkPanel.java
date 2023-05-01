@@ -40,16 +40,16 @@ public class DrinkPanel extends HorizontalLayout {
         label.setMinWidth("250px");
         label.setMaxWidth("250px");
 
-        IntegerField integerField = new IntegerField();
-        integerField.setValue(drinkBooking.getAmount());
-        integerField.setStepButtonsVisible(true);
-        integerField.setMin(0);
-        integerField.setMax(drinkBooking.getAmount());
+        IntegerField drinkAmountField = new IntegerField();
+        drinkAmountField.setValue(drinkBooking.getAmount());
+        drinkAmountField.setStepButtonsVisible(true);
+        drinkAmountField.setMin(0);
+        drinkAmountField.setMax(drinkBooking.getAmount());
 
         setWidthFull();
         addCSS();
         setAlignItems(Alignment.CENTER);
-        add(label, integerField);
+        add(label, drinkAmountField);
     }
 
     public IntegerField createIntegerField(DrinkVariant drinkVariant) {
@@ -61,6 +61,7 @@ public class DrinkPanel extends HorizontalLayout {
         mlField.setMax(drinkVariant.getDrink().getStockInMilliliters() / drinkVariant.getMl());
 
         mlField.addValueChangeListener(e -> {
+            //TODO
         });
         return mlField;
     }

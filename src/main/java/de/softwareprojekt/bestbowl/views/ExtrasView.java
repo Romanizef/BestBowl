@@ -46,8 +46,6 @@ public class ExtrasView extends VerticalLayout {
     private ShoePanel shoePanel;
     private FoodPanel foodPanel;
 
-
-
     @Autowired
     public ExtrasView(DrinkRepository drinkRepository) {
         this.drinkRepository = drinkRepository;
@@ -65,7 +63,7 @@ public class ExtrasView extends VerticalLayout {
         tabLayout = new HorizontalLayout();
         Tab drink = new Tab(VaadinIcon.COFFEE.create(), new Span("Getränke"));
         Tab food = new Tab(VaadinIcon.CROSS_CUTLERY.create(), new Span("Speisen"));
-        Tab shoe = new Tab(VaadinIcon.BELL.create(), new Span("Schuhe"));
+        Tab shoe = new Tab(VaadinIcon.RETWEET.create(), new Span("Schuhe"));
 
         tabs.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED,
                 TabSheetVariant.MATERIAL_BORDERED,
@@ -83,7 +81,7 @@ public class ExtrasView extends VerticalLayout {
         verticalLayout.setWidthFull();
         List<Drink> drinkList = drinkRepository.findAll();
 
-        for (Drink drink: drinkList) {
+        for (Drink drink : drinkList) {
             verticalLayout.add(new DrinkPanel(drink));
         }
 
@@ -117,8 +115,5 @@ public class ExtrasView extends VerticalLayout {
      * private final FoodRepository foodRepository;
      * 
      * private final FoodBookingRepository foodBookingRepository;
-     *
-     *
-     *
      */
 }
