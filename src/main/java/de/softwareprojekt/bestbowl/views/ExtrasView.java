@@ -60,6 +60,7 @@ public class ExtrasView extends VerticalLayout {
 
     private Component createArticlePanelComponent() {
         tabs = new TabSheet();
+
         tabLayout = new HorizontalLayout();
         Tab drink = new Tab(VaadinIcon.COFFEE.create(), new Span("Getränke"));
         Tab food = new Tab(VaadinIcon.CROSS_CUTLERY.create(), new Span("Speisen"));
