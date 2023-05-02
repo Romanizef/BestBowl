@@ -84,9 +84,7 @@ public class FoodPanel extends HorizontalLayout {
     }
 
      private void addCSS() {
-        getStyle().set("border", "2px solid #1b7513");
-        getStyle().set("background-color", "#FF9E99");
-        getStyle().set("padding", "10px");
-        getStyle().set("border-radius", "10px");
+        getStyle().set("border", "2px solid #FF9E99").set("background-color", "#FF9E990A").set("padding", "10px")
+                .set("margin-bottom", "5px").set("border-radius", "10px");
     }
 }

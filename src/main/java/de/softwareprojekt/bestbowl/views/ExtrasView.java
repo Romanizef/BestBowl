@@ -17,6 +17,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.*;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.DrinkRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.FoodRepository;
+import de.softwareprojekt.bestbowl.utils.VaadinUtils;
 import de.softwareprojekt.bestbowl.views.extrasElements.DrinkPanel;
 import de.softwareprojekt.bestbowl.views.extrasElements.FoodPanel;
 import de.softwareprojekt.bestbowl.views.extrasElements.ShoePanel;
@@ -159,7 +160,17 @@ public class ExtrasView extends VerticalLayout {
 
         //ToDo Dialog Fenster "Sind Sie sicher das sie Bezahlen wollen?"
 
-        goToBill.addClickListener(e -> UI.getCurrent().navigate(InvoiceView.class).ifPresent(view -> view.setBowlingAlleyBooking(bowlingAlleyBooking)));
+        addItem.addClickListener(buttonClickEvent -> {
+
+        });
+
+        goToBill.addClickListener(buttonClickEvent -> {
+            if(VaadinUtils.showConfirmationDialog("Alles Gut?", "Ja Suppi", "Bruda nein")){
+                UI.getCurrent().navigate(InvoiceView.class).ifPresent(view -> view.setBowlingAlleyBooking(bowlingAlleyBooking));
+            }
+        });
+
+        //goToBill.addClickListener(e -> UI.getCurrent().navigate(InvoiceView.class).ifPresent(view -> view.setBowlingAlleyBooking(bowlingAlleyBooking)));
 
         layout.add(addItem,goToBill);
         return layout;

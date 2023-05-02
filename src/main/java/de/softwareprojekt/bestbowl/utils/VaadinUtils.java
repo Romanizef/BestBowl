@@ -5,8 +5,11 @@ import com.vaadin.flow.component.HasEnabled;
 import com.vaadin.flow.component.HasOrderedComponents;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.ComboBoxVariant;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
@@ -23,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -198,4 +202,30 @@ public class VaadinUtils {
         }
         return false;
     }
+
+    public static boolean showConfirmationDialog(String confirmationQuestion, String confirmAnswer, String cancelAnswer) {
+        AtomicBoolean dialogAnswer = new AtomicBoolean(false);
+
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
+        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+
+        ConfirmDialog dialog = new ConfirmDialog();
+        dialog.setHeader("Bestätigen");
+        dialog.setText(confirmationQuestion);
+
+        dialog.setCancelable(true);
+        dialog.setCancelText(cancelAnswer);
+        dialog.addCancelListener(event -> dialogAnswer.set(false));
+
+        dialog.setConfirmText(confirmAnswer);
+        dialog.addConfirmListener(event -> dialogAnswer.set(true));
+
+        dialog.open();
+
+
+        return dialogAnswer.get();
+    }
+
 }
+
