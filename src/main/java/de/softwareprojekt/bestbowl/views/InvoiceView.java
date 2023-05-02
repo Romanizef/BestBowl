@@ -171,6 +171,7 @@ public final class InvoiceView extends VerticalLayout {
             showNotification("Rechnung bezahlt");
             // TODO Summe wird geupdated
             // TODO Alle Elemente sperren Children nochmal Angucken bei anderen Verwaltungen
+            // TODO ExtraView auf erste Belegte Bahn weiterleiten
         });
         return payButton;
     }

@@ -38,7 +38,7 @@ public class ShoePanel extends HorizontalLayout {
         Label label = new Label("" + bowlingShoeBooking.getBowlingShoe().getSize());
         label.setMinWidth("250px");
         label.setMaxWidth("250px");
-
+        //list mit Schuhen wo der spezifische Client drin steht und alle Elemente in der Liste sind der amount
         IntegerField shoeAmountField = new IntegerField();
 //        shoeAmountField.setValue(bowlingShoeBooking.getAmount());
         shoeAmountField.setStepButtonsVisible(true);
