@@ -1,5 +1,6 @@
 package de.softwareprojekt.bestbowl.views;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -7,13 +8,18 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.softwareprojekt.bestbowl.jpa.entities.*;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlley;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.Drink;
+import de.softwareprojekt.bestbowl.jpa.entities.Food;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.DrinkRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.FoodRepository;
@@ -23,12 +29,8 @@ import de.softwareprojekt.bestbowl.views.extrasElements.FoodPanel;
 import de.softwareprojekt.bestbowl.views.extrasElements.ShoePanel;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -53,7 +55,6 @@ public class ExtrasView extends VerticalLayout {
     private TabSheet tabs;
 
 
-
     @Autowired
     public ExtrasView(DrinkRepository drinkRepository, FoodRepository foodRepository, BowlingAlleyRepository bowlingAlleyRepository) {
         this.bowlingAlleyRepository = bowlingAlleyRepository;
@@ -66,7 +67,6 @@ public class ExtrasView extends VerticalLayout {
         Component footerButtons = createFooterButtons();
         add(alleyButtonsComponent, articlePanelComponent, footerButtons);
     }
-
 
 
     private Component createArticlePanelComponent() {
@@ -85,7 +85,6 @@ public class ExtrasView extends VerticalLayout {
         tabLayout.add(tabs);
         return tabLayout;
     }
-
 
 
     private Component createShoePanel() {
@@ -108,7 +107,7 @@ public class ExtrasView extends VerticalLayout {
         return verticalLayout;
     }
 
-    private Component createFoodPanel(){
+    private Component createFoodPanel() {
         FormLayout formLayout = new FormLayout();
         formLayout.setResponsiveSteps(new ResponsiveStep("100px", 2));
 
@@ -165,14 +164,12 @@ public class ExtrasView extends VerticalLayout {
         });
 
         goToBill.addClickListener(buttonClickEvent -> {
-            if(VaadinUtils.showConfirmationDialog("Alles Gut?", "Ja Suppi", "Bruda nein")){
+            VaadinUtils.showConfirmationDialog("Alles Gut?", "Ja Suppi", "Bruda nein", () -> {
                 UI.getCurrent().navigate(InvoiceView.class).ifPresent(view -> view.setBowlingAlleyBooking(bowlingAlleyBooking));
-            }
+            });
         });
 
-        //goToBill.addClickListener(e -> UI.getCurrent().navigate(InvoiceView.class).ifPresent(view -> view.setBowlingAlleyBooking(bowlingAlleyBooking)));
-
-        layout.add(addItem,goToBill);
+        layout.add(addItem, goToBill);
         return layout;
     }
 

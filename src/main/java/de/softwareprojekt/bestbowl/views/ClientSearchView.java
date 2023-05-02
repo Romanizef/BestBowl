@@ -51,6 +51,7 @@ public class ClientSearchView extends VerticalLayout {
     private Button nextStepButton;
     private Label selectedClientLabel;
     private Client selectedClient = null;
+    private boolean newClientSaved = false;
 
     @Autowired
     public ClientSearchView(ClientRepository clientRepository) {
@@ -125,6 +126,10 @@ public class ClientSearchView extends VerticalLayout {
         dialog.addOpenedChangeListener(e -> {
             if (e.isOpened()) {
                 resetDialog();
+            } else {
+                if (!newClientSaved) {
+                    selectedClient = null;
+                }
             }
         });
 
@@ -180,8 +185,7 @@ public class ClientSearchView extends VerticalLayout {
         clientGrid.deselectAll();
         updateFooterComponents();
 
-        selectedClient = new Client();
-        selectedClient.addAddress(new Address());
+        selectedClient = createNewClient();
         binder.readBean(selectedClient);
 
         validationErrorLabel.setText("");
@@ -284,5 +288,11 @@ public class ClientSearchView extends VerticalLayout {
             nextStepButton.setEnabled(true);
             selectedClientLabel.setText(template + selectedClient.getFirstName() + " " + selectedClient.getLastName());
         }
+    }
+
+    public Client createNewClient() {
+        Client client = new Client();
+        client.addAddress(new Address());
+        return client;
     }
 }

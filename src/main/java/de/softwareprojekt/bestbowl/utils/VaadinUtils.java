@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -203,9 +202,7 @@ public class VaadinUtils {
         return false;
     }
 
-    public static boolean showConfirmationDialog(String confirmationQuestion, String confirmAnswer, String cancelAnswer) {
-        AtomicBoolean dialogAnswer = new AtomicBoolean(false);
-
+    public static void showConfirmationDialog(String confirmationQuestion, String confirmAnswer, String cancelAnswer, Runnable onConfirm) {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
@@ -216,15 +213,11 @@ public class VaadinUtils {
 
         dialog.setCancelable(true);
         dialog.setCancelText(cancelAnswer);
-        dialog.addCancelListener(event -> dialogAnswer.set(false));
 
         dialog.setConfirmText(confirmAnswer);
-        dialog.addConfirmListener(event -> dialogAnswer.set(true));
+        dialog.addConfirmListener(event -> onConfirm.run());
 
         dialog.open();
-
-
-        return dialogAnswer.get();
     }
 
 }
