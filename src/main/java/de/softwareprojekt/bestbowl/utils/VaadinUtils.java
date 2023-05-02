@@ -8,8 +8,6 @@ import com.vaadin.flow.component.combobox.ComboBoxVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
@@ -202,11 +200,13 @@ public class VaadinUtils {
         return false;
     }
 
+    /**
+     * @param confirmationQuestion text of the dialog
+     * @param confirmAnswer        text of the confirm button
+     * @param cancelAnswer         text of the cancel button
+     * @param onConfirm            code to be executed on confirmation
+     */
     public static void showConfirmationDialog(String confirmationQuestion, String confirmAnswer, String cancelAnswer, Runnable onConfirm) {
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.setAlignItems(FlexComponent.Alignment.CENTER);
-        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-
         ConfirmDialog dialog = new ConfirmDialog();
         dialog.setHeader("Bestätigen");
         dialog.setText(confirmationQuestion);
@@ -219,6 +219,4 @@ public class VaadinUtils {
 
         dialog.open();
     }
-
 }
-
