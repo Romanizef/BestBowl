@@ -79,7 +79,8 @@ public final class InvoiceView extends VerticalLayout {
         return verticalLayout;
     }
 
-    private void setBowlingAlleyBooking(BowlingAlleyBooking bowlingAlleyBooking) {
+    // TODO ExtrasView ruft Methode auf und übergibt Daten
+    public void setBowlingAlleyBooking(BowlingAlleyBooking bowlingAlleyBooking) {
         this.bowlingAlleyBooking = bowlingAlleyBooking;
         // TODO createCompleteInvoice aufrufen
     }
@@ -174,4 +175,6 @@ public final class InvoiceView extends VerticalLayout {
         });
         return payButton;
     }
+
+
 }

@@ -18,8 +18,23 @@ public class FoodPanel extends HorizontalLayout {
     private FormLayout kachelLayout;
     private Grid<FoodBooking> shoeGrid;
 
-    public FoodPanel() {
+    public FoodPanel(Food food) {
+        Label label = new Label(food.getName());
+        label.setMinWidth("250px");
+        label.setMaxWidth("250px");
 
+        IntegerField shoeAmountField = new IntegerField();
+        shoeAmountField.setValue(0);
+        shoeAmountField.setStepButtonsVisible(true);
+        shoeAmountField.setMin(0);
+        shoeAmountField.setMax(food.getStock());
+
+
+        addCSS();
+        setAlignItems(Alignment.CENTER);
+        setFlexGrow(0);
+        //setWidth("200px");
+        add(label, shoeAmountField);
     }
 
     public FoodPanel(FoodBooking foodBooking) {
@@ -69,7 +84,9 @@ public class FoodPanel extends HorizontalLayout {
     }
 
      private void addCSS() {
-        kachelLayout.getStyle().set("border", "1px solid #1b7513");
-        kachelLayout.getStyle().set("background-color", "#2dbf21");
+        getStyle().set("border", "2px solid #1b7513");
+        getStyle().set("background-color", "#FF9E99");
+        getStyle().set("padding", "10px");
+        getStyle().set("border-radius", "10px");
     }
 }
