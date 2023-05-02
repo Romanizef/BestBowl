@@ -18,7 +18,20 @@ public class ShoePanel extends HorizontalLayout {
     private Grid<BowlingShoeBooking> shoeGrid;
 
     public ShoePanel() {
+        Label label = new Label("Schuhgröße");
+        label.setMinWidth("250px");
+        label.setMaxWidth("250px");
 
+        IntegerField shoeAmountField = new IntegerField();
+//        shoeAmountField.setValue(bowlingShoeBooking.getAmount());
+        shoeAmountField.setStepButtonsVisible(true);
+        shoeAmountField.setMin(0);
+//        shoeAmountField.setMax(bowlingShoeBooking.getAmount());
+
+        setWidthFull();
+        // addCSS();
+        setAlignItems(Alignment.CENTER);
+        add(label, shoeAmountField);
     }
 
     public ShoePanel(BowlingShoeBooking bowlingShoeBooking) {

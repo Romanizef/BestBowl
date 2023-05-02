@@ -1,34 +1,36 @@
 package de.softwareprojekt.bestbowl.views;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
-import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.Drink;
+import de.softwareprojekt.bestbowl.jpa.entities.*;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.DrinkRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.FoodRepository;
 import de.softwareprojekt.bestbowl.views.extrasElements.DrinkPanel;
 import de.softwareprojekt.bestbowl.views.extrasElements.FoodPanel;
 import de.softwareprojekt.bestbowl.views.extrasElements.ShoePanel;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Matija Kopschek
@@ -38,25 +40,33 @@ import java.util.List;
 @PageTitle("Extras")
 @PermitAll
 public class ExtrasView extends VerticalLayout {
-
     private final DrinkRepository drinkRepository;
+    private final FoodRepository foodRepository;
+
+    private BowlingAlley bowlingAlley;
+
+    private BowlingAlleyRepository bowlingAlleyRepository;
+    private BowlingAlleyBooking bowlingAlleyBooking;
     private HorizontalLayout alleyLayout;
     private HorizontalLayout tabLayout;
     private TabSheet tabs;
-    private ShoePanel shoePanel;
-    private FoodPanel foodPanel;
+
+
 
     @Autowired
-    public ExtrasView(DrinkRepository drinkRepository) {
+    public ExtrasView(DrinkRepository drinkRepository, FoodRepository foodRepository, BowlingAlleyRepository bowlingAlleyRepository) {
+        this.bowlingAlleyRepository = bowlingAlleyRepository;
         this.drinkRepository = drinkRepository;
+        this.foodRepository = foodRepository;
         setSizeFull();
         setAlignItems(Alignment.CENTER);
-        Component alleyComponent = createBahnComponent();
-        shoePanel = new ShoePanel();
-        foodPanel = new FoodPanel();
+        Component alleyButtonsComponent = createAlleyButtonsComponent();
         Component articlePanelComponent = createArticlePanelComponent();
-        add(alleyComponent, articlePanelComponent);
+        Component footerButtons = createFooterButtons();
+        add(alleyButtonsComponent, articlePanelComponent, footerButtons);
     }
+
+
 
     private Component createArticlePanelComponent() {
         tabs = new TabSheet();
@@ -69,11 +79,20 @@ public class ExtrasView extends VerticalLayout {
                 TabSheetVariant.MATERIAL_BORDERED,
                 TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
         tabs.add(drink, createDrinkPanel());
-        tabs.add(food, foodPanel.addPanelComponent());
-        tabs.add(shoe, shoePanel.addPanelComponent());
+        tabs.add(food, createFoodPanel());
+        tabs.add(shoe, createShoePanel());
         tabLayout.add(tabs);
         return tabLayout;
     }
+
+
+
+    private Component createShoePanel() {
+        ShoePanel shoePanel = new ShoePanel();
+
+        return shoePanel;
+    }
+
 
     private Component createDrinkPanel() {
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -84,36 +103,70 @@ public class ExtrasView extends VerticalLayout {
         for (Drink drink : drinkList) {
             verticalLayout.add(new DrinkPanel(drink));
         }
-
+        verticalLayout.setMaxHeight("400px");
         return verticalLayout;
     }
 
-    private final Component createBahnComponent() {
+    private Component createFoodPanel(){
+        FormLayout formLayout = new FormLayout();
+        formLayout.setResponsiveSteps(new ResponsiveStep("100px", 2));
+
+
+        List<Food> foodList = foodRepository.findAll();
+
+        for (Food food : foodList) {
+            formLayout.add(new FoodPanel(food));
+        }
+
+        formLayout.setMaxWidth("1000px");
+        return formLayout;
+    }
+
+    private final Component createAlleyButtonsComponent() {
         alleyLayout = new HorizontalLayout();
         alleyLayout.setPadding(true);
         alleyLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         // ToDo Buttons Einzeln erzeugen
-        alleyLayout.add(new Button("Bahn 1"));
-        alleyLayout.add(new Button("Bahn 2"));
-        alleyLayout.add(new Button("Bahn 3"));
+
+        List<BowlingAlley> bowlingAlleyList = bowlingAlleyRepository.findAll();
+        bowlingAlleyList.sort(Comparator.comparingInt(BowlingAlley::getId));
+        long currentTime = System.currentTimeMillis();
+        List<BowlingAlley> freeBowlingAlleyList = bowlingAlleyRepository.findAllByNoBookingOverlapBetweenTimeStamps(currentTime, currentTime);
+        Set<Integer> freeBowlingAlleyHashSet = freeBowlingAlleyList.stream().map(BowlingAlley::getId).collect(Collectors.toSet());
+
+        for (BowlingAlley bowlingAlley : bowlingAlleyList) {
+            Button bahn = new Button("Bahn " + bowlingAlley.getId());
+            bahn.setEnabled(!freeBowlingAlleyHashSet.contains(bowlingAlley.getId()));
+            alleyLayout.add(bahn);
+
+        }
+
         return alleyLayout;
     }
 
-    /*
-     * DrinkRepository drinkRepository, DrinkBookingRepository
-     * drinkBookingRepository, FoodRepository foodRepository, FoodBookingRepository
-     * foodBookingRepository
-     * this.drinkRepository = drinkRepository;
-     * this.drinkBookingRepository = drinkBookingRepository;
-     * this.foodRepository = foodRepository;
-     * this.foodBookingRepository = foodBookingRepository;
-     *
-     * private final DrinkRepository drinkRepository;
-     * 
-     * private final DrinkBookingRepository drinkBookingRepository;
-     * 
-     * private final FoodRepository foodRepository;
-     * 
-     * private final FoodBookingRepository foodBookingRepository;
-     */
+    private Component createFooterButtons() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setWidthFull();
+        layout.setAlignItems(Alignment.CENTER);
+        Button addItem = new Button("Hinzufügen");
+        Button goToBill = new Button("Bezahlen");
+        addItem.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        addItem.setWidth("55%");
+        String bHeight = "55px";
+        addItem.setHeight(bHeight);
+        goToBill.setWidth("40%");
+        goToBill.setHeight(bHeight);
+
+        //ToDo Dialog Fenster "Sind Sie sicher das sie Bezahlen wollen?"
+
+        goToBill.addClickListener(e -> UI.getCurrent().navigate(InvoiceView.class).ifPresent(view -> view.setBowlingAlleyBooking(bowlingAlleyBooking)));
+
+        layout.add(addItem,goToBill);
+        return layout;
+    }
+
+    public void setBowlingAlleyBooking(BowlingAlleyBooking bowlingAlleyBooking) {
+        //ToDo hier noch angeben, welche Bahn die mit Bahn Button übergeben wird
+        this.bowlingAlleyBooking = bowlingAlleyBooking;
+    }
 }

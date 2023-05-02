@@ -190,7 +190,7 @@ public class BowlingAlleyBookingView extends VerticalLayout {
         button.setWidth("55%");
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         button.addClickListener(e -> UI.getCurrent().navigate(ExtrasView.class).ifPresent(extrasView -> {
-            // übergeben von latestBooking
+            extrasView.setBowlingAlleyBooking(latestBooking);
         }));
         return button;
     }
