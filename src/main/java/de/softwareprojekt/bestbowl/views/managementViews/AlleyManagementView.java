@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views;
+package de.softwareprojekt.bestbowl.views.managementViews;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -13,19 +13,16 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.softwareprojekt.bestbowl.jpa.entities.Association;
-import de.softwareprojekt.bestbowl.jpa.repositories.AssociationRepository;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlley;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
-import de.softwareprojekt.bestbowl.utils.validators.AssociationValidator;
+import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -33,40 +30,39 @@ import static de.softwareprojekt.bestbowl.utils.Utils.matches;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
- * @author Matija Kopschek
- * @author Marten Voß
+ * @author Matija
  */
-@Route(value = "associationManagement", layout = MainView.class)
-@PageTitle("Vereinsverwaltung")
+@Route(value = "alleyManagement", layout = MainView.class)
+@PageTitle("Bahnenverwaltung")
 @RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
-public class AssociationManagementView extends VerticalLayout {
-    private final Binder<Association> binder = new Binder<>();
-    private final AssociationRepository associationRepository;
-    private Grid<Association> associationGrid;
+public class AlleyManagementView extends VerticalLayout {
+    private final Binder<BowlingAlley> binder = new Binder<>();
+    private final BowlingAlleyRepository bowlingAlleyRepository;
+    private Grid<BowlingAlley> bowlingAlleyGrid;
     private FormLayout editLayout;
-    private Association selectedAssociation = null;
+    private BowlingAlley selectedBowlingAlley = null;
     private Label validationErrorLabel;
-    private boolean editingNewAssociation = false;
+    private boolean editingNewBowlingAlley = false;
 
     @Autowired
-    public AssociationManagementView(AssociationRepository associationRepository) {
-        this.associationRepository = associationRepository;
+    public AlleyManagementView(BowlingAlleyRepository bowlingAlleyRepository) {
+        this.bowlingAlleyRepository = bowlingAlleyRepository;
         setSizeFull();
-        Button newAssociationButton = createNewAssociationButton();
+        Button newBowlingAlleyButton = createNewBowlingAlleyButton();
         HorizontalLayout gridLayout = createGridLayout();
-        add(newAssociationButton, gridLayout);
+        add(newBowlingAlleyButton, gridLayout);
         updateEditLayoutState();
     }
 
-    private Button createNewAssociationButton() {
-        Button button = new Button("Neuen Verein hinzufügen");
+    private Button createNewBowlingAlleyButton() {
+        Button button = new Button("Neue Bahn hinzufügen");
         button.setWidthFull();
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         button.addClickListener(e -> {
-            associationGrid.deselectAll();
-            selectedAssociation = new Association();
-            binder.readBean(selectedAssociation);
-            editingNewAssociation = true;
+            bowlingAlleyGrid.deselectAll();
+            selectedBowlingAlley = new BowlingAlley();
+            binder.readBean(selectedBowlingAlley);
+            editingNewBowlingAlley = true;
             updateEditLayoutState();
         });
         return button;
@@ -75,46 +71,41 @@ public class AssociationManagementView extends VerticalLayout {
     private HorizontalLayout createGridLayout() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setSizeFull();
-        associationGrid = createGrid();
+        bowlingAlleyGrid = createGrid();
         editLayout = createEditLayout();
-        layout.add(associationGrid, editLayout);
+        layout.add(bowlingAlleyGrid, editLayout);
         return layout;
     }
 
-    private Grid<Association> createGrid() {
-        Grid<Association> grid = new Grid<>(Association.class);
+    private Grid<BowlingAlley> createGrid() {
+        Grid<BowlingAlley> grid = new Grid<>(BowlingAlley.class);
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         grid.removeAllColumns();
-        Grid.Column<Association> idColumn = grid.addColumn("id").setHeader("ID");
-        Grid.Column<Association> nameColumn = grid.addColumn("name").setHeader("Name");
-        Grid.Column<Association> discountColumn = grid.addColumn("discount").setHeader("Rabatt");
-        Grid.Column<Association> activeColumn = grid
+        Grid.Column<BowlingAlley> idColumn = grid.addColumn("id").setHeader("ID");
+        Grid.Column<BowlingAlley> activeColumn = grid
                 .addColumn(association -> association.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setWidth("75%");
         grid.setHeight("100%");
 
-        List<Association> associationList = associationRepository.findAll();
-        GridListDataView<Association> dataView = grid.setItems(associationList);
-        AssociationFilter associationFilter = new AssociationFilter(dataView);
+        List<BowlingAlley> bowlingAlleyList = bowlingAlleyRepository.findAll();
+        GridListDataView<BowlingAlley> dataView = grid.setItems(bowlingAlleyList);
+        BowlingAlleyFilter associationFilter = new BowlingAlleyFilter(dataView);
         grid.getHeaderRows().clear();
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", associationFilter::setId));
-        headerRow.getCell(nameColumn).setComponent(createFilterHeaderString("Name", associationFilter::setName));
-        headerRow.getCell(discountColumn)
-                .setComponent(createFilterHeaderString("Rabatt", associationFilter::setDiscount));
         headerRow.getCell(activeColumn)
                 .setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", associationFilter::setActive));
         associationFilter.setActive(true);
 
         grid.addSelectionListener(e -> {
             if (e.isFromClient()) {
-                Optional<Association> optionalAssociation = e.getFirstSelectedItem();
-                if (optionalAssociation.isPresent()) {
-                    selectedAssociation = optionalAssociation.get();
-                    binder.readBean(selectedAssociation);
-                    editingNewAssociation = false;
+                Optional<BowlingAlley> optionalBowlingAlley = e.getFirstSelectedItem();
+                if (optionalBowlingAlley.isPresent()) {
+                    selectedBowlingAlley = optionalBowlingAlley.get();
+                    binder.readBean(selectedBowlingAlley);
+                    editingNewBowlingAlley = false;
                     updateEditLayoutState();
                 } else {
                     resetEditLayout();
@@ -128,14 +119,6 @@ public class AssociationManagementView extends VerticalLayout {
         FormLayout layout = new FormLayout();
         layout.setWidth("25%");
 
-        TextField nameField = new TextField("Name");
-        nameField.setWidthFull();
-        nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-
-        TextField discountField = new TextField("Rabatt");
-        discountField.setWidthFull();
-        discountField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-
         HorizontalLayout checkboxLayout = new HorizontalLayout();
         checkboxLayout.setAlignItems(Alignment.CENTER);
         checkboxLayout.setWidthFull();
@@ -143,13 +126,9 @@ public class AssociationManagementView extends VerticalLayout {
 
         Checkbox activeCheckbox = new Checkbox("Aktiv");
         checkboxLayout.add(activeCheckbox);
-        layout.add(nameField, discountField, checkboxLayout, createValidationLabelLayout(), buttonLayoutConfig());
+        layout.add(checkboxLayout, createValidationLabelLayout(), buttonLayoutConfig());
 
-        binder.withValidator(new AssociationValidator());
-        binder.bind(nameField, Association::getName, Association::setName);
-        binder.bind(discountField, a -> String.valueOf(a.getDiscount()),
-                (association, s) -> association.setDiscount(Double.parseDouble(s)));
-        binder.bind(activeCheckbox, Association::isActive, Association::setActive);
+        binder.bind(activeCheckbox, BowlingAlley::isActive, BowlingAlley::setActive);
         return layout;
     }
 
@@ -185,15 +164,15 @@ public class AssociationManagementView extends VerticalLayout {
 
     private void updateEditLayoutState() {
         validationErrorLabel.setText("");
-        setChildrenEnabled(editLayout.getChildren(), selectedAssociation != null);
+        setChildrenEnabled(editLayout.getChildren(), selectedBowlingAlley != null);
     }
 
     private void resetEditLayout() {
-        associationGrid.deselectAll();
-        selectedAssociation = null;
+        bowlingAlleyGrid.deselectAll();
+        selectedBowlingAlley = null;
 
-        Association client = new Association();
-        binder.readBean(client);
+        BowlingAlley bowlingAlley = new BowlingAlley();
+        binder.readBean(bowlingAlley);
 
         updateEditLayoutState();
         setValueForIntegerFieldChildren(editLayout.getChildren(), null);
@@ -215,7 +194,7 @@ public class AssociationManagementView extends VerticalLayout {
 
     private boolean writeBean() {
         try {
-            binder.writeBean(selectedAssociation);
+            binder.writeBean(selectedBowlingAlley);
             return true;
         } catch (ValidationException e) {
             if (!e.getValidationErrors().isEmpty()) {
@@ -226,48 +205,34 @@ public class AssociationManagementView extends VerticalLayout {
     }
 
     private void saveToDb() {
-        associationRepository.save(selectedAssociation);
-        if (editingNewAssociation) {
-            associationGrid.getListDataView().addItem(selectedAssociation);
+        bowlingAlleyRepository.save(selectedBowlingAlley);
+        if (editingNewBowlingAlley) {
+            bowlingAlleyGrid.getListDataView().addItem(selectedBowlingAlley);
         } else {
-            associationGrid.getListDataView().refreshItem(selectedAssociation);
+            bowlingAlleyGrid.getListDataView().refreshItem(selectedBowlingAlley);
         }
         resetEditLayout();
-        showNotification("Verein gespeichert");
+        showNotification("Bahn gespeichert");
     }
 
-    private static class AssociationFilter {
-        private final GridListDataView<Association> dataView;
+    private static class BowlingAlleyFilter {
+        private final GridListDataView<BowlingAlley> dataView;
         private String id;
-        private String name;
-        private String discount;
         private Boolean active;
 
-        public AssociationFilter(GridListDataView<Association> dataView) {
+        public BowlingAlleyFilter(GridListDataView<BowlingAlley> dataView) {
             this.dataView = dataView;
             this.dataView.addFilter(this::test);
         }
 
-        public boolean test(Association association) {
-            boolean matchesId = matches(String.valueOf(association.getId()), id);
-            boolean matchesName = matches(association.getName(), name);
-            boolean matchesDiscount = matches(String.valueOf(association.getDiscount()), discount);
-            boolean matchesActive = active == null || active == association.isActive();
-            return matchesId && matchesDiscount && matchesName && matchesActive;
+        public boolean test(BowlingAlley bowlingAlley) {
+            boolean matchesId = matches(String.valueOf(bowlingAlley.getId()), id);
+            boolean matchesActive = active == null || active == bowlingAlley.isActive();
+            return matchesId && matchesActive;
         }
 
         public void setId(String id) {
             this.id = id;
-            dataView.refreshAll();
-        }
-
-        public void setName(String name) {
-            this.name = name;
-            dataView.refreshAll();
-        }
-
-        public void setDiscount(String discount) {
-            this.discount = discount;
             dataView.refreshAll();
         }
 

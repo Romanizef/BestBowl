@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views;
+package de.softwareprojekt.bestbowl.views.bookingViews;
 
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -10,6 +10,7 @@ import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
+import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.extrasElements.DrinkPanel;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;

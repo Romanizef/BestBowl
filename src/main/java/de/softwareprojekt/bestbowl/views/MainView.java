@@ -17,6 +17,14 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
 import de.softwareprojekt.bestbowl.BestBowlApplication;
 import de.softwareprojekt.bestbowl.beans.SecurityService;
+import de.softwareprojekt.bestbowl.views.bookingViews.ClientSearchView;
+import de.softwareprojekt.bestbowl.views.bookingViews.ExtrasView;
+import de.softwareprojekt.bestbowl.views.managementViews.AlleyManagementView;
+import de.softwareprojekt.bestbowl.views.managementViews.ArticleManagementView;
+import de.softwareprojekt.bestbowl.views.managementViews.AssociationManagementView;
+import de.softwareprojekt.bestbowl.views.managementViews.ClientManagementView;
+import de.softwareprojekt.bestbowl.views.managementViews.UserManagementView;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;

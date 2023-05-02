@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views;
+package de.softwareprojekt.bestbowl.views.managementViews;
 
 
 import com.vaadin.flow.component.button.Button;
@@ -25,6 +25,7 @@ import de.softwareprojekt.bestbowl.jpa.repositories.DrinkRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.DrinkVariantRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.FoodRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.form.DrinkForm;
 import de.softwareprojekt.bestbowl.views.form.FoodForm;
 import de.softwareprojekt.bestbowl.views.form.ShoeForm;

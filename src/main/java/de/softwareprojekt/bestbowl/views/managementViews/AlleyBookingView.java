@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views;
+package de.softwareprojekt.bestbowl.views.managementViews;
 
 
 /**

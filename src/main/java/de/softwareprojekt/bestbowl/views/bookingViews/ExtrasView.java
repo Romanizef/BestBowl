@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views;
+package de.softwareprojekt.bestbowl.views.bookingViews;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -24,6 +24,7 @@ import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.DrinkRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.FoodRepository;
 import de.softwareprojekt.bestbowl.utils.VaadinUtils;
+import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.extrasElements.DrinkPanel;
 import de.softwareprojekt.bestbowl.views.extrasElements.FoodPanel;
 import de.softwareprojekt.bestbowl.views.extrasElements.ShoePanel;

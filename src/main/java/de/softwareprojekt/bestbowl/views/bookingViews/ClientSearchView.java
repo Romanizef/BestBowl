@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views;
+package de.softwareprojekt.bestbowl.views.bookingViews;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -26,6 +26,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.Association;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepository;
 import de.softwareprojekt.bestbowl.utils.validators.ClientValidator;
+import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 

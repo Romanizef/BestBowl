@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views;
+package de.softwareprojekt.bestbowl.views.managementViews;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -29,6 +29,7 @@ import de.softwareprojekt.bestbowl.jpa.repositories.UserRepository;
 import de.softwareprojekt.bestbowl.utils.Utils;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.utils.validators.UserValidator;
+import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
