@@ -33,6 +33,12 @@ public class DrinkPanel extends HorizontalLayout {
         for (DrinkVariant drinkVariant : drinkVariantList) {
             variantLayout.add(createIntegerField(drinkVariant));
         }
+
+        setWidthFull();
+        addCSS();
+        setAlignItems(Alignment.CENTER);
+        add(label, variantLayout);
+
     }
 
     public DrinkPanel(DrinkBooking drinkBooking) {
