@@ -160,7 +160,7 @@ public class ExtrasView extends VerticalLayout {
         //ToDo Dialog Fenster "Sind Sie sicher das sie Bezahlen wollen?"
 
         addItem.addClickListener(buttonClickEvent -> {
-
+            
         });
 
         goToBill.addClickListener(buttonClickEvent -> {

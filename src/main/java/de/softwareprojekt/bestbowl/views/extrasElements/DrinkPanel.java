@@ -41,6 +41,8 @@ public class DrinkPanel extends HorizontalLayout {
 
     }
 
+
+
     public DrinkPanel(DrinkBooking drinkBooking) {
         Label label = new Label(drinkBooking.getName());
         label.setMinWidth("250px");
