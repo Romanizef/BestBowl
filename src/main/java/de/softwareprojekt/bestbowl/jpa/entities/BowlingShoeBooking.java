@@ -24,9 +24,9 @@ public class BowlingShoeBooking implements Serializable {
     private BowlingAlley bowlingAlley;
     @Id
     private long timeStamp;
+
     @ManyToOne
     private BowlingShoe bowlingShoe;
-    private int amount;
     private boolean active;
 
     public BowlingShoeBooking() {
@@ -63,14 +63,6 @@ public class BowlingShoeBooking implements Serializable {
 
     public void setBowlingShoe(BowlingShoe bowlingShoe) {
         this.bowlingShoe = bowlingShoe;
-    }
-
-    public int getAmount() {
-        return amount;
-    }
-
-    public void setAmount(int amount) {
-        this.amount = amount;
     }
 
     public boolean isActive() {

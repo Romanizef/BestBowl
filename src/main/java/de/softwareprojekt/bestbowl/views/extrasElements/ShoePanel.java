@@ -1,14 +1,13 @@
 package de.softwareprojekt.bestbowl.views.extrasElements;
 
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoe;
-
-import com.vaadin.flow.component.html.Label;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
 
 /**
  * @author Matija Kopschek
@@ -28,10 +27,10 @@ public class ShoePanel extends HorizontalLayout {
         label.setMaxWidth("250px");
 
         IntegerField shoeAmountField = new IntegerField();
-        shoeAmountField.setValue(bowlingShoeBooking.getAmount());
+//        shoeAmountField.setValue(bowlingShoeBooking.getAmount());
         shoeAmountField.setStepButtonsVisible(true);
         shoeAmountField.setMin(0);
-        shoeAmountField.setMax(bowlingShoeBooking.getAmount());
+//        shoeAmountField.setMax(bowlingShoeBooking.getAmount());
 
         setWidthFull();
         // addCSS();
@@ -44,7 +43,7 @@ public class ShoePanel extends HorizontalLayout {
         sizeField.setValue(0);
         sizeField.setStepButtonsVisible(true);
         sizeField.setMin(0);
-        sizeField.setMax(bowlingShoe.getStock() / bowlingShoeBooking.getAmount());
+//        sizeField.setMax(bowlingShoe.getStock() / bowlingShoeBooking.getAmount());
 
         sizeField.addValueChangeListener(e -> {
             // TODO
