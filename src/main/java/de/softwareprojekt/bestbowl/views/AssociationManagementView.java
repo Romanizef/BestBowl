@@ -1,6 +1,5 @@
 package de.softwareprojekt.bestbowl.views;
 
-import com.vaadin.flow.component.HasEnabled;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -9,6 +8,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -16,11 +16,13 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.jpa.entities.Association;
 import de.softwareprojekt.bestbowl.jpa.repositories.AssociationRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.utils.validators.AssociationValidator;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -43,6 +45,8 @@ public class AssociationManagementView extends VerticalLayout {
     private Grid<Association> associationGrid;
     private FormLayout editLayout;
     private Association selectedAssociation = null;
+    private Label validationErrorLabel;
+    private boolean editingNewAssociation = false;
 
     @Autowired
     public AssociationManagementView(AssociationRepository associationRepository) {
@@ -62,6 +66,7 @@ public class AssociationManagementView extends VerticalLayout {
             associationGrid.deselectAll();
             selectedAssociation = new Association();
             binder.readBean(selectedAssociation);
+            editingNewAssociation = true;
             updateEditLayoutState();
         });
         return button;
@@ -109,12 +114,12 @@ public class AssociationManagementView extends VerticalLayout {
                 if (optionalAssociation.isPresent()) {
                     selectedAssociation = optionalAssociation.get();
                     binder.readBean(selectedAssociation);
+                    editingNewAssociation = false;
+                    updateEditLayoutState();
                 } else {
-                    selectedAssociation = null;
-                    binder.readBean(new Association());
+                    resetEditLayout();
                 }
             }
-            updateEditLayoutState();
         });
         return grid;
     }
@@ -138,8 +143,9 @@ public class AssociationManagementView extends VerticalLayout {
 
         Checkbox activeCheckbox = new Checkbox("Aktiv");
         checkboxLayout.add(activeCheckbox);
-        layout.add(nameField, discountField, checkboxLayout, buttonLayoutConfig());
+        layout.add(nameField, discountField, checkboxLayout, createValidationLabelLayout(), buttonLayoutConfig());
 
+        binder.withValidator(new AssociationValidator());
         binder.bind(nameField, Association::getName, Association::setName);
         binder.bind(discountField, a -> String.valueOf(a.getDiscount()),
                 (association, s) -> association.setDiscount(Double.parseDouble(s)));
@@ -161,9 +167,9 @@ public class AssociationManagementView extends VerticalLayout {
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
         saveButton.addClickListener(clickEvent -> {
-            showNotification("Verein gespeichert");
-            disableEditLayout();
-            // TODO Verein in die Datenbank speichern
+            if (writeBean()) {
+                saveToDb();
+            }
         });
         return saveButton;
     }
@@ -172,33 +178,62 @@ public class AssociationManagementView extends VerticalLayout {
         cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
         cancelButton.addClickListener(clickEvent -> {
             showNotification("Bearbeitung abgebrochen");
-            disableEditLayout();
+            resetEditLayout();
         });
         return cancelButton;
     }
 
     private void updateEditLayoutState() {
-        if (selectedAssociation == null) {
-            disableEditLayout();
-        } else {
-            enableEditLayout();
+        validationErrorLabel.setText("");
+        setChildrenEnabled(editLayout.getChildren(), selectedAssociation != null);
+    }
+
+    private void resetEditLayout() {
+        associationGrid.deselectAll();
+        selectedAssociation = null;
+
+        Association client = new Association();
+        binder.readBean(client);
+
+        updateEditLayoutState();
+        setValueForIntegerFieldChildren(editLayout.getChildren(), null);
+    }
+
+    private VerticalLayout createValidationLabelLayout() {
+        VerticalLayout validationLabelLayout = new VerticalLayout();
+        validationLabelLayout.setWidthFull();
+        validationLabelLayout.setPadding(false);
+        validationLabelLayout.setMargin(false);
+        validationLabelLayout.setAlignItems(Alignment.CENTER);
+
+        validationErrorLabel = new Label();
+        validationErrorLabel.getStyle().set("color", "red");
+
+        validationLabelLayout.add(validationErrorLabel);
+        return validationLabelLayout;
+    }
+
+    private boolean writeBean() {
+        try {
+            binder.writeBean(selectedAssociation);
+            return true;
+        } catch (ValidationException e) {
+            if (!e.getValidationErrors().isEmpty()) {
+                validationErrorLabel.setText(e.getValidationErrors().get(0).getErrorMessage());
+            }
         }
+        return false;
     }
 
-    private void enableEditLayout() {
-        editLayout.getChildren().forEach(component -> {
-            if (component instanceof HasEnabled c) {
-                c.setEnabled(true);
-            }
-        });
-    }
-
-    private void disableEditLayout() {
-        editLayout.getChildren().forEach(component -> {
-            if (component instanceof HasEnabled c) {
-                c.setEnabled(false);
-            }
-        });
+    private void saveToDb() {
+        associationRepository.save(selectedAssociation);
+        if (editingNewAssociation) {
+            associationGrid.getListDataView().addItem(selectedAssociation);
+        } else {
+            associationGrid.getListDataView().refreshItem(selectedAssociation);
+        }
+        resetEditLayout();
+        showNotification("Verein gespeichert");
     }
 
     private static class AssociationFilter {
