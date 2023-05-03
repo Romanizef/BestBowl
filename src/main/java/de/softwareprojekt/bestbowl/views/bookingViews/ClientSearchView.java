@@ -8,6 +8,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -17,6 +18,7 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -52,7 +54,7 @@ public class ClientSearchView extends VerticalLayout {
     private Button nextStepButton;
     private Label selectedClientLabel;
     private Client selectedClient = null;
-    private boolean newClientSaved = false;
+    private Client newClient = null;
 
     @Autowired
     public ClientSearchView(ClientRepository clientRepository) {
@@ -75,7 +77,7 @@ public class ClientSearchView extends VerticalLayout {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Neuen Kunden anlegen");
         dialog.setCloseOnOutsideClick(false);
-        dialog.setCloseOnEsc(true);
+        dialog.setCloseOnEsc(false);
 
         VerticalLayout layout = new VerticalLayout();
         TextField firstNameField = new TextField("Vorname");
@@ -112,24 +114,29 @@ public class ClientSearchView extends VerticalLayout {
         footerLayout.setFlexGrow(1, cancelButton, saveButton);
         dialog.getFooter().add(footerLayout);
 
-        cancelButton.addClickListener(e -> dialog.close());
+        cancelButton.addClickListener(e -> {
+            newClient = null;
+            dialog.close();
+        });
         saveButton.addClickListener(e -> {
-            if (writeBean()) {
-                clientRepository.save(selectedClient);
-                dialog.close();
-                clientGrid.getListDataView().addItem(selectedClient);
+            if (writeBean(newClient)) {
+                clientRepository.save(newClient);
+                clientGrid.getListDataView().addItem(newClient);
                 clientGrid.deselectAll();
-                clientGrid.select(selectedClient);
-                updateFooterComponents();
+                clientGrid.select(newClient);
+                selectedClient = newClient;
                 showNotification("Kunde angelegt");
+                dialog.close();
             }
         });
         dialog.addOpenedChangeListener(e -> {
             if (e.isOpened()) {
                 resetDialog();
             } else {
-                if (!newClientSaved) {
-                    selectedClient = null;
+                if (newClient != null) {
+                    selectedClient = newClient;
+                    newClient = null;
+                    updateFooterComponents();
                 }
             }
         });
@@ -170,9 +177,9 @@ public class ClientSearchView extends VerticalLayout {
         return validationLabelLayout;
     }
 
-    private boolean writeBean() {
+    private boolean writeBean(Client client) {
         try {
-            binder.writeBean(selectedClient);
+            binder.writeBean(client);
             return true;
         } catch (ValidationException e) {
             if (!e.getValidationErrors().isEmpty()) {
@@ -183,14 +190,9 @@ public class ClientSearchView extends VerticalLayout {
     }
 
     private void resetDialog() {
-        clientGrid.deselectAll();
-        updateFooterComponents();
-
-        selectedClient = createNewClient();
-        binder.readBean(selectedClient);
-
+        newClient = createNewClient();
+        binder.readBean(newClient);
         validationErrorLabel.setText("");
-
         setValueForIntegerFieldChildren(newClientDialog.getChildren(), null);
     }
 
@@ -264,7 +266,8 @@ public class ClientSearchView extends VerticalLayout {
                 }
             }
         }
-        clientGrid.setItems(clientList);
+        GridListDataView<Client> clientGridListDataView = clientGrid.setItems(clientList);
+        clientGridListDataView.setSortOrder(Client::getLastName, SortDirection.ASCENDING);
     }
 
     private Component createFooterComponent() {

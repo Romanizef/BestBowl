@@ -13,6 +13,8 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
@@ -20,11 +22,13 @@ import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlley;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.utils.validators.BowlingAlleyValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.matches;
@@ -120,6 +124,10 @@ public class AlleyManagementView extends VerticalLayout {
         FormLayout layout = new FormLayout();
         layout.setWidth("25%");
 
+        IntegerField idField = new IntegerField("ID");
+        idField.setWidthFull();
+        idField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
         HorizontalLayout checkboxLayout = new HorizontalLayout();
         checkboxLayout.setAlignItems(Alignment.CENTER);
         checkboxLayout.setWidthFull();
@@ -127,8 +135,10 @@ public class AlleyManagementView extends VerticalLayout {
 
         Checkbox activeCheckbox = new Checkbox("Aktiv");
         checkboxLayout.add(activeCheckbox);
-        layout.add(checkboxLayout, createValidationLabelLayout(), buttonLayoutConfig());
+        layout.add(idField, checkboxLayout, createValidationLabelLayout(), buttonLayoutConfig());
 
+        binder.withValidator(new BowlingAlleyValidator());
+        binder.bind(idField, BowlingAlley::getId, (alley, i) -> alley.setId(Objects.requireNonNullElse(i, 0)));
         binder.bind(activeCheckbox, BowlingAlley::isActive, BowlingAlley::setActive);
         return layout;
     }
@@ -156,10 +166,7 @@ public class AlleyManagementView extends VerticalLayout {
 
     private Button cancelButtonConfig(Button cancelButton) {
         cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
-        cancelButton.addClickListener(clickEvent -> {
-            showNotification("Bearbeitung abgebrochen");
-            resetEditLayout();
-        });
+        cancelButton.addClickListener(clickEvent -> resetEditLayout());
         return cancelButton;
     }
 
