@@ -178,6 +178,7 @@ public class VaadinUtils {
             }
             if (component instanceof IntegerField child) {
                 child.setValue(value);
+                child.setInvalid(false);
             }
         });
     }
