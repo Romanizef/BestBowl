@@ -6,6 +6,9 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import  com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -14,6 +17,8 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import de.softwareprojekt.bestbowl.jpa.entities.Food;
+
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.showNotification;
 
 /**
  * @author Max Ziller
@@ -28,15 +33,19 @@ public class FoodForm extends FormLayout{
     Button saveButton = new Button("Sichern");
     Button cancelButton = new Button("Abbrechen");
 
+
     public FoodForm(Binder<Food> foodBinder){
         setWidth("25%");
         nameField.setWidthFull();
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         stockField.setWidthFull();
+        stockField.setSuffixComponent(new Span("Stück"));
         stockField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         reorderPointField.setWidthFull();
+        reorderPointField.setSuffixComponent(new Span("Stück"));
         reorderPointField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         priceField.setWidthFull();
+        priceField.setSuffixComponent(new Span("EUR"));
         priceField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
         HorizontalLayout checkboxLayout = new HorizontalLayout();
@@ -60,12 +69,36 @@ public class FoodForm extends FormLayout{
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setWidthFull();
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
+        cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
+
         buttonLayout.add(cancelButton, saveButton);
         buttonLayout.setFlexGrow(1, cancelButton, saveButton);
 
         saveButton.addClickShortcut(Key.ENTER);
         cancelButton.addClickShortcut(Key.ESCAPE);
 
+        saveButton.addClickListener(clickEvent -> {
+            // TODO Kunde in die Datenbank speichern
+            //resetEditLayout();
+            showNotification("Speise gespeichert");
+        });
+        cancelButton.addClickListener(clickEvent -> {
+           //resetEditLayout();
+            showNotification("Bearbeitung abgebrochen");
+        });
         return buttonLayout;
     }
+
+   /* private void resetEditLayout() {
+        foodGrid.deselectAll();
+        selectedFood = null;
+
+        Food food = new Food();
+        binder.readBean(food);
+
+        updateEditLayoutState();
+        setValueForIntegerFieldChildren(editLayout.getChildren(), null);
+    */
 }
+

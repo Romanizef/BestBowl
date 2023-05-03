@@ -27,6 +27,7 @@ import de.softwareprojekt.bestbowl.jpa.repositories.FoodRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.form.DrinkForm;
+import de.softwareprojekt.bestbowl.views.form.DrinkVariantForm;
 import de.softwareprojekt.bestbowl.views.form.FoodForm;
 import de.softwareprojekt.bestbowl.views.form.ShoeForm;
 import jakarta.annotation.security.RolesAllowed;
@@ -35,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Optional;
 
+import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
@@ -56,19 +58,21 @@ public class ArticleManagementView extends VerticalLayout {
     private final VerticalLayout foodTabSheet = new VerticalLayout();
     private final VerticalLayout drinkTabSheet = new VerticalLayout();
     private final VerticalLayout shoeTabSheet = new VerticalLayout();
+    private final VerticalLayout innerDrinkTabSheet = new VerticalLayout();
+    private final VerticalLayout innerDrinkVariantTabSheet = new VerticalLayout();
     private Grid<Food> foodGrid;
     private Grid<Drink> drinkGrid;
     private Grid<DrinkVariant> drinkVariantGrid;
     private Grid<BowlingShoe> shoeGrid;
     private FoodForm foodForm;
     private DrinkForm drinkForm;
+    private DrinkVariantForm drinkVariantForm;
     private ShoeForm shoeForm;
 
-    private FormLayout editFoodForm;
-    private FormLayout editDrinkForm;
     private FormLayout editShoeForm;
     private Food selectedFood = null;
     private Drink selectedDrink = null;
+    private DrinkVariant selectedDrinkVariant = null;
     private BowlingShoe selectedShoe = null;
 
 
@@ -90,18 +94,34 @@ public class ArticleManagementView extends VerticalLayout {
         tabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
         tabSheet.addThemeVariants(TabSheetVariant.LUMO_BORDERED);
         add(tabSheet);
+
         Button newFoodButton = createNewFoodButton();
         HorizontalLayout foodGridFormLayout = createFoodGridFormLayout();
         foodTabSheet.setSizeFull();
         foodTabSheet.add(newFoodButton, foodGridFormLayout);
         updateEditFoodLayoutState();
 
-        Button newDrinkButton = createNewDrinkButton();
-        HorizontalLayout drinkGridFormLayout = createDrinkGridFormLayout();
-        drinkVariantGrid = createDrinkVariantGrid();
         drinkTabSheet.setSizeFull();
-        drinkTabSheet.add(newDrinkButton, drinkGridFormLayout, drinkVariantGrid);
+        TabSheet innerTabSheet = new TabSheet();
+        innerTabSheet.setSizeFull();
+        innerTabSheet.add("Getränk", innerDrinkTabSheet);
+        innerTabSheet.add("Getränk Variante", innerDrinkVariantTabSheet);
+        innerTabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED);
+        innerTabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
+        innerTabSheet.addThemeVariants(TabSheetVariant.LUMO_BORDERED);
+        drinkTabSheet.add(innerTabSheet);
+
+        Button drinkButton = createNewDrinkButton();
+        HorizontalLayout drinkGridFormLayout = createDrinkGridFormLayout();
+        innerDrinkTabSheet.setSizeFull();
+        innerDrinkTabSheet.add(drinkButton, drinkGridFormLayout);
         updateEditDrinkLayoutState();
+
+        Button drinkVariantButton = createNewDrinkVariantButton();
+        HorizontalLayout drinkVariantGridFormLayout = createDrinkVariantGridFormLayout();
+        innerDrinkVariantTabSheet.setSizeFull();
+        innerDrinkVariantTabSheet.add(drinkVariantButton,drinkVariantGridFormLayout);
+        updateEditDrinkVariantLayoutState();
 
         Button newShoeButton = createNewShoeButton();
         HorizontalLayout shoeGridFormLayout = createShoeGridFormLayout();
@@ -136,6 +156,19 @@ public class ArticleManagementView extends VerticalLayout {
         return button;
     }
 
+    private Button createNewDrinkVariantButton() {
+        Button button = new Button("Neue Getränkevariante hinzufügen");
+        button.setWidthFull();
+        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        button.addClickListener(e -> {
+            drinkVariantGrid.deselectAll();
+            selectedDrinkVariant = new DrinkVariant();
+            drinkVariantBinder.readBean(selectedDrinkVariant);
+            updateEditDrinkVariantLayoutState();
+        });
+        return button;
+    }
+
     private Button createNewShoeButton() {
         Button button = new Button("Neue Schuhe hinzufügen");
         button.setWidthFull();
@@ -163,6 +196,13 @@ public class ArticleManagementView extends VerticalLayout {
         }
     }
 
+    private void updateEditDrinkVariantLayoutState() {
+        setChildrenEnabled(drinkVariantForm.getChildren(), selectedDrinkVariant != null);
+        if (selectedDrinkVariant == null) {
+            setValueForIntegerFieldChildren(drinkVariantForm.getChildren(), null);
+        }
+    }
+
     private void updateEditShoeLayoutState() {
         setChildrenEnabled(editShoeForm.getChildren(), selectedShoe != null);
         if (selectedShoe == null) {
@@ -175,18 +215,25 @@ public class ArticleManagementView extends VerticalLayout {
         foodForm = new FoodForm(foodBinder);
         layout.setSizeFull();
         foodGrid = createFoodGrid();
-        editFoodForm = foodForm;
         layout.add(foodGrid, foodForm);
         return layout;
     }
 
     private HorizontalLayout createDrinkGridFormLayout() {
         HorizontalLayout layout = new HorizontalLayout();
-        drinkForm = new DrinkForm(drinkVariantBinder, drinkBinder);
+        drinkForm = new DrinkForm(drinkBinder);
         layout.setSizeFull();
         drinkGrid = createDrinkGrid();
-        editDrinkForm = drinkForm;
         layout.add(drinkGrid, drinkForm);
+        return layout;
+    }
+
+    private HorizontalLayout createDrinkVariantGridFormLayout() {
+        HorizontalLayout layout = new HorizontalLayout();
+        drinkVariantForm = new DrinkVariantForm(drinkVariantBinder, drinkBinder);
+        layout.setSizeFull();
+        drinkVariantGrid = createDrinkVariantGrid();
+        layout.add(drinkVariantGrid, drinkVariantForm);
         return layout;
     }
 
@@ -210,12 +257,13 @@ public class ArticleManagementView extends VerticalLayout {
         Grid.Column<Food> reorderPointColumn = foodGrid.addColumn("reorderPoint").setHeader("Meldebestand");
         Grid.Column<Food> priceColumn = foodGrid.addColumn("price").setHeader("Preis");
         Grid.Column<Food> activeColumn = foodGrid.addColumn("active").setHeader("Aktiv");
-        foodGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
+        foodGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
         foodGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         foodGrid.setWidth("75%");
         foodGrid.setHeight("100%");
         List<Food> foodList = foodRepository.findAll();
         GridListDataView<Food> dataView = foodGrid.setItems(foodList);
+
         FoodFilter foodFilter = new FoodFilter(dataView);
         foodGrid.getHeaderRows().clear();
         HeaderRow headerRow = foodGrid.appendHeaderRow();
@@ -226,7 +274,7 @@ public class ArticleManagementView extends VerticalLayout {
         headerRow.getCell(priceColumn).setComponent(createFilterHeaderString("Preis", foodFilter::setPrice));
         headerRow.getCell(activeColumn)
                 .setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", foodFilter::setActive));
-        foodFilter.setActive(true);
+
         foodGrid.addSelectionListener(e -> {
             if (e.isFromClient()) {
                 Optional<Food> optionalFood = e.getFirstSelectedItem();
@@ -243,35 +291,6 @@ public class ArticleManagementView extends VerticalLayout {
         return foodGrid;
     }
 
-    private Grid<DrinkVariant> createDrinkVariantGrid() {
-        Grid<DrinkVariant> drinkVariantGrid = new Grid<>(DrinkVariant.class);
-        drinkVariantGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
-        drinkVariantGrid.removeAllColumns();
-        Grid.Column<DrinkVariant> idColumn = drinkVariantGrid.addColumn(DrinkVariant::getId).setHeader("ID");
-        drinkVariantGrid.addColumn(DrinkVariant -> DrinkVariant.getDrink() == null ? "" :
-                DrinkVariant.getDrink().getName()).setHeader("Getränk");
-        Grid.Column<DrinkVariant> mlColumn = drinkVariantGrid.addColumn(DrinkVariant::getMl).setHeader("Milliliter");
-        Grid.Column<DrinkVariant> priceColumn = drinkVariantGrid.addColumn(DrinkVariant::getPrice).setHeader("Preis");
-        drinkVariantGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
-        drinkVariantGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
-        drinkVariantGrid.setWidth("75%");
-        drinkVariantGrid.setHeight("100%");
-
-        List<DrinkVariant> drinkVariantList = drinkVariantRepository.findAll();
-        GridListDataView<DrinkVariant> dataView = drinkVariantGrid.setItems(drinkVariantList);
-
-        DrinkVariantFilter drinkVariantFilter = new DrinkVariantFilter(dataView);
-        drinkVariantGrid.getHeaderRows().clear();
-        HeaderRow headerRow = drinkVariantGrid.appendHeaderRow();
-        headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", drinkVariantFilter::setId));
-        //headerRow.getCell(drinkVariantGrid).setComponent(createFilterHeaderString("Getränk", drinkVariantFilter::setName));
-        //Filter Feld für GetränkeVariante funktioniert so noch nicht
-        headerRow.getCell(mlColumn).setComponent(createFilterHeaderInteger("Variante", drinkVariantFilter::setMl));
-        headerRow.getCell(priceColumn).setComponent(createFilterHeaderInteger("Preis", drinkVariantFilter::setPrice));
-
-        return drinkVariantGrid;
-    }
-
     private Grid<Drink> createDrinkGrid() {
         Grid<Drink> drinkGrid = new Grid<>(Drink.class);
         drinkGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
@@ -281,12 +300,13 @@ public class ArticleManagementView extends VerticalLayout {
         Grid.Column<Drink> stockColumn = drinkGrid.addColumn("stockInMilliliters").setHeader("Bestand");
         Grid.Column<Drink> reorderPointColumn = drinkGrid.addColumn("reorderPoint").setHeader("Meldebestand");
         Grid.Column<Drink> activeColumn = drinkGrid.addColumn("active").setHeader("Aktiv");
-        drinkGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
+        drinkGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
         drinkGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         drinkGrid.setWidth("75%");
         drinkGrid.setHeight("100%");
         List<Drink> drinkList = drinkRepository.findAll();
         GridListDataView<Drink> dataView = drinkGrid.setItems(drinkList);
+
         DrinkFilter drinkFilter = new DrinkFilter(dataView);
         drinkGrid.getHeaderRows().clear();
         HeaderRow headerRow = drinkGrid.appendHeaderRow();
@@ -297,7 +317,6 @@ public class ArticleManagementView extends VerticalLayout {
                 .setComponent(createFilterHeaderInteger("Meldebestand", drinkFilter::setReorderPoint));
         headerRow.getCell(activeColumn)
                 .setComponent(createFilterHeaderBoolean("Aktive", "Inaktiv", drinkFilter::setActive));
-        drinkFilter.setActive(true);
         drinkGrid.addSelectionListener(e -> {
             if (e.isFromClient()) {
                 Optional<Drink> optionalDrink = e.getFirstSelectedItem();
@@ -314,20 +333,64 @@ public class ArticleManagementView extends VerticalLayout {
         return drinkGrid;
     }
 
+    private Grid<DrinkVariant> createDrinkVariantGrid() {
+        Grid<DrinkVariant> drinkVariantGrid = new Grid<>(DrinkVariant.class);
+        drinkVariantGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        drinkVariantGrid.removeAllColumns();
+        Grid.Column<DrinkVariant> idColumn = drinkVariantGrid.addColumn(DrinkVariant::getId).setHeader("ID");
+        drinkVariantGrid.addColumn(DrinkVariant -> DrinkVariant.getDrink() == null ? "" :
+                DrinkVariant.getDrink().getName()).setHeader("Getränk");
+        Grid.Column<DrinkVariant> mlColumn = drinkVariantGrid.addColumn(DrinkVariant::getMl).setHeader("Variante");
+        Grid.Column<DrinkVariant> priceColumn = drinkVariantGrid.addColumn(DrinkVariant::getPrice).setHeader("Preis");
+        drinkVariantGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
+        drinkVariantGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+        drinkVariantGrid.setWidth("75%");
+        drinkVariantGrid.setHeight("100%");
+
+        List<DrinkVariant> drinkVariantList = drinkVariantRepository.findAll();
+        GridListDataView<DrinkVariant> dataView = drinkVariantGrid.setItems(drinkVariantList);
+
+        DrinkVariantFilter drinkVariantFilter = new DrinkVariantFilter(dataView);
+        drinkVariantGrid.getHeaderRows().clear();
+        HeaderRow headerRow = drinkVariantGrid.appendHeaderRow();
+        headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", drinkVariantFilter::setId));
+        //headerRow.getCell(drinkVariantGrid).setComponent(createFilterHeaderString("Getränk", drinkVariantFilter::setName));
+        //Filter Feld für GetränkeVariante funktioniert so noch nicht
+        headerRow.getCell(mlColumn).setComponent(createFilterHeaderInteger("Variante", drinkVariantFilter::setMl));
+        headerRow.getCell(priceColumn).setComponent(createFilterHeaderInteger("Preis", drinkVariantFilter::setPrice));
+
+        drinkVariantGrid.addSelectionListener(e -> {
+            if (e.isFromClient()) {
+                Optional<DrinkVariant> optionalDrinkVariant = e.getFirstSelectedItem();
+                if (optionalDrinkVariant.isPresent()) {
+                    selectedDrinkVariant = optionalDrinkVariant.get();
+                    drinkVariantBinder.readBean(selectedDrinkVariant);
+                } else {
+                    selectedDrinkVariant = null;
+                    drinkVariantBinder.readBean(new DrinkVariant());
+                }
+            }
+            updateEditDrinkVariantLayoutState();
+        });
+        return drinkVariantGrid;
+    }
+
     private Grid<BowlingShoe> createShoeGrid() {
         Grid<BowlingShoe> shoeGrid = new Grid<>(BowlingShoe.class);
         shoeGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
         shoeGrid.removeAllColumns();
         Grid.Column<BowlingShoe> idColumn = shoeGrid.addColumn(BowlingShoe::getId).setHeader("ID");
-        Grid.Column<BowlingShoe> boughtColumn = shoeGrid.addColumn("boughtAt").setHeader("Kaufdatum");
+        shoeGrid.addColumn(e -> toDateString(e.getBoughtAt()),"dd mm yyyy").setHeader("Kaufdatum");
         Grid.Column<BowlingShoe> sizeColumn = shoeGrid.addColumn("size").setHeader("Größe");
         Grid.Column<BowlingShoe> activeColumn = shoeGrid.addColumn("active").setHeader("Aktiv");
-        shoeGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
+        shoeGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
         shoeGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         shoeGrid.setWidth("75%");
         shoeGrid.setHeight("100%");
+
         List<BowlingShoe> shoeList = bowlingShoeRepository.findAll();
         GridListDataView<BowlingShoe> dataView = shoeGrid.setItems(shoeList);
+
         ShoeFilter shoeFilter = new ShoeFilter(dataView);
         shoeGrid.getHeaderRows().clear();
         HeaderRow headerRow = shoeGrid.appendHeaderRow();
@@ -336,7 +399,6 @@ public class ArticleManagementView extends VerticalLayout {
         headerRow.getCell(sizeColumn).setComponent(createFilterHeaderInteger("Größe", shoeFilter::setSize));
         headerRow.getCell(activeColumn)
                 .setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", shoeFilter::setActive));
-        shoeFilter.setActive(true);
         shoeGrid.addSelectionListener(e -> {
             if (e.isFromClient()) {
                 Optional<BowlingShoe> optionalBowlingShoe = e.getFirstSelectedItem();
@@ -360,7 +422,7 @@ public class ArticleManagementView extends VerticalLayout {
         private String stock;
         private String reorderPoint;
         private String price;
-        private boolean active;
+        private Boolean active;
 
         public FoodFilter(GridListDataView<Food> dataView) {
             this.dataView = dataView;
@@ -373,7 +435,7 @@ public class ArticleManagementView extends VerticalLayout {
             boolean matchesStock = matches(String.valueOf(food.getStock()), stock);
             boolean matchesReorderPoint = matches(String.valueOf(food.getReorderPoint()), reorderPoint);
             boolean matchesPrice = matches(String.valueOf(food.getPrice()), price);
-            boolean matchesActive = food.isActive() == active;
+            boolean matchesActive = active == null || active == food.isActive();
             return matchesId && matchesName && matchesStock && matchesReorderPoint && matchesPrice && matchesActive;
         }
 
@@ -406,7 +468,7 @@ public class ArticleManagementView extends VerticalLayout {
             dataView.refreshAll();
         }
 
-        public void setActive(boolean active) {
+        public void setActive(Boolean active) {
             this.active = active;
             dataView.refreshAll();
         }
@@ -418,8 +480,7 @@ public class ArticleManagementView extends VerticalLayout {
         private String name;
         private String stock;
         private String reorderPoint;
-
-        private boolean active;
+        private Boolean active;
 
         public DrinkFilter(GridListDataView<Drink> dataView) {
             this.dataView = dataView;
@@ -431,7 +492,7 @@ public class ArticleManagementView extends VerticalLayout {
             boolean matchesName = matches(drink.getName(), name);
             boolean matchesStock = matches(String.valueOf(drink.getStockInMilliliters()), stock);
             boolean matchesReorderPoint = matches(String.valueOf(drink.getReorderPoint()), reorderPoint);
-            boolean matchesActive = drink.isActive() == active;
+            boolean matchesActive = active == null || active == drink.isActive();
             return matchesId && matchesName && matchesStock && matchesReorderPoint && matchesActive;
         }
 
@@ -459,7 +520,7 @@ public class ArticleManagementView extends VerticalLayout {
             dataView.refreshAll();
         }
 
-        public void setActive(boolean active) {
+        public void setActive(Boolean active) {
             this.active = active;
             dataView.refreshAll();
         }
@@ -520,8 +581,7 @@ public class ArticleManagementView extends VerticalLayout {
         private DatePicker boughtAt;
         //private String boughtAt;
         private String size;
-
-        private boolean active;
+        private Boolean active;
 
         public ShoeFilter(GridListDataView<BowlingShoe> dataView) {
             this.dataView = dataView;
@@ -530,9 +590,9 @@ public class ArticleManagementView extends VerticalLayout {
 
         public boolean test(BowlingShoe shoe) {
             boolean matchesId = matches(String.valueOf(shoe.getId()), id);
-            // boolean matchesBoughtAt = matches(boughtAt);
+            //boolean matchesBoughtAt = matches(boughtAt);
             boolean matchesSize = matches(String.valueOf(shoe.getSize()), size);
-            boolean matchesActive = shoe.isActive() == active;
+            boolean matchesActive = active == null || active == shoe.isActive();
             return matchesId && matchesSize && matchesActive;
         }
 
@@ -559,7 +619,7 @@ public class ArticleManagementView extends VerticalLayout {
             dataView.refreshAll();
         }
 
-        public void setActive(boolean active) {
+        public void setActive(Boolean active) {
             this.active = active;
             dataView.refreshAll();
         }
