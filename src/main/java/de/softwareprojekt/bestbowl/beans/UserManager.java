@@ -12,7 +12,9 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Marten Voß
@@ -21,6 +23,7 @@ import java.util.List;
 public class UserManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserManager.class);
     private final List<String> currentUserNameList = new ArrayList<>();
+    private final Map<String, Boolean> userDrawerStateMap = new HashMap<>();
     private UserDetailsManager userDetailsManager;
     private PasswordEncoder passwordEncoder;
 
@@ -51,6 +54,7 @@ public class UserManager {
                         .build();
                 currentUserNameList.add(user.getName());
                 userDetailsManager.createUser(userDetails);
+                userDrawerStateMap.putIfAbsent(user.getName(), true);
             }
         }
     }
@@ -94,6 +98,14 @@ public class UserManager {
      */
     public String encodePassword(String password) {
         return passwordEncoder.encode(password);
+    }
+
+    public boolean getDrawerStateForUser(String userName) {
+        return userDrawerStateMap.getOrDefault(userName, true);
+    }
+
+    public void toggleDrawerStateForUser(String userName) {
+        userDrawerStateMap.put(userName, !getDrawerStateForUser(userName));
     }
 
     @Autowired

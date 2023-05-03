@@ -23,6 +23,7 @@ import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -33,8 +34,8 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
  * @author Matija
  */
 @Route(value = "alleyManagement", layout = MainView.class)
-@PageTitle("Bahnenverwaltung")
-@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
+@PageTitle("Bahnverwaltung")
+@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 public class AlleyManagementView extends VerticalLayout {
     private final Binder<BowlingAlley> binder = new Binder<>();
     private final BowlingAlleyRepository bowlingAlleyRepository;

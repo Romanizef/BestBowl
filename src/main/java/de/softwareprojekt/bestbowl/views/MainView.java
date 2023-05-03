@@ -17,15 +17,12 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
 import de.softwareprojekt.bestbowl.BestBowlApplication;
 import de.softwareprojekt.bestbowl.beans.SecurityService;
+import de.softwareprojekt.bestbowl.beans.UserManager;
 import de.softwareprojekt.bestbowl.views.bookingViews.ClientSearchView;
 import de.softwareprojekt.bestbowl.views.bookingViews.ExtrasView;
-import de.softwareprojekt.bestbowl.views.managementViews.AlleyManagementView;
-import de.softwareprojekt.bestbowl.views.managementViews.ArticleManagementView;
-import de.softwareprojekt.bestbowl.views.managementViews.AssociationManagementView;
-import de.softwareprojekt.bestbowl.views.managementViews.ClientManagementView;
-import de.softwareprojekt.bestbowl.views.managementViews.UserManagementView;
-
+import de.softwareprojekt.bestbowl.views.managementViews.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Optional;
 
@@ -38,10 +35,14 @@ import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
  * @author Ali aus Mali, chillt am Strand in Bali und drinkt ne ganze Bacardi
  */
 public class MainView extends AppLayout implements AppShellConfigurator {
+    private final transient SecurityService securityService;
+    private final transient UserManager userManager;
     private final Tabs menu;
     private final H1 viewTitle;
 
-    public MainView(@Autowired SecurityService securityService) {
+    public MainView(@Autowired SecurityService securityService, @Autowired UserManager userManager) {
+        this.securityService = securityService;
+        this.userManager = userManager;
         setPrimarySection(Section.DRAWER);
         viewTitle = new H1();
         viewTitle.getStyle()
@@ -57,7 +58,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         addToNavbar(headerLayout);
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
-        setDrawerOpened(true);
+        setDrawerOpened(userManager.getDrawerStateForUser(getAuthenticatedUserNameOrDefault()));
     }
 
     private static Tab createTab(String text, Class<? extends Component> navigationTarget) {
@@ -75,15 +76,14 @@ public class MainView extends AppLayout implements AppShellConfigurator {
     private Tab[] createMenuItems() {
         return new Tab[]{
                 createTab("Kunde suchen", ClientSearchView.class),
-                createTab("Extras bestellen",ExtrasView.class ),
+                createTab("Extras bestellen", ExtrasView.class),
                 createTab("Kundenverwaltung", ClientManagementView.class),
                 createTab("Vereinsverwaltung", AssociationManagementView.class),
                 createTab("Artikelverwaltung", ArticleManagementView.class),
                 createTab("Nutzerverwaltung", UserManagementView.class),
-                createTab("Bahnenverwaltung", AlleyManagementView.class),
+                createTab("Bahnverwaltung", AlleyManagementView.class),
                 createTab("Statistiken", StatisticsView.class),
                 createTab("Datenbank", DatabaseRedirectView.class)
-
         };
     }
 
@@ -93,7 +93,9 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         layout.setWidthFull();
         layout.setSpacing(false);
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
-        layout.add(new DrawerToggle());
+        DrawerToggle drawerToggle = new DrawerToggle();
+        drawerToggle.addClickListener(e -> userManager.toggleDrawerStateForUser(getAuthenticatedUserNameOrDefault()));
+        layout.add(drawerToggle);
         layout.add(viewTitle);
         layout.expand(viewTitle);
         return layout;
@@ -132,5 +134,10 @@ public class MainView extends AppLayout implements AppShellConfigurator {
 
     private String getCurrentPageTitle() {
         return getContent().getClass().getAnnotation(PageTitle.class).value();
+    }
+
+    private String getAuthenticatedUserNameOrDefault() {
+        UserDetails userDetails = securityService.getAuthenticatedUser();
+        return userDetails == null ? "-" : userDetails.getUsername();
     }
 }
