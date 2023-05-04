@@ -15,7 +15,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.FoodBooking;
  * @author Ali aus Mali
  */
 public class FoodPanel extends HorizontalLayout {
-    private FormLayout kachelLayout;
+
     private Grid<FoodBooking> shoeGrid;
 
     public FoodPanel(Food food) {
@@ -29,11 +29,9 @@ public class FoodPanel extends HorizontalLayout {
         shoeAmountField.setMin(0);
         shoeAmountField.setMax(food.getStock());
 
-
         addCSS();
         setAlignItems(Alignment.CENTER);
         setFlexGrow(0);
-        //setWidth("200px");
         add(label, shoeAmountField);
     }
 
@@ -67,24 +65,8 @@ public class FoodPanel extends HorizontalLayout {
         return sizeField;
     }
 
-    public FormLayout addPanelComponent() {
-        kachelLayout = new FormLayout();
-        kachelLayout.setResponsiveSteps(new ResponsiveStep("0", 2));
-
-        IntegerField foodField = new IntegerField();
-        foodField.setValue(2);
-        foodField.setStepButtonsVisible(true);
-        foodField.setMin(0);
-        foodField.setMax(9);  //TODO Lagerbestand muss aus der DB ausgelesen werden und als max gesetzt
-        foodField.setLabel("Speisename");
-
-        kachelLayout.add(foodField);
-        addCSS();
-        return kachelLayout;
-    }
-
      private void addCSS() {
-        getStyle().set("border", "2px solid #FF9E99").set("background-color", "#FF9E990A").set("padding", "10px")
-                .set("margin-bottom", "5px").set("border-radius", "10px");
+        getStyle().set("border", "2px solid #b3f542").set("background-color", "#b3f54210").set("padding", "10px")
+                .set("margin-bottom", "10px").set("border-radius", "50px");
     }
 }
