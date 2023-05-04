@@ -26,7 +26,6 @@ public class DrinkVariantForm extends FormLayout {
     TextField nameField = new TextField("Name");
     NumberField priceField = new NumberField("Preis");
     IntegerField variantField = new IntegerField("Variante");
-   // ComboBox<String> variantCB = new ComboBox<>("Variante");
     Checkbox activeCheckbox = new Checkbox("Artikel aktivieren");
 
     Button saveButton = new Button("Sichern");
@@ -36,12 +35,6 @@ public class DrinkVariantForm extends FormLayout {
         setWidth("25%");
         nameField.setWidthFull();
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-        /*variantCB.setWidthFull();
-        variantCB.setAllowCustomValue(false);
-        variantCB.setItems("Klein 250ml", "Mittel 500ml", "Groß 750ml"); //noch nicht final
-        variantCB.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
-        */
-
         variantField.setWidthFull();
         variantField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         priceField.setWidthFull();
