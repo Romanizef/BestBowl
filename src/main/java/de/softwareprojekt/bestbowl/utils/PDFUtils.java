@@ -22,13 +22,13 @@ public class PDFUtils {
 
     public static void createDemoPdf() {
         //create "test" folder in working dir
-        File testFolder = new File(Utils.getWorkingDirPath() + File.separator + "test");
+        File testFolder = new File(Utils.getWorkingDirPath() + File.separator + "rechnung");
         if (!Utils.createDirectoryIfMissing(testFolder)) {
             return;
         }
 
         try {
-            File pdfFile = new File(testFolder.getAbsolutePath() + File.separator + "demo.pdf");
+            File pdfFile = new File(testFolder.getAbsolutePath() + File.separator + "rechnungs.pdf");
             PDDocument document = new PDDocument();
 
             PDPage page = new PDPage();
@@ -39,7 +39,7 @@ public class PDFUtils {
             contentStream.setLeading(14.5f);
             contentStream.setFont(PDType1Font.HELVETICA_BOLD, 20);
             contentStream.newLineAtOffset(25, 700);
-            contentStream.showText("Hello!");
+            //contentStream.showText("Rechnungsnr" + );
             contentStream.newLine();
             contentStream.setFont(PDType1Font.HELVETICA, 15);
             contentStream.showText("test");

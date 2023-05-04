@@ -34,6 +34,7 @@ import static de.softwareprojekt.bestbowl.utils.Utils.matches;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
+ * Creates a view for all the associations to be created, managed and inactivated
  * @author Matija Kopschek
  * @author Marten Voß
  */
@@ -49,6 +50,14 @@ public class AssociationManagementView extends VerticalLayout {
     private Label validationErrorLabel;
     private boolean editingNewAssociation = false;
 
+    /**
+     * Constructor for the AssociationManagementView.
+     * Instantiates the grid Layout, the new association button 
+     * and the association repo
+     * @see #createNewAssociationButton()
+     * @see #createGridLayout()
+     * @param associationRepository
+     */
     @Autowired
     public AssociationManagementView(AssociationRepository associationRepository) {
         this.associationRepository = associationRepository;
@@ -59,6 +68,13 @@ public class AssociationManagementView extends VerticalLayout {
         updateEditLayoutState();
     }
 
+    /**
+     * Creates a new button for adding a new association.
+     * If the button is clicked the editing Layout becomes available 
+     * and a new association with all the needed data is added.
+     * @see #updateEditLayoutState()
+     * @return {@code button}
+     */
     private Button createNewAssociationButton() {
         Button button = new Button("Neuen Verein hinzufügen");
         button.setWidthFull();
@@ -73,6 +89,12 @@ public class AssociationManagementView extends VerticalLayout {
         return button;
     }
 
+    /**
+     * Creates a new {@code HorizontalLayout} for the grid and the editing Layout
+     * @see #createGrid()
+     * @see #createEditLayout()
+     * @return {@code layout}
+     */
     private HorizontalLayout createGridLayout() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setSizeFull();
@@ -82,6 +104,16 @@ public class AssociationManagementView extends VerticalLayout {
         return layout;
     }
 
+    /**
+     * Creates a grid based on all the fields of the association class
+     * and adds an filter for all rows.
+     * {@code If} one of the gridlines is selected the editing Layout is refreshed
+     * with all the data out of the currently selected line.
+     * {@code Else} the editing Layout is reset to default.
+     * @see #updateEditLayoutState()
+     * @see #resetEditLayout()
+     * @return {@code grid}
+     */
     private Grid<Association> createGrid() {
         Grid<Association> grid = new Grid<>(Association.class);
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
@@ -125,6 +157,14 @@ public class AssociationManagementView extends VerticalLayout {
         return grid;
     }
 
+    /**
+     * Creates a new {@code FormLayout} with two {@code TextFields} for
+     * the association name and the discount and also a Checkbox for 
+     * the active option.
+     * Validates all Inputs and binds them with the association class in 
+     * the database.
+     * @return {@code layout}
+     */
     private FormLayout createEditLayout() {
         FormLayout layout = new FormLayout();
         layout.setWidth("25%");
@@ -154,6 +194,13 @@ public class AssociationManagementView extends VerticalLayout {
         return layout;
     }
 
+    /**
+     * Ceates a new {@code HorizontalLayout} for the {@code cancelButton} and {@code saveButton}
+     * @see #cancelButtonConfig(Button)
+     * @see #saveButtonConfig(Button)
+     * 
+     * @return {@code buttonLayout}
+     */
     private HorizontalLayout buttonLayoutConfig() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setWidthFull();
@@ -164,6 +211,16 @@ public class AssociationManagementView extends VerticalLayout {
         return buttonLayout;
     }
 
+    /**
+     * Creates a {@code saveButton} for the editing Layout. 
+     * When pressed it shows a confirmation notification 
+     * and saves all User input to the database
+     * @see #saveToDb()
+     * @see #writeBean()
+     * 
+     * @param saveButton
+     * @return {@code saveButton}
+     */
     private Button saveButtonConfig(Button saveButton) {
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
@@ -175,6 +232,14 @@ public class AssociationManagementView extends VerticalLayout {
         return saveButton;
     }
 
+    /**
+     * Creates a {@code cancelButton} for the editing Layout. 
+     * When pressed it shows a confirmation notification and deletes all user input 
+     * @see #resetEditLayout()
+     * 
+     * @param cancelButton
+     * @return {@code cancelButton}
+     */
     private Button cancelButtonConfig(Button cancelButton) {
         cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
         cancelButton.addClickListener(clickEvent -> {
@@ -184,11 +249,18 @@ public class AssociationManagementView extends VerticalLayout {
         return cancelButton;
     }
 
+    /**
+     * 
+     */
     private void updateEditLayoutState() {
         validationErrorLabel.setText("");
         setChildrenEnabled(editLayout.getChildren(), selectedAssociation != null);
     }
 
+    /**
+     * Deletes all the User input in the editing layout 
+     * and resets it to default
+     */
     private void resetEditLayout() {
         associationGrid.deselectAll();
         selectedAssociation = null;
@@ -200,6 +272,12 @@ public class AssociationManagementView extends VerticalLayout {
         setValueForIntegerFieldChildren(editLayout.getChildren(), null);
     }
 
+    /**
+     * If the input is missing or wrong this layout 
+     * with the {@code validationErrorLabel} is portrayed
+     * 
+     * @return {@code validationLabelLayout}
+     */
     private VerticalLayout createValidationLabelLayout() {
         VerticalLayout validationLabelLayout = new VerticalLayout();
         validationLabelLayout.setWidthFull();
@@ -214,6 +292,9 @@ public class AssociationManagementView extends VerticalLayout {
         return validationLabelLayout;
     }
 
+    /**
+     * Writes changes from the bound fields to the given bean if all validators pass.
+     */
     private boolean writeBean() {
         try {
             binder.writeBean(selectedAssociation);
@@ -226,6 +307,9 @@ public class AssociationManagementView extends VerticalLayout {
         return false;
     }
 
+    /**
+     * Saving the updated/new association to the database
+     */
     private void saveToDb() {
         associationRepository.save(selectedAssociation);
         if (editingNewAssociation) {
@@ -244,11 +328,20 @@ public class AssociationManagementView extends VerticalLayout {
         private String discount;
         private Boolean active;
 
+        /**
+         * Constructor for AssociationFilter
+         * @param dataView
+         */
         public AssociationFilter(GridListDataView<Association> dataView) {
             this.dataView = dataView;
             this.dataView.addFilter(this::test);
         }
 
+        /**
+         * Cheking if grid filter row names match association-class fields
+         * @param association
+         * @return {@code matchesId} {@code matchesName} {@code matchesDiscount} {@code matchesActive}
+         */
         public boolean test(Association association) {
             boolean matchesId = matches(String.valueOf(association.getId()), id);
             boolean matchesName = matches(association.getName(), name);
@@ -257,21 +350,37 @@ public class AssociationManagementView extends VerticalLayout {
             return matchesId && matchesDiscount && matchesName && matchesActive;
         }
 
+        /**
+         * Setter for association id
+         * @param id
+         */
         public void setId(String id) {
             this.id = id;
             dataView.refreshAll();
         }
 
+        /**
+         * Setter for association name
+         * @param name
+         */
         public void setName(String name) {
             this.name = name;
             dataView.refreshAll();
         }
 
+        /**
+         * Setter for association discount
+         * @param discount
+         */
         public void setDiscount(String discount) {
             this.discount = discount;
             dataView.refreshAll();
         }
 
+        /**
+         * Setter for active setting of association
+         * @param active
+         */
         public void setActive(Boolean active) {
             this.active = active;
             dataView.refreshAll();
