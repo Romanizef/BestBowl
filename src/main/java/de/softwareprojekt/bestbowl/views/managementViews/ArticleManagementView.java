@@ -30,6 +30,7 @@ import de.softwareprojekt.bestbowl.views.form.DrinkForm;
 import de.softwareprojekt.bestbowl.views.form.DrinkVariantForm;
 import de.softwareprojekt.bestbowl.views.form.FoodForm;
 import de.softwareprojekt.bestbowl.views.form.ShoeForm;
+import elemental.util.MapFromStringToString;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -338,8 +339,7 @@ public class ArticleManagementView extends VerticalLayout {
         drinkVariantGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
         drinkVariantGrid.removeAllColumns();
         Grid.Column<DrinkVariant> idColumn = drinkVariantGrid.addColumn(DrinkVariant::getId).setHeader("ID");
-        drinkVariantGrid.addColumn(DrinkVariant -> DrinkVariant.getDrink() == null ? "" :
-                DrinkVariant.getDrink().getName()).setHeader("Getränk");
+        Grid.Column<DrinkVariant> nameColum = drinkVariantGrid.addColumn(DrinkVariant -> DrinkVariant.getDrink() == null ? "" : DrinkVariant.getDrink().getName()).setHeader("Getränk");
         Grid.Column<DrinkVariant> mlColumn = drinkVariantGrid.addColumn(DrinkVariant::getMl).setHeader("Variante");
         Grid.Column<DrinkVariant> priceColumn = drinkVariantGrid.addColumn(DrinkVariant::getPrice).setHeader("Preis");
         drinkVariantGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
@@ -354,8 +354,7 @@ public class ArticleManagementView extends VerticalLayout {
         drinkVariantGrid.getHeaderRows().clear();
         HeaderRow headerRow = drinkVariantGrid.appendHeaderRow();
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", drinkVariantFilter::setId));
-        //headerRow.getCell(drinkVariantGrid).setComponent(createFilterHeaderString("Getränk", drinkVariantFilter::setName));
-        //Filter Feld für GetränkeVariante funktioniert so noch nicht
+        headerRow.getCell(nameColum).setComponent(createFilterHeaderString("Getränk", drinkVariantFilter::setName));
         headerRow.getCell(mlColumn).setComponent(createFilterHeaderInteger("Variante", drinkVariantFilter::setMl));
         headerRow.getCell(priceColumn).setComponent(createFilterHeaderInteger("Preis", drinkVariantFilter::setPrice));
 
@@ -529,7 +528,7 @@ public class ArticleManagementView extends VerticalLayout {
     private static class DrinkVariantFilter {
         private final GridListDataView<DrinkVariant> dataView;
         private String id;
-        private String name; //siehe Methode Zeile 439
+        private String name;
         private String milliliter;
         private String price;
 
@@ -541,7 +540,7 @@ public class ArticleManagementView extends VerticalLayout {
 
         public boolean test(DrinkVariant drinkVariant) {
             boolean matchesId = matches(String.valueOf(drinkVariant.getId()), id);
-            boolean matchesDrink = matches(String.valueOf(drinkVariant.getDrink()), name); //Filter funktioniert noch nicht
+            boolean matchesDrink = matches((drinkVariant.getDrink().getName()), name);
             boolean matchesMilliliter = matches(String.valueOf(drinkVariant.getMl()), milliliter);
             boolean matchesPrice = matches(String.valueOf(drinkVariant.getPrice()), price);
             return matchesId && matchesDrink && matchesMilliliter && matchesPrice;
@@ -556,13 +555,11 @@ public class ArticleManagementView extends VerticalLayout {
             dataView.refreshAll();
         }
 
-        /*public void setName(String name) {
+        public void setName(String name) {
             this.name = name;
             dataView.refreshAll();
         }
-        //Da das Filter Feld für GetränkeVariante noch nicht funktioniert ist diese Methode auskommentiert
-         */
-
+       
         public void setMl(String milliliter) {
             this.milliliter = milliliter;
             dataView.refreshAll();
