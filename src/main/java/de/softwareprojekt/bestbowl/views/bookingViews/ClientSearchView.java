@@ -39,7 +39,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * Creates a View in which the user can search for a Client.
- * 
+ *
  * @author Marten Voß
  */
 @Route(value = "clientSearch", layout = MainView.class)
@@ -61,7 +61,7 @@ public class ClientSearchView extends VerticalLayout {
     /**
      * Constructor for the ClientSearchView. Creates a new ClientSearchView with
      * the given clientRepository.
-     * 
+     *
      * @param clientRepository
      * @see #createNewClientDialog()
      * @see #createHeader()
@@ -91,11 +91,11 @@ public class ClientSearchView extends VerticalLayout {
     /**
      * Creates a {@code Component} for the header. A new Layout filled with the
      * first and last name, the e-mail, full address and the association of the new
-     * client ist created. In the footer two buttons are created, one for saving the
+     * client is created. In the footer two buttons are created, one for saving the
      * new client to the database and one for canceling the creation. The
-     * {@code Binder} binds the fields to the {@code Client} class and validates
-     * them.
-     * 
+     * {@code Binder} binds the fields to the {@code Client} entity and validates
+     * it.
+     *
      * @return {@code Dialog}
      * @see #resetDialog()
      * @see #createNewClientDialog()
@@ -111,22 +111,29 @@ public class ClientSearchView extends VerticalLayout {
         VerticalLayout layout = new VerticalLayout();
         TextField firstNameField = new TextField("Vorname");
         firstNameField.setWidthFull();
+        firstNameField.setRequiredIndicatorVisible(true);
         TextField lastNameField = new TextField("Nachname");
         lastNameField.setWidthFull();
+        lastNameField.setRequiredIndicatorVisible(true);
         TextField emailField = new TextField("E-Mail");
         emailField.setWidthFull();
+        emailField.setRequiredIndicatorVisible(true);
         HorizontalLayout streetLayout = new HorizontalLayout();
         streetLayout.setWidthFull();
         TextField streetField = new TextField("Straße");
+        streetField.setRequiredIndicatorVisible(true);
         IntegerField houseNrField = new IntegerField("H. NR");
         houseNrField.setWidth("65px");
+        houseNrField.setRequiredIndicatorVisible(true);
         streetLayout.add(streetField, houseNrField);
         streetLayout.setFlexGrow(1, streetField);
         HorizontalLayout cityLayout = new HorizontalLayout();
         cityLayout.setWidthFull();
         IntegerField postCodeField = new IntegerField("PLZ");
         postCodeField.setWidth("85px");
+        postCodeField.setRequiredIndicatorVisible(true);
         TextField cityField = new TextField("Stadt");
+        cityField.setRequiredIndicatorVisible(true);
         cityLayout.add(postCodeField, cityField);
         cityLayout.setFlexGrow(1, cityField);
         ComboBox<Association> associationCB = createAssociationCB("Verein");
@@ -197,7 +204,7 @@ public class ClientSearchView extends VerticalLayout {
 
     /**
      * Creates a {@code VerticalLayout} for the validation label.
-     * 
+     *
      * @return {@code VerticalLayout}
      */
     private VerticalLayout createValidationLabelLayout() {
@@ -215,9 +222,8 @@ public class ClientSearchView extends VerticalLayout {
     }
 
     /**
-     * Writes the {@code Client} object to the {@code Binder} and validates the
-     * fields.
-     * 
+     * Writes the contents of the bound fields into the {@code Client} object and validates the fields.
+     *
      * @param client
      * @return {@code boolean}
      */
@@ -246,7 +252,7 @@ public class ClientSearchView extends VerticalLayout {
 
     /**
      * Creates a html header
-     * 
+     *
      * @return {@code Component}
      */
     private Component createHeader() {
@@ -255,7 +261,7 @@ public class ClientSearchView extends VerticalLayout {
 
     /**
      * Creates a {@code TextField} for searching inside a HorizontalLayout.
-     * 
+     *
      * @return {@code Component}
      */
     private Component createSearchComponent() {
@@ -275,7 +281,7 @@ public class ClientSearchView extends VerticalLayout {
 
     /**
      * Creates a {@code Button} for creating a new {@code Client} object.
-     * 
+     *
      * @return {@code Component}
      */
     private Component newClientComponent() {
@@ -287,7 +293,7 @@ public class ClientSearchView extends VerticalLayout {
 
     /**
      * Creates a {@code Grid} for displaying the {@code Client} objects.
-     * 
+     *
      * @return {@code Grid<Client>}
      */
     private Grid<Client> createGrid() {
@@ -346,7 +352,7 @@ public class ClientSearchView extends VerticalLayout {
     /**
      * Creates a {@code VerticalLayout} for the selected client label and the next
      * step button, which is used to navigate to the next view.
-     * 
+     *
      * @return {@code Component}
      */
     private Component createFooterComponent() {
@@ -380,7 +386,7 @@ public class ClientSearchView extends VerticalLayout {
 
     /**
      * Creates a new {@code Client} object.
-     * 
+     *
      * @return {@code Client}
      */
     public Client createNewClient() {
