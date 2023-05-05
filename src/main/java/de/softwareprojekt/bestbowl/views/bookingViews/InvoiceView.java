@@ -195,7 +195,7 @@ public final class InvoiceView extends VerticalLayout {
             // TODO Alle Elemente sperren Children nochmal Angucken bei anderen Verwaltungen
             // setChildrenEnabled();
             // TODO ExtraView auf erste Belegte Bahn weiterleiten
-            // Zahlung un Rechnung in DB speichern
+            // Zahlung und Rechnung in DB speichern
         });
         return payButton;
     }

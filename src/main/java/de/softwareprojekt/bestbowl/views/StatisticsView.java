@@ -6,6 +6,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -15,7 +16,9 @@ import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
 
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.utils.PDFUtils;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import jakarta.annotation.security.RolesAllowed;
@@ -27,6 +30,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+
 import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
 
 /**
@@ -40,6 +46,7 @@ import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
 public class StatisticsView extends VerticalLayout {
     private Grid<Statistic> statisticGrid;
     private Statistic selectedStatistic = null;
+    private BowlingAlleyBooking booking = new BowlingAlleyBooking();
     private TextField searchField;
     private PDFUtils pdfUtils;
 
@@ -48,7 +55,7 @@ public class StatisticsView extends VerticalLayout {
         pdfUtils = new PDFUtils();
         Component searchComponent = createSearchComponent();
         HorizontalLayout gridLayout = createGridLayout();
-        add(searchComponent, gridLayout, createDownloadAsPDFButton());
+        add(searchComponent, gridLayout, createDownloadAnchor());
     }
 
     private Component createSearchComponent() {
@@ -129,22 +136,50 @@ public class StatisticsView extends VerticalLayout {
         return grid;
     }
 
-    /**
-     * @return
+    /*
+     * private Button createDownloadAsPDFButton() {
+     * Button pdfButton = new Button("PDF");
+     * pdfButton.setIcon(new Icon(VaadinIcon.DOWNLOAD));
+     * pdfButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY,
+     * ButtonVariant.LUMO_LARGE);
+     * pdfButton.addClickListener(e -> {
+     * try {
+     * PDDocument pdfDocument = pdfUtils.createInvoicePdf(booking);
+     * StreamResource streamResource = new StreamResource("test.pdf",
+     * () -> getClass().getResourceAsStream("\rechnungs.pdf"));
+     * Anchor anchor = new Anchor(streamResource, "Download PDF");
+     * anchor.getElement().setAttribute("download", "downloaded-other-name.pdf");
+     * add(anchor);
+     * 
+     * // TODO pdf erstellen, zwischenspeichern, herauslesen, downloaden und löschen
+     * 
+     * } catch (IOException e1) {
+     * e1.printStackTrace();
+     * }
+     * });
+     * return pdfButton;
+     * }
      */
-    private Button createDownloadAsPDFButton() {
-        Button pdfButton = new Button("PDF");
-        pdfButton.setIcon(new Icon(VaadinIcon.DOWNLOAD));
-        pdfButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
-        pdfButton.addClickListener(e -> {
-            try {
-                pdfUtils.createInvoicePdf();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-            // TODO pdf erstellen und downloaden
-        });
-        return pdfButton;
+
+    private Component createDownloadAnchor() {
+        createPDF();
+        StreamResource streamResource = new StreamResource("rechnungs.pdf",
+                () -> getClass().getResourceAsStream("\rechnungs.pdf"));
+        Anchor anchor = new Anchor(streamResource, "Download PDF");
+        anchor.getElement().setAttribute("download", "test.pdf");
+        // add(anchor);
+
+        // TODO pdf erstellen, zwischenspeichern, herauslesen, downloaden und löschen
+
+        return anchor;
+    }
+
+    private void createPDF() {
+        try {
+            pdfUtils.createInvoicePdf(booking);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private record Statistic(int id, int clientID, String clientLastName, Date date, double total) {
