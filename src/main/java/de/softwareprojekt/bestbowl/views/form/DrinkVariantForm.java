@@ -22,25 +22,42 @@ import com.vaadin.flow.data.binder.Binder;
 import de.softwareprojekt.bestbowl.jpa.entities.Drink;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
 
+/**
+ * Creates the Form for the DrinkVariant Entity
+ * 
+ * @author Max Ziller
+ */
 public class DrinkVariantForm extends FormLayout {
     TextField nameField = new TextField("Name");
     NumberField priceField = new NumberField("Preis");
     IntegerField variantField = new IntegerField("Variante");
-   // ComboBox<String> variantCB = new ComboBox<>("Variante");
+    // ComboBox<String> variantCB = new ComboBox<>("Variante");
     Checkbox activeCheckbox = new Checkbox("Artikel aktivieren");
 
     Button saveButton = new Button("Sichern");
     Button cancelButton = new Button("Abbrechen");
 
-    public DrinkVariantForm(Binder<DrinkVariant> drinkVariantBinder,Binder<Drink> drinkBinder){
+    /**
+     * Constructor for the DrinkVariantForm. Creates a name field, a variant field
+     * and a price field.
+     * A checkbox is also generated for the active status of the drink.
+     * The {@code Binder} binds the fields to the entity.
+     * 
+     * @param drinkVariantBinder
+     * @param drinkBinder
+     * @see #createButtonLayout()
+     */
+    public DrinkVariantForm(Binder<DrinkVariant> drinkVariantBinder, Binder<Drink> drinkBinder) {
         setWidth("25%");
         nameField.setWidthFull();
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-        /*variantCB.setWidthFull();
-        variantCB.setAllowCustomValue(false);
-        variantCB.setItems("Klein 250ml", "Mittel 500ml", "Groß 750ml"); //noch nicht final
-        variantCB.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
-        */
+        /*
+         * variantCB.setWidthFull();
+         * variantCB.setAllowCustomValue(false);
+         * variantCB.setItems("Klein 250ml", "Mittel 500ml", "Groß 750ml"); //noch nicht
+         * final
+         * variantCB.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
+         */
 
         variantField.setWidthFull();
         variantField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
@@ -57,12 +74,18 @@ public class DrinkVariantForm extends FormLayout {
         add(nameField, variantField, priceField, checkboxLayout,
                 createButtonLayout());
 
-        drinkBinder.bind(nameField, Drink::getName, Drink::setName); /*Binder funktioniert noch nicht*/
+        drinkBinder.bind(nameField, Drink::getName, Drink::setName); /* Binder funktioniert noch nicht */
         drinkVariantBinder.bind(priceField, DrinkVariant::getPrice, DrinkVariant::setPrice);
         drinkVariantBinder.bind(variantField, DrinkVariant::getMl, DrinkVariant::setMl);
     }
 
-    private Component createButtonLayout(){
+    /**
+     * Creates the button layout for the form. A save and a cancel Button are
+     * created too. They are activated with the Enter and Escape Key.
+     * 
+     * @return {@code HorizontalLayout}
+     */
+    private Component createButtonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setWidthFull();
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

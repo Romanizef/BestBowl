@@ -18,6 +18,11 @@ import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoe;
 import java.time.LocalDate;
 import java.util.Locale;
 
+/**
+ * Creates the Form for the Shoe Entity.
+ * 
+ * @author Max Ziller
+ */
 public class ShoeForm extends FormLayout {
     DatePicker boughtAtField = new DatePicker("Kaufdatum");
     IntegerField sizeField = new IntegerField("Größe");
@@ -25,7 +30,15 @@ public class ShoeForm extends FormLayout {
     Button saveButton = new Button("Sichern");
     Button cancelButton = new Button("Abbrechen");
 
-    public ShoeForm(Binder<BowlingShoe> shoeBinder){
+    /**
+     * Constructor for the ShoeForm. Creates a boughtAt and size Field and a
+     * checkbox for the active status.
+     * The {@code Binder} binds the fields to the entity.
+     * 
+     * @param shoeBinder
+     * @see #createButtonLayout()
+     */
+    public ShoeForm(Binder<BowlingShoe> shoeBinder) {
         setWidth("25%");
         boughtAtField.setWidthFull();
         boughtAtField.setLocale(Locale.GERMANY);
@@ -41,11 +54,18 @@ public class ShoeForm extends FormLayout {
 
         add(boughtAtField, sizeField, checkboxLayout, createButtonLayout());
 
-       //shoeBinder.bind(boughtAtField, BowlingShoe::getBoughtAt, BowlingShoe::setBoughtAt);
+        // shoeBinder.bind(boughtAtField, BowlingShoe::getBoughtAt,
+        // BowlingShoe::setBoughtAt);
         shoeBinder.bind(sizeField, BowlingShoe::getSize, BowlingShoe::setSize);
         shoeBinder.bind(activeCheckbox, BowlingShoe::isActive, BowlingShoe::setActive);
     }
-    private Component createButtonLayout(){
+
+    /**
+     * Creates the Button Layout. Adds the save and cancel Buttons.
+     * They are activated with the Enter and Escape Key.
+     * @return {@code HorizontalLayout}
+     */
+    private Component createButtonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setWidthFull();
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
