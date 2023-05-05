@@ -16,7 +16,7 @@ public class BookingHistory implements Serializable {
 
     @Id
     @GeneratedValue
-    private int id;
+    private int id; //invoice id
 
     @ManyToOne
     private Client client;

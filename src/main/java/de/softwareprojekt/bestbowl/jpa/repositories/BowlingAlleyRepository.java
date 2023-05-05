@@ -4,12 +4,14 @@ import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlley;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * @author Marten Voß
  */
+@Repository
 public interface BowlingAlleyRepository extends JpaRepository<BowlingAlley, Integer> {
 
     @Query("select ba from BowlingAlley ba where ba.active = true and ba.id not in (" +

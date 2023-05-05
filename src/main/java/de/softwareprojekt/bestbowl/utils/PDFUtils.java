@@ -1,17 +1,19 @@
 package de.softwareprojekt.bestbowl.utils;
 
+import de.softwareprojekt.bestbowl.beans.Repos;
+import de.softwareprojekt.bestbowl.jpa.entities.*;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.awt.Color;
 
-import de.softwareprojekt.bestbowl.jpa.entities.Client;
-
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Matija Kopschek
@@ -22,11 +24,22 @@ public class PDFUtils {
     private Client client;
 
     /**
-     * 
+     *
      */
     public PDFUtils() {
     }
 
+
+    public static PDDocument createInvoice(BowlingAlleyBooking booking) {
+        //get data from DB
+        Optional<BookingHistory> bookingHistory = Repos.getBookingHistoryRepository().findByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(booking.getClient(), booking.getBowlingAlley(), booking.getStartTime());
+        List<DrinkBooking> drinkBookingList = Repos.getDrinkBookingRepository().findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(booking.getClient(), booking.getBowlingAlley(), booking.getStartTime());
+        List<FoodBooking> foodBookingList = Repos.getFoodBookingRepository().findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(booking.getClient(), booking.getBowlingAlley(), booking.getStartTime());
+        List<BowlingShoeBooking> shoekBookingList = Repos.getBowlingShoeBookingRepository().findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(booking.getClient(), booking.getBowlingAlley(), booking.getStartTime());
+        //create pdf file
+        //...
+        return null;
+    }
 
     /**
      * @throws IOException
