@@ -6,7 +6,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -20,10 +19,10 @@ import java.util.Locale;
 
 /**
  * Creates the Form for the Shoe Entity.
- * 
+ *
  * @author Max Ziller
  */
-public class ShoeForm extends FormLayout {
+public class BowlingShoeForm extends FormLayout {
     DatePicker boughtAtField = new DatePicker("Kaufdatum");
     IntegerField sizeField = new IntegerField("Größe");
     Checkbox activeCheckbox = new Checkbox("Artikel aktivieren");
@@ -34,11 +33,11 @@ public class ShoeForm extends FormLayout {
      * Constructor for the ShoeForm. Creates a boughtAt and size Field and a
      * checkbox for the active status.
      * The {@code Binder} binds the fields to the entity.
-     * 
+     *
      * @param shoeBinder
      * @see #createButtonLayout()
      */
-    public ShoeForm(Binder<BowlingShoe> shoeBinder) {
+    public BowlingShoeForm(Binder<BowlingShoe> shoeBinder) {
         setWidth("25%");
         boughtAtField.setWidthFull();
         boughtAtField.setLocale(Locale.GERMANY);

@@ -5,7 +5,7 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.formlayout.FormLayout;
+import  com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -22,7 +22,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.showNotification;
 
 /**
  * Creates the Form for the Food Entity.
- * 
+ *
  * @author Max Ziller
  */
 public class FoodForm extends FormLayout {
@@ -38,7 +38,7 @@ public class FoodForm extends FormLayout {
      * Constructor for the FoodForm. Creates a name, stock, reorderPoint and price
      * Fields and a checkbox for the active status.
      * The {@code Binder} binds the fields to the entity.
-     * 
+     *
      * @param foodBinder
      * @see #createButtonLayout()
      */
@@ -75,7 +75,7 @@ public class FoodForm extends FormLayout {
     /**
      * Creates the Button Layout. Used to save and cancel the changes and add them
      * into the database. They are activated with the Enter and Escape Key.
-     * 
+     *
      * @return {@code HorizontalLayout}
      */
     private Component createButtonLayout() {
@@ -107,10 +107,10 @@ public class FoodForm extends FormLayout {
      * private void resetEditLayout() {
      * foodGrid.deselectAll();
      * selectedFood = null;
-     * 
+     *
      * Food food = new Food();
      * binder.readBean(food);
-     * 
+     *
      * updateEditLayoutState();
      * setValueForIntegerFieldChildren(editLayout.getChildren(), null);
      */
