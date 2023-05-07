@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
 import static de.softwareprojekt.bestbowl.utils.Utils.matches;
@@ -42,12 +43,12 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * Creates a View for the Client Management.
- * 
+ *
  * @author Marten Voß
  */
 @Route(value = "clientManagement", layout = MainView.class)
 @PageTitle("Kundenverwaltung")
-@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
+@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 public class ClientManagementView extends VerticalLayout {
     private final transient ClientRepository clientRepository;
     private final Binder<Client> binder = new Binder<>();
@@ -59,7 +60,7 @@ public class ClientManagementView extends VerticalLayout {
 
     /**
      * Constructor for the Client Management View.
-     * 
+     *
      * @param clientRepository
      * @see #createNewClientButton()
      * @see #createGridLayout()
@@ -78,7 +79,7 @@ public class ClientManagementView extends VerticalLayout {
     /**
      * Creates a {@code Button} for creating a new Client. The new Client is set to
      * the {@code selectedClient} and the grid is updated.
-     * 
+     *
      * @return {@code Button}
      * @see #updateEditLayoutState()
      */
@@ -100,7 +101,7 @@ public class ClientManagementView extends VerticalLayout {
 
     /**
      * Creates a {@code HorizontalLayout} for the {@code Grid}.
-     * 
+     *
      * @return {@code Grid}
      * @see #createEditLayout()
      * @see #createGrid()
@@ -117,7 +118,7 @@ public class ClientManagementView extends VerticalLayout {
     /**
      * Creates a {@code Grid<Client>} with all the attributes of the client entity.
      * Filters for the columns are also generated.
-     * 
+     *
      * @return {@code Grid<Client>}
      * @see #updateEditLayoutState()
      * @see #resetEditLayout()
@@ -188,7 +189,7 @@ public class ClientManagementView extends VerticalLayout {
      * name, the e-mail, full address and the active settings of a client. A save
      * and cancel button is added to the {@code FormLayout}. The {@code Binder}
      * binds the {@code Client} to the {@code TextField}s.
-     * 
+     *
      * @return {@code FormLayout}
      */
     private FormLayout createEditLayout() {
@@ -198,14 +199,17 @@ public class ClientManagementView extends VerticalLayout {
         TextField firstNameField = new TextField("Vorname");
         firstNameField.setWidthFull();
         firstNameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        firstNameField.setRequiredIndicatorVisible(true);
 
         TextField lastNameField = new TextField("Nachname");
         lastNameField.setWidthFull();
         lastNameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        lastNameField.setRequiredIndicatorVisible(true);
 
         TextField emailField = new TextField("E-Mail");
         emailField.setWidthFull();
         emailField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        emailField.setRequiredIndicatorVisible(true);
 
         ComboBox<Association> associationCB = createAssociationCB("Verein");
         associationCB.setWidthFull();
@@ -214,18 +218,22 @@ public class ClientManagementView extends VerticalLayout {
         TextField streetField = new TextField("Straße");
         streetField.setWidthFull();
         streetField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        streetField.setRequiredIndicatorVisible(true);
 
         IntegerField houseNrField = new IntegerField("Hausnummer");
         houseNrField.setWidthFull();
         houseNrField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        houseNrField.setRequiredIndicatorVisible(true);
 
         IntegerField postCodeField = new IntegerField("PLZ");
         postCodeField.setWidthFull();
         postCodeField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        postCodeField.setRequiredIndicatorVisible(true);
 
         TextField cityField = new TextField("Stadt");
         cityField.setWidthFull();
         cityField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        cityField.setRequiredIndicatorVisible(true);
 
         HorizontalLayout checkboxLayout = new HorizontalLayout();
         checkboxLayout.setAlignItems(Alignment.CENTER);
@@ -251,7 +259,17 @@ public class ClientManagementView extends VerticalLayout {
                 postCodeField, cityField, checkboxLayout, createValidationLabelLayout(), buttonLayout);
 
         saveButton.addClickListener(clickEvent -> {
+            String uneditedEmail = Objects.requireNonNullElse(selectedClient.getEmail(), "");
+            Set<String> clientEmailSet = clientRepository.findAllEmails();
+            if (!editingNewClient) {
+                clientEmailSet.remove(uneditedEmail);
+            }
             if (writeBean()) {
+                if (clientEmailSet.contains(selectedClient.getEmail())) {
+                    validationErrorLabel.setText("Diese E-Mail wird bereits verwendet");
+                    selectedClient.setEmail(uneditedEmail);
+                    return;
+                }
                 saveToDb();
             }
         });
@@ -285,7 +303,7 @@ public class ClientManagementView extends VerticalLayout {
     /**
      * Creates a {@code VerticalLayout} with a {@code Label} for displaying
      * a ValidationError.
-     * 
+     *
      * @return {@code VerticalLayout}
      */
     private VerticalLayout createValidationLabelLayout() {
@@ -305,8 +323,7 @@ public class ClientManagementView extends VerticalLayout {
     /**
      * Writes the {@code Client} object to the {@code Binder} and validates the
      * fields.
-     * 
-     * @param client
+     *
      * @return {@code boolean}
      */
     private boolean writeBean() {
@@ -323,7 +340,7 @@ public class ClientManagementView extends VerticalLayout {
 
     /**
      * Saves the {@code Client} object to the database and updates the grid.
-     * 
+     *
      * @see #resetEditLayout()
      */
     private void saveToDb() {
@@ -340,13 +357,14 @@ public class ClientManagementView extends VerticalLayout {
     /**
      * Resets the edit layout by setting a new {@code Client} to null and disabling
      * all the children.
-     * 
+     *
      * @see #updateEditLayoutState()
      * @see #setValueForIntegerFieldChildren(List, Integer)
      */
     private void resetEditLayout() {
         clientGrid.deselectAll();
         selectedClient = null;
+        editingNewClient = false;
 
         Client client = new Client();
         client.addAddress(new Address());
@@ -358,7 +376,7 @@ public class ClientManagementView extends VerticalLayout {
 
     /**
      * Updates the state of the children components of the edit layout.
-     * 
+     *
      * @see #setChildrenEnabled(List, boolean)
      */
     private void updateEditLayoutState() {
@@ -384,7 +402,7 @@ public class ClientManagementView extends VerticalLayout {
 
         /**
          * Constructor for the {@code ClientFilter}.
-         * 
+         *
          * @param dataView
          */
         public ClientFilter(GridListDataView<Client> dataView) {
@@ -394,7 +412,7 @@ public class ClientManagementView extends VerticalLayout {
 
         /**
          * Tests if the {@code Client} attributes match the filter attributes.
-         * 
+         *
          * @param client
          * @return {@code boolean}
          */

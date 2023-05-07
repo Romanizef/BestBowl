@@ -20,7 +20,6 @@ import de.softwareprojekt.bestbowl.beans.SecurityService;
 import de.softwareprojekt.bestbowl.beans.UserManager;
 import de.softwareprojekt.bestbowl.views.bookingViews.ClientSearchView;
 import de.softwareprojekt.bestbowl.views.bookingViews.ExtrasView;
-import de.softwareprojekt.bestbowl.views.managementViews.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -30,6 +29,7 @@ import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
 
 /**
  * Is the main template for all the other views and incorporates them as tabs
+ *
  * @author Marten Voß
  * @author Matija Kopschek
  * @author Max Ziller
@@ -44,6 +44,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
     /**
      * Constructor for the main view. Creates a new title for the View, Horizontal Layout for the header,
      * in which the two buttons logout and shutdown are placed and a new menu
+     *
      * @param securityService
      * @param userManager
      * @see #createHeaderContent()
@@ -74,6 +75,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
 
     /**
      * Creates a new {@code Tab} Component
+     *
      * @param text
      * @param navigationTarget
      * @return {@code tab}
@@ -87,6 +89,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
 
     /**
      * All the Views are shown as a tab in the menu
+     *
      * @return {@code Tab[]}
      */
     private Tab[] createMenuItems() {
@@ -96,12 +99,12 @@ public class MainView extends AppLayout implements AppShellConfigurator {
                 createTab("Verwaltungen", ManagementView.class),
                 createTab("Statistiken", StatisticsView.class),
                 createTab("Datenbank", DatabaseRedirectView.class)
-
         };
     }
 
     /**
      * A new Header is created, with the drawer toggle and the title
+     *
      * @return {@code layout}
      */
     private HorizontalLayout createHeaderContent() {
@@ -120,6 +123,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
 
     /**
      * Creates a new {@code VerticalLayout} for the menu
+     *
      * @param menu
      * @return {@code layout}
      */
@@ -134,7 +138,8 @@ public class MainView extends AppLayout implements AppShellConfigurator {
     }
 
     /**
-     * Creates a new {@code Tabs} Component, which embeddes all the Views as {@code Tabs}
+     * Creates a new {@code Tabs} Component, which embeds all the Views as {@code Tabs}
+     *
      * @return {@code Tabs}
      * @see #createMenuItems()
      */
@@ -147,15 +152,19 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         return tabs;
     }
 
+    /**
+     * Marks the current open tab in the drawer
+     */
     @Override
     protected void afterNavigation() {
         super.afterNavigation();
-        getTabForComponent(getContent()).ifPresent(menu::setSelectedTab);
+        menu.setSelectedTab(getTabForComponent(getContent()).orElse(null));
         viewTitle.setText(getCurrentPageTitle());
     }
 
     /**
      * Returns the {@code Tab} for the given {@code Component}
+     *
      * @param component
      * @return {@code Optional<Tab>}
      */
@@ -166,6 +175,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
 
     /**
      * Returns the title of the current page
+     *
      * @return {@code String}
      */
     private String getCurrentPageTitle() {
@@ -174,6 +184,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
 
     /**
      * Returns the name of the authenticated user or the default
+     *
      * @return {@code String}
      */
     private String getAuthenticatedUserNameOrDefault() {

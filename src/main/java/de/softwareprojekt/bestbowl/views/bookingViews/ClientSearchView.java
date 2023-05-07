@@ -157,6 +157,11 @@ public class ClientSearchView extends VerticalLayout {
         });
         saveButton.addClickListener(e -> {
             if (writeBean(newClient)) {
+                Set<String> clientEmailSet = clientRepository.findAllEmails();
+                if (clientEmailSet.contains(newClient.getEmail())) {
+                    validationErrorLabel.setText("Diese E-Mail wird bereits verwendet");
+                    return;
+                }
                 clientRepository.save(newClient);
                 clientGrid.getListDataView().addItem(newClient);
                 clientGrid.deselectAll();

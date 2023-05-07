@@ -291,7 +291,7 @@ public class UserManagementView extends VerticalLayout {
             return false;
         }
         if (userEmailSet.contains(selectedUser.getEmail())) {
-            validationErrorLabel.setText("Ein Nutzer mit dieser E-Mail existiert bereits");
+            validationErrorLabel.setText("Diese E-Mail wird bereits verwendet");
             return false;
         }
         return true;
