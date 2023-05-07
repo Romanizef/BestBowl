@@ -18,14 +18,16 @@ import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.form.DrinkForm;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.List;
 import java.util.Optional;
+
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
-@Route(value = "DrinkManagement", layout = MainView.class)
-@PageTitle("Getraenkeverwaltung")
+@Route(value = "drinkManagement", layout = MainView.class)
+@PageTitle("Getränkeverwaltung")
 @RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
-public class DrinkView extends VerticalLayout {
+public class DrinkManagementView extends VerticalLayout {
     private final DrinkRepository drinkRepository;
     private final Binder<Drink> drinkBinder = new Binder<>();
     private Grid<Drink> drinkGrid;
@@ -33,7 +35,7 @@ public class DrinkView extends VerticalLayout {
     private Drink selectedDrink = null;
 
     @Autowired
-    public DrinkView (DrinkRepository drinkRepository){
+    public DrinkManagementView(DrinkRepository drinkRepository) {
         this.drinkRepository = drinkRepository;
         setSizeFull();
         Button newDrinkButton = createNewDrinkButton();
@@ -87,7 +89,7 @@ public class DrinkView extends VerticalLayout {
         List<Drink> drinkList = drinkRepository.findAll();
         GridListDataView<Drink> dataView = drinkGrid.setItems(drinkList);
 
-        DrinkView.DrinkFilter drinkFilter = new DrinkView.DrinkFilter(dataView);
+        DrinkManagementView.DrinkFilter drinkFilter = new DrinkManagementView.DrinkFilter(dataView);
         drinkGrid.getHeaderRows().clear();
         HeaderRow headerRow = drinkGrid.appendHeaderRow();
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", drinkFilter::setId));

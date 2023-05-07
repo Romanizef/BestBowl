@@ -31,6 +31,26 @@ public class User implements Serializable {
         active = true;
     }
 
+    public User(User other) {
+        this.id = other.id;
+        this.name = other.name;
+        this.email = other.email;
+        this.encodedPassword = other.encodedPassword;
+        this.securityQuestionAnswer = other.securityQuestionAnswer;
+        this.role = other.role;
+        this.active = other.active;
+    }
+
+    public void copyValuesOf(User other) {
+        this.id = other.id;
+        this.name = other.name;
+        this.email = other.email;
+        this.encodedPassword = other.encodedPassword;
+        this.securityQuestionAnswer = other.securityQuestionAnswer;
+        this.role = other.role;
+        this.active = other.active;
+    }
+
     public int getId() {
         return id;
     }

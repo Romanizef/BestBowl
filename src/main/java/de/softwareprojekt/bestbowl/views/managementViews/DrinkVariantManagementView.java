@@ -19,15 +19,16 @@ import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.form.DrinkVariantForm;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.List;
 import java.util.Optional;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderInteger;
 
-@Route(value = "DrinkVariantManagement", layout = MainView.class)
-@PageTitle("Getraenkevariantenverwaltung")
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
+
+@Route(value = "drinkVariantManagement", layout = MainView.class)
+@PageTitle("Getränkevariantenverwaltung")
 @RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
-public class DrinkVariantView extends VerticalLayout {
+public class DrinkVariantManagementView extends VerticalLayout {
     private final DrinkVariantRepository drinkVariantRepository;
     private final Binder<DrinkVariant> drinkVariantBinder = new Binder<>();
     private final Binder<Drink> drinkBinder = new Binder<>();
@@ -36,7 +37,7 @@ public class DrinkVariantView extends VerticalLayout {
     private DrinkVariant selectedDrinkVariant = null;
 
     @Autowired
-    public DrinkVariantView(DrinkVariantRepository drinkVariantRepository){
+    public DrinkVariantManagementView(DrinkVariantRepository drinkVariantRepository) {
         this.drinkVariantRepository = drinkVariantRepository;
         setSizeFull();
         Button newDrinkVariantButton = createNewDrinkVariantButton();
@@ -90,7 +91,7 @@ public class DrinkVariantView extends VerticalLayout {
         List<DrinkVariant> drinkVariantList = drinkVariantRepository.findAll();
         GridListDataView<DrinkVariant> dataView = drinkVariantGrid.setItems(drinkVariantList);
 
-        DrinkVariantView.DrinkVariantFilter drinkVariantFilter = new DrinkVariantView.DrinkVariantFilter(dataView);
+        DrinkVariantManagementView.DrinkVariantFilter drinkVariantFilter = new DrinkVariantManagementView.DrinkVariantFilter(dataView);
         drinkVariantGrid.getHeaderRows().clear();
         HeaderRow headerRow = drinkVariantGrid.appendHeaderRow();
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", drinkVariantFilter::setId));

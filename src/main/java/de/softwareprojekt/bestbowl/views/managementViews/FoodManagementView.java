@@ -19,15 +19,16 @@ import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.form.FoodForm;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.List;
 import java.util.Optional;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderBoolean;
 
-@Route(value = "FoodManagement", layout = MainView.class)
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
+
+@Route(value = "foodManagement", layout = MainView.class)
 @PageTitle("Speiesenverwaltung")
 @RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
-public class FoodView extends VerticalLayout {
+public class FoodManagementView extends VerticalLayout {
     private final FoodRepository foodRepository;
     private final Binder<Food> foodBinder = new Binder<>();
     private Grid<Food> foodGrid;
@@ -35,7 +36,7 @@ public class FoodView extends VerticalLayout {
     private Food selectedFood = null;
 
     @Autowired
-    public FoodView(FoodRepository foodRepository){
+    public FoodManagementView(FoodRepository foodRepository) {
         this.foodRepository = foodRepository;
         setSizeFull();
         Button newFoodButton = createNewFoodButton();
@@ -90,7 +91,7 @@ public class FoodView extends VerticalLayout {
         List<Food> foodList = foodRepository.findAll();
         GridListDataView<Food> dataView = foodGrid.setItems(foodList);
 
-        FoodView.FoodFilter foodFilter = new FoodView.FoodFilter(dataView);
+        FoodManagementView.FoodFilter foodFilter = new FoodManagementView.FoodFilter(dataView);
         foodGrid.getHeaderRows().clear();
         HeaderRow headerRow = foodGrid.appendHeaderRow();
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", foodFilter::setId));

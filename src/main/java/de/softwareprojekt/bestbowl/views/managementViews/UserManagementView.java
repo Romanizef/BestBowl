@@ -192,21 +192,29 @@ public class UserManagementView extends VerticalLayout {
                 createValidationLabelLayout(), buttonLayout);
 
         saveButton.addClickListener(clickEvent -> {
+            User uneditedUser = new User(selectedUser);
             if (Utils.isStringNotEmpty(passwordField.getValue())) {
                 //saving with a password change
                 if (!isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
                     showNotification("Das Passwort eines Nutzers kann nur als Admin geändert werden");
                     return;
                 }
-                if (writeBean() && validateUserSave()) {
-                    saveToDbAndUpdateUserManager();
+                if (writeBean()) {
+                    if (validateUserSave()) {
+                        saveToDbAndUpdateUserManager();
+                    } else {
+                        selectedUser.copyValuesOf(uneditedUser);
+                    }
                 }
             } else {
                 //saving without password change
-                String encodedPw = selectedUser.getEncodedPassword();
-                if (writeBean() && validateUserSave()) {
-                    selectedUser.setEncodedPassword(encodedPw);
-                    saveToDbAndUpdateUserManager();
+                if (writeBean()) {
+                    if (validateUserSave()) {
+                        selectedUser.setEncodedPassword(uneditedUser.getEncodedPassword());
+                        saveToDbAndUpdateUserManager();
+                    } else {
+                        selectedUser.copyValuesOf(uneditedUser);
+                    }
                 }
             }
         });
