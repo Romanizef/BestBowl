@@ -2,7 +2,6 @@ package de.softwareprojekt.bestbowl.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -76,6 +75,9 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
         setDrawerOpened(userManager.getDrawerStateForUser(getAuthenticatedUserNameOrDefault()));
+        if (userManager.getDarkModeStateForUser(getAuthenticatedUserNameOrDefault())) {
+            getElement().getThemeList().add(Lumo.DARK);
+        }
     }
 
     /**
@@ -130,11 +132,13 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         Button button = new Button();
         button.setIcon(VaadinIcon.LIGHTBULB.create());
         button.addClickListener(e -> {
-            ThemeList themeList = UI.getCurrent().getElement().getThemeList();
+            ThemeList themeList = getElement().getThemeList();
             if (themeList.contains(Lumo.DARK)) {
                 themeList.remove(Lumo.DARK);
+                userManager.setDarkModeStateForUser(getAuthenticatedUserNameOrDefault(), false);
             } else {
                 themeList.add(Lumo.DARK);
+                userManager.setDarkModeStateForUser(getAuthenticatedUserNameOrDefault(), true);
             }
         });
         return button;
