@@ -15,11 +15,13 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.spring.security.AuthenticationContext;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyBookingRepository;
 import de.softwareprojekt.bestbowl.utils.AlleyBookingChecker;
 import de.softwareprojekt.bestbowl.utils.Utils;
+import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,7 @@ import java.util.Locale;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
 import static de.softwareprojekt.bestbowl.utils.Utils.toHoursString;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.isCurrentUserInRole;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.showNotification;
 
 /**
@@ -42,6 +45,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.showNotification;
 @PermitAll
 public class BowlingAlleyBookingView extends VerticalLayout {
     private final transient BowlingAlleyBookingRepository bowlingAlleyBookingRepository;
+    private final transient AuthenticationContext authenticationContext;
     private final transient AlleyBookingChecker alleyBookingChecker = new AlleyBookingChecker();
     private final H1 clientHeader;
     private final Grid<BowlingAlleyBooking> bookingGrid;
@@ -59,8 +63,9 @@ public class BowlingAlleyBookingView extends VerticalLayout {
     private long gridUpperBound;
 
     @Autowired
-    public BowlingAlleyBookingView(BowlingAlleyBookingRepository bowlingAlleyBookingRepository) {
+    public BowlingAlleyBookingView(BowlingAlleyBookingRepository bowlingAlleyBookingRepository, AuthenticationContext authenticationContext) {
         this.bowlingAlleyBookingRepository = bowlingAlleyBookingRepository;
+        this.authenticationContext = authenticationContext;
         setSizeFull();
         setAlignItems(Alignment.CENTER);
 
@@ -107,15 +112,17 @@ public class BowlingAlleyBookingView extends VerticalLayout {
         layout.add(datePicker, timePicker, durationCB, checkButton, wholeDayButton);
 
         checkButton.addClickListener(e -> {
-            alleyBookingChecker.setTimeInfo(datePicker.getValue(), timePicker.getValue(), (int) (durationCB.getValue().hours() * 60));
-            gridLowerBound = alleyBookingChecker.getStartTime();
-            gridUpperBound = alleyBookingChecker.getEndTime();
-            if (alleyBookingChecker.checkAvailability()) {
-                showNotification("Freie Bahn: Nr. " + alleyBookingChecker.getAvailableAlleyId());
-            } else {
-                showNotification("Keine Bahn frei zu der ausgewählten Zeit");
+            if (verifyTime()) {
+                alleyBookingChecker.setTimeInfo(datePicker.getValue(), timePicker.getValue(), (int) (durationCB.getValue().hours() * 60));
+                gridLowerBound = alleyBookingChecker.getStartTime();
+                gridUpperBound = alleyBookingChecker.getEndTime();
+                if (alleyBookingChecker.checkAvailability()) {
+                    showNotification("Freie Bahn: Nr. " + alleyBookingChecker.getAvailableAlleyId());
+                } else {
+                    showNotification("Keine Bahn frei zu der ausgewählten Zeit");
+                }
+                updateGridItems();
             }
-            updateGridItems();
         });
         wholeDayButton.addClickListener(e -> {
             gridLowerBound = Utils.setLocalDateTimeToDayStart(LocalDateTime.of(datePicker.getValue(), timePicker.getValue())).atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L;
@@ -132,14 +139,16 @@ public class BowlingAlleyBookingView extends VerticalLayout {
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         button.addClickListener(e -> {
-            alleyBookingChecker.setTimeInfo(datePicker.getValue(), timePicker.getValue(), (int) (durationCB.getValue().hours() * 60));
-            gridLowerBound = alleyBookingChecker.getStartTime();
-            gridUpperBound = alleyBookingChecker.getEndTime();
-            if ((latestBooking = alleyBookingChecker.book()) != null) {
-                showNotification("Bahn Nr. " + alleyBookingChecker.getAvailableAlleyId() + " gebucht");
+            if (verifyTime()) {
+                alleyBookingChecker.setTimeInfo(datePicker.getValue(), timePicker.getValue(), (int) (durationCB.getValue().hours() * 60));
+                gridLowerBound = alleyBookingChecker.getStartTime();
+                gridUpperBound = alleyBookingChecker.getEndTime();
+                if ((latestBooking = alleyBookingChecker.book()) != null) {
+                    showNotification("Bahn Nr. " + alleyBookingChecker.getAvailableAlleyId() + " gebucht");
+                }
+                updateGridItems();
+                updateLabelAndButtons();
             }
-            updateGridItems();
-            updateLabelAndButtons();
         });
         return button;
     }
@@ -234,6 +243,21 @@ public class BowlingAlleyBookingView extends VerticalLayout {
         this.selectedClient = selectedClient;
         alleyBookingChecker.setClient(selectedClient);
         updateInitialComponents();
+    }
+
+    private boolean verifyTime() {
+        LocalDateTime selectedStartTime = LocalDateTime.of(datePicker.getValue(), timePicker.getValue());
+        LocalDateTime currentTime = Utils.getCurrentDateTimeRounded();
+        if (selectedStartTime.isAfter(currentTime)) {
+            return true;
+        } else {
+            //admin can book in the past for testing purposes
+            if (isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
+                return true;
+            }
+            showNotification("Die Buchungszeit darf nicht in der Vergangenheit sein");
+            return false;
+        }
     }
 
     private record Duration(double hours) {

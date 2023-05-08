@@ -10,6 +10,7 @@ import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
+import de.softwareprojekt.bestbowl.jpa.repositories.BookingHistoryRepository;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.extrasElements.DrinkPanel;
 import com.vaadin.flow.component.icon.Icon;
@@ -50,7 +51,6 @@ public final class InvoiceView extends VerticalLayout {
         add(tabComponent, tabButtonComponent, footerComponent);
     }
 
-    // TODO Tabs erst erstellen wenn alles andere fertig
     private final Component tabConfig() {
         tabs = new TabSheet();
         tabLayout = new HorizontalLayout();
@@ -58,12 +58,12 @@ public final class InvoiceView extends VerticalLayout {
         tabs.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED,
                 TabSheetVariant.MATERIAL_BORDERED,
                 TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
-        tabs.add("Gesamtrechnung", null);
+        tabs.add("Gesamtrechnung", createCompleteInvoice());
         tabLayout.add(tabs);
         return tabLayout;
     }
 
-    private Component createCompleteInvoice() {
+    public Component createCompleteInvoice() {
         VerticalLayout verticalLayout = new VerticalLayout();
         if (bowlingAlleyBooking != null) {
             List<DrinkBooking> drinkBookingList = Repos.getDrinkBookingRepository()
@@ -80,10 +80,30 @@ public final class InvoiceView extends VerticalLayout {
         return verticalLayout;
     }
 
-    // TODO ExtrasView ruft Methode auf und übergibt Daten
+    public Component createPartialInvoice() {
+        VerticalLayout verticalLayout = new VerticalLayout();
+        if (bowlingAlleyBooking != null) {
+            List<DrinkBooking> drinkBookingList = Repos.getDrinkBookingRepository()
+                    .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
+                            bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
+
+            verticalLayout.setAlignItems(Alignment.CENTER);
+            verticalLayout.setWidthFull();
+
+            for (DrinkBooking drinkBooking : drinkBookingList) {
+                verticalLayout.add(new DrinkPanel(drinkBooking));
+            }
+        }
+        verticalLayout.add(createPartialPayButton());
+        return verticalLayout;
+    }
+
     public void setBowlingAlleyBooking(BowlingAlleyBooking bowlingAlleyBooking) {
         this.bowlingAlleyBooking = bowlingAlleyBooking;
-        // TODO createCompleteInvoice aufrufen
+    }
+
+    public BowlingAlleyBooking getBowlingAlleyBooking(){
+        return bowlingAlleyBooking;
     }
 
     private final Component tabButtonPlacement(Component addButton, Component subButton) {
@@ -103,7 +123,7 @@ public final class InvoiceView extends VerticalLayout {
         tabAddButton.setIcon(new Icon(VaadinIcon.PLUS_CIRCLE));
         tabAddButton.addClickListener(event -> {
             if (bowlingAlleyBooking != null) {
-                tabs.setSelectedTab(tabs.add("Teilrechnung", createPartialPayButton()));
+                tabs.setSelectedTab(tabs.add("Teilrechnung", createPartialInvoice()));
             }
         });
         return tabAddButton;
@@ -155,6 +175,7 @@ public final class InvoiceView extends VerticalLayout {
         payButton.addClickListener(clickEvent -> {
             showNotification("Rechnung bezahlt");
             // TODO pdf erstellen und per EMail versenden
+            // TODO Rechnung speichern in Datenbank
         });
         return payButton;
     }
@@ -172,10 +193,10 @@ public final class InvoiceView extends VerticalLayout {
             showNotification("Rechnung bezahlt");
             // TODO Summe wird geupdated
             // TODO Alle Elemente sperren Children nochmal Angucken bei anderen Verwaltungen
+            // setChildrenEnabled();
             // TODO ExtraView auf erste Belegte Bahn weiterleiten
+            // Zahlung und Rechnung in DB speichern
         });
         return payButton;
     }
-
-
 }

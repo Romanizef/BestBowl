@@ -51,7 +51,8 @@ public class CommandLineListener {
                     } else if (command.equals("addUsers")) {
                         userManager.addNewUser("admin", "admin", "23.5.1993", "admin@bestbowl.de", UserRole.ADMIN);
                         userManager.addNewUser("owner", "owner", "7.3.1986", "owner@bestbowl.de", UserRole.OWNER);
-                        userManager.addNewUser("employee", "employee", "19.10.2001", "employee@bestbowl.de", UserRole.EMPLOYEE);
+                        userManager.addNewUser("employee", "employee", "19.10.2001", "employee@bestbowl.de",
+                                UserRole.EMPLOYEE);
                         LOGGER.info("Users added");
                     } else if (command.equals("generateRandomClients")) {
                         generateRandomClients(100);
@@ -82,10 +83,13 @@ public class CommandLineListener {
                     } else if (command.equals("generateBowlingAlleys")) {
                         generateBowlingAlleys();
                         LOGGER.info("BowlingAlleys generated");
-                    } else if (command.equals("demoPdf")) {
-                        PDFUtils.createDemoPdf();
-                        LOGGER.info("pdf created");
                     }
+                    /*
+                     * else if (command.equals("demoPdf")) {
+                     * PDFUtils.createInvoicePdf();
+                     * LOGGER.info("pdf created");
+                     * }
+                     */
 
                 } catch (Exception e) {
                     if (e.getMessage() != null) {
@@ -118,7 +122,8 @@ public class CommandLineListener {
 
     private void generateRandomAssociations(int count) {
         List<Association> existingAssociationList = Repos.getAssociationRepository().findAll();
-        DuplicateChecker duplicateChecker = new DuplicateChecker(existingAssociationList.stream().map(Association::getName).collect(Collectors.toSet()));
+        DuplicateChecker duplicateChecker = new DuplicateChecker(
+                existingAssociationList.stream().map(Association::getName).collect(Collectors.toSet()));
 
         List<Association> associationList = new ArrayList<>(count);
         Faker faker = new Faker();
@@ -149,7 +154,8 @@ public class CommandLineListener {
 
     private void generateRandomFoods(int count) {
         List<Food> existingFoodList = Repos.getFoodRepository().findAll();
-        DuplicateChecker duplicateChecker = new DuplicateChecker(existingFoodList.stream().map(Food::getName).collect(Collectors.toSet()));
+        DuplicateChecker duplicateChecker = new DuplicateChecker(
+                existingFoodList.stream().map(Food::getName).collect(Collectors.toSet()));
 
         List<Food> foodList = new ArrayList<>(count);
         Faker faker = new Faker();
@@ -168,7 +174,8 @@ public class CommandLineListener {
 
     private void generateRandomDrinks(int count) {
         List<Drink> existingDrinkList = Repos.getDrinkRepository().findAll();
-        DuplicateChecker duplicateChecker = new DuplicateChecker(existingDrinkList.stream().map(Drink::getName).collect(Collectors.toSet()));
+        DuplicateChecker duplicateChecker = new DuplicateChecker(
+                existingDrinkList.stream().map(Drink::getName).collect(Collectors.toSet()));
 
         List<Drink> foodList = new ArrayList<>(count);
         Faker faker = new Faker();

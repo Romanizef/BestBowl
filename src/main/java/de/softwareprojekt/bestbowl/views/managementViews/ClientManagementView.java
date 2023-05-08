@@ -35,12 +35,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
 import static de.softwareprojekt.bestbowl.utils.Utils.matches;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
+ * Creates a View for the Client Management.
+ *
  * @author Marten Voß
  */
 @Route(value = "clientManagement", layout = MainView.class)
@@ -55,6 +58,14 @@ public class ClientManagementView extends VerticalLayout {
     private Client selectedClient = null;
     private boolean editingNewClient = false;
 
+    /**
+     * Constructor for the Client Management View.
+     *
+     * @param clientRepository
+     * @see #createNewClientButton()
+     * @see #createGridLayout()
+     * @see #updateEditLayoutState()
+     */
     @Autowired
     public ClientManagementView(ClientRepository clientRepository) {
         this.clientRepository = clientRepository;
@@ -65,6 +76,13 @@ public class ClientManagementView extends VerticalLayout {
         updateEditLayoutState();
     }
 
+    /**
+     * Creates a {@code Button} for creating a new Client. The new Client is set to
+     * the {@code selectedClient} and the grid is updated.
+     *
+     * @return {@code Button}
+     * @see #updateEditLayoutState()
+     */
     private Button createNewClientButton() {
         Button button = new Button("Neuen Kunden hinzufügen");
         button.setWidthFull();
@@ -81,6 +99,13 @@ public class ClientManagementView extends VerticalLayout {
         return button;
     }
 
+    /**
+     * Creates a {@code HorizontalLayout} for the {@code Grid}.
+     *
+     * @return {@code Grid}
+     * @see #createEditLayout()
+     * @see #createGrid()
+     */
     private HorizontalLayout createGridLayout() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setSizeFull();
@@ -90,6 +115,14 @@ public class ClientManagementView extends VerticalLayout {
         return layout;
     }
 
+    /**
+     * Creates a {@code Grid<Client>} with all the attributes of the client entity.
+     * Filters for the columns are also generated.
+     *
+     * @return {@code Grid<Client>}
+     * @see #updateEditLayoutState()
+     * @see #resetEditLayout()
+     */
     private Grid<Client> createGrid() {
         Grid<Client> grid = new Grid<>(Client.class);
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
@@ -98,12 +131,18 @@ public class ClientManagementView extends VerticalLayout {
         Grid.Column<Client> firstNameColumn = grid.addColumn("firstName").setHeader("Vorname");
         Grid.Column<Client> lastNameColumn = grid.addColumn("lastName").setHeader("Nachname");
         Grid.Column<Client> emailColumn = grid.addColumn("email").setHeader("E-Mail");
-        Grid.Column<Client> associationColumn = grid.addColumn(client -> client.getAssociation() == null ? "" : client.getAssociation().getName()).setHeader("Verein");
-        Grid.Column<Client> streetColumn = grid.addColumn(client -> client.getAddress().getStreet()).setHeader("Straße");
-        Grid.Column<Client> houseNrColumn = grid.addColumn(client -> client.getAddress().getHouseNr()).setHeader("Hausnummer");
-        Grid.Column<Client> postCodeColumn = grid.addColumn(client -> client.getAddress().getPostCode()).setHeader("PLZ");
+        Grid.Column<Client> associationColumn = grid
+                .addColumn(client -> client.getAssociation() == null ? "" : client.getAssociation().getName())
+                .setHeader("Verein");
+        Grid.Column<Client> streetColumn = grid.addColumn(client -> client.getAddress().getStreet())
+                .setHeader("Straße");
+        Grid.Column<Client> houseNrColumn = grid.addColumn(client -> client.getAddress().getHouseNr())
+                .setHeader("Hausnummer");
+        Grid.Column<Client> postCodeColumn = grid.addColumn(client -> client.getAddress().getPostCode())
+                .setHeader("PLZ");
         Grid.Column<Client> cityColumn = grid.addColumn(client -> client.getAddress().getCity()).setHeader("Stadt");
-        Grid.Column<Client> activeColumn = grid.addColumn(client -> client.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
+        Grid.Column<Client> activeColumn = grid.addColumn(client -> client.isActive() ? "Aktiv" : "Inaktiv")
+                .setHeader("Aktiv");
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setWidth("75%");
@@ -115,15 +154,19 @@ public class ClientManagementView extends VerticalLayout {
         grid.getHeaderRows().clear();
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", clientFilter::setId));
-        headerRow.getCell(firstNameColumn).setComponent(createFilterHeaderString("Vorname", clientFilter::setFirstName));
+        headerRow.getCell(firstNameColumn)
+                .setComponent(createFilterHeaderString("Vorname", clientFilter::setFirstName));
         headerRow.getCell(lastNameColumn).setComponent(createFilterHeaderString("Nachname", clientFilter::setLastName));
         headerRow.getCell(emailColumn).setComponent(createFilterHeaderString("E-Mail", clientFilter::setEmail));
-        headerRow.getCell(associationColumn).setComponent(createFilterHeaderString("Verein", clientFilter::setAssociationName));
+        headerRow.getCell(associationColumn)
+                .setComponent(createFilterHeaderString("Verein", clientFilter::setAssociationName));
         headerRow.getCell(streetColumn).setComponent(createFilterHeaderString("Straße", clientFilter::setStreet));
-        headerRow.getCell(houseNrColumn).setComponent(createFilterHeaderInteger("Hausnummer", clientFilter::setHouseNr));
+        headerRow.getCell(houseNrColumn)
+                .setComponent(createFilterHeaderInteger("Hausnummer", clientFilter::setHouseNr));
         headerRow.getCell(postCodeColumn).setComponent(createFilterHeaderInteger("PLZ", clientFilter::setPostCode));
         headerRow.getCell(cityColumn).setComponent(createFilterHeaderString("Stadt", clientFilter::setCity));
-        headerRow.getCell(activeColumn).setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", clientFilter::setActive));
+        headerRow.getCell(activeColumn)
+                .setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", clientFilter::setActive));
 
         grid.addSelectionListener(e -> {
             if (e.isFromClient()) {
@@ -141,6 +184,14 @@ public class ClientManagementView extends VerticalLayout {
         return grid;
     }
 
+    /**
+     * Creates a {@code FormLayout} with {@code TextField}s for the first and last
+     * name, the e-mail, full address and the active settings of a client. A save
+     * and cancel button is added to the {@code FormLayout}. The {@code Binder}
+     * binds the {@code Client} to the {@code TextField}s.
+     *
+     * @return {@code FormLayout}
+     */
     private FormLayout createEditLayout() {
         FormLayout layout = new FormLayout();
         layout.setWidth("25%");
@@ -148,14 +199,17 @@ public class ClientManagementView extends VerticalLayout {
         TextField firstNameField = new TextField("Vorname");
         firstNameField.setWidthFull();
         firstNameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        firstNameField.setRequiredIndicatorVisible(true);
 
         TextField lastNameField = new TextField("Nachname");
         lastNameField.setWidthFull();
         lastNameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        lastNameField.setRequiredIndicatorVisible(true);
 
         TextField emailField = new TextField("E-Mail");
         emailField.setWidthFull();
         emailField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        emailField.setRequiredIndicatorVisible(true);
 
         ComboBox<Association> associationCB = createAssociationCB("Verein");
         associationCB.setWidthFull();
@@ -164,18 +218,22 @@ public class ClientManagementView extends VerticalLayout {
         TextField streetField = new TextField("Straße");
         streetField.setWidthFull();
         streetField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        streetField.setRequiredIndicatorVisible(true);
 
         IntegerField houseNrField = new IntegerField("Hausnummer");
         houseNrField.setWidthFull();
         houseNrField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        houseNrField.setRequiredIndicatorVisible(true);
 
         IntegerField postCodeField = new IntegerField("PLZ");
         postCodeField.setWidthFull();
         postCodeField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        postCodeField.setRequiredIndicatorVisible(true);
 
         TextField cityField = new TextField("Stadt");
         cityField.setWidthFull();
         cityField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        cityField.setRequiredIndicatorVisible(true);
 
         HorizontalLayout checkboxLayout = new HorizontalLayout();
         checkboxLayout.setAlignItems(Alignment.CENTER);
@@ -201,7 +259,17 @@ public class ClientManagementView extends VerticalLayout {
                 postCodeField, cityField, checkboxLayout, createValidationLabelLayout(), buttonLayout);
 
         saveButton.addClickListener(clickEvent -> {
+            String uneditedEmail = Objects.requireNonNullElse(selectedClient.getEmail(), "");
+            Set<String> clientEmailSet = clientRepository.findAllEmails();
+            if (!editingNewClient) {
+                clientEmailSet.remove(uneditedEmail);
+            }
             if (writeBean()) {
+                if (clientEmailSet.contains(selectedClient.getEmail())) {
+                    validationErrorLabel.setText("Diese E-Mail wird bereits verwendet");
+                    selectedClient.setEmail(uneditedEmail);
+                    return;
+                }
                 saveToDb();
             }
         });
@@ -220,16 +288,24 @@ public class ClientManagementView extends VerticalLayout {
                         client.setAssociation(association);
                     }
                 }));
-        binder.bind(streetField, client -> client.getAddress().getStreet(), ((client, s) -> client.getAddress().setStreet(s)));
+        binder.bind(streetField, client -> client.getAddress().getStreet(),
+                ((client, s) -> client.getAddress().setStreet(s)));
         binder.bind(houseNrField, client -> client.getAddress().getHouseNr(),
                 ((client, i) -> client.getAddress().setHouseNr(Objects.requireNonNullElse(i, 0))));
         binder.bind(postCodeField, client -> client.getAddress().getPostCode(),
                 ((client, i) -> client.getAddress().setPostCode(Objects.requireNonNullElse(i, 0))));
-        binder.bind(cityField, client -> client.getAddress().getCity(), ((client, s) -> client.getAddress().setCity(s)));
+        binder.bind(cityField, client -> client.getAddress().getCity(),
+                ((client, s) -> client.getAddress().setCity(s)));
         binder.bind(activeCheckbox, Client::isActive, Client::setActive);
         return layout;
     }
 
+    /**
+     * Creates a {@code VerticalLayout} with a {@code Label} for displaying
+     * a ValidationError.
+     *
+     * @return {@code VerticalLayout}
+     */
     private VerticalLayout createValidationLabelLayout() {
         VerticalLayout validationLabelLayout = new VerticalLayout();
         validationLabelLayout.setWidthFull();
@@ -244,6 +320,12 @@ public class ClientManagementView extends VerticalLayout {
         return validationLabelLayout;
     }
 
+    /**
+     * Writes the {@code Client} object to the {@code Binder} and validates the
+     * fields.
+     *
+     * @return {@code boolean}
+     */
     private boolean writeBean() {
         try {
             binder.writeBean(selectedClient);
@@ -256,6 +338,11 @@ public class ClientManagementView extends VerticalLayout {
         return false;
     }
 
+    /**
+     * Saves the {@code Client} object to the database and updates the grid.
+     *
+     * @see #resetEditLayout()
+     */
     private void saveToDb() {
         clientRepository.save(selectedClient);
         if (editingNewClient) {
@@ -267,9 +354,17 @@ public class ClientManagementView extends VerticalLayout {
         showNotification("Kunde gespeichert");
     }
 
+    /**
+     * Resets the edit layout by setting a new {@code Client} to null and disabling
+     * all the children.
+     *
+     * @see #updateEditLayoutState()
+     * @see #setValueForIntegerFieldChildren(List, Integer)
+     */
     private void resetEditLayout() {
         clientGrid.deselectAll();
         selectedClient = null;
+        editingNewClient = false;
 
         Client client = new Client();
         client.addAddress(new Address());
@@ -279,11 +374,19 @@ public class ClientManagementView extends VerticalLayout {
         setValueForIntegerFieldChildren(editLayout.getChildren(), null);
     }
 
+    /**
+     * Updates the state of the children components of the edit layout.
+     *
+     * @see #setChildrenEnabled(List, boolean)
+     */
     private void updateEditLayoutState() {
         validationErrorLabel.setText("");
         setChildrenEnabled(editLayout.getChildren(), selectedClient != null);
     }
 
+    /**
+     * Creates filters for the {@code Client} objects.
+     */
     private static class ClientFilter {
         private final GridListDataView<Client> dataView;
         private String id;
@@ -297,11 +400,22 @@ public class ClientManagementView extends VerticalLayout {
         private String city;
         private Boolean active;
 
+        /**
+         * Constructor for the {@code ClientFilter}.
+         *
+         * @param dataView
+         */
         public ClientFilter(GridListDataView<Client> dataView) {
             this.dataView = dataView;
             this.dataView.addFilter(this::test);
         }
 
+        /**
+         * Tests if the {@code Client} attributes match the filter attributes.
+         *
+         * @param client
+         * @return {@code boolean}
+         */
         public boolean test(Client client) {
             boolean matchesId = matches(String.valueOf(client.getId()), id);
             boolean matchesFirstName = matches(client.getFirstName(), firstName);

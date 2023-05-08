@@ -249,4 +249,5 @@ public class AlleyManagementView extends VerticalLayout {
             dataView.refreshAll();
         }
     }
+
 }

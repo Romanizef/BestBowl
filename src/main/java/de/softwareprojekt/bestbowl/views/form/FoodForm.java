@@ -21,10 +21,11 @@ import de.softwareprojekt.bestbowl.jpa.entities.Food;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.showNotification;
 
 /**
+ * Creates the Form for the Food Entity.
+ *
  * @author Max Ziller
  */
-
-public class FoodForm extends FormLayout{
+public class FoodForm extends FormLayout {
     TextField nameField = new TextField("Name");
     IntegerField stockField = new IntegerField("Bestand");
     IntegerField reorderPointField = new IntegerField("Meldebestand");
@@ -33,8 +34,15 @@ public class FoodForm extends FormLayout{
     Button saveButton = new Button("Sichern");
     Button cancelButton = new Button("Abbrechen");
 
-
-    public FoodForm(Binder<Food> foodBinder){
+    /**
+     * Constructor for the FoodForm. Creates a name, stock, reorderPoint and price
+     * Fields and a checkbox for the active status.
+     * The {@code Binder} binds the fields to the entity.
+     *
+     * @param foodBinder
+     * @see #createButtonLayout()
+     */
+    public FoodForm(Binder<Food> foodBinder) {
         setWidth("25%");
         nameField.setWidthFull();
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
@@ -54,9 +62,8 @@ public class FoodForm extends FormLayout{
         checkboxLayout.setHeight("50px");
         checkboxLayout.add(activeCheckbox);
 
-
         add(nameField, stockField, reorderPointField, priceField, checkboxLayout,
-            createButtonLayout());
+                createButtonLayout());
 
         foodBinder.bind(nameField, Food::getName, Food::setName);
         foodBinder.bind(stockField, Food::getStock, Food::setStock);
@@ -65,7 +72,13 @@ public class FoodForm extends FormLayout{
         foodBinder.bind(activeCheckbox, Food::isActive, Food::setActive);
     }
 
-    private Component createButtonLayout(){
+    /**
+     * Creates the Button Layout. Used to save and cancel the changes and add them
+     * into the database. They are activated with the Enter and Escape Key.
+     *
+     * @return {@code HorizontalLayout}
+     */
+    private Component createButtonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setWidthFull();
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -80,25 +93,25 @@ public class FoodForm extends FormLayout{
 
         saveButton.addClickListener(clickEvent -> {
             // TODO Kunde in die Datenbank speichern
-            //resetEditLayout();
+            // resetEditLayout();
             showNotification("Speise gespeichert");
         });
         cancelButton.addClickListener(clickEvent -> {
-           //resetEditLayout();
+            // resetEditLayout();
             showNotification("Bearbeitung abgebrochen");
         });
         return buttonLayout;
     }
 
-   /* private void resetEditLayout() {
-        foodGrid.deselectAll();
-        selectedFood = null;
-
-        Food food = new Food();
-        binder.readBean(food);
-
-        updateEditLayoutState();
-        setValueForIntegerFieldChildren(editLayout.getChildren(), null);
-    */
+    /*
+     * private void resetEditLayout() {
+     * foodGrid.deselectAll();
+     * selectedFood = null;
+     *
+     * Food food = new Food();
+     * binder.readBean(food);
+     *
+     * updateEditLayoutState();
+     * setValueForIntegerFieldChildren(editLayout.getChildren(), null);
+     */
 }
-

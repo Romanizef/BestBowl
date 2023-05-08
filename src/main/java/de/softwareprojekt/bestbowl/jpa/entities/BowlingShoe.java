@@ -24,6 +24,10 @@ public class BowlingShoe implements Serializable {
     private int size;
     private boolean active;
 
+    public BowlingShoe() {
+        active = true;
+    }
+
     public int getId() {
         return id;
     }

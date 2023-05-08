@@ -4,8 +4,6 @@ import de.softwareprojekt.bestbowl.jpa.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
@@ -26,14 +24,6 @@ public class UserManager {
     private final Map<String, Boolean> userDrawerStateMap = new HashMap<>();
     private UserDetailsManager userDetailsManager;
     private PasswordEncoder passwordEncoder;
-
-    /**
-     * Adds all users from the db to the UserDetailsManager on application startup
-     */
-    @EventListener(ApplicationReadyEvent.class)
-    public void init() {
-        updateUsersFromDb();
-    }
 
     /**
      * Adds or updates all users in the db to the UserDetailsManager

@@ -4,12 +4,14 @@ import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * @author Marten Voß
  */
+@Repository
 public interface BowlingAlleyBookingRepository extends JpaRepository<BowlingAlleyBooking, Integer> {
 
     @Query("from BowlingAlleyBooking bab, BowlingAlley ba where bab.bowlingAlley.id = ba.id and ba.active = true and bab.active = true and " +

@@ -36,7 +36,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
 import static de.softwareprojekt.bestbowl.utils.Utils.matches;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
@@ -52,6 +54,7 @@ public class UserManagementView extends VerticalLayout {
     private final Binder<User> binder = new Binder<>();
     private Grid<User> userGrid;
     private FormLayout editLayout;
+    private PasswordField passwordField;
     private Label validationErrorLabel;
     private User selectedUser = null;
     private boolean editingNewUser = false;
@@ -142,24 +145,28 @@ public class UserManagementView extends VerticalLayout {
         TextField nameField = new TextField("Name");
         nameField.setWidthFull();
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        nameField.setRequiredIndicatorVisible(true);
 
         TextField emailField = new TextField("E-Mail");
         emailField.setWidthFull();
         emailField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        emailField.setRequiredIndicatorVisible(true);
 
-        PasswordField passwordField = new PasswordField("Passwort");
+        passwordField = new PasswordField("Passwort");
         passwordField.setWidthFull();
         passwordField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
         TextField securityQuestionAnswerField = new TextField("Sicherheitsfragenantwort");
         securityQuestionAnswerField.setWidthFull();
         securityQuestionAnswerField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        securityQuestionAnswerField.setRequiredIndicatorVisible(true);
 
         ComboBox<String> roleCB = new ComboBox<>("Nutzerrolle");
         roleCB.setWidthFull();
         roleCB.setAllowCustomValue(false);
         roleCB.setItems(UserRole.getAllValues());
         roleCB.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
+        roleCB.setRequiredIndicatorVisible(true);
 
         HorizontalLayout checkboxLayout = new HorizontalLayout();
         checkboxLayout.setAlignItems(Alignment.CENTER);
@@ -185,6 +192,7 @@ public class UserManagementView extends VerticalLayout {
                 createValidationLabelLayout(), buttonLayout);
 
         saveButton.addClickListener(clickEvent -> {
+            User uneditedUser = new User(selectedUser);
             if (Utils.isStringNotEmpty(passwordField.getValue())) {
                 //saving with a password change
                 if (!isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
@@ -192,14 +200,21 @@ public class UserManagementView extends VerticalLayout {
                     return;
                 }
                 if (writeBean()) {
-                    saveToDbAndUpdateUserManager();
+                    if (validateUserSave()) {
+                        saveToDbAndUpdateUserManager();
+                    } else {
+                        selectedUser.copyValuesOf(uneditedUser);
+                    }
                 }
             } else {
                 //saving without password change
-                String encodedPw = selectedUser.getEncodedPassword();
                 if (writeBean()) {
-                    selectedUser.setEncodedPassword(encodedPw);
-                    saveToDbAndUpdateUserManager();
+                    if (validateUserSave()) {
+                        selectedUser.setEncodedPassword(uneditedUser.getEncodedPassword());
+                        saveToDbAndUpdateUserManager();
+                    } else {
+                        selectedUser.copyValuesOf(uneditedUser);
+                    }
                 }
             }
         });
@@ -241,6 +256,47 @@ public class UserManagementView extends VerticalLayout {
         return false;
     }
 
+    private boolean validateUserSave() {
+        //empty password check when creating a new user
+        if (editingNewUser && !isStringNotEmpty(passwordField.getValue())) {
+            validationErrorLabel.setText("Passwort darf nicht leer sein");
+            return false;
+        }
+        //query the existing data on the db for the current user
+        Optional<User> dbUser = userRepository.findById(selectedUser.getId());
+        //admin checks
+        if ((dbUser.isPresent() && dbUser.get().getRole().equals(UserRole.ADMIN)) || selectedUser.getRole().equals(UserRole.ADMIN)) {
+            //admin users can only be updated by admins
+            if (!isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
+                validationErrorLabel.setText("Nur Admins können Admin Nutzer verwalten");
+                return false;
+            }
+            //there must be 1 active admin user in the system
+            List<User> adminUserList = userRepository.findAllByRoleEquals(UserRole.ADMIN);
+            if (adminUserList.size() == 1 && selectedUser.getId() == adminUserList.get(0).getId() && !selectedUser.isActive()) {
+                validationErrorLabel.setText("Es muss 1 aktiver Admin Nutzer im System existieren");
+                return false;
+            }
+        }
+        //name and email duplicate checks
+        Set<String> userNameSet = userRepository.findAllNames();
+        Set<String> userEmailSet = userRepository.findAllEmails();
+        //if the user exists in the db, delete the name and email of the unedited user from the sets
+        dbUser.ifPresent(user -> {
+            userNameSet.remove(user.getName());
+            userEmailSet.remove(user.getEmail());
+        });
+        if (userNameSet.contains(selectedUser.getName())) {
+            validationErrorLabel.setText("Ein Nutzer mit diesem Namen existiert bereits");
+            return false;
+        }
+        if (userEmailSet.contains(selectedUser.getEmail())) {
+            validationErrorLabel.setText("Diese E-Mail wird bereits verwendet");
+            return false;
+        }
+        return true;
+    }
+
     private void saveToDbAndUpdateUserManager() {
         userRepository.save(selectedUser);
         if (editingNewUser) {
@@ -257,10 +313,12 @@ public class UserManagementView extends VerticalLayout {
         userGrid.deselectAll();
         selectedUser = null;
         binder.readBean(new User());
+        editingNewUser = false;
         updateEditLayoutState();
     }
 
     private void updateEditLayoutState() {
+        passwordField.setRequiredIndicatorVisible(editingNewUser);
         validationErrorLabel.setText("");
         setChildrenEnabled(editLayout.getChildren(), selectedUser != null);
     }

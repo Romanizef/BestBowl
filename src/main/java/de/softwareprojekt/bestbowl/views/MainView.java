@@ -2,10 +2,12 @@ package de.softwareprojekt.bestbowl.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -13,14 +15,15 @@ import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
+import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.theme.lumo.Lumo;
 import de.softwareprojekt.bestbowl.BestBowlApplication;
 import de.softwareprojekt.bestbowl.beans.SecurityService;
 import de.softwareprojekt.bestbowl.beans.UserManager;
 import de.softwareprojekt.bestbowl.views.bookingViews.ClientSearchView;
 import de.softwareprojekt.bestbowl.views.bookingViews.ExtrasView;
-import de.softwareprojekt.bestbowl.views.managementViews.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -29,6 +32,8 @@ import java.util.Optional;
 import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
 
 /**
+ * Is the main template for all the other views and incorporates them as tabs
+ *
  * @author Marten Voß
  * @author Matija Kopschek
  * @author Max Ziller
@@ -40,6 +45,17 @@ public class MainView extends AppLayout implements AppShellConfigurator {
     private final Tabs menu;
     private final H1 viewTitle;
 
+    /**
+     * Constructor for the main view. Creates a new title for the View, Horizontal Layout for the header,
+     * in which the two buttons logout and shutdown are placed and a new menu
+     *
+     * @param securityService
+     * @param userManager
+     * @see #createHeaderContent()
+     * @see #createMenu()
+     * @see #createMenuItems()
+     * @see #createDrawerContent(Tabs)
+     */
     public MainView(@Autowired SecurityService securityService, @Autowired UserManager userManager) {
         this.securityService = securityService;
         this.userManager = userManager;
@@ -51,6 +67,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
 
         HorizontalLayout headerLayout = createHeaderContent();
         headerLayout.add(new Button("Shutdown", e -> startThread(BestBowlApplication::shutdown, "shutdown", true)));
+        headerLayout.add(createDarkModeToggle());
         if (securityService.getAuthenticatedUser() != null) {
             Button logoutButton = new Button("Logout", click -> securityService.logout());
             headerLayout.add(logoutButton);
@@ -61,6 +78,13 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         setDrawerOpened(userManager.getDrawerStateForUser(getAuthenticatedUserNameOrDefault()));
     }
 
+    /**
+     * Creates a new {@code Tab} Component
+     *
+     * @param text
+     * @param navigationTarget
+     * @return {@code tab}
+     */
     private static Tab createTab(String text, Class<? extends Component> navigationTarget) {
         final Tab tab = new Tab();
         tab.add(new RouterLink(text, navigationTarget));
@@ -69,25 +93,25 @@ public class MainView extends AppLayout implements AppShellConfigurator {
     }
 
     /**
-     * Add all views here to be added to the main side drawer
+     * All the Views are shown as a tab in the menu
      *
-     * @return an array of tabs
+     * @return {@code Tab[]}
      */
     private Tab[] createMenuItems() {
         return new Tab[]{
                 createTab("Kunde suchen", ClientSearchView.class),
                 createTab("Extras bestellen", ExtrasView.class),
-                createTab("Kundenverwaltung", ClientManagementView.class),
-                createTab("Vereinsverwaltung", AssociationManagementView.class),
-                createTab("Artikelverwaltung", ArticleManagementView.class),
-//                createTab("Buchungsverwaltung", AlleyBookingView.class),
-                createTab("Nutzerverwaltung", UserManagementView.class),
-                createTab("Bahnverwaltung", AlleyManagementView.class),
+                createTab("Verwaltungen", ManagementView.class),
                 createTab("Statistiken", StatisticsView.class),
                 createTab("Datenbank", DatabaseRedirectView.class)
         };
     }
 
+    /**
+     * A new Header is created, with the drawer toggle and the title
+     *
+     * @return {@code layout}
+     */
     private HorizontalLayout createHeaderContent() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setId("header");
@@ -102,6 +126,26 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         return layout;
     }
 
+    private Button createDarkModeToggle() {
+        Button button = new Button();
+        button.setIcon(VaadinIcon.LIGHTBULB.create());
+        button.addClickListener(e -> {
+            ThemeList themeList = UI.getCurrent().getElement().getThemeList();
+            if (themeList.contains(Lumo.DARK)) {
+                themeList.remove(Lumo.DARK);
+            } else {
+                themeList.add(Lumo.DARK);
+            }
+        });
+        return button;
+    }
+
+    /**
+     * Creates a new {@code VerticalLayout} for the menu
+     *
+     * @param menu
+     * @return {@code layout}
+     */
     private Component createDrawerContent(Tabs menu) {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
@@ -112,6 +156,12 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         return layout;
     }
 
+    /**
+     * Creates a new {@code Tabs} Component, which embeds all the Views as {@code Tabs}
+     *
+     * @return {@code Tabs}
+     * @see #createMenuItems()
+     */
     private Tabs createMenu() {
         final Tabs tabs = new Tabs();
         tabs.setOrientation(Tabs.Orientation.VERTICAL);
@@ -121,22 +171,41 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         return tabs;
     }
 
+    /**
+     * Marks the current open tab in the drawer
+     */
     @Override
     protected void afterNavigation() {
         super.afterNavigation();
-        getTabForComponent(getContent()).ifPresent(menu::setSelectedTab);
+        menu.setSelectedTab(getTabForComponent(getContent()).orElse(null));
         viewTitle.setText(getCurrentPageTitle());
     }
 
+    /**
+     * Returns the {@code Tab} for the given {@code Component}
+     *
+     * @param component
+     * @return {@code Optional<Tab>}
+     */
     private Optional<Tab> getTabForComponent(Component component) {
         return menu.getChildren().filter(tab -> ComponentUtil.getData(tab, Class.class).equals(component.getClass()))
                 .findFirst().map(Tab.class::cast);
     }
 
+    /**
+     * Returns the title of the current page
+     *
+     * @return {@code String}
+     */
     private String getCurrentPageTitle() {
         return getContent().getClass().getAnnotation(PageTitle.class).value();
     }
 
+    /**
+     * Returns the name of the authenticated user or the default
+     *
+     * @return {@code String}
+     */
     private String getAuthenticatedUserNameOrDefault() {
         UserDetails userDetails = securityService.getAuthenticatedUser();
         return userDetails == null ? "-" : userDetails.getUsername();

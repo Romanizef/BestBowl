@@ -29,8 +29,7 @@ import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.form.DrinkForm;
 import de.softwareprojekt.bestbowl.views.form.DrinkVariantForm;
 import de.softwareprojekt.bestbowl.views.form.FoodForm;
-import de.softwareprojekt.bestbowl.views.form.ShoeForm;
-import elemental.util.MapFromStringToString;
+import de.softwareprojekt.bestbowl.views.form.BowlingShoeForm;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -68,7 +67,7 @@ public class ArticleManagementView extends VerticalLayout {
     private FoodForm foodForm;
     private DrinkForm drinkForm;
     private DrinkVariantForm drinkVariantForm;
-    private ShoeForm shoeForm;
+    private BowlingShoeForm shoeForm;
 
     private FormLayout editShoeForm;
     private Food selectedFood = null;
@@ -240,7 +239,7 @@ public class ArticleManagementView extends VerticalLayout {
 
     private HorizontalLayout createShoeGridFormLayout() {
         HorizontalLayout layout = new HorizontalLayout();
-        shoeForm = new ShoeForm(shoeBinder);
+        shoeForm = new BowlingShoeForm(shoeBinder);
         layout.setSizeFull();
         shoeGrid = createShoeGrid();
         editShoeForm = shoeForm;
