@@ -15,14 +15,25 @@ import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.utils.PDFUtils;
 
 /**
+ * Creates an email
+ * 
  * @author Matija Kopschek
  */
 public class MailSenderUtil {
 
     protected Session mailSession; // Session which represents the connection with the E-Mail-Server
 
-    // Connecting with the Email-Server via smtpPortAddress and smtpHostAddress and
-    // Loging into your Email account
+    /**
+     * Connecting with the Email-Server via smtpPortAddress and smtpHostAddress and
+     * Loging into your Email account
+     * 
+     * @param smtpHostAddress
+     * @param smtpPortAddress
+     * @param username
+     * @param password
+     * @see #addProperties(String, String, Properties)
+     * @see #loginAuthentificator(String, String)
+     */
     public void login(String smtpHostAddress, String smtpPortAddress, String username, String password) {
         // List of properties that are important for the log in for the email server
         Properties properties = new Properties();
@@ -30,10 +41,15 @@ public class MailSenderUtil {
 
         Authenticator authenticator = loginAuthentificator(username, password);
         this.mailSession = Session.getInstance(properties, authenticator); // creating a new session and loging in
-        System.out.println("Successfull Login!");
     }
 
-    // Adding all necessary properties for a successful connection with SMTP-Server
+    /**
+     * Adding all necessary properties for a successful connection with SMTP-Server
+     * 
+     * @param smtpHostAddress
+     * @param smtpPortAddress
+     * @param properties
+     */
     private void addProperties(String smtpHostAddress, String smtpPortAddress, Properties properties) {
         properties.put("mail.smtp.host", smtpHostAddress); // smtp-server host name
         properties.put("mail.smtp.socketFactory.port", smtpPortAddress); // smtp-server port number
@@ -43,7 +59,13 @@ public class MailSenderUtil {
         properties.put("mail.smtp.port", smtpPortAddress); // smtp-server port number
     }
 
-    // Logging into the Mail-Server with user name and password
+    /**
+     * Logging into the Mail-Server with user name and password
+     * 
+     * @param username
+     * @param password
+     * @return {@code  Authenticator}
+     */
     private Authenticator loginAuthentificator(String username, String password) {
         Authenticator authenticator = new Authenticator() {
             @Override
@@ -54,8 +76,24 @@ public class MailSenderUtil {
         return authenticator;
     }
 
-    // Sending the Email with its contents (Subject, message) from the transmitter
-    // to the receiver
+    /**
+     * Sending the Email with its contents (Subject, message) from the transmitter
+     * to the receiver
+     * 
+     * @param transmitterMail
+     * @param transmitterName
+     * @param receiverAddresses
+     * @param subject
+     * @param mailText
+     * @param booking
+     * @throws MessagingException
+     * @throws IllegalStateException
+     * @throws UnsupportedEncodingException
+     * @see #headerSettings(MimeMessage)
+     * @see #messageSettings(String, String, String, String, String, MimeMessage,
+     *      BowlingAlleyBooking)
+     * @see #loginCheck()
+     */
     public void send(String transmitterMail, String transmitterName, String receiverAddresses, String subject,
             String mailText, BowlingAlleyBooking booking)
             throws MessagingException, IllegalStateException, UnsupportedEncodingException {
@@ -66,11 +104,24 @@ public class MailSenderUtil {
         headerSettings(mimeMessage);
         messageSettings(transmitterMail, transmitterName, receiverAddresses, subject, mailText, mimeMessage, booking);
 
-        System.out.println("E-Mail is being sent...");
         Transport.send(mimeMessage);
-        System.out.println("E-Mail sent");
     }
 
+    /**
+     * Sets all the important information for the Email (transmitter, receiver,
+     * subject, message, attachment)
+     * 
+     * @param transmitterMail
+     * @param transmitterName
+     * @param receiverAddresses
+     * @param subject
+     * @param mailText
+     * @param mimeMessage
+     * @param booking
+     * @return
+     * @throws MessagingException
+     * @throws UnsupportedEncodingException
+     */
     private Message messageSettings(String transmitterMail, String transmitterName, String receiverAddresses,
             String subject, String mailText, MimeMessage mimeMessage, BowlingAlleyBooking booking)
             throws MessagingException, UnsupportedEncodingException {
@@ -111,6 +162,13 @@ public class MailSenderUtil {
         return mimeMessage;
     }
 
+    /**
+     * Sets all the important information for the email header
+     * 
+     * @param mimeMessage
+     * @return {@code MimeMessage}
+     * @throws MessagingException
+     */
     private Message headerSettings(MimeMessage mimeMessage) throws MessagingException {
         mimeMessage.addHeader("Content-type", "text/HTML; charset=UTF-8"); // So the message gets displayed correctly in
                                                                            // HTML with UTF8 encoding (e.g. Umlaute)
@@ -119,7 +177,9 @@ public class MailSenderUtil {
         return mimeMessage;
     }
 
-    // Checking if your logged into your mailSession, login()-method executed
+    /**
+     * Checking if your logged into your mailSession, login()-method executed
+     */
     private void loginCheck() {
         if (mailSession == null) {
             throw new IllegalStateException("Please Log in!");
