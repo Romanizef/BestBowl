@@ -2,10 +2,12 @@ package de.softwareprojekt.bestbowl.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -13,8 +15,10 @@ import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
+import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.theme.lumo.Lumo;
 import de.softwareprojekt.bestbowl.BestBowlApplication;
 import de.softwareprojekt.bestbowl.beans.SecurityService;
 import de.softwareprojekt.bestbowl.beans.UserManager;
@@ -63,6 +67,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
 
         HorizontalLayout headerLayout = createHeaderContent();
         headerLayout.add(new Button("Shutdown", e -> startThread(BestBowlApplication::shutdown, "shutdown", true)));
+        headerLayout.add(createDarkModeToggle());
         if (securityService.getAuthenticatedUser() != null) {
             Button logoutButton = new Button("Logout", click -> securityService.logout());
             headerLayout.add(logoutButton);
@@ -119,6 +124,20 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         layout.add(viewTitle);
         layout.expand(viewTitle);
         return layout;
+    }
+
+    private Button createDarkModeToggle() {
+        Button button = new Button();
+        button.setIcon(VaadinIcon.LIGHTBULB.create());
+        button.addClickListener(e -> {
+            ThemeList themeList = UI.getCurrent().getElement().getThemeList();
+            if (themeList.contains(Lumo.DARK)) {
+                themeList.remove(Lumo.DARK);
+            } else {
+                themeList.add(Lumo.DARK);
+            }
+        });
+        return button;
     }
 
     /**
