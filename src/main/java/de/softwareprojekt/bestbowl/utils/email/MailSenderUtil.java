@@ -1,12 +1,18 @@
 package de.softwareprojekt.bestbowl.utils.email;
 
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.activation.FileDataSource;
 import jakarta.mail.*;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.*;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Properties;
+
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.utils.PDFUtils;
 
 /**
  * @author Matija Kopschek
@@ -15,7 +21,8 @@ public class MailSenderUtil {
 
     protected Session mailSession; // Session which represents the connection with the E-Mail-Server
 
-    // Connecting with the Email-Server via smtpPortAddress and smtpHostAddress and Loging into your Email account
+    // Connecting with the Email-Server via smtpPortAddress and smtpHostAddress and
+    // Loging into your Email account
     public void login(String smtpHostAddress, String smtpPortAddress, String username, String password) {
         // List of properties that are important for the log in for the email server
         Properties properties = new Properties();
@@ -31,7 +38,8 @@ public class MailSenderUtil {
         properties.put("mail.smtp.host", smtpHostAddress); // smtp-server host name
         properties.put("mail.smtp.socketFactory.port", smtpPortAddress); // smtp-server port number
         properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory"); // using ssl
-        properties.put("mail.smtp.auth", "true"); // smtp-server has an authentication process (see loginAuthenticator()-method)
+        properties.put("mail.smtp.auth", "true"); // smtp-server has an authentication process (see
+                                                  // loginAuthenticator()-method)
         properties.put("mail.smtp.port", smtpPortAddress); // smtp-server port number
     }
 
@@ -49,13 +57,14 @@ public class MailSenderUtil {
     // Sending the Email with its contents (Subject, message) from the transmitter
     // to the receiver
     public void send(String transmitterMail, String transmitterName, String receiverAddresses, String subject,
-                     String mailText) throws MessagingException, IllegalStateException, UnsupportedEncodingException {
+            String mailText, BowlingAlleyBooking booking)
+            throws MessagingException, IllegalStateException, UnsupportedEncodingException {
 
         loginCheck();
         // MimeMessage allows attachments to the Email (for the receipt.pdf)
         MimeMessage mimeMessage = new MimeMessage(mailSession);
         headerSettings(mimeMessage);
-        messageSettings(transmitterMail, transmitterName, receiverAddresses, subject, mailText, mimeMessage);
+        messageSettings(transmitterMail, transmitterName, receiverAddresses, subject, mailText, mimeMessage, booking);
 
         System.out.println("E-Mail is being sent...");
         Transport.send(mimeMessage);
@@ -63,24 +72,48 @@ public class MailSenderUtil {
     }
 
     private Message messageSettings(String transmitterMail, String transmitterName, String receiverAddresses,
-                                    String subject, String mailText, MimeMessage mimeMessage)
+            String subject, String mailText, MimeMessage mimeMessage, BowlingAlleyBooking booking)
             throws MessagingException, UnsupportedEncodingException {
 
-        mimeMessage.setFrom(new InternetAddress(transmitterMail, transmitterName)); // Emailaddress + name is being transmitted
-        mimeMessage.setReplyTo(InternetAddress.parse(transmitterMail, false)); // Transmitter information (senderMail + dont
-        // strict enforce RFC822 syntax)
+        BodyPart messageBodyPart = new MimeBodyPart();
+        Multipart multipart = new MimeMultipart();
+        BodyPart attachmentBodyPart = new MimeBodyPart();
+        // Emailaddress + name is being transmitted
+        mimeMessage.setFrom(new InternetAddress(transmitterMail, transmitterName));
+        // Transmitter information (senderMail + dont strict enforce RFC822 syntax)
+        mimeMessage.setReplyTo(InternetAddress.parse(transmitterMail, false));
+
         mimeMessage.setSubject(subject, "UTF-8"); // subject for email being set with UTF-8 encoding (e.g. Umlaute)
-        mimeMessage.setText(mailText, "UTF-8"); // message for email being set with UTF-8 encoding (e.g. Umlaute)
         mimeMessage.setSentDate(new Date()); // current Date
-        //TODO Anhänge
 
+        // Part 1 is message
+        messageBodyPart.setText(mailText);
+        multipart.addBodyPart(messageBodyPart);
 
-        mimeMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiverAddresses, false)); // Recipient is only one, no cc																							// person no cc
+        // Part 2 is attachment
+        // Create pdf from pdfUtils and add to multipart
+        PDFUtils pdfUtils = new PDFUtils();
+        try {
+            pdfUtils.createInvoicePdf(booking);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String filename = pdfUtils.getFilePath();
+        DataSource source = new FileDataSource(filename);
+        attachmentBodyPart.setDataHandler(new DataHandler(source));
+        attachmentBodyPart.setFileName(filename);
+        multipart.addBodyPart(attachmentBodyPart);
+
+        mimeMessage.setContent(multipart);
+        // Only one Recipient
+        mimeMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiverAddresses, false));
+        // no cc
         return mimeMessage;
     }
 
     private Message headerSettings(MimeMessage mimeMessage) throws MessagingException {
-        mimeMessage.addHeader("Content-type", "text/HTML; charset=UTF-8"); // So the message gets displayed correctly in HTML with UTF8 encoding (e.g. Umlaute)
+        mimeMessage.addHeader("Content-type", "text/HTML; charset=UTF-8"); // So the message gets displayed correctly in
+                                                                           // HTML with UTF8 encoding (e.g. Umlaute)
         mimeMessage.addHeader("format", "flowed"); // formatting
         mimeMessage.addHeader("Content-Transfer-Encoding", "8bit"); // character encoding
         return mimeMessage;
