@@ -10,7 +10,6 @@ import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
-import de.softwareprojekt.bestbowl.jpa.repositories.BookingHistoryRepository;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.extrasElements.DrinkPanel;
 import com.vaadin.flow.component.icon.Icon;
@@ -63,6 +62,7 @@ public final class InvoiceView extends VerticalLayout {
         return tabLayout;
     }
 
+    //TODO food und shoe
     public Component createCompleteInvoice() {
         VerticalLayout verticalLayout = new VerticalLayout();
         if (bowlingAlleyBooking != null) {
@@ -80,6 +80,7 @@ public final class InvoiceView extends VerticalLayout {
         return verticalLayout;
     }
 
+    //TODO food und shoe
     public Component createPartialInvoice() {
         VerticalLayout verticalLayout = new VerticalLayout();
         if (bowlingAlleyBooking != null) {

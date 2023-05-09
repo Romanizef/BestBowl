@@ -1,5 +1,6 @@
 package de.softwareprojekt.bestbowl.utils.email;
 
+import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 
@@ -18,7 +19,7 @@ public class MailSenderController {
      * @param booking
      */
     public void sendMail(BowlingAlleyBooking booking) {
-        BowlingCenter bowlingCenter = new BowlingCenter();
+        BowlingCenter bowlingCenter = Repos.getBowlingCenterRepository().getBowlingCenter();
 
         String senderMail = bowlingCenter.getEmail(); // The E-Mail of the transmitter
         String password = bowlingCenter.getPassword(); // specific password created for this program

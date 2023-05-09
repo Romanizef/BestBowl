@@ -94,6 +94,7 @@ public class AlleyManagementView extends VerticalLayout {
         grid.setWidth("75%");
         grid.setHeight("100%");
 
+        //TODO validator
         List<BowlingAlley> bowlingAlleyList = bowlingAlleyRepository.findAll();
         GridListDataView<BowlingAlley> dataView = grid.setItems(bowlingAlleyList);
         BowlingAlleyFilter associationFilter = new BowlingAlleyFilter(dataView);

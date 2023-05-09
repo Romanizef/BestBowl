@@ -17,8 +17,8 @@ public class AssociationValidator implements Validator<Association> {
         if (!isStringMinNChars(association.getName(), 2)) {
             return ValidationResult.error("Vereinsname muss länger als 2 Zeichen sein!");
         }
-        if (association.getDiscount() <= 0.0) {
-            return ValidationResult.error("Rabatt muss über 0% sein!");
+        if (association.getDiscount() < 0.0) {
+            return ValidationResult.error("Rabatt muss unter 0% sein!");
         }
         return ValidationResult.ok();
     }

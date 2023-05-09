@@ -28,13 +28,17 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.matches;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
- * Creates a view for all the associations to be created, managed and inactivated
+ * Creates a view for all the associations to be created, managed and
+ * inactivated
+ * 
  * @author Matija Kopschek
  * @author Marten Voß
  */
@@ -52,8 +56,9 @@ public class AssociationManagementView extends VerticalLayout {
 
     /**
      * Constructor for the AssociationManagementView.
-     * Instantiates the grid Layout, the new association button 
+     * Instantiates the grid Layout, the new association button
      * and the association repo
+     * 
      * @see #createNewAssociationButton()
      * @see #createGridLayout()
      * @param associationRepository
@@ -70,8 +75,9 @@ public class AssociationManagementView extends VerticalLayout {
 
     /**
      * Creates a new button for adding a new association.
-     * If the button is clicked the editing Layout becomes available 
+     * If the button is clicked the editing Layout becomes available
      * and a new association with all the needed data is added.
+     * 
      * @see #updateEditLayoutState()
      * @return {@code button}
      */
@@ -91,6 +97,7 @@ public class AssociationManagementView extends VerticalLayout {
 
     /**
      * Creates a new {@code HorizontalLayout} for the grid and the editing Layout
+     * 
      * @see #createGrid()
      * @see #createEditLayout()
      * @return {@code layout}
@@ -110,6 +117,7 @@ public class AssociationManagementView extends VerticalLayout {
      * {@code If} one of the gridlines is selected the editing Layout is refreshed
      * with all the data out of the currently selected line.
      * {@code Else} the editing Layout is reset to default.
+     * 
      * @see #updateEditLayoutState()
      * @see #resetEditLayout()
      * @return {@code grid}
@@ -127,7 +135,6 @@ public class AssociationManagementView extends VerticalLayout {
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setWidth("75%");
         grid.setHeight("100%");
-
         List<Association> associationList = associationRepository.findAll();
         GridListDataView<Association> dataView = grid.setItems(associationList);
         AssociationFilter associationFilter = new AssociationFilter(dataView);
@@ -159,10 +166,11 @@ public class AssociationManagementView extends VerticalLayout {
 
     /**
      * Creates a new {@code FormLayout} with two {@code TextFields} for
-     * the association name and the discount and also a Checkbox for 
+     * the association name and the discount and also a Checkbox for
      * the active option.
-     * Validates all Inputs and binds them with the association class in 
+     * Validates all Inputs and binds them with the association class in
      * the database.
+     * 
      * @return {@code layout}
      */
     private FormLayout createEditLayout() {
@@ -195,7 +203,9 @@ public class AssociationManagementView extends VerticalLayout {
     }
 
     /**
-     * Ceates a new {@code HorizontalLayout} for the {@code cancelButton} and {@code saveButton}
+     * Ceates a new {@code HorizontalLayout} for the {@code cancelButton} and
+     * {@code saveButton}
+     * 
      * @see #cancelButtonConfig(Button)
      * @see #saveButtonConfig(Button)
      * 
@@ -212,9 +222,10 @@ public class AssociationManagementView extends VerticalLayout {
     }
 
     /**
-     * Creates a {@code saveButton} for the editing Layout. 
-     * When pressed it shows a confirmation notification 
+     * Creates a {@code saveButton} for the editing Layout.
+     * When pressed it shows a confirmation notification
      * and saves all User input to the database
+     * 
      * @see #saveToDb()
      * @see #writeBean()
      * 
@@ -225,7 +236,17 @@ public class AssociationManagementView extends VerticalLayout {
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
         saveButton.addClickListener(clickEvent -> {
+            String uneditedName = Objects.requireNonNullElse(selectedAssociation.getName(), "");
+            Set<String> associationNameSet = associationRepository.findAllNames();
+            if (!editingNewAssociation) {
+                associationNameSet.remove(uneditedName);
+            }
             if (writeBean()) {
+                if (associationNameSet.contains(selectedAssociation.getName())) {
+                    validationErrorLabel.setText("Dieser Name wird bereits verwendet");
+                    selectedAssociation.setName(uneditedName);
+                    return;
+                }
                 saveToDb();
             }
         });
@@ -233,8 +254,9 @@ public class AssociationManagementView extends VerticalLayout {
     }
 
     /**
-     * Creates a {@code cancelButton} for the editing Layout. 
-     * When pressed it shows a confirmation notification and deletes all user input 
+     * Creates a {@code cancelButton} for the editing Layout.
+     * When pressed it shows a confirmation notification and deletes all user input
+     * 
      * @see #resetEditLayout()
      * 
      * @param cancelButton
@@ -258,12 +280,13 @@ public class AssociationManagementView extends VerticalLayout {
     }
 
     /**
-     * Deletes all the User input in the editing layout 
+     * Deletes all the User input in the editing layout
      * and resets it to default
      */
     private void resetEditLayout() {
         associationGrid.deselectAll();
         selectedAssociation = null;
+        editingNewAssociation = false;
 
         Association client = new Association();
         binder.readBean(client);
@@ -273,7 +296,7 @@ public class AssociationManagementView extends VerticalLayout {
     }
 
     /**
-     * If the input is missing or wrong this layout 
+     * If the input is missing or wrong this layout
      * with the {@code validationErrorLabel} is portrayed
      * 
      * @return {@code validationLabelLayout}
@@ -293,7 +316,8 @@ public class AssociationManagementView extends VerticalLayout {
     }
 
     /**
-     * Writes changes from the bound fields to the given bean if all validators pass.
+     * Writes changes from the bound fields to the given bean if all validators
+     * pass.
      */
     private boolean writeBean() {
         try {
@@ -330,6 +354,7 @@ public class AssociationManagementView extends VerticalLayout {
 
         /**
          * Constructor for AssociationFilter
+         * 
          * @param dataView
          */
         public AssociationFilter(GridListDataView<Association> dataView) {
@@ -339,8 +364,10 @@ public class AssociationManagementView extends VerticalLayout {
 
         /**
          * Cheking if grid filter row names match association-class fields
+         * 
          * @param association
-         * @return {@code matchesId} {@code matchesName} {@code matchesDiscount} {@code matchesActive}
+         * @return {@code matchesId} {@code matchesName} {@code matchesDiscount}
+         *         {@code matchesActive}
          */
         public boolean test(Association association) {
             boolean matchesId = matches(String.valueOf(association.getId()), id);
@@ -352,6 +379,7 @@ public class AssociationManagementView extends VerticalLayout {
 
         /**
          * Setter for association id
+         * 
          * @param id
          */
         public void setId(String id) {
@@ -361,6 +389,7 @@ public class AssociationManagementView extends VerticalLayout {
 
         /**
          * Setter for association name
+         * 
          * @param name
          */
         public void setName(String name) {
@@ -370,6 +399,7 @@ public class AssociationManagementView extends VerticalLayout {
 
         /**
          * Setter for association discount
+         * 
          * @param discount
          */
         public void setDiscount(String discount) {
@@ -379,6 +409,7 @@ public class AssociationManagementView extends VerticalLayout {
 
         /**
          * Setter for active setting of association
+         * 
          * @param active
          */
         public void setActive(Boolean active) {

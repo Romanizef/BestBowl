@@ -5,11 +5,14 @@ import jakarta.activation.DataSource;
 import jakarta.activation.FileDataSource;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
+import jakarta.mail.util.ByteArrayDataSource;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Properties;
+
+import com.helger.commons.mime.MimeType;
 
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.utils.PDFUtils;
@@ -143,16 +146,9 @@ public class MailSenderUtil {
 
         // Part 2 is attachment
         // Create pdf from pdfUtils and add to multipart
-        PDFUtils pdfUtils = new PDFUtils();
-        try {
-            pdfUtils.createInvoicePdf(booking);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        String filename = pdfUtils.getFilePath();
-        DataSource source = new FileDataSource(filename);
+        DataSource source = new ByteArrayDataSource(PDFUtils.createInvoicePdf(booking),  "application/pdf");
         attachmentBodyPart.setDataHandler(new DataHandler(source));
-        attachmentBodyPart.setFileName(filename);
+        attachmentBodyPart.setFileName("rechnung.pdf");
         multipart.addBodyPart(attachmentBodyPart);
 
         mimeMessage.setContent(multipart);
