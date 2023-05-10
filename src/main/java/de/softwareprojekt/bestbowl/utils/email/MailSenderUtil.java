@@ -103,12 +103,12 @@ public class MailSenderUtil {
      * @throws IllegalStateException
      * @throws UnsupportedEncodingException
      * @see #headerSettings(MimeMessage)
-     * @see #invoiceMessageSettings(String, String, String, String, String,
+     * @see #attachmentMailSettings(String, String, String, String, String,
      *      MimeMessage,
      *      BowlingAlleyBooking)
      * @see #loginCheck()
      */
-    public void sendInvoice(String transmitterMail, String transmitterName, String receiverAddresses, String subject,
+    public void sendAttachmentMail(String transmitterMail, String transmitterName, String receiverAddress, String subject,
             String mailText, BowlingAlleyBooking booking)
             throws MessagingException, IllegalStateException, UnsupportedEncodingException {
 
@@ -116,7 +116,7 @@ public class MailSenderUtil {
         // MimeMessage allows attachments to the Email (for the receipt.pdf)
         MimeMessage mimeMessage = new MimeMessage(mailSession);
         headerSettings(mimeMessage);
-        invoiceMessageSettings(transmitterMail, transmitterName, receiverAddresses, subject, mailText, mimeMessage,
+        attachmentMailSettings(transmitterMail, transmitterName, receiverAddress, subject, mailText, mimeMessage,
                 booking);
 
         Transport.send(mimeMessage);
@@ -138,22 +138,20 @@ public class MailSenderUtil {
      * @throws IllegalStateException
      * @throws UnsupportedEncodingException
      * @see #headerSettings(MimeMessage)
-     * @see #invoiceMessageSettings(String, String, String, String, String,
+     * @see #attachmentMailSettings(String, String, String, String, String,
      *      MimeMessage,
      *      BowlingAlleyBooking)
      * @see #loginCheck()
      */
-    public void sendBookingConfirmation(String transmitterMail, String transmitterName, String receiverAddresses,
-            String subject,
-            String mailText, BowlingAlleyBooking booking)
+    public void sendMessageOnlyMail(String transmitterMail, String transmitterName, String receiverAddress,
+            String subject, String mailText)
             throws MessagingException, IllegalStateException, UnsupportedEncodingException {
 
         loginCheck();
         MimeMessage mimeMessage = new MimeMessage(mailSession);
         headerSettings(mimeMessage);
-        bookingConfirmationMessageSettings(transmitterMail, transmitterName, receiverAddresses, subject, mailText,
-                mimeMessage,
-                booking);
+        messageOnlyMailSettings(transmitterMail, transmitterName, receiverAddress, subject, mailText,
+                mimeMessage);
 
         Transport.send(mimeMessage);
     }
@@ -173,21 +171,19 @@ public class MailSenderUtil {
      * @throws MessagingException
      * @throws UnsupportedEncodingException
      */
-    private Message bookingConfirmationMessageSettings(String transmitterMail, String transmitterName,
-            String receiverAddresses, String subject, String mailText, MimeMessage mimeMessage,
-            BowlingAlleyBooking booking) throws MessagingException, UnsupportedEncodingException {
+    private Message messageOnlyMailSettings(String transmitterMail, String transmitterName,
+            String receiverAddresses, String subject, String mailText, MimeMessage mimeMessage)
+            throws MessagingException, UnsupportedEncodingException {
 
-        messageBodyPart = new MimeBodyPart();
         // Emailaddress + name is being transmitted
         mimeMessage.setFrom(new InternetAddress(transmitterMail, transmitterName));
         // Transmitter information (senderMail + dont strict enforce RFC822 syntax)
         mimeMessage.setReplyTo(InternetAddress.parse(transmitterMail, false));
-
         mimeMessage.setSubject(subject, "UTF-8"); // subject for email being set with UTF-8 encoding (e.g. Umlaute)
         mimeMessage.setSentDate(new Date()); // current Date
-
-        // Part 1 is message
-        messageBodyPart.setText(mailText);
+        mimeMessage.setText(mailText, "UTF-8");
+        // Only one Recipient. no cc
+        mimeMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiverAddresses, false));
         return mimeMessage;
     }
 
@@ -207,7 +203,7 @@ public class MailSenderUtil {
      * @throws MessagingException
      * @throws UnsupportedEncodingException
      */
-    private Message invoiceMessageSettings(String transmitterMail, String transmitterName, String receiverAddresses,
+    private Message attachmentMailSettings(String transmitterMail, String transmitterName, String receiverAddresses,
             String subject, String mailText, MimeMessage mimeMessage, BowlingAlleyBooking booking)
             throws MessagingException, UnsupportedEncodingException {
 
