@@ -21,6 +21,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyBookingRepository;
 import de.softwareprojekt.bestbowl.utils.AlleyBookingChecker;
 import de.softwareprojekt.bestbowl.utils.Utils;
+import de.softwareprojekt.bestbowl.utils.email.MailSenderService;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.PermitAll;
@@ -61,9 +62,11 @@ public class BowlingAlleyBookingView extends VerticalLayout {
     private BowlingAlleyBooking latestBooking = null;
     private long gridLowerBound;
     private long gridUpperBound;
+    private MailSenderService mailSenderController = new MailSenderService();
 
     @Autowired
-    public BowlingAlleyBookingView(BowlingAlleyBookingRepository bowlingAlleyBookingRepository, AuthenticationContext authenticationContext) {
+    public BowlingAlleyBookingView(BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
+            AuthenticationContext authenticationContext) {
         this.bowlingAlleyBookingRepository = bowlingAlleyBookingRepository;
         this.authenticationContext = authenticationContext;
         setSizeFull();
@@ -113,7 +116,8 @@ public class BowlingAlleyBookingView extends VerticalLayout {
 
         checkButton.addClickListener(e -> {
             if (verifyTime()) {
-                alleyBookingChecker.setTimeInfo(datePicker.getValue(), timePicker.getValue(), (int) (durationCB.getValue().hours() * 60));
+                alleyBookingChecker.setTimeInfo(datePicker.getValue(), timePicker.getValue(),
+                        (int) (durationCB.getValue().hours() * 60));
                 gridLowerBound = alleyBookingChecker.getStartTime();
                 gridUpperBound = alleyBookingChecker.getEndTime();
                 if (alleyBookingChecker.checkAvailability()) {
@@ -125,7 +129,9 @@ public class BowlingAlleyBookingView extends VerticalLayout {
             }
         });
         wholeDayButton.addClickListener(e -> {
-            gridLowerBound = Utils.setLocalDateTimeToDayStart(LocalDateTime.of(datePicker.getValue(), timePicker.getValue())).atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L;
+            gridLowerBound = Utils
+                    .setLocalDateTimeToDayStart(LocalDateTime.of(datePicker.getValue(), timePicker.getValue()))
+                    .atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L;
             gridUpperBound = gridLowerBound + java.time.Duration.ofDays(1).toMillis();
             updateGridItems();
         });
@@ -140,11 +146,13 @@ public class BowlingAlleyBookingView extends VerticalLayout {
 
         button.addClickListener(e -> {
             if (verifyTime()) {
-                alleyBookingChecker.setTimeInfo(datePicker.getValue(), timePicker.getValue(), (int) (durationCB.getValue().hours() * 60));
+                alleyBookingChecker.setTimeInfo(datePicker.getValue(), timePicker.getValue(),
+                        (int) (durationCB.getValue().hours() * 60));
                 gridLowerBound = alleyBookingChecker.getStartTime();
                 gridUpperBound = alleyBookingChecker.getEndTime();
                 if ((latestBooking = alleyBookingChecker.book()) != null) {
                     showNotification("Bahn Nr. " + alleyBookingChecker.getAvailableAlleyId() + " gebucht");
+                    mailSenderController.sendBookingConfirmationMail(latestBooking);
                 }
                 updateGridItems();
                 updateLabelAndButtons();
@@ -166,6 +174,7 @@ public class BowlingAlleyBookingView extends VerticalLayout {
 
         cancelBookingButton.addClickListener(e -> {
             if (latestBooking != null) {
+                mailSenderController.sendBookingCancelationMail(latestBooking);
                 latestBooking.setActive(false);
                 bowlingAlleyBookingRepository.save(latestBooking);
                 latestBooking = null;
@@ -192,7 +201,8 @@ public class BowlingAlleyBookingView extends VerticalLayout {
     }
 
     private void updateGridItems() {
-        bookingGrid.setItems(bowlingAlleyBookingRepository.findAllByTimePeriodsOverlapping(gridLowerBound, gridUpperBound));
+        bookingGrid.setItems(
+                bowlingAlleyBookingRepository.findAllByTimePeriodsOverlapping(gridLowerBound, gridUpperBound));
     }
 
     private Button createExtrasButton() {
@@ -219,7 +229,8 @@ public class BowlingAlleyBookingView extends VerticalLayout {
             checkButton.setEnabled(false);
             bookButton.setEnabled(false);
         } else {
-            clientHeader.setText("Bahn buchen für: " + selectedClient.getFirstName() + " " + selectedClient.getLastName());
+            clientHeader
+                    .setText("Bahn buchen für: " + selectedClient.getFirstName() + " " + selectedClient.getLastName());
             checkButton.setEnabled(true);
             bookButton.setEnabled(true);
         }
@@ -251,7 +262,7 @@ public class BowlingAlleyBookingView extends VerticalLayout {
         if (selectedStartTime.isAfter(currentTime)) {
             return true;
         } else {
-            //admin can book in the past for testing purposes
+            // admin can book in the past for testing purposes
             if (isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
                 return true;
             }

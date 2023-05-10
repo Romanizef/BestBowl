@@ -18,7 +18,9 @@ import java.util.regex.Pattern;
 public class Utils {
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
     private static final File WORKING_DIR_ROOT = new File("");
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", Pattern.CASE_INSENSITIVE);
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?",
+            Pattern.CASE_INSENSITIVE);
 
     private Utils() {
     }
@@ -120,7 +122,8 @@ public class Utils {
     }
 
     /**
-     * Checks if the value contains any of the search terms and if so removes that search term from the list
+     * Checks if the value contains any of the search terms and if so removes that
+     * search term from the list
      *
      * @param value       String that is checked
      * @param searchTerms list of search terms
@@ -157,6 +160,14 @@ public class Utils {
     }
 
     /**
+     * @param ms unix timestamp
+     * @return date string with day, month, year
+     */
+    public static String toDateOnlyString(Long ms) {
+        return toDateString(ms, "dd.MM.yyyy");
+    }
+
+    /**
      * @param ms     unix timestamp
      * @param format format of the date parsable by SimpleDateFormat
      * @return formatted date string
@@ -181,7 +192,8 @@ public class Utils {
     }
 
     /**
-     * @return a LocalDateTime of the current time with the minute rounded to the next 1/4 hour
+     * @return a LocalDateTime of the current time with the minute rounded to the
+     *         next 1/4 hour
      */
     public static LocalDateTime getCurrentDateTimeRounded() {
         LocalDateTime localDateTime = LocalDateTime.now().withNano(0).withSecond(0);

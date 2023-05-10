@@ -1,18 +1,33 @@
 package de.softwareprojekt.bestbowl.views;
 
+import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
+import static de.softwareprojekt.bestbowl.utils.Utils.matches;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderInteger;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderString;
+
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.SortDirection;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -22,18 +37,6 @@ import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.utils.PDFUtils;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import jakarta.annotation.security.RolesAllowed;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-
-import org.apache.pdfbox.pdmodel.PDDocument;
-
-import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
 
 /**
  * Creates a view for all bookings to be displayed and downloaded
@@ -46,16 +49,17 @@ import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
 public class StatisticsView extends VerticalLayout {
     private Grid<Statistic> statisticGrid;
     private Statistic selectedStatistic = null;
-    private BowlingAlleyBooking booking = new BowlingAlleyBooking();
+    private BowlingAlleyBooking booking;
     private TextField searchField;
-    private PDFUtils pdfUtils;
 
+    /**
+     * 
+     */
     public StatisticsView() {
         setSizeFull();
-        pdfUtils = new PDFUtils();
         Component searchComponent = createSearchComponent();
         HorizontalLayout gridLayout = createGridLayout();
-        add(searchComponent, gridLayout, createDownloadAnchor());
+        add(searchComponent, gridLayout);
     }
 
     private Component createSearchComponent() {
@@ -117,71 +121,123 @@ public class StatisticsView extends VerticalLayout {
      * @return
      */
     private Grid<Statistic> createGrid() {
+        // TODO grid befüllen
         Grid<Statistic> grid = new Grid<>(Statistic.class);
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         grid.removeAllColumns();
-        grid.addColumn(Statistic::id).setHeader("ID");
-        grid.addColumn(Statistic::clientID).setHeader("KundenID");
-        grid.addColumn(Statistic::clientLastName).setHeader("Nachname");
-        grid.addColumn(Statistic::date).setHeader("Datum");
-        grid.addColumn(Statistic::total).setHeader("Summe");
+
+        /* Grid.Column<Statistic> idColumn = grid.addColumn(new ComponentRenderer<>(statistic -> {
+            HorizontalLayout horizontalLayout = new HorizontalLayout();
+            horizontalLayout.add(createDownloadAnchor(), new Label(String.valueOf(statistic.id())));
+            return horizontalLayout;
+        })).setHeader("Rechnungsnummer");
+        Grid.Column<Statistic> clientIDColumn = grid.addColumn("clientID").setHeader("Kundennummer");
+        Grid.Column<Statistic> clientLastNameColumn = grid.addColumn("clientLastName").setHeader("Kundennachname");
+        Grid.Column<Statistic> dateColumn = grid.addColumn("date").setHeader("Datum");
+        Grid.Column<Statistic> totalColumn = grid.addColumn("total").setHeader("Summe");
+        grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setSizeFull();
+
+        List<Statistic> statisticList = new ArrayList<>();
+        GridListDataView<Statistic> dataView = grid.setItems(statisticList);
+        StatisticFilter statisticFilter = new StatisticFilter(dataView);
+        grid.getHeaderRows().clear();
+        HeaderRow headerRow = grid.appendHeaderRow();
+        headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", statisticFilter::setId));
+        headerRow.getCell(clientIDColumn)
+                .setComponent(createFilterHeaderInteger("Kundernummer", statisticFilter::setClientID));
+        headerRow.getCell(clientLastNameColumn)
+                .setComponent(createFilterHeaderString("Nachname", statisticFilter::setClientLastName));
+        headerRow.getCell(dateColumn).setComponent(createFilterHeaderString("Datum", statisticFilter::setDate));
+        headerRow.getCell(totalColumn)
+                .setComponent(createFilterHeaderString("Summe", statisticFilter::setTotal));
+
         grid.addSelectionListener(e -> {
             if (e.isFromClient()) {
                 Optional<Statistic> optionalStatistic = e.getFirstSelectedItem();
                 selectedStatistic = optionalStatistic.orElse(null);
             }
-        });
+        }); */
         return grid;
     }
 
-    /*
-     * private Button createDownloadAsPDFButton() {
-     * Button pdfButton = new Button("PDF");
-     * pdfButton.setIcon(new Icon(VaadinIcon.DOWNLOAD));
-     * pdfButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY,
-     * ButtonVariant.LUMO_LARGE);
-     * pdfButton.addClickListener(e -> {
-     * try {
-     * PDDocument pdfDocument = pdfUtils.createInvoicePdf(booking);
-     * StreamResource streamResource = new StreamResource("test.pdf",
-     * () -> getClass().getResourceAsStream("\rechnungs.pdf"));
-     * Anchor anchor = new Anchor(streamResource, "Download PDF");
-     * anchor.getElement().setAttribute("download", "downloaded-other-name.pdf");
-     * add(anchor);
-     * 
-     * // TODO pdf erstellen, zwischenspeichern, herauslesen, downloaden und löschen
-     * 
-     * } catch (IOException e1) {
-     * e1.printStackTrace();
-     * }
-     * });
-     * return pdfButton;
-     * }
-     */
-
     private Component createDownloadAnchor() {
-        createPDF();
-        StreamResource streamResource = new StreamResource("rechnungs.pdf",
-                () -> getClass().getResourceAsStream("\rechnungs.pdf"));
-        Anchor anchor = new Anchor(streamResource, "Download PDF");
-        anchor.getElement().setAttribute("download", "test.pdf");
-        // add(anchor);
+        Button pdfButton = new Button(new Icon(VaadinIcon.DOWNLOAD));
 
-        // TODO pdf erstellen, zwischenspeichern, herauslesen, downloaden und löschen
+        byte[] pdfContent = PDFUtils.createInvoicePdf(booking);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(pdfContent);
+
+        StreamResource streamResource = new StreamResource("rechnungs.pdf", () -> byteArrayInputStream);
+        Anchor anchor = new Anchor(streamResource, "Download PDF");
+        anchor.add(pdfButton);
+        anchor.onEnabledStateChanged(isAttached());
+        anchor.removeAll();
+        anchor.getElement().setAttribute("download", "test.pdf");
 
         return anchor;
     }
 
-    private void createPDF() {
-        try {
-            pdfUtils.createInvoicePdf(booking);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private record Statistic(int id, int clientID, String clientLastName, Date date, double total) {
+
     }
 
-    private record Statistic(int id, int clientID, String clientLastName, Date date, double total) {
+    /**
+     * Creates filters for the {@code Statistic} objects.
+     */
+    private static class StatisticFilter {
+        private final GridListDataView<Statistic> dataView;
+        private String id;
+        private String clientID;
+        private String clientLastName;
+        private String date;
+        private String total;
+
+        /**
+         * Constructor for the {@code StatisticFilter}.
+         *
+         * @param dataView
+         */
+        public StatisticFilter(GridListDataView<Statistic> dataView) {
+            this.dataView = dataView;
+            this.dataView.addFilter(this::test);
+        }
+
+        /**
+         * Tests if the {@code Statistic} attributes match the filter attributes.
+         *
+         * @param statistic
+         * @return {@code boolean}
+         */
+        public boolean test(Statistic statistic) {
+            boolean matchesId = matches(String.valueOf(statistic.id()), id);
+            boolean matchesClientID = matches(String.valueOf(statistic.clientID()), clientID);
+            boolean matchesClientLastName = matches(statistic.clientLastName(), clientLastName);
+            boolean matchesDate = matches(String.valueOf(statistic.date()), date);
+            boolean matchesTotal = matches(String.valueOf(statistic.total()), total);
+            return matchesId && matchesClientID && matchesClientLastName && matchesDate
+                    && matchesTotal;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+            dataView.refreshAll();
+        }
+
+        public void setClientID(String clientID) {
+            this.clientID = clientID;
+        }
+
+        public void setClientLastName(String clientLastName) {
+            this.clientLastName = clientLastName;
+        }
+
+        public void setDate(String date) {
+            this.date = date;
+        }
+
+        public void setTotal(String total) {
+            this.total = total;
+        }
     }
 }

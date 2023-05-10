@@ -13,7 +13,6 @@ public class Repos {
     private static Repos instance;
     private AddressRepository addressRepository;
     private AssociationRepository associationRepository;
-    private BookingHistoryRepository bookingHistoryRepository;
     private BowlingAlleyBookingRepository bowlingAlleyBookingRepository;
     private BowlingAlleyRepository bowlingAlleyRepository;
     private BowlingCenterRepository bowlingCenterRepository;
@@ -45,14 +44,6 @@ public class Repos {
         this.associationRepository = associationRepository;
     }
 
-    public static BookingHistoryRepository getBookingHistoryRepository() {
-        return instance.bookingHistoryRepository;
-    }
-
-    @Autowired
-    public void setBookingHistoryRepository(BookingHistoryRepository bookingHistoryRepository) {
-        this.bookingHistoryRepository = bookingHistoryRepository;
-    }
 
     public static BowlingAlleyBookingRepository getBowlingAlleyBookingRepository() {
         return instance.bowlingAlleyBookingRepository;

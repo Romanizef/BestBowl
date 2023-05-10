@@ -25,6 +25,8 @@ public class User implements Serializable {
     private String securityQuestionAnswer;
     private String role;
 
+    private boolean darkMode;
+
     private boolean active;
 
     public User() {
@@ -38,6 +40,7 @@ public class User implements Serializable {
         this.encodedPassword = other.encodedPassword;
         this.securityQuestionAnswer = other.securityQuestionAnswer;
         this.role = other.role;
+        this.darkMode = other.darkMode;
         this.active = other.active;
     }
 
@@ -48,6 +51,7 @@ public class User implements Serializable {
         this.encodedPassword = other.encodedPassword;
         this.securityQuestionAnswer = other.securityQuestionAnswer;
         this.role = other.role;
+        this.darkMode = other.darkMode;
         this.active = other.active;
     }
 
@@ -97,6 +101,14 @@ public class User implements Serializable {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public boolean isDarkMode() {
+        return darkMode;
+    }
+
+    public void setDarkMode(boolean darkMode) {
+        this.darkMode = darkMode;
     }
 
     public boolean isActive() {

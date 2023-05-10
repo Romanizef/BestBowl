@@ -9,10 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Marten Voß
@@ -64,6 +61,10 @@ public class UserManager {
         user.setSecurityQuestionAnswer(securityQuestionAnswer);
         user.setEmail(email);
         user.setRole(userRole);
+
+        Optional<User> userWithSameName = Repos.getUserRepository().findByName(user.getName());
+        userWithSameName.ifPresent(Repos.getUserRepository()::delete);
+
         Repos.getUserRepository().save(user);
         updateUsersFromDb();
     }
@@ -96,6 +97,19 @@ public class UserManager {
 
     public void toggleDrawerStateForUser(String userName) {
         userDrawerStateMap.put(userName, !getDrawerStateForUser(userName));
+    }
+
+    public boolean getDarkModeStateForUser(String userName) {
+        Optional<User> user = Repos.getUserRepository().findByName(userName);
+        return user.map(User::isDarkMode).orElse(false);
+    }
+
+    public void setDarkModeStateForUser(String userName, boolean darkMode) {
+        Optional<User> user = Repos.getUserRepository().findByName(userName);
+        user.ifPresent(u -> {
+            u.setDarkMode(darkMode);
+            Repos.getUserRepository().save(u);
+        });
     }
 
     @Autowired

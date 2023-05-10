@@ -24,6 +24,7 @@ public class BowlingAlleyBooking implements Serializable {
     private BowlingAlley bowlingAlley;
     private long startTime;
     private long endTime;
+    private boolean completed;
 
     private boolean active;
 
@@ -81,5 +82,13 @@ public class BowlingAlleyBooking implements Serializable {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
     }
 }
