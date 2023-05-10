@@ -1,21 +1,26 @@
 package de.softwareprojekt.bestbowl.utils.email;
 
-import jakarta.activation.DataHandler;
-import jakarta.activation.DataSource;
-import jakarta.activation.FileDataSource;
-import jakarta.mail.*;
-import jakarta.mail.internet.*;
-import jakarta.mail.util.ByteArrayDataSource;
-
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Properties;
 
-import com.helger.commons.mime.MimeType;
-
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.utils.PDFUtils;
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.mail.Authenticator;
+import jakarta.mail.BodyPart;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.util.ByteArrayDataSource;
 
 /**
  * Creates an email
@@ -25,6 +30,9 @@ import de.softwareprojekt.bestbowl.utils.PDFUtils;
 public class MailSenderUtil {
 
     protected Session mailSession; // Session which represents the connection with the E-Mail-Server
+    private BodyPart messageBodyPart;
+    private Multipart multipart;
+    private BodyPart attachmentBodyPart;
 
     /**
      * Connecting with the Email-Server via smtpPortAddress and smtpHostAddress and
@@ -80,8 +88,10 @@ public class MailSenderUtil {
     }
 
     /**
-     * Sending the Email with its contents (Subject, message) from the transmitter
-     * to the receiver
+     * Sending the Email with its contents (Subject, message etc.) from the
+     * transmitter
+     * to the receiver. This sending Method sends an attachment of the receipt to
+     * the client.
      * 
      * @param transmitterMail
      * @param transmitterName
@@ -93,11 +103,12 @@ public class MailSenderUtil {
      * @throws IllegalStateException
      * @throws UnsupportedEncodingException
      * @see #headerSettings(MimeMessage)
-     * @see #messageSettings(String, String, String, String, String, MimeMessage,
+     * @see #invoiceMessageSettings(String, String, String, String, String,
+     *      MimeMessage,
      *      BowlingAlleyBooking)
      * @see #loginCheck()
      */
-    public void send(String transmitterMail, String transmitterName, String receiverAddresses, String subject,
+    public void sendInvoice(String transmitterMail, String transmitterName, String receiverAddresses, String subject,
             String mailText, BowlingAlleyBooking booking)
             throws MessagingException, IllegalStateException, UnsupportedEncodingException {
 
@@ -105,13 +116,84 @@ public class MailSenderUtil {
         // MimeMessage allows attachments to the Email (for the receipt.pdf)
         MimeMessage mimeMessage = new MimeMessage(mailSession);
         headerSettings(mimeMessage);
-        messageSettings(transmitterMail, transmitterName, receiverAddresses, subject, mailText, mimeMessage, booking);
+        invoiceMessageSettings(transmitterMail, transmitterName, receiverAddresses, subject, mailText, mimeMessage,
+                booking);
 
         Transport.send(mimeMessage);
     }
 
     /**
-     * Sets all the important information for the Email (transmitter, receiver,
+     * Sending the Email with its contents (Subject, message etc.) from the
+     * transmitter
+     * to the receiver. This sending Method sends an attachment of the receipt to
+     * the client.
+     * 
+     * @param transmitterMail
+     * @param transmitterName
+     * @param receiverAddresses
+     * @param subject
+     * @param mailText
+     * @param booking
+     * @throws MessagingException
+     * @throws IllegalStateException
+     * @throws UnsupportedEncodingException
+     * @see #headerSettings(MimeMessage)
+     * @see #invoiceMessageSettings(String, String, String, String, String,
+     *      MimeMessage,
+     *      BowlingAlleyBooking)
+     * @see #loginCheck()
+     */
+    public void sendBookingConfirmation(String transmitterMail, String transmitterName, String receiverAddresses,
+            String subject,
+            String mailText, BowlingAlleyBooking booking)
+            throws MessagingException, IllegalStateException, UnsupportedEncodingException {
+
+        loginCheck();
+        MimeMessage mimeMessage = new MimeMessage(mailSession);
+        headerSettings(mimeMessage);
+        bookingConfirmationMessageSettings(transmitterMail, transmitterName, receiverAddresses, subject, mailText,
+                mimeMessage,
+                booking);
+
+        Transport.send(mimeMessage);
+    }
+
+    /**
+     * Sets all the important information for the booking confirmation Email
+     * (transmitter, receiver, subject, message, attachment)
+     * 
+     * @param transmitterMail
+     * @param transmitterName
+     * @param receiverAddresses
+     * @param subject
+     * @param mailText
+     * @param mimeMessage
+     * @param booking
+     * @return {@code Message}
+     * @throws MessagingException
+     * @throws UnsupportedEncodingException
+     */
+    private Message bookingConfirmationMessageSettings(String transmitterMail, String transmitterName,
+            String receiverAddresses, String subject, String mailText, MimeMessage mimeMessage,
+            BowlingAlleyBooking booking) throws MessagingException, UnsupportedEncodingException {
+
+        messageBodyPart = new MimeBodyPart();
+        // Emailaddress + name is being transmitted
+        mimeMessage.setFrom(new InternetAddress(transmitterMail, transmitterName));
+        // Transmitter information (senderMail + dont strict enforce RFC822 syntax)
+        mimeMessage.setReplyTo(InternetAddress.parse(transmitterMail, false));
+
+        mimeMessage.setSubject(subject, "UTF-8"); // subject for email being set with UTF-8 encoding (e.g. Umlaute)
+        mimeMessage.setSentDate(new Date()); // current Date
+
+        // Part 1 is message
+        messageBodyPart.setText(mailText);
+        return mimeMessage;
+    }
+
+    /**
+     * Sets all the important information for the invoice Email (transmitter,
+     * receiver,
      * subject, message, attachment)
      * 
      * @param transmitterMail
@@ -121,17 +203,17 @@ public class MailSenderUtil {
      * @param mailText
      * @param mimeMessage
      * @param booking
-     * @return
+     * @return {@code Message}
      * @throws MessagingException
      * @throws UnsupportedEncodingException
      */
-    private Message messageSettings(String transmitterMail, String transmitterName, String receiverAddresses,
+    private Message invoiceMessageSettings(String transmitterMail, String transmitterName, String receiverAddresses,
             String subject, String mailText, MimeMessage mimeMessage, BowlingAlleyBooking booking)
             throws MessagingException, UnsupportedEncodingException {
 
-        BodyPart messageBodyPart = new MimeBodyPart();
-        Multipart multipart = new MimeMultipart();
-        BodyPart attachmentBodyPart = new MimeBodyPart();
+        messageBodyPart = new MimeBodyPart();
+        multipart = new MimeMultipart();
+        attachmentBodyPart = new MimeBodyPart();
         // Emailaddress + name is being transmitted
         mimeMessage.setFrom(new InternetAddress(transmitterMail, transmitterName));
         // Transmitter information (senderMail + dont strict enforce RFC822 syntax)
@@ -146,7 +228,7 @@ public class MailSenderUtil {
 
         // Part 2 is attachment
         // Create pdf from pdfUtils and add to multipart
-        DataSource source = new ByteArrayDataSource(PDFUtils.createInvoicePdf(booking),  "application/pdf");
+        DataSource source = new ByteArrayDataSource(PDFUtils.createInvoicePdf(booking), "application/pdf");
         attachmentBodyPart.setDataHandler(new DataHandler(source));
         attachmentBodyPart.setFileName("rechnung.pdf");
         multipart.addBodyPart(attachmentBodyPart);
