@@ -44,7 +44,6 @@ public class Repos {
         this.associationRepository = associationRepository;
     }
 
-
     public static BowlingAlleyBookingRepository getBowlingAlleyBookingRepository() {
         return instance.bowlingAlleyBookingRepository;
     }

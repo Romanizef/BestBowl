@@ -2,6 +2,7 @@ package de.softwareprojekt.bestbowl.beans;
 
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 import de.softwareprojekt.bestbowl.jpa.entities.User;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingCenterRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.UserRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import org.slf4j.Logger;
@@ -23,10 +24,15 @@ public class Initializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(Initializer.class);
     private static final String DEFAULT_ADMIN_PASSWORD = "admin";
     private final UserManager userManager;
+    private final BowlingCenterRepository bowlingCenterRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public Initializer(UserManager userManager) {
+    public Initializer(UserManager userManager, BowlingCenterRepository bowlingCenterRepository,
+                       UserRepository userRepository) {
         this.userManager = userManager;
+        this.bowlingCenterRepository = bowlingCenterRepository;
+        this.userRepository = userRepository;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -40,10 +46,10 @@ public class Initializer {
     }
 
     private void createBowlingCenterIfNotPresent() {
-        Optional<BowlingCenter> bowlingCenterOptional = Repos.getBowlingCenterRepository().findById(1);
+        Optional<BowlingCenter> bowlingCenterOptional = bowlingCenterRepository.findById(1);
         if (bowlingCenterOptional.isEmpty()) {
             BowlingCenter bowlingCenter = createDefaultBowlingCenter();
-            Repos.getBowlingCenterRepository().save(bowlingCenter);
+            bowlingCenterRepository.save(bowlingCenter);
         }
     }
 
@@ -66,7 +72,6 @@ public class Initializer {
     }
 
     private void createAdminUserIfNotPresent() {
-        UserRepository userRepository = Repos.getUserRepository();
         List<User> adminUserList = userRepository.findAllByRoleEquals(UserRole.ADMIN);
         if (adminUserList.isEmpty()) {
             User adminUser = createDefaultAdminUser();

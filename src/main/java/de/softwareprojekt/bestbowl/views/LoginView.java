@@ -15,11 +15,11 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.beans.UserManager;
 import de.softwareprojekt.bestbowl.jpa.entities.User;
+import de.softwareprojekt.bestbowl.jpa.repositories.UserRepository;
 import de.softwareprojekt.bestbowl.utils.Utils;
-import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
@@ -34,11 +34,14 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.showNotification;
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     private final LoginForm loginForm = new LoginForm();
     private final Dialog passwordResetDialog;
+    private final transient UserManager userManager;
+    private final transient UserRepository userRepository;
     private User selectedUserForPasswordReset = null;
-    @Resource
-    private transient UserManager userManager;
 
-    public LoginView() {
+    @Autowired
+    public LoginView(UserManager userManager, UserRepository userRepository) {
+        this.userManager = userManager;
+        this.userRepository = userRepository;
         addClassName("login-view");
         setSizeFull();
         setJustifyContentMode(JustifyContentMode.CENTER);
@@ -106,7 +109,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
             String userName = userNameField.getValue();
             String answer = questionField.getValue();
             if (Utils.isStringNotEmpty(userName, answer)) {
-                Optional<User> optionalUser = Repos.getUserRepository().findByName(userName);
+                Optional<User> optionalUser = userRepository.findByName(userName);
                 if (optionalUser.isPresent()) {
                     User user = optionalUser.get();
                     if (user.getSecurityQuestionAnswer().equals(answer)) {
