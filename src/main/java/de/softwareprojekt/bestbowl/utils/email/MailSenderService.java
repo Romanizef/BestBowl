@@ -1,21 +1,20 @@
 package de.softwareprojekt.bestbowl.utils.email;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 
+import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
+
 /**
  * Controller class for sending emails.
- * 
+ *
  * @author Matija Kopschek
  */
 // @Service
 public class MailSenderService {
-    private BowlingCenter bowlingCenter = Repos.getBowlingCenterRepository().getBowlingCenter();
-    private MailSenderUtil sender = new MailSenderUtil();
+    private final MailSenderUtil sender = new MailSenderUtil();
+    private BowlingCenter bowlingCenter;
 
     /**
      * Uses the emailUtils sendInvoice-method to send an email. Sets all the
@@ -23,10 +22,14 @@ public class MailSenderService {
      * information. The email is sent to the client with an attachment of the
      * receipt. Can be used in other classes to
      * automatically send emails.
-     * 
+     *
      * @param booking
      */
     public void sendInvoiceMail(BowlingAlleyBooking booking) {
+        if (!getConnectionParameters()) {
+            return;
+        }
+
         String senderMail = bowlingCenter.getEmail(); // The E-Mail of the transmitter
         String password = bowlingCenter.getPassword(); // specific password created for this program
         String smtphost = bowlingCenter.getSmtpHost(); // smtp.gmail.com: host is gmail.com
@@ -55,10 +58,13 @@ public class MailSenderService {
      * sets all the important email
      * information. The email is sent to the client. Can be used in other classes to
      * automatically send emails.
-     * 
+     *
      * @param booking
      */
     public void sendBookingConfirmationMail(BowlingAlleyBooking booking) {
+        if (!getConnectionParameters()) {
+            return;
+        }
 
         String senderMail = bowlingCenter.getEmail(); // The E-Mail of the transmitter
         String password = bowlingCenter.getPassword(); // specific password created for this program
@@ -89,10 +95,13 @@ public class MailSenderService {
      * sets all the important email
      * information. The email is sent to the client. Can be used in other classes to
      * automatically send emails.
-     * 
+     *
      * @param booking
      */
     public void sendBookingCancelationMail(BowlingAlleyBooking booking) {
+        if (!getConnectionParameters()) {
+            return;
+        }
 
         String senderMail = bowlingCenter.getEmail(); // The E-Mail of the transmitter
         String password = bowlingCenter.getPassword(); // specific password created for this program
@@ -116,5 +125,19 @@ public class MailSenderService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * reads the parameters from the db and checks them
+     *
+     * @return if the parameters are present
+     */
+    private boolean getConnectionParameters() {
+        bowlingCenter = Repos.getBowlingCenterRepository().getBowlingCenter();
+        if (bowlingCenter == null) {
+            return false;
+        }
+        return (isStringNotEmpty(bowlingCenter.getEmail(), bowlingCenter.getPassword(),
+                bowlingCenter.getSmtpHost(), bowlingCenter.getSmtpPort()));
     }
 }
