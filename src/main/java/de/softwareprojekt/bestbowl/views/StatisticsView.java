@@ -1,25 +1,23 @@
 package de.softwareprojekt.bestbowl.views;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
-import static de.softwareprojekt.bestbowl.utils.Utils.matches;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderInteger;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderString;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -34,6 +32,13 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.FoodBooking;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.DrinkBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.FoodBookingRepository;
 import de.softwareprojekt.bestbowl.utils.PDFUtils;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import jakarta.annotation.security.RolesAllowed;
@@ -47,19 +52,38 @@ import jakarta.annotation.security.RolesAllowed;
 @PageTitle("Statistiken")
 @RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
 public class StatisticsView extends VerticalLayout {
-    private Grid<Statistic> statisticGrid;
-    private Statistic selectedStatistic = null;
-    private BowlingAlleyBooking booking;
+    private Grid<BowlingAlleyBooking> bookingGrid;
+    private BowlingAlleyBooking selectedBowlingAlleyBooking = null;
+    private final transient BowlingAlleyBookingRepository bowlingAlleyBookingRepository;
+    private final transient DrinkBookingRepository drinkBookingRepository;
+    private final transient FoodBookingRepository foodBookingRepository;
+    private final transient BowlingShoeBookingRepository shoeBookingRepository;
+
     private TextField searchField;
 
-    /**
-     * 
-     */
-    public StatisticsView() {
+    @Autowired
+    public StatisticsView(BowlingAlleyBookingRepository bookingRepository,
+            DrinkBookingRepository drinkBookingRepository, FoodBookingRepository foodBookingRepository,
+            BowlingShoeBookingRepository shoeBookingRepository) {
+        this.bowlingAlleyBookingRepository = bookingRepository;
+        this.drinkBookingRepository = drinkBookingRepository;
+        this.foodBookingRepository = foodBookingRepository;
+        this.shoeBookingRepository = shoeBookingRepository;
         setSizeFull();
+        Component headerComponent = createHeader();
         Component searchComponent = createSearchComponent();
         HorizontalLayout gridLayout = createGridLayout();
-        add(searchComponent, gridLayout);
+        add(headerComponent, searchComponent, gridLayout);
+        updateGridItems();
+    }
+
+    /**
+     * Creates a html header
+     *
+     * @return {@code Component}
+     */
+    private Component createHeader() {
+        return new H1("Statistiken");
     }
 
     private Component createSearchComponent() {
@@ -86,86 +110,99 @@ public class StatisticsView extends VerticalLayout {
     }
 
     private void updateGridItems() {
-        List<Statistic> statisticList = new ArrayList<>();
+        List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository.findAll();
         String searchFieldValue = searchField.getValue();
         String[] searchTerms;
         if (searchFieldValue != null) {
             searchTerms = searchFieldValue.trim().split(" ");
-            Iterator<Statistic> statisticIterator = statisticList.iterator();
-            while (statisticIterator.hasNext()) {
-                Statistic statistic = statisticIterator.next();
+            Iterator<BowlingAlleyBooking> bowlingAlleyBookingIterator = bowlingAlleyBookingList.iterator();
+            while (bowlingAlleyBookingIterator.hasNext()) {
+                BowlingAlleyBooking bowlingAlleyBooking = bowlingAlleyBookingIterator.next();
                 List<String> searchTermsCopy = new ArrayList<>(Arrays.stream(searchTerms).toList());
-                matchAndRemoveIfContains(String.valueOf(statistic.id()), searchTermsCopy);
-                matchAndRemoveIfContains(String.valueOf(statistic.clientID()), searchTermsCopy);
-                matchAndRemoveIfContains(statistic.clientLastName(), searchTermsCopy);
-                matchAndRemoveIfContains(String.valueOf(statistic.date()), searchTermsCopy);
-                matchAndRemoveIfContains(String.valueOf(statistic.total()), searchTermsCopy);
+                matchAndRemoveIfContains(String.valueOf(bowlingAlleyBooking.getId()), searchTermsCopy);
+                matchAndRemoveIfContains(String.valueOf(bowlingAlleyBooking.getClient().getId()), searchTermsCopy);
+                matchAndRemoveIfContains(bowlingAlleyBooking.getClient().getLastName(), searchTermsCopy);
+                matchAndRemoveIfContains(String.valueOf(bowlingAlleyBooking.getStartTime()), searchTermsCopy);
                 if (!searchTermsCopy.isEmpty()) {
-                    statisticIterator.remove();
+                    bowlingAlleyBookingIterator.remove();
                 }
             }
         }
-        GridListDataView<Statistic> statisticGridListDataView = statisticGrid.setItems(statisticList);
-        statisticGridListDataView.setSortOrder(Statistic::clientLastName, SortDirection.ASCENDING);
+        GridListDataView<BowlingAlleyBooking> bookingGridListDataView = bookingGrid
+                .setItems(bowlingAlleyBookingList);
+        bookingGridListDataView.setSortOrder(BowlingAlleyBooking::getId, SortDirection.ASCENDING);
     }
 
     private HorizontalLayout createGridLayout() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setSizeFull();
-        statisticGrid = createGrid();
-        layout.add(statisticGrid);
+        bookingGrid = createGrid();
+        layout.add(bookingGrid);
         return layout;
     }
 
     /**
      * @return
      */
-    private Grid<Statistic> createGrid() {
-        // TODO grid befüllen
-        Grid<Statistic> grid = new Grid<>(Statistic.class);
+    private Grid<BowlingAlleyBooking> createGrid() {
+        Grid<BowlingAlleyBooking> grid = new Grid<>(BowlingAlleyBooking.class);
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         grid.removeAllColumns();
 
-        /* Grid.Column<Statistic> idColumn = grid.addColumn(new ComponentRenderer<>(statistic -> {
+        grid.addColumn(new ComponentRenderer<>(statistic -> {
             HorizontalLayout horizontalLayout = new HorizontalLayout();
-            horizontalLayout.add(createDownloadAnchor(), new Label(String.valueOf(statistic.id())));
+            horizontalLayout.add(createDownloadAnchor(), new Label(String.valueOf(statistic.getId())));
             return horizontalLayout;
         })).setHeader("Rechnungsnummer");
-        Grid.Column<Statistic> clientIDColumn = grid.addColumn("clientID").setHeader("Kundennummer");
-        Grid.Column<Statistic> clientLastNameColumn = grid.addColumn("clientLastName").setHeader("Kundennachname");
-        Grid.Column<Statistic> dateColumn = grid.addColumn("date").setHeader("Datum");
-        Grid.Column<Statistic> totalColumn = grid.addColumn("total").setHeader("Summe");
+        grid.addColumn(booking -> booking.getClient() == null ? "" : booking.getClient().getId())
+                .setHeader("Kundennummer").setSortable(true);
+        grid.addColumn(booking -> booking.getClient() == null ? "" : booking.getClient().getLastName())
+                .setHeader("Kundennachname").setSortable(true);
+        grid.addColumn("startTime").setHeader("Datum");
+        //grid.addColumn(String.valueOf(calculateTotal())).setHeader("Summe");
+
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setSizeFull();
 
-        List<Statistic> statisticList = new ArrayList<>();
-        GridListDataView<Statistic> dataView = grid.setItems(statisticList);
-        StatisticFilter statisticFilter = new StatisticFilter(dataView);
-        grid.getHeaderRows().clear();
-        HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", statisticFilter::setId));
-        headerRow.getCell(clientIDColumn)
-                .setComponent(createFilterHeaderInteger("Kundernummer", statisticFilter::setClientID));
-        headerRow.getCell(clientLastNameColumn)
-                .setComponent(createFilterHeaderString("Nachname", statisticFilter::setClientLastName));
-        headerRow.getCell(dateColumn).setComponent(createFilterHeaderString("Datum", statisticFilter::setDate));
-        headerRow.getCell(totalColumn)
-                .setComponent(createFilterHeaderString("Summe", statisticFilter::setTotal));
+        grid.addSelectionListener(e ->
 
-        grid.addSelectionListener(e -> {
+        {
             if (e.isFromClient()) {
-                Optional<Statistic> optionalStatistic = e.getFirstSelectedItem();
-                selectedStatistic = optionalStatistic.orElse(null);
+                Optional<BowlingAlleyBooking> optionalStatistic = e.getFirstSelectedItem();
+                selectedBowlingAlleyBooking = optionalStatistic.orElse(null);
             }
-        }); */
+        });
         return grid;
     }
+
+/*     private double calculateTotal() {
+        List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository.findAll();
+        List<DrinkBooking> drinkBookingList = drinkBookingRepository.findAll();
+        List<FoodBooking> foodBookingList = foodBookingRepository.findAll();
+        List<BowlingShoeBooking> shoeBookingList = shoeBookingRepository.findAll();
+
+        double total = 0;
+        for (BowlingAlleyBooking alleyBooking : bowlingAlleyBookingList) {
+            total += alleyBooking.getPrice();
+        }
+        for (DrinkBooking drinkBooking : drinkBookingList) {
+            total += drinkBooking.getPrice();
+        }
+        for (FoodBooking foodBooking : foodBookingList) {
+            total += foodBooking.getPrice();
+        }
+        for (BowlingShoeBooking shoeBooking : shoeBookingList) {
+            total += shoeBooking.getPrice();
+        }
+
+        return total;
+    } */
 
     private Component createDownloadAnchor() {
         Button pdfButton = new Button(new Icon(VaadinIcon.DOWNLOAD));
 
-        byte[] pdfContent = PDFUtils.createInvoicePdf(booking);
+        byte[] pdfContent = PDFUtils.createInvoicePdf(selectedBowlingAlleyBooking);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(pdfContent);
 
         StreamResource streamResource = new StreamResource("rechnungs.pdf", () -> byteArrayInputStream);
@@ -176,68 +213,5 @@ public class StatisticsView extends VerticalLayout {
         anchor.getElement().setAttribute("download", "test.pdf");
 
         return anchor;
-    }
-
-    private record Statistic(int id, int clientID, String clientLastName, Date date, double total) {
-
-    }
-
-    /**
-     * Creates filters for the {@code Statistic} objects.
-     */
-    private static class StatisticFilter {
-        private final GridListDataView<Statistic> dataView;
-        private String id;
-        private String clientID;
-        private String clientLastName;
-        private String date;
-        private String total;
-
-        /**
-         * Constructor for the {@code StatisticFilter}.
-         *
-         * @param dataView
-         */
-        public StatisticFilter(GridListDataView<Statistic> dataView) {
-            this.dataView = dataView;
-            this.dataView.addFilter(this::test);
-        }
-
-        /**
-         * Tests if the {@code Statistic} attributes match the filter attributes.
-         *
-         * @param statistic
-         * @return {@code boolean}
-         */
-        public boolean test(Statistic statistic) {
-            boolean matchesId = matches(String.valueOf(statistic.id()), id);
-            boolean matchesClientID = matches(String.valueOf(statistic.clientID()), clientID);
-            boolean matchesClientLastName = matches(statistic.clientLastName(), clientLastName);
-            boolean matchesDate = matches(String.valueOf(statistic.date()), date);
-            boolean matchesTotal = matches(String.valueOf(statistic.total()), total);
-            return matchesId && matchesClientID && matchesClientLastName && matchesDate
-                    && matchesTotal;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-            dataView.refreshAll();
-        }
-
-        public void setClientID(String clientID) {
-            this.clientID = clientID;
-        }
-
-        public void setClientLastName(String clientLastName) {
-            this.clientLastName = clientLastName;
-        }
-
-        public void setDate(String date) {
-            this.date = date;
-        }
-
-        public void setTotal(String total) {
-            this.total = total;
-        }
     }
 }

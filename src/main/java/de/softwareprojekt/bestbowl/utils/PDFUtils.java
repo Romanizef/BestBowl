@@ -33,6 +33,8 @@ public class PDFUtils {
     private static final int CELL_WIDTH_DISCRIPTION = 150;
     private static final int CELL_WIDTH_AMOUNT = 10;
     private static final int CELL_WIDTH_PRICE = 30;
+    private static final int CELL_WIDTH_DISCOUNT = 30;
+    private static final int CELL_WIDTH_TOTAL = 30;
     private static final int TEXT_OFFSET = 50;
     private static final int POSITIONS_PER_PAGE = 10;
 

@@ -25,6 +25,7 @@ public class BowlingAlleyBooking implements Serializable {
     private long startTime;
     private long endTime;
     private boolean completed;
+    private double price;
 
     private boolean active;
 
@@ -90,5 +91,13 @@ public class BowlingAlleyBooking implements Serializable {
 
     public void setCompleted(boolean completed) {
         this.completed = completed;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 }
