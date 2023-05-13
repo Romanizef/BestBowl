@@ -62,7 +62,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
         button.addClickListener(e -> {
             drinkVariantGrid.deselectAll();
             selectedDrinkVariant = new DrinkVariant();
-            drinkVariantBinder.readBean(selectedDrinkVariant);
+            drinkVariantBinder.readBean(null);
             saveButton.setEnabled(true);
             cancelButton.setEnabled(true);
             editingNewDrinkVariant = true;
@@ -257,11 +257,11 @@ public class DrinkVariantManagementView extends VerticalLayout {
 
         public boolean test(DrinkVariant drinkVariant) {
             boolean matchesId = matches(String.valueOf(drinkVariant.getId()), id);
-            boolean matchesDrink = matches((drinkVariant.getDrink().getName()), name);
+            //boolean matchesDrink = matches((drinkVariant.getDrink().getName()), name);
             boolean matchesMilliliter = matches(String.valueOf(drinkVariant.getMl()), milliliter);
             boolean matchesPrice = matches(String.valueOf(drinkVariant.getPrice()), price);
-            boolean matchesActive = active == null || active == drinkVariant.getDrink().isActive();
-            return matchesId  && matchesMilliliter && matchesPrice && matchesActive && matchesDrink;
+         //   boolean matchesActive = active == null || active == drinkVariant.getDrink().isActive();
+            return matchesId  && matchesMilliliter && matchesPrice; // && matchesActive && matchesDrink;
         }
 
         private boolean matches(String value, String searchTerm) {

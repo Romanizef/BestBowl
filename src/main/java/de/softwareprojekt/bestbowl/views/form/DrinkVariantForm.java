@@ -79,11 +79,12 @@ public class DrinkVariantForm extends FormLayout {
 
         add(drinkCB,nameField, variantField, priceField, checkboxLayout);
 
-        drinkVariantBinder.bind(nameField, drinkVariant -> drinkVariant.getDrink().getName(),
-               ((drinkVariant, s) -> drinkVariant.getDrink().setName(s)));
+       // drinkVariantBinder.bind(nameField, drinkVariant -> drinkVariant.getDrink().getName(),
+         //      ((drinkVariant, s) -> drinkVariant.getDrink().setName(s)));
+
         drinkVariantBinder.bind(priceField, DrinkVariant::getPrice, DrinkVariant::setPrice);
         drinkVariantBinder.bind(variantField, DrinkVariant::getMl, DrinkVariant::setMl);
-        drinkVariantBinder.bind(activeCheckbox,drinkVariant -> drinkVariant.getDrink().isActive(),
-                ((drinkVariant, s) -> drinkVariant.getDrink().setActive(s)));
+       // drinkVariantBinder.bind(activeCheckbox,drinkVariant -> drinkVariant.getDrink().isActive(),
+        //       ((drinkVariant, s) -> drinkVariant.getDrink().setActive(s)));
     }
 }
