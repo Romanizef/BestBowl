@@ -27,6 +27,10 @@ public class BowlingShoeBooking implements Serializable {
 
     @ManyToOne
     private BowlingShoe bowlingShoe;
+    private boolean completed;
+
+    private double price;
+
     private boolean active;
 
     public BowlingShoeBooking() {
@@ -71,5 +75,21 @@ public class BowlingShoeBooking implements Serializable {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
     }
 }

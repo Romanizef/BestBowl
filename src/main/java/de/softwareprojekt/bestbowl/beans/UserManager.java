@@ -1,6 +1,7 @@
 package de.softwareprojekt.bestbowl.beans;
 
 import de.softwareprojekt.bestbowl.jpa.entities.User;
+import de.softwareprojekt.bestbowl.jpa.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +20,21 @@ public class UserManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserManager.class);
     private final List<String> currentUserNameList = new ArrayList<>();
     private final Map<String, Boolean> userDrawerStateMap = new HashMap<>();
+    private final UserRepository userRepository;
     private UserDetailsManager userDetailsManager;
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public UserManager(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     /**
      * Adds or updates all users in the db to the UserDetailsManager
      * After this is called all users that are active can authenticate
      */
     public void updateUsersFromDb() {
-        List<User> userList = Repos.getUserRepository().findAll();
+        List<User> userList = userRepository.findAll();
 
         currentUserNameList.forEach(s -> userDetailsManager.deleteUser(s));
         currentUserNameList.clear();
@@ -62,10 +69,10 @@ public class UserManager {
         user.setEmail(email);
         user.setRole(userRole);
 
-        Optional<User> userWithSameName = Repos.getUserRepository().findByName(user.getName());
-        userWithSameName.ifPresent(Repos.getUserRepository()::delete);
+        Optional<User> userWithSameName = userRepository.findByName(user.getName());
+        userWithSameName.ifPresent(userRepository::delete);
 
-        Repos.getUserRepository().save(user);
+        userRepository.save(user);
         updateUsersFromDb();
     }
 
@@ -77,7 +84,7 @@ public class UserManager {
      */
     public void changePassword(User user, String password) {
         user.setEncodedPassword(passwordEncoder.encode(password));
-        Repos.getUserRepository().save(user);
+        userRepository.save(user);
         updateUsersFromDb();
     }
 
@@ -100,15 +107,15 @@ public class UserManager {
     }
 
     public boolean getDarkModeStateForUser(String userName) {
-        Optional<User> user = Repos.getUserRepository().findByName(userName);
+        Optional<User> user = userRepository.findByName(userName);
         return user.map(User::isDarkMode).orElse(false);
     }
 
     public void setDarkModeStateForUser(String userName, boolean darkMode) {
-        Optional<User> user = Repos.getUserRepository().findByName(userName);
+        Optional<User> user = userRepository.findByName(userName);
         user.ifPresent(u -> {
             u.setDarkMode(darkMode);
-            Repos.getUserRepository().save(u);
+            userRepository.save(u);
         });
     }
 

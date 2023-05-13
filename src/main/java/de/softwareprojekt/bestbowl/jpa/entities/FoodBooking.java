@@ -27,6 +27,8 @@ public class FoodBooking implements Serializable {
 
     private String name;
     private int amount;
+    private boolean completed;
+
     private double price;
 
     private boolean active;
@@ -89,5 +91,13 @@ public class FoodBooking implements Serializable {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
     }
 }
