@@ -1,14 +1,9 @@
 package de.softwareprojekt.bestbowl.views.form;
 
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
+
 import com.vaadin.flow.component.checkbox.Checkbox;
 import  com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -17,8 +12,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import de.softwareprojekt.bestbowl.jpa.entities.Food;
-
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.showNotification;
 
 /**
  * Creates the Form for the Food Entity.
@@ -31,8 +24,6 @@ public class FoodForm extends FormLayout {
     IntegerField reorderPointField = new IntegerField("Meldebestand");
     NumberField priceField = new NumberField("Preis");
     Checkbox activeCheckbox = new Checkbox("Artikel aktivieren");
-    Button saveButton = new Button("Sichern");
-    Button cancelButton = new Button("Abbrechen");
 
     /**
      * Constructor for the FoodForm. Creates a name, stock, reorderPoint and price
@@ -40,10 +31,9 @@ public class FoodForm extends FormLayout {
      * The {@code Binder} binds the fields to the entity.
      *
      * @param foodBinder
-     * @see #createButtonLayout()
+     *
      */
     public FoodForm(Binder<Food> foodBinder) {
-        setWidth("25%");
         nameField.setWidthFull();
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         stockField.setWidthFull();
@@ -62,8 +52,8 @@ public class FoodForm extends FormLayout {
         checkboxLayout.setHeight("50px");
         checkboxLayout.add(activeCheckbox);
 
-        add(nameField, stockField, reorderPointField, priceField, checkboxLayout,
-                createButtonLayout());
+
+        add(nameField, stockField, reorderPointField, priceField, checkboxLayout);
 
         foodBinder.bind(nameField, Food::getName, Food::setName);
         foodBinder.bind(stockField, Food::getStock, Food::setStock);
@@ -72,46 +62,6 @@ public class FoodForm extends FormLayout {
         foodBinder.bind(activeCheckbox, Food::isActive, Food::setActive);
     }
 
-    /**
-     * Creates the Button Layout. Used to save and cancel the changes and add them
-     * into the database. They are activated with the Enter and Escape Key.
-     *
-     * @return {@code HorizontalLayout}
-     */
-    private Component createButtonLayout() {
-        HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.setWidthFull();
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
-        cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
 
-        buttonLayout.add(cancelButton, saveButton);
-        buttonLayout.setFlexGrow(1, cancelButton, saveButton);
-
-        saveButton.addClickShortcut(Key.ENTER);
-        cancelButton.addClickShortcut(Key.ESCAPE);
-
-        saveButton.addClickListener(clickEvent -> {
-            // TODO Kunde in die Datenbank speichern
-            // resetEditLayout();
-            showNotification("Speise gespeichert");
-        });
-        cancelButton.addClickListener(clickEvent -> {
-            // resetEditLayout();
-            showNotification("Bearbeitung abgebrochen");
-        });
-        return buttonLayout;
-    }
-
-    /*
-     * private void resetEditLayout() {
-     * foodGrid.deselectAll();
-     * selectedFood = null;
-     *
-     * Food food = new Food();
-     * binder.readBean(food);
-     *
-     * updateEditLayoutState();
-     * setValueForIntegerFieldChildren(editLayout.getChildren(), null);
-     */
 }
+

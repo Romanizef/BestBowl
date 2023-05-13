@@ -28,6 +28,24 @@ public class Food implements Serializable {
         active = true;
     }
 
+    public Food(Food other){
+        this.id = other.id;
+        this.name = other.name;
+        this.price = other.price;
+        this.stock = other.stock;
+        this.reorderPoint = other.reorderPoint;
+        this.active = other.active;
+    }
+
+    public void copyValuesOf(Food other){
+        this.id = other.id;
+        this.name = other.name;
+        this.price = other.price;
+        this.stock = other.stock;
+        this.reorderPoint = other.reorderPoint;
+        this.active = other.active;
+    }
+
     public int getId() {
         return id;
     }

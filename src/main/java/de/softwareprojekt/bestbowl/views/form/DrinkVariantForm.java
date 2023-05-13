@@ -19,8 +19,15 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
+import de.softwareprojekt.bestbowl.beans.Repos;
+import de.softwareprojekt.bestbowl.jpa.entities.Association;
 import de.softwareprojekt.bestbowl.jpa.entities.Drink;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createAssociationCB;
 
 /**
  * Creates the Form for the DrinkVariant Entity
@@ -31,11 +38,7 @@ public class DrinkVariantForm extends FormLayout {
     TextField nameField = new TextField("Name");
     NumberField priceField = new NumberField("Preis");
     IntegerField variantField = new IntegerField("Variante");
-    // ComboBox<String> variantCB = new ComboBox<>("Variante");
     Checkbox activeCheckbox = new Checkbox("Artikel aktivieren");
-
-    Button saveButton = new Button("Sichern");
-    Button cancelButton = new Button("Abbrechen");
 
     /**
      * Constructor for the DrinkVariantForm. Creates a name field, a variant field
@@ -45,22 +48,25 @@ public class DrinkVariantForm extends FormLayout {
      *
      * @param drinkVariantBinder
      * @param drinkBinder
-     * @see #createButtonLayout()
+     *
      */
     public DrinkVariantForm(Binder<DrinkVariant> drinkVariantBinder, Binder<Drink> drinkBinder) {
-        setWidth("25%");
+
+        ComboBox<Drink>  drinkCB = new ComboBox<>();
+        drinkCB.setWidthFull();
+        drinkCB.setItems(); // Noch keine Daten in der ComboBox
+        drinkCB.setAllowCustomValue(false);
+        drinkCB.setPlaceholder("-");
+        drinkCB.setRequiredIndicatorVisible(true);
+        drinkCB.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
+
         nameField.setWidthFull();
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-        /*
-         * variantCB.setWidthFull();
-         * variantCB.setAllowCustomValue(false);
-         * variantCB.setItems("Klein 250ml", "Mittel 500ml", "Groß 750ml"); //noch nicht
-         * final
-         * variantCB.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
-         */
 
         variantField.setWidthFull();
+        variantField.setSuffixComponent(new Span("ml"));
         variantField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
         priceField.setWidthFull();
         priceField.setSuffixComponent(new Span("EUR"));
         priceField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
@@ -71,32 +77,14 @@ public class DrinkVariantForm extends FormLayout {
         checkboxLayout.setHeight("50px");
         checkboxLayout.add(activeCheckbox);
 
-        add(nameField, variantField, priceField, checkboxLayout,
-                createButtonLayout());
+        add(drinkCB,nameField, variantField, priceField, checkboxLayout);
 
-        drinkBinder.bind(nameField, Drink::getName, Drink::setName); /* Binder funktioniert noch nicht */
+       // drinkVariantBinder.bind(nameField, drinkVariant -> drinkVariant.getDrink().getName(),
+         //      ((drinkVariant, s) -> drinkVariant.getDrink().setName(s)));
+
         drinkVariantBinder.bind(priceField, DrinkVariant::getPrice, DrinkVariant::setPrice);
         drinkVariantBinder.bind(variantField, DrinkVariant::getMl, DrinkVariant::setMl);
-    }
-
-    /**
-     * Creates the button layout for the form. A save and a cancel Button are
-     * created too. They are activated with the Enter and Escape Key.
-     *
-     * @return {@code HorizontalLayout}
-     */
-    private Component createButtonLayout() {
-        HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.setWidthFull();
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
-        cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
-        buttonLayout.add(cancelButton, saveButton);
-        buttonLayout.setFlexGrow(1, cancelButton, saveButton);
-
-        saveButton.addClickShortcut(Key.ENTER);
-        cancelButton.addClickShortcut(Key.ESCAPE);
-
-        return buttonLayout;
+       // drinkVariantBinder.bind(activeCheckbox,drinkVariant -> drinkVariant.getDrink().isActive(),
+        //       ((drinkVariant, s) -> drinkVariant.getDrink().setActive(s)));
     }
 }

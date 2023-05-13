@@ -1,14 +1,19 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoe;
@@ -35,6 +40,10 @@ public class BowlingShoeManagementView extends VerticalLayout {
     private Grid<BowlingShoe> bowlingShoeGrid;
     private BowlingShoeForm bowlingShoeForm;
     private BowlingShoe selectedShoe = null;
+    private Label validationErrorLabel;
+    private boolean editingNewBowlingShoe = false;
+    private final Button saveButton = new Button("Sichern");
+    private final Button cancelButton = new Button("Abbrechen");
 
     @Autowired
     public BowlingShoeManagementView(BowlingShoeRepository bowlingShoeRepository) {
@@ -54,26 +63,108 @@ public class BowlingShoeManagementView extends VerticalLayout {
             bowlingShoeGrid.deselectAll();
             selectedShoe = new BowlingShoe();
             bowlingShoeBinder.readBean(selectedShoe);
+            saveButton.setEnabled(true);
+            cancelButton.setEnabled(true);
+            editingNewBowlingShoe = false;
             updateEditBowlingShoeLayoutState();
         });
         return button;
     }
 
     private void updateEditBowlingShoeLayoutState() {
+        validationErrorLabel.setText("");
         setChildrenEnabled(bowlingShoeForm.getChildren(), selectedShoe != null);
-        if (selectedShoe == null) {
-            setValueForIntegerFieldChildren(bowlingShoeForm.getChildren(), null);
-        }
     }
 
     private HorizontalLayout createBowlingShoeGridFormLayout() {
         HorizontalLayout layout = new HorizontalLayout();
-        bowlingShoeForm = new BowlingShoeForm(bowlingShoeBinder);
         layout.setSizeFull();
         bowlingShoeGrid = createBowlingShoeGrid();
-        layout.add(bowlingShoeGrid, bowlingShoeForm);
+        layout.add(bowlingShoeGrid, createBowlingShoeFormLayout());
         return layout;
     }
+
+    private VerticalLayout createBowlingShoeFormLayout(){
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSizeFull();
+        layout.setWidth("25%");
+        bowlingShoeForm = new BowlingShoeForm(bowlingShoeBinder);
+        layout.add(bowlingShoeForm, createValidationLabelLayout(), createButton());
+        return layout;
+    }
+
+    private VerticalLayout createValidationLabelLayout(){
+        VerticalLayout validationLabelLayout = new VerticalLayout();
+        validationLabelLayout.setWidthFull();
+        validationLabelLayout.setPadding(false);
+        validationLabelLayout.setMargin(false);
+        validationLabelLayout.setAlignItems(Alignment.CENTER);
+
+        validationErrorLabel = new Label();
+        validationErrorLabel.getStyle().set("color", "red");
+
+        validationLabelLayout.add(validationErrorLabel);
+        return validationLabelLayout;
+    }
+
+    private boolean writeBean(){
+        try{
+            bowlingShoeBinder.writeBean(selectedShoe);
+            return true;
+        } catch (ValidationException e) {
+            if(!e.getValidationErrors().isEmpty()){
+            validationErrorLabel.setText(e.getValidationErrors().get(0).getErrorMessage());
+            }
+        }
+        return false;
+    }
+
+    public Component createButton(){
+        HorizontalLayout buttonLayout = new HorizontalLayout();
+        buttonLayout.setWidthFull();
+        saveButton.setEnabled(false);
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
+        cancelButton.setEnabled(false);
+        cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
+
+        saveButton.addClickListener(clickEvent -> {
+            BowlingShoe undeditedBowlingShoe = new BowlingShoe();
+            if(writeBean()){
+                    saveToDnAndUpdateBowlingShoe();
+                } else {
+                    selectedShoe.copyValueOf(undeditedBowlingShoe);
+                }
+        });
+        cancelButton.addClickListener(clickEvent -> resetEditLayout());
+
+        buttonLayout.add(cancelButton, saveButton);
+        buttonLayout.setFlexGrow(1, cancelButton, saveButton);
+        return buttonLayout;
+    }
+
+    private void saveToDnAndUpdateBowlingShoe(){
+        bowlingShoeRepository.save(selectedShoe);
+        if(editingNewBowlingShoe){
+            bowlingShoeGrid.getListDataView().addItem(selectedShoe);
+        } else {
+            bowlingShoeGrid.getListDataView().refreshItem(selectedShoe);
+        }
+        resetEditLayout();
+        showNotification("Schuh gespeichert");
+    }
+
+    private void resetEditLayout(){
+        bowlingShoeGrid.deselectAll();
+        selectedShoe = null;
+        editingNewBowlingShoe = false;
+        saveButton.setEnabled(false);
+        cancelButton.setEnabled(false);
+
+        updateEditBowlingShoeLayoutState();
+        setValueForIntegerFieldChildren(bowlingShoeForm.getChildren(),null);
+    }
+
 
     private Grid<BowlingShoe> createBowlingShoeGrid() {
         Grid<BowlingShoe> shoeGrid = new Grid<>(BowlingShoe.class);
@@ -102,12 +193,17 @@ public class BowlingShoeManagementView extends VerticalLayout {
         shoeGrid.addSelectionListener(e -> {
             if (e.isFromClient()) {
                 Optional<BowlingShoe> optionalBowlingShoe = e.getFirstSelectedItem();
+                saveButton.setEnabled(true);
+                cancelButton.setEnabled(true);
                 if (optionalBowlingShoe.isPresent()) {
                     selectedShoe = optionalBowlingShoe.get();
                     bowlingShoeBinder.readBean(selectedShoe);
+                    editingNewBowlingShoe = false;
                 } else {
                     selectedShoe = null;
-                    bowlingShoeBinder.readBean(new BowlingShoe());
+                    bowlingShoeBinder.readBean(null);
+                    saveButton.setEnabled(false);
+                    cancelButton.setEnabled(false);
                 }
             }
             updateEditBowlingShoeLayoutState();
@@ -134,10 +230,6 @@ public class BowlingShoeManagementView extends VerticalLayout {
             boolean matchesActive = active == null || active == shoe.isActive();
             return matchesId && matchesBoughtAt && matchesSize && matchesActive;
         }
-
-        /*
-        Filterregel noch nicht geschrieben
-        */
 
         private boolean matches(String value, String searchTerm) {
             return searchTerm == null || searchTerm.isEmpty() || value.toLowerCase().contains(searchTerm.toLowerCase());

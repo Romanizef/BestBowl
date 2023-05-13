@@ -35,6 +35,22 @@ public class Drink implements Serializable {
         drinkVariant.setDrink(this);
     }
 
+    public Drink(Drink other){
+        this.id = other.id;
+        this.name = other.name;
+        this.stockInMilliliters = other.stockInMilliliters;
+        this.reorderPoint = other.reorderPoint;
+        this.active = other.active;
+    }
+
+    public void copyValuesOf(Drink other){
+        this.id = other.id;
+        this.name = other.name;
+        this.stockInMilliliters = other.stockInMilliliters;
+        this.reorderPoint = other.reorderPoint;
+        this.active = other.active;
+    }
+
     public int getId() {
         return id;
     }

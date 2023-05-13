@@ -23,6 +23,20 @@ public class DrinkVariant implements Serializable {
     public DrinkVariant() {
     }
 
+    public DrinkVariant(DrinkVariant other){
+        this.id = other.id;
+        this.ml = other.ml;
+        this.price = other.price;
+    }
+
+    public void copyValueOf(DrinkVariant other){
+        this.id = other.id;
+        this.ml = other.ml;
+        this.price = other.price;
+    }
+
+
+
     public int getId() {
         return id;
     }
