@@ -28,6 +28,20 @@ public class BowlingShoe implements Serializable {
         active = true;
     }
 
+    public BowlingShoe(BowlingShoe other){
+        this.id = other.id;
+        this.size = other.size;
+        this.boughtAt = other.boughtAt;
+        this.active = other.active;
+    }
+
+    public void copyValueOf(BowlingShoe other){
+        this.id = other.id;
+        this.size = other.size;
+        this.boughtAt = other.boughtAt;
+        this.active = other.active;
+    }
+
     public int getId() {
         return id;
     }

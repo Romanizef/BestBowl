@@ -1,15 +1,20 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.jpa.entities.Food;
@@ -22,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
@@ -34,6 +40,10 @@ public class FoodManagementView extends VerticalLayout {
     private Grid<Food> foodGrid;
     private FoodForm foodForm;
     private Food selectedFood = null;
+    private Label validationErrorLabel;
+    private boolean editingNewFood = false;
+    private final Button saveButton = new Button("Sichern");
+    private final Button cancelButton = new Button("Abbrechen");
 
     @Autowired
     public FoodManagementView(FoodRepository foodRepository) {
@@ -53,26 +63,123 @@ public class FoodManagementView extends VerticalLayout {
             foodGrid.deselectAll();
             selectedFood = new Food();
             foodBinder.readBean(selectedFood);
+            saveButton.setEnabled(true);
+            cancelButton.setEnabled(true);
+            editingNewFood = false;
             updateEditFoodLayoutState();
         });
         return button;
     }
 
     private void updateEditFoodLayoutState() {
+        validationErrorLabel.setText("");
         setChildrenEnabled(foodForm.getChildren(), selectedFood != null);
-        if (selectedFood == null) {
-            setValueForIntegerFieldChildren(foodForm.getChildren(), null);
-        }
     }
 
     private HorizontalLayout createFoodGridFormLayout() {
         HorizontalLayout layout = new HorizontalLayout();
-        foodForm = new FoodForm(foodBinder);
         layout.setSizeFull();
         foodGrid = createFoodGrid();
-        layout.add(foodGrid, foodForm);
+        layout.add(foodGrid,createFoodFormLayout());
         return layout;
     }
+
+    private VerticalLayout createFoodFormLayout(){
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSizeFull();
+        layout.setWidth("25%");
+        foodForm = new FoodForm(foodBinder);
+        layout.add(foodForm, createValidationLabelLayout(), createButton());
+        return layout;
+    }
+
+    private VerticalLayout createValidationLabelLayout() {
+        VerticalLayout validationLabelLayout = new VerticalLayout();
+        validationLabelLayout.setWidthFull();
+        validationLabelLayout.setPadding(false);
+        validationLabelLayout.setMargin(false);
+        validationLabelLayout.setAlignItems(Alignment.CENTER);
+
+        validationErrorLabel = new Label();
+        validationErrorLabel.getStyle().set("color", "red");
+
+        validationLabelLayout.add(validationErrorLabel);
+        return validationLabelLayout;
+    }
+
+    private boolean writeBean() {
+        try {
+            foodBinder.writeBean(selectedFood);
+            return true;
+        } catch (ValidationException e) {
+            if (!e.getValidationErrors().isEmpty()) {
+                validationErrorLabel.setText(e.getValidationErrors().get(0).getErrorMessage());
+            }
+        }
+        return false;
+    }
+
+
+    private Component createButton() {
+        HorizontalLayout buttonLayout = new HorizontalLayout();
+        buttonLayout.setWidthFull();
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
+        cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
+
+        saveButton.addClickListener(clickEvent ->{
+            Food uneditedFood = new Food(selectedFood);
+            if(writeBean()){
+                if(validateFoodSave()){
+                    saveToDbAndUpdateFood();
+                } else {
+                    selectedFood.copyValuesOf(uneditedFood);
+                }
+            }
+        });
+
+        cancelButton.addClickListener(clickEvent -> resetEditLayout());
+
+        buttonLayout.add(cancelButton, saveButton);
+        buttonLayout.setFlexGrow(1, cancelButton, saveButton);
+        return buttonLayout;
+    }
+
+    private void saveToDbAndUpdateFood() {
+        foodRepository.save(selectedFood);
+        if(editingNewFood){
+            foodGrid.getListDataView().addItem(selectedFood);
+        } else {
+            foodGrid.getListDataView().refreshItem(selectedFood);
+        }
+        resetEditLayout();
+        showNotification("Speise gespeichert");
+    }
+
+    private void resetEditLayout() {
+        foodGrid.deselectAll();
+        selectedFood = null;
+        foodBinder.readBean(new Food());
+        editingNewFood = false;
+        saveButton.setEnabled(false);
+        cancelButton.setEnabled(false);
+        updateEditFoodLayoutState();
+        setValueForIntegerFieldChildren(foodForm.getChildren(),null);
+    }
+
+    private boolean validateFoodSave(){
+        Optional<Food> dbFood = foodRepository.findById(selectedFood.getId());
+        Set<String> foodNameSet = foodRepository.findAllNames();
+        dbFood.ifPresent(food -> {
+            foodNameSet.remove(food.getName());
+        });
+        if(foodNameSet.contains(selectedFood.getName())){
+            validationErrorLabel.setText("Eine Speise mit diesem Namen existiert bereits");
+            return false;
+        }
+        return true;
+    }
+
 
     private Grid<Food> createFoodGrid() {
         Grid<Food> foodGrid = new Grid<>(Food.class);
@@ -83,7 +190,7 @@ public class FoodManagementView extends VerticalLayout {
         Grid.Column<Food> stockColumn = foodGrid.addColumn("stock").setHeader("Bestand");
         Grid.Column<Food> reorderPointColumn = foodGrid.addColumn("reorderPoint").setHeader("Meldebestand");
         Grid.Column<Food> priceColumn = foodGrid.addColumn("price").setHeader("Preis");
-        Grid.Column<Food> activeColumn = foodGrid.addColumn("active").setHeader("Aktiv");
+        Grid.Column<Food> activeColumn = foodGrid.addColumn(s -> s.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
         foodGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
         foodGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         foodGrid.setWidth("75%");
@@ -105,12 +212,17 @@ public class FoodManagementView extends VerticalLayout {
         foodGrid.addSelectionListener(e -> {
             if (e.isFromClient()) {
                 Optional<Food> optionalFood = e.getFirstSelectedItem();
+                saveButton.setEnabled(true);
+                cancelButton.setEnabled(true);
                 if (optionalFood.isPresent()) {
                     selectedFood = optionalFood.get();
                     foodBinder.readBean(selectedFood);
+                    editingNewFood = false;
                 } else {
                     selectedFood = null;
-                    foodBinder.readBean(new Food());
+                    foodBinder.readBean(null);
+                    saveButton.setEnabled(false);
+                    cancelButton.setEnabled(false);
                 }
             }
             updateEditFoodLayoutState();
