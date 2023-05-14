@@ -6,7 +6,7 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.server.StreamResource;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.utils.PDFUtils;
+import de.softwareprojekt.bestbowl.utils.pdf.PDFUtils;
 
 import java.io.ByteArrayInputStream;
 

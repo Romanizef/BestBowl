@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.utils;
+package de.softwareprojekt.bestbowl.utils.other;
 
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlley;

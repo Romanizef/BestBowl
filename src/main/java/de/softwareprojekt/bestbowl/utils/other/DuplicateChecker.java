@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.utils;
+package de.softwareprojekt.bestbowl.utils.other;
 
 import java.util.Optional;
 import java.util.Set;

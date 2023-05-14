@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.Properties;
 
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.utils.PDFUtils;
+import de.softwareprojekt.bestbowl.utils.pdf.PDFUtils;
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
 import jakarta.mail.Authenticator;

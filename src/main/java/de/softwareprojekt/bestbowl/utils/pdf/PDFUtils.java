@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.utils;
+package de.softwareprojekt.bestbowl.utils.pdf;
 
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
@@ -21,6 +21,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.FoodBooking;
+import de.softwareprojekt.bestbowl.utils.Utils;
 
 /**
  * @author Matija Kopschek

@@ -23,6 +23,10 @@ import de.softwareprojekt.bestbowl.beans.SecurityService;
 import de.softwareprojekt.bestbowl.beans.UserManager;
 import de.softwareprojekt.bestbowl.views.bookingViews.ClientSearchView;
 import de.softwareprojekt.bestbowl.views.bookingViews.ExtrasView;
+import de.softwareprojekt.bestbowl.views.managementViews.ManagementView;
+import de.softwareprojekt.bestbowl.views.otherViews.DatabaseRedirectView;
+import de.softwareprojekt.bestbowl.views.otherViews.StatisticsView;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 

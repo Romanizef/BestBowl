@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views;
+package de.softwareprojekt.bestbowl.views.otherViews;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
 
@@ -39,8 +39,9 @@ import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyBookingRepositor
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.DrinkBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.FoodBookingRepository;
-import de.softwareprojekt.bestbowl.utils.PDFUtils;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.utils.pdf.PDFUtils;
+import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
 
 /**
