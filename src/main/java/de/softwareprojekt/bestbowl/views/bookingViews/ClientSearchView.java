@@ -252,7 +252,7 @@ public class ClientSearchView extends VerticalLayout {
         newClient = createNewClient();
         binder.readBean(newClient);
         validationErrorLabel.setText("");
-        setValueForIntegerFieldChildren(newClientDialog.getChildren(), null);
+        clearNumberFieldChildren(newClientDialog.getChildren());
     }
 
     /**

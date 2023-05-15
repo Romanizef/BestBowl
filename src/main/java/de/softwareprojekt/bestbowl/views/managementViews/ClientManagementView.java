@@ -371,7 +371,7 @@ public class ClientManagementView extends VerticalLayout {
         binder.readBean(client);
 
         updateEditLayoutState();
-        setValueForIntegerFieldChildren(editLayout.getChildren(), null);
+        clearNumberFieldChildren(editLayout.getChildren());
     }
 
     /**

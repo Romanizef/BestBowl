@@ -1,32 +1,42 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.ComboBoxVariant;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.function.SerializableComparator;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.Drink;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
-import de.softwareprojekt.bestbowl.jpa.repositories.DrinkRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.DrinkVariantRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.views.MainView;
-import de.softwareprojekt.bestbowl.views.form.DrinkVariantForm;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
@@ -38,20 +48,25 @@ public class DrinkVariantManagementView extends VerticalLayout {
     private final Binder<DrinkVariant> drinkVariantBinder = new Binder<>();
     private final Binder<Drink> drinkBinder = new Binder<>();
     private Grid<DrinkVariant> drinkVariantGrid;
-    private DrinkVariantForm drinkVariantForm;
+    private FormLayout drinkVariantForm;
+    private ComboBox<Drink> drinkCB;
+
+    public void setSelectedDrinkVariant(DrinkVariant selectedDrinkVariant) {
+        this.selectedDrinkVariant = selectedDrinkVariant;
+        updateEditDrinkVariantLayoutState();
+        drinkVariantBinder.readBean(selectedDrinkVariant);
+    }
+
     private DrinkVariant selectedDrinkVariant = null;
     private Label validationErrorLabel;
     private boolean editingNewDrinkVariant = false;
-    private final Button saveButton = new Button("Sichern");
-    private final Button cancelButton = new Button("Abbrechen");
 
     @Autowired
     public DrinkVariantManagementView(DrinkVariantRepository drinkVariantRepository) {
         this.drinkVariantRepository = drinkVariantRepository;
         setSizeFull();
         Button newDrinkVariantButton = createNewDrinkVariantButton();
-        HorizontalLayout drinkVariantGridFormLayout = createDrinkVariantGridFormLayout();
-        add(newDrinkVariantButton, drinkVariantGridFormLayout);
+        add(newDrinkVariantButton, createGridFormLayout());
         updateEditDrinkVariantLayoutState();
     }
 
@@ -62,11 +77,11 @@ public class DrinkVariantManagementView extends VerticalLayout {
         button.addClickListener(e -> {
             drinkVariantGrid.deselectAll();
             selectedDrinkVariant = new DrinkVariant();
-            drinkVariantBinder.readBean(null);
-            saveButton.setEnabled(true);
-            cancelButton.setEnabled(true);
+            drinkVariantBinder.readBean(selectedDrinkVariant);
             editingNewDrinkVariant = true;
+            drinkCB.setValue(Drink.NO_DRINK);
             updateEditDrinkVariantLayoutState();
+            clearNumberFieldChildren(drinkVariantForm.getChildren());
         });
         return button;
     }
@@ -76,24 +91,96 @@ public class DrinkVariantManagementView extends VerticalLayout {
         setChildrenEnabled(drinkVariantForm.getChildren(), selectedDrinkVariant != null);
     }
 
-    private HorizontalLayout createDrinkVariantGridFormLayout() {
+    private HorizontalLayout createGridFormLayout() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setSizeFull();
         drinkVariantGrid = createDrinkVariantGrid();
-        layout.add(drinkVariantGrid, createDrinkVariantFormLayout());
+        drinkVariantForm = drinkVariantForm();
+        layout.add(drinkVariantGrid, drinkVariantForm);
         return layout;
     }
 
-    private VerticalLayout createDrinkVariantFormLayout(){
-        VerticalLayout layout = new VerticalLayout();
-        layout.setSizeFull();
-        layout.setWidth("25%");
-        drinkVariantForm = new DrinkVariantForm(drinkVariantBinder, drinkBinder);
-        layout.add(drinkVariantForm, createValidationLabelLayout(), createButton());
-        loadNewDrinkVariant();
-        return layout;
+    private FormLayout drinkVariantForm() {
+        FormLayout drinkVariantlayout = new FormLayout();
+        drinkVariantlayout.setWidth("25%");
+
+        drinkCB = createDrinkCB();
+
+        NumberField priceField = new NumberField("Preis");
+        IntegerField variantField = new IntegerField("Variante");
+        Button saveButton = new Button("Sichern");
+        Button cancelButton = new Button("Abbrechen");
+
+        variantField.setWidthFull();
+        variantField.setSuffixComponent(new Span("ml"));
+        variantField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
+        priceField.setWidthFull();
+        priceField.setSuffixComponent(new Span("EUR"));
+        priceField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
+
+        HorizontalLayout buttonLayout = new HorizontalLayout();
+        buttonLayout.setWidthFull();
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
+        cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
+
+        saveButton.addClickListener(clickEvent -> {
+            DrinkVariant undeditedDrinkVariant = new DrinkVariant(selectedDrinkVariant);
+            if (writeBean()) {
+                if (validateDrinkVariantSave()) {
+                    saveToDbAndUpdateDrinkVariant();
+                } else {
+                    selectedDrinkVariant.copyValueOf(undeditedDrinkVariant);
+                }
+            }
+        });
+        cancelButton.addClickListener(clickEvent -> resetEditLayout());
+
+        buttonLayout.add(cancelButton, saveButton);
+        buttonLayout.setFlexGrow(1, cancelButton, saveButton);
+
+        drinkVariantlayout.add(drinkCB, variantField, priceField, createValidationLabelLayout(),
+                buttonLayout);
+
+        drinkVariantBinder.bind(drinkCB,
+                drinkVariant -> drinkVariant.getDrink() == null ? Drink.NO_DRINK : drinkVariant.getDrink(),
+                ((drinkVariant, drink) -> {
+                    if (drink.equals(Drink.NO_DRINK)) {
+                        drinkVariant.setDrink(null);
+                    } else {
+                        drinkVariant.setDrink(drink);
+                    }
+                }));
+        drinkVariantBinder.bind(priceField, DrinkVariant::getPrice, DrinkVariant::setPrice);
+        drinkVariantBinder.bind(variantField, DrinkVariant::getMl, DrinkVariant::setMl);
+        return drinkVariantlayout;
     }
-    private VerticalLayout createValidationLabelLayout(){
+
+    private ComboBox<Drink> createDrinkCB() {
+        ComboBox<Drink> drinkCB = new ComboBox<>("Getränk");
+
+        List<Drink> drinkList = Repos.getDrinkRepository().findAll();
+        Set<Drink> drinkSet = new HashSet<>(drinkList.size() + 1);
+        drinkSet.add(Drink.NO_DRINK);
+        drinkSet.addAll(drinkList);
+        ListDataProvider<Drink> dataProvider = new ListDataProvider<>(drinkSet);
+        dataProvider.setSortComparator((SerializableComparator<Drink>) (o1, o2) -> o1.getName().compareTo(o2.getName()));
+
+        drinkCB.setWidthFull();
+        drinkCB.setItems(dataProvider);
+        drinkCB.setValue(Drink.NO_DRINK);
+        drinkCB.setItemLabelGenerator(Drink::getName);
+        drinkCB.setAllowCustomValue(false);
+        drinkCB.setRequiredIndicatorVisible(true);
+        drinkCB.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
+
+        return drinkCB;
+    }
+
+
+    private VerticalLayout createValidationLabelLayout() {
         VerticalLayout validationLabelLayout = new VerticalLayout();
         validationLabelLayout.setWidthFull();
         validationLabelLayout.setPadding(false);
@@ -107,45 +194,22 @@ public class DrinkVariantManagementView extends VerticalLayout {
         return validationLabelLayout;
     }
 
-    private boolean writeBean(){
-        try{
+    private boolean writeBean() {
+        try {
             drinkVariantBinder.writeBean(selectedDrinkVariant);
             return true;
-        } catch (ValidationException e){
-            if(!e.getValidationErrors().isEmpty()) {
+        } catch (ValidationException e) {
+            if (!e.getValidationErrors().isEmpty()) {
                 validationErrorLabel.setText(e.getValidationErrors().get(0).getErrorMessage());
             }
         }
         return false;
     }
 
-    public Component createButton(){
-        HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.setWidthFull();
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
-        cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
 
-        saveButton.addClickListener(clickEvent ->{
-            DrinkVariant undeditedDrinkVariant = new DrinkVariant(selectedDrinkVariant);
-            if(writeBean()){
-                if(validateDrinkVariantSave()){
-                    saveToDbAndUpdateDrinkVariant();
-                } else {
-                    selectedDrinkVariant.copyValueOf(undeditedDrinkVariant);
-                }
-            }
-        });
-        cancelButton.addClickListener(clickEvent -> resetEditLayout());
-
-        buttonLayout.add(cancelButton, saveButton);
-        buttonLayout.setFlexGrow(1, cancelButton, saveButton);
-        return buttonLayout;
-    }
-
-    private void saveToDbAndUpdateDrinkVariant(){
+    private void saveToDbAndUpdateDrinkVariant() {
         drinkVariantRepository.save(selectedDrinkVariant);
-        if(editingNewDrinkVariant){
+        if (editingNewDrinkVariant) {
             drinkVariantGrid.getListDataView().addItem(selectedDrinkVariant);
         } else {
             drinkVariantGrid.getListDataView().refreshItem(selectedDrinkVariant);
@@ -154,41 +218,38 @@ public class DrinkVariantManagementView extends VerticalLayout {
         showNotification("Getränkvariante gespeichert");
     }
 
-    private void resetEditLayout(){
+    private void resetEditLayout() {
         drinkVariantGrid.deselectAll();
         selectedDrinkVariant = null;
         editingNewDrinkVariant = false;
-        saveButton.setEnabled(false);
-        cancelButton.setEnabled(false);
 
         Drink drink = new Drink();
         drink.addDrinkVariant(new DrinkVariant());
         drinkBinder.readBean(drink);
 
         updateEditDrinkVariantLayoutState();
-        setValueForIntegerFieldChildren(drinkVariantForm.getChildren(), null);
+        clearNumberFieldChildren(drinkVariantForm.getChildren());
     }
 
-    private boolean validateDrinkVariantSave(){
+    private boolean validateDrinkVariantSave() {
+        //checke ob Getränk ausgewählt
+        if (selectedDrinkVariant.getDrink() == null) {
+            validationErrorLabel.setText("Ein Getränk muss ausgewählt sein!");
+            return false;
+        }
+
         Optional<DrinkVariant> dbDrinkVariant = drinkVariantRepository.findById(selectedDrinkVariant.getId());
-        //Variante(ml) und name duplicate check
-        // name check noch nicht geschrieben FEHLT noch !!
+        //Variante(ml) duplicate check
+
         Set<Integer> drinkVariantMlSet = drinkVariantRepository.findAllMlForDrink(selectedDrinkVariant.getDrink());
         dbDrinkVariant.ifPresent(drinkVariant -> {
             drinkVariantMlSet.remove(drinkVariant.getMl());
         });
-        if(drinkVariantMlSet.contains(selectedDrinkVariant.getMl())) {
+        if (drinkVariantMlSet.contains(selectedDrinkVariant.getMl())) {
             validationErrorLabel.setText("Ein Getränkvariante mit dieser größe existiert bereits");
             return false;
         }
         return true;
-    }
-
-    public void loadNewDrinkVariant(){
-        int counter = drinkVariantGrid.getListDataView().getItemCount();
-        int drinkVariantCounter = counter -1;
-        selectedDrinkVariant = drinkVariantGrid.getListDataView().getItem(drinkVariantCounter);
-        drinkVariantBinder.readBean(selectedDrinkVariant);
     }
 
     private Grid<DrinkVariant> createDrinkVariantGrid() {
@@ -202,7 +263,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
         Grid.Column<DrinkVariant> priceColumn = drinkVariantGrid.addColumn(DrinkVariant::getPrice).setHeader("Preis");
         Grid.Column<DrinkVariant> activeColumn =
                 drinkVariantGrid.addColumn(DrinkVariant ->
-                        DrinkVariant.getDrink() == null ? "" : DrinkVariant.getDrink().isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
+                        DrinkVariant.getDrink() == null ? "" : DrinkVariant.getDrink().isActive() ? "Aktiv" : "Inaktiv").setHeader("Getränk Aktiv");
         drinkVariantGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
         drinkVariantGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         drinkVariantGrid.setWidth("75%");
@@ -224,8 +285,6 @@ public class DrinkVariantManagementView extends VerticalLayout {
         drinkVariantGrid.addSelectionListener(e -> {
             if (e.isFromClient()) {
                 Optional<DrinkVariant> optionalDrinkVariant = e.getFirstSelectedItem();
-                saveButton.setEnabled(true);
-                cancelButton.setEnabled(true);
                 if (optionalDrinkVariant.isPresent()) {
                     selectedDrinkVariant = optionalDrinkVariant.get();
                     drinkVariantBinder.readBean(selectedDrinkVariant);
@@ -233,8 +292,6 @@ public class DrinkVariantManagementView extends VerticalLayout {
                 } else {
                     selectedDrinkVariant = null;
                     drinkVariantBinder.readBean(null);
-                    saveButton.setEnabled(false);
-                    cancelButton.setEnabled(false);
                 }
             }
             updateEditDrinkVariantLayoutState();
@@ -257,11 +314,11 @@ public class DrinkVariantManagementView extends VerticalLayout {
 
         public boolean test(DrinkVariant drinkVariant) {
             boolean matchesId = matches(String.valueOf(drinkVariant.getId()), id);
-            //boolean matchesDrink = matches((drinkVariant.getDrink().getName()), name);
+            boolean matchesDrink = matches((drinkVariant.getDrink().getName()), name);
             boolean matchesMilliliter = matches(String.valueOf(drinkVariant.getMl()), milliliter);
             boolean matchesPrice = matches(String.valueOf(drinkVariant.getPrice()), price);
-         //   boolean matchesActive = active == null || active == drinkVariant.getDrink().isActive();
-            return matchesId  && matchesMilliliter && matchesPrice; // && matchesActive && matchesDrink;
+            boolean matchesActive = active == null || active == drinkVariant.getDrink().isActive();
+            return matchesId && matchesDrink && matchesMilliliter && matchesPrice && matchesActive;
         }
 
         private boolean matches(String value, String searchTerm) {

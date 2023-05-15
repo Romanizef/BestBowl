@@ -67,6 +67,7 @@ public class BowlingShoeManagementView extends VerticalLayout {
             cancelButton.setEnabled(true);
             editingNewBowlingShoe = false;
             updateEditBowlingShoeLayoutState();
+            clearNumberFieldChildren(bowlingShoeForm.getChildren());
         });
         return button;
     }
@@ -162,7 +163,7 @@ public class BowlingShoeManagementView extends VerticalLayout {
         cancelButton.setEnabled(false);
 
         updateEditBowlingShoeLayoutState();
-        setValueForIntegerFieldChildren(bowlingShoeForm.getChildren(),null);
+        clearNumberFieldChildren(bowlingShoeForm.getChildren());
     }
 
 

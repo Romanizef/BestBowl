@@ -67,6 +67,7 @@ public class FoodManagementView extends VerticalLayout {
             cancelButton.setEnabled(true);
             editingNewFood = false;
             updateEditFoodLayoutState();
+            clearNumberFieldChildren(foodForm.getChildren());
         });
         return button;
     }
@@ -164,7 +165,7 @@ public class FoodManagementView extends VerticalLayout {
         saveButton.setEnabled(false);
         cancelButton.setEnabled(false);
         updateEditFoodLayoutState();
-        setValueForIntegerFieldChildren(foodForm.getChildren(),null);
+        clearNumberFieldChildren(foodForm.getChildren());
     }
 
     private boolean validateFoodSave(){

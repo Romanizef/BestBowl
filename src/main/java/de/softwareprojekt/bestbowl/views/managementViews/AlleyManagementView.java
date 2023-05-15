@@ -183,7 +183,7 @@ public class AlleyManagementView extends VerticalLayout {
         binder.readBean(bowlingAlley);
 
         updateEditLayoutState();
-        setValueForIntegerFieldChildren(editLayout.getChildren(), null);
+        clearNumberFieldChildren(editLayout.getChildren());
     }
 
     private VerticalLayout createValidationLabelLayout() {

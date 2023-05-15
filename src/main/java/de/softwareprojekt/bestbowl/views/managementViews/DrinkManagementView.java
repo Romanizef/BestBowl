@@ -16,7 +16,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
-import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.jpa.entities.Drink;
@@ -29,7 +28,6 @@ import de.softwareprojekt.bestbowl.views.form.DrinkForm;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -43,13 +41,11 @@ public class DrinkManagementView extends VerticalLayout {
     private final DrinkRepository drinkRepository;
     private final DrinkVariantRepository drinkVariantRepository;
     private final Binder<Drink> drinkBinder = new Binder<>();
-    private Grid<Drink> drinkGrid;
-    private DrinkForm drinkForm;
-
     private final Button saveButton = new Button("Sichern");
     private final Button cancelButton = new Button("Abbrechen");
     private final Button saveAndOpenDrinkVariantButton = new Button("Sicher & neue Variante anlegen");
-
+    private Grid<Drink> drinkGrid;
+    private DrinkForm drinkForm;
     private Drink selectedDrink = null;
     private Label validationErrorLabel;
     private boolean editingNewDrink = false;
@@ -78,6 +74,7 @@ public class DrinkManagementView extends VerticalLayout {
             cancelButton.setEnabled(true);
             editingNewDrink = true;
             updateEditDrinkLayoutState();
+            clearNumberFieldChildren(drinkForm.getChildren());
         });
         return button;
     }
@@ -95,7 +92,7 @@ public class DrinkManagementView extends VerticalLayout {
         return layout;
     }
 
-    private VerticalLayout createDrinkFormLayout(){
+    private VerticalLayout createDrinkFormLayout() {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
         layout.setWidth("25%");
@@ -104,7 +101,7 @@ public class DrinkManagementView extends VerticalLayout {
         return layout;
     }
 
-    private VerticalLayout createValiationLabelLayout(){
+    private VerticalLayout createValiationLabelLayout() {
         VerticalLayout validationLabelLayout = new VerticalLayout();
         validationLabelLayout.setWidthFull();
         validationLabelLayout.setPadding(false);
@@ -118,19 +115,19 @@ public class DrinkManagementView extends VerticalLayout {
         return validationLabelLayout;
     }
 
-    private  boolean writeBean(){
-        try{
+    private boolean writeBean() {
+        try {
             drinkBinder.writeBean(selectedDrink);
             return true;
-        } catch (ValidationException e){
-            if(!e.getValidationErrors().isEmpty()){
+        } catch (ValidationException e) {
+            if (!e.getValidationErrors().isEmpty()) {
                 validationErrorLabel.setText(e.getValidationErrors().get(0).getErrorMessage());
             }
         }
         return false;
     }
 
-    private Component createButton(){
+    private Component createButton() {
         VerticalLayout buttonOrderLayout = new VerticalLayout();
         buttonOrderLayout.setWidthFull();
         buttonOrderLayout.setPadding(false);
@@ -147,22 +144,27 @@ public class DrinkManagementView extends VerticalLayout {
         cancelButton.setEnabled(false);
         cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
 
-        saveAndOpenDrinkVariantButton.addClickListener(clickEvent ->{
+        saveAndOpenDrinkVariantButton.addClickListener(clickEvent -> {
             Drink undeditedDrink = new Drink(selectedDrink);
-            if(writeBean()){
-                if(validateDrinkSave()){
+            if (writeBean()) {
+                if (validateDrinkSave()) {
+                    Drink drinkDummy = selectedDrink;
                     saveToDbAndUpdateDrink();
-                    UI.getCurrent().getPage().open("http://localhost:8080/drinkVariantManagement", "_self");
+                    UI.getCurrent().navigate(DrinkVariantManagementView.class).ifPresent(view -> {
+                        DrinkVariant drinkVariant = new DrinkVariant();
+                        drinkVariant.setDrink(drinkDummy);
+                        view.setSelectedDrinkVariant(drinkVariant);
+                    });
                 } else {
                     selectedDrink.copyValuesOf(undeditedDrink);
                 }
             }
         });
 
-        saveButton.addClickListener(clickEvent ->{
+        saveButton.addClickListener(clickEvent -> {
             Drink undeditedDrink = new Drink(selectedDrink);
-            if(writeBean()){
-                if(validateDrinkSave()){
+            if (writeBean()) {
+                if (validateDrinkSave()) {
                     saveToDbAndUpdateDrink();
                 } else {
                     selectedDrink.copyValuesOf(undeditedDrink);
@@ -180,10 +182,9 @@ public class DrinkManagementView extends VerticalLayout {
         return buttonOrderLayout;
     }
 
-    private void saveToDbAndUpdateDrink(){
+    private void saveToDbAndUpdateDrink() {
         drinkRepository.save(selectedDrink);
-        if(editingNewDrink){
-            createNewDrinkVariant();
+        if (editingNewDrink) {
             drinkGrid.getListDataView().addItem(selectedDrink);
         } else {
             drinkGrid.getListDataView().refreshItem(selectedDrink);
@@ -192,14 +193,7 @@ public class DrinkManagementView extends VerticalLayout {
         showNotification("Getränk gespeichert");
     }
 
-    private void createNewDrinkVariant(){
-        drinkBinder.readBean(selectedDrink);
-        DrinkVariant newDrinkVariant = new DrinkVariant();
-        newDrinkVariant.setDrink(selectedDrink);
-        drinkVariantRepository.save(newDrinkVariant);
-    }
-
-    private void resetEditLayout(){
+    private void resetEditLayout() {
         drinkGrid.deselectAll();
         selectedDrink = null;
         editingNewDrink = false;
@@ -212,17 +206,17 @@ public class DrinkManagementView extends VerticalLayout {
         drinkBinder.readBean(drink);
 
         updateEditDrinkLayoutState();
-        setValueForIntegerFieldChildren(drinkForm.getChildren(), null);
+        clearNumberFieldChildren(drinkForm.getChildren());
     }
 
-    private boolean validateDrinkSave(){
+    private boolean validateDrinkSave() {
         Optional<Drink> dbDrink = drinkRepository.findById(selectedDrink.getId());
         //name duplicate check
         Set<String> drinkNameSet = drinkRepository.findAllNames();
         dbDrink.ifPresent(drink -> {
             drinkNameSet.remove(drink.getName());
         });
-        if(drinkNameSet.contains(selectedDrink.getName())){
+        if (drinkNameSet.contains(selectedDrink.getName())) {
             validationErrorLabel.setText("Ein Getränk mit diesem Namen existiert bereits");
             return false;
         }

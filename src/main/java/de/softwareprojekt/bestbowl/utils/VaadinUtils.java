@@ -8,9 +8,7 @@ import com.vaadin.flow.component.combobox.ComboBoxVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.textfield.TextFieldVariant;
+import com.vaadin.flow.component.textfield.*;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.SerializableComparator;
@@ -171,13 +169,17 @@ public class VaadinUtils {
      * @param children stream of all child elements
      * @param value    new value for all IntegerFields
      */
-    public static void setValueForIntegerFieldChildren(Stream<Component> children, Integer value) {
+    public static void clearNumberFieldChildren(Stream<Component> children) {
         children.forEach(component -> {
             if (component instanceof HasOrderedComponents parent) {
-                setValueForIntegerFieldChildren(parent.getChildren(), value);
+                clearNumberFieldChildren(parent.getChildren());
             }
             if (component instanceof IntegerField child) {
-                child.setValue(value);
+                child.setValue(null);
+                child.setInvalid(false);
+            }
+            if (component instanceof NumberField child){
+                child.setValue(null);
                 child.setInvalid(false);
             }
         });
