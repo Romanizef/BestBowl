@@ -95,6 +95,7 @@ public class ClientManagementView extends VerticalLayout {
             binder.readBean(selectedClient);
             editingNewClient = true;
             updateEditLayoutState();
+            clearNumberFieldChildren(editLayout.getChildren());
         });
         return button;
     }
