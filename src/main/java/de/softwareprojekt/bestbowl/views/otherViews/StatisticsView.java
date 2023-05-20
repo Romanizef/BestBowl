@@ -12,7 +12,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
@@ -33,6 +35,7 @@ import com.vaadin.flow.server.StreamResource;
 
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.FoodBooking;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyBookingRepository;
@@ -42,6 +45,7 @@ import de.softwareprojekt.bestbowl.jpa.repositories.FoodBookingRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.utils.pdf.PDFUtils;
 import de.softwareprojekt.bestbowl.views.MainView;
+import de.softwareprojekt.bestbowl.views.bookingViews.ClientSearchView;
 import jakarta.annotation.security.RolesAllowed;
 
 /**
@@ -59,8 +63,10 @@ public class StatisticsView extends VerticalLayout {
     private final transient DrinkBookingRepository drinkBookingRepository;
     private final transient FoodBookingRepository foodBookingRepository;
     private final transient BowlingShoeBookingRepository shoeBookingRepository;
-
-    private TextField searchField;
+    private Client currentClient = null;
+    private Button lastViewButton;
+    private Button refreshButton;
+    private final H1 clientHeader;
 
     @Autowired
     public StatisticsView(BowlingAlleyBookingRepository bookingRepository,
@@ -70,76 +76,76 @@ public class StatisticsView extends VerticalLayout {
         this.drinkBookingRepository = drinkBookingRepository;
         this.foodBookingRepository = foodBookingRepository;
         this.shoeBookingRepository = shoeBookingRepository;
+        clientHeader = new H1();
         setSizeFull();
-        Component headerComponent = createHeader();
-        Component searchComponent = createSearchComponent();
-        HorizontalLayout gridLayout = createGridLayout();
-        add(headerComponent, searchComponent, gridLayout);
+        bookingGrid = createGrid();
+        Component footerComponent = createFooterComponent();
+        add(clientHeader, bookingGrid, footerComponent);
         updateGridItems();
     }
 
+    // setter für aktuellen Kunden
+    public void setSelectedClient(Client selectedClient) {
+        this.currentClient = selectedClient;
+        updateInitialComponents();
+    }
+
+    // Message wenn kein Kunde ausgewählt
+    // Text feld welcher kunde ausgewählt
+    private void updateInitialComponents() {
+        if (currentClient == null) {
+            clientHeader.setText("Statistiken für: (kein Kunde ausgewählt)");
+        } else {
+            clientHeader
+                    .setText("Statistiken für: " + currentClient.getFirstName() + " " + currentClient.getLastName());
+        }
+    }
+
     /**
-     * Creates a html header
+     * Creates a {@code VerticalLayout} for the selected client label and the next
+     * step button, which is used to navigate to the next view.
      *
      * @return {@code Component}
      */
-    private Component createHeader() {
-        return new H1("Statistiken");
+    private Component createFooterComponent() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setWidthFull();
+        layout.setAlignItems(Alignment.CENTER);
+        layout.add(createLastViewButton(layout), createRefreshButton(layout));
+        return layout;
     }
 
-    private Component createSearchComponent() {
-        HorizontalLayout searchLayout = new HorizontalLayout();
-        searchLayout.setWidth("70%");
-        searchFieldConfig();
-        searchButtonConfig(searchLayout);
-        return searchLayout;
+    private Button createLastViewButton(VerticalLayout layout) {
+        lastViewButton = new Button("Zurück zu Kundensuche");
+        lastViewButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        lastViewButton.setIcon(new Icon(VaadinIcon.BACKWARDS));
+        lastViewButton.setWidth("55%");
+        lastViewButton.addClickListener(e -> UI.getCurrent().navigate(ClientSearchView.class));
+        return lastViewButton;
     }
 
-    private void searchFieldConfig() {
-        searchField = new TextField();
-        searchField.setPlaceholder("Suche nach Kundennummer, Rechnungsnummer oder Nachname ...");
-        searchField.setValueChangeMode(ValueChangeMode.EAGER);
-        searchField.addValueChangeListener(e -> updateGridItems());
-    }
-
-    private void searchButtonConfig(HorizontalLayout searchLayout) {
-        Button searchButton = new Button();
-        searchButton.setIcon(VaadinIcon.SEARCH.create());
-        searchButton.addClickListener(e -> updateGridItems());
-        searchLayout.expand(searchField);
-        searchLayout.add(searchField, searchButton);
+    // refresh button der updateGridItems aufruft (falls kunde leer nicht
+    // aktuallisieren, zurück zu kundensuche)
+    private Button createRefreshButton(VerticalLayout layout) {
+        refreshButton = new Button("Aktualisieren");
+        refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        refreshButton.setIcon(new Icon(VaadinIcon.REFRESH));
+        refreshButton.setWidth("55%");
+        lastViewButton.addClickListener(e -> {
+            if (this.currentClient != null) {
+                updateGridItems();
+            } else {
+                UI.getCurrent().navigate(ClientSearchView.class);
+            }
+        });
+        return refreshButton;
     }
 
     private void updateGridItems() {
-        List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository.findAll();
-        String searchFieldValue = searchField.getValue();
-        String[] searchTerms;
-        if (searchFieldValue != null) {
-            searchTerms = searchFieldValue.trim().split(" ");
-            Iterator<BowlingAlleyBooking> bowlingAlleyBookingIterator = bowlingAlleyBookingList.iterator();
-            while (bowlingAlleyBookingIterator.hasNext()) {
-                BowlingAlleyBooking bowlingAlleyBooking = bowlingAlleyBookingIterator.next();
-                List<String> searchTermsCopy = new ArrayList<>(Arrays.stream(searchTerms).toList());
-                matchAndRemoveIfContains(String.valueOf(bowlingAlleyBooking.getId()), searchTermsCopy);
-                matchAndRemoveIfContains(String.valueOf(bowlingAlleyBooking.getClient().getId()), searchTermsCopy);
-                matchAndRemoveIfContains(bowlingAlleyBooking.getClient().getLastName(), searchTermsCopy);
-                matchAndRemoveIfContains(String.valueOf(bowlingAlleyBooking.getStartTime()), searchTermsCopy);
-                if (!searchTermsCopy.isEmpty()) {
-                    bowlingAlleyBookingIterator.remove();
-                }
-            }
-        }
-        GridListDataView<BowlingAlleyBooking> bookingGridListDataView = bookingGrid
-                .setItems(bowlingAlleyBookingList);
-        bookingGridListDataView.setSortOrder(BowlingAlleyBooking::getId, SortDirection.ASCENDING);
-    }
+        bookingGrid.setItems(
+                bowlingAlleyBookingRepository
+                        .findAllByClientEquals(currentClient));
 
-    private HorizontalLayout createGridLayout() {
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.setSizeFull();
-        bookingGrid = createGrid();
-        layout.add(bookingGrid);
-        return layout;
     }
 
     /**
@@ -160,24 +166,27 @@ public class StatisticsView extends VerticalLayout {
         grid.addColumn(booking -> booking.getClient() == null ? "" : booking.getClient().getLastName())
                 .setHeader("Kundennachname").setSortable(true);
         grid.addColumn("startTime").setHeader("Datum");
-        //grid.addColumn(String.valueOf(calculateTotal())).setHeader("Summe");
+        // grid.addColumn(String.valueOf(calculateTotal())).setHeader("Summe");
 
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setSizeFull();
 
-        grid.addSelectionListener(e ->
-
-        {
-            if (e.isFromClient()) {
-                Optional<BowlingAlleyBooking> optionalStatistic = e.getFirstSelectedItem();
-                selectedBowlingAlleyBooking = optionalStatistic.orElse(null);
-            }
-        });
+        /*
+         * grid.addSelectionListener(e ->
+         * 
+         * {
+         * if (e.isFromClient()) {
+         * Optional<BowlingAlleyBooking> optionalStatistic = e.getFirstSelectedItem();
+         * selectedBowlingAlleyBooking = optionalStatistic.orElse(null);
+         * updateFooterComponents();
+         * }
+         * });
+         */
         return grid;
     }
 
-/*     private double calculateTotal() {
+    private double calculateTotal() {
         List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository.findAll();
         List<DrinkBooking> drinkBookingList = drinkBookingRepository.findAll();
         List<FoodBooking> foodBookingList = foodBookingRepository.findAll();
@@ -198,7 +207,7 @@ public class StatisticsView extends VerticalLayout {
         }
 
         return total;
-    } */
+    }
 
     private Component createDownloadAnchor() {
         Button pdfButton = new Button(new Icon(VaadinIcon.DOWNLOAD));

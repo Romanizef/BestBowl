@@ -29,6 +29,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepository;
 import de.softwareprojekt.bestbowl.utils.validators.ClientValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
+import de.softwareprojekt.bestbowl.views.otherViews.StatisticsView;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -54,6 +55,7 @@ public class ClientSearchView extends VerticalLayout {
     private Label validationErrorLabel;
     private TextField searchField;
     private Button nextStepButton;
+    private Button showStatisticButton;
     private Label selectedClientLabel;
     private Client selectedClient = null;
     private Client newClient = null;
@@ -227,7 +229,8 @@ public class ClientSearchView extends VerticalLayout {
     }
 
     /**
-     * Writes the contents of the bound fields into the {@code Client} object and validates the fields.
+     * Writes the contents of the bound fields into the {@code Client} object and
+     * validates the fields.
      *
      * @param client
      * @return {@code boolean}
@@ -371,6 +374,13 @@ public class ClientSearchView extends VerticalLayout {
         layout.add(selectedClientLabel, nextStepButton);
         nextStepButton.addClickListener(e -> UI.getCurrent().navigate(BowlingAlleyBookingView.class)
                 .ifPresent(bookingView -> bookingView.setSelectedClient(selectedClient)));
+               
+        showStatisticButton = new Button("Statistik anzeigen");
+        showStatisticButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        showStatisticButton.setWidth("55%");
+        layout.add(showStatisticButton);
+        showStatisticButton.addClickListener(e -> UI.getCurrent().navigate(StatisticsView.class)
+                .ifPresent(statisticsView -> statisticsView.setSelectedClient(selectedClient)));
         return layout;
     }
 
@@ -382,9 +392,11 @@ public class ClientSearchView extends VerticalLayout {
         String template = "Ausgewählter Kunde: ";
         if (selectedClient == null) {
             nextStepButton.setEnabled(false);
+            showStatisticButton.setEnabled(false);
             selectedClientLabel.setText(template);
         } else {
             nextStepButton.setEnabled(true);
+            showStatisticButton.setEnabled(true);
             selectedClientLabel.setText(template + selectedClient.getFirstName() + " " + selectedClient.getLastName());
         }
     }

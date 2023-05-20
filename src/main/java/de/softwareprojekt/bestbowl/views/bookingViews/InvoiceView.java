@@ -147,9 +147,10 @@ public final class InvoiceView extends VerticalLayout {
         return tabSubButton;
     }
 
+    //Notification mit text
     private final Notification showTabDeletionErrorNotification() {
         errorNotification = new Notification();
-        errorNotification.setPosition(Position.BOTTOM_CENTER);
+        errorNotification.setPosition(Position.MIDDLE);
         errorNotification.addThemeVariants(NotificationVariant.LUMO_ERROR);
 
         Div text = new Div(new Text("Gesamtrechnung nicht löschbar!"));

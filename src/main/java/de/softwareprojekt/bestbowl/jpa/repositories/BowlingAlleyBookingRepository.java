@@ -1,6 +1,8 @@
 package de.softwareprojekt.bestbowl.jpa.repositories;
 
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.Client;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,4 +22,5 @@ public interface BowlingAlleyBookingRepository extends JpaRepository<BowlingAlle
             "or :lowerBound between bab.startTime and bab.endTime " +
             ") order by bab.bowlingAlley.id")
     List<BowlingAlleyBooking> findAllByTimePeriodsOverlapping(@Param("lowerBound") long lowerBound, @Param("upperBound") long upperBound);
+    List<BowlingAlleyBooking> findAllByClientEquals(Client client);
 }

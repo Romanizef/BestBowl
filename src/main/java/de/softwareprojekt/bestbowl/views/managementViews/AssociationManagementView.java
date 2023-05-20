@@ -91,6 +91,7 @@ public class AssociationManagementView extends VerticalLayout {
             binder.readBean(selectedAssociation);
             editingNewAssociation = true;
             updateEditLayoutState();
+            clearNumberFieldChildren(editLayout.getChildren());
         });
         return button;
     }
