@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalTime;
 import java.util.Objects;
 
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.showNotification;
+import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
 
 /**
  * @author Marten Voß

@@ -38,7 +38,7 @@ import java.util.Locale;
 import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
 import static de.softwareprojekt.bestbowl.utils.Utils.toHoursString;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.isCurrentUserInRole;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.showNotification;
+import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
 
 /**
  * @author Marten Voß

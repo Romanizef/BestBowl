@@ -40,6 +40,7 @@ import java.util.Set;
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
 import static de.softwareprojekt.bestbowl.utils.Utils.matches;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
+import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
 
 /**
  * Creates a View for the Client Management.

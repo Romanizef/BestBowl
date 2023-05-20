@@ -1,31 +1,29 @@
 package de.softwareprojekt.bestbowl.views.bookingViews;
 
-import com.vaadin.flow.component.html.Div;
+import java.util.List;
+
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
-import de.softwareprojekt.bestbowl.utils.Messages.ErrorNotification;
+import de.softwareprojekt.bestbowl.utils.email.MailSenderService;
+import de.softwareprojekt.bestbowl.utils.messages.NotificationSender;
+import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.extrasElements.DrinkPanel;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.notification.Notification.Position;
 import jakarta.annotation.security.PermitAll;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.showNotification;
-
-import java.util.List;
 
 /**
  * @author Matija Kopschek
@@ -37,13 +35,15 @@ public final class InvoiceView extends VerticalLayout {
     private TabSheet tabs;
     private HorizontalLayout tabLayout;
     private HorizontalLayout buttonLayout;
-    private ErrorNotification errorNotification;
+    private NotificationSender errorNotification;
     private BowlingAlleyBooking bowlingAlleyBooking;
+    private final transient MailSenderService mailSenderController;
 
     public InvoiceView() {
         setSizeFull();
         setAlignItems(Alignment.CENTER);
-        errorNotification = new ErrorNotification();
+        errorNotification = new NotificationSender();
+        mailSenderController = new MailSenderService();
         Component tabComponent = tabConfig();
         Component addButton = addTabAddButton();
         Component subButton = addTabSubButton();
@@ -64,7 +64,7 @@ public final class InvoiceView extends VerticalLayout {
         return tabLayout;
     }
 
-    //TODO food und shoe
+    // TODO food und shoe
     public Component createCompleteInvoice() {
         VerticalLayout verticalLayout = new VerticalLayout();
         if (bowlingAlleyBooking != null) {
@@ -82,7 +82,7 @@ public final class InvoiceView extends VerticalLayout {
         return verticalLayout;
     }
 
-    //TODO food und shoe
+    // TODO food und shoe
     public Component createPartialInvoice() {
         VerticalLayout verticalLayout = new VerticalLayout();
         if (bowlingAlleyBooking != null) {
@@ -105,7 +105,7 @@ public final class InvoiceView extends VerticalLayout {
         this.bowlingAlleyBooking = bowlingAlleyBooking;
     }
 
-    public BowlingAlleyBooking getBowlingAlleyBooking(){
+    public BowlingAlleyBooking getBowlingAlleyBooking() {
         return bowlingAlleyBooking;
     }
 
@@ -143,8 +143,7 @@ public final class InvoiceView extends VerticalLayout {
             if (!tabs.getSelectedTab().getLabel().equals("Gesamtrechnung")) {
                 tabs.remove(tabs.getSelectedTab());
             } else {
-                errorNotification.setText("Gesamtrechnung nicht löschbar!");
-                errorNotification.showErrorNotification();
+                errorNotification.showErrorNotification("Gesamtrechnung nicht löschbar!");
             }
         });
         return tabSubButton;
@@ -161,8 +160,9 @@ public final class InvoiceView extends VerticalLayout {
         payButton.setDisableOnClick(true);
         payButton.addClickListener(clickEvent -> {
             showNotification("Rechnung bezahlt");
-            // TODO pdf erstellen und per EMail versenden
-            // TODO Rechnung speichern in Datenbank
+            mailSenderController.sendInvoiceMail(bowlingAlleyBooking);
+            bowlingAlleyBooking.setCompleted(true);
+            UI.getCurrent().navigate(ExtrasView.class);
         });
         return payButton;
     }
@@ -178,11 +178,11 @@ public final class InvoiceView extends VerticalLayout {
         payButton.setDisableOnClick(true);
         payButton.addClickListener(clickEvent -> {
             showNotification("Rechnung bezahlt");
+            bowlingAlleyBooking.setCompleted(true);
             // TODO Summe wird geupdated
             // TODO Alle Elemente sperren Children nochmal Angucken bei anderen Verwaltungen
-            // setChildrenEnabled();
+            // setChildrenEnabled(tabs.getChildren(), selectedAssociation != null);
             // TODO ExtraView auf erste Belegte Bahn weiterleiten
-            // Zahlung und Rechnung in DB speichern
         });
         return payButton;
     }

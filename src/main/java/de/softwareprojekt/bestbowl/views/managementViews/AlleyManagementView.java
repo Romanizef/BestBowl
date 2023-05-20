@@ -33,6 +33,7 @@ import java.util.Optional;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.matches;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
+import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
 
 /**
  * @author Matija

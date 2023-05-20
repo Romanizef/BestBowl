@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.showNotification;
+import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
 
 /**
  * @author Marten Voß

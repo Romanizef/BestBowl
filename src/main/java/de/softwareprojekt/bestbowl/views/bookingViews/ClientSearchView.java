@@ -37,6 +37,7 @@ import java.util.*;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
+import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
 
 /**
  * Creates a View in which the user can search for a Client.

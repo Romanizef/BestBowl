@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
+import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
 
 @Route(value = "foodManagement", layout = MainView.class)
 @PageTitle("Speiesenverwaltung")

@@ -30,6 +30,7 @@ import java.util.Optional;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
+import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
 
 @Route(value = "shoeManagement", layout = MainView.class)
 @PageTitle("Schuhverwaltung")

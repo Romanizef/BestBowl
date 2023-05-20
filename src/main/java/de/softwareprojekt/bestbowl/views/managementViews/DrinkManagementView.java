@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
+import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
 
 @Route(value = "drinkManagement", layout = MainView.class)
 @PageTitle("Getränkeverwaltung")

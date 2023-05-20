@@ -36,25 +36,6 @@ public class VaadinUtils {
     }
 
     /**
-     * Displays a message for 3000ms in the screen center.
-     *
-     * @param text the text to be displayed
-     */
-    public static void showNotification(String text) {
-        showNotification(text, 3000);
-    }
-
-    /**
-     * Displays a message for the given duration in the screen center.
-     *
-     * @param text the text to be displayed
-     */
-    public static void showNotification(String text, int durationInMs) {
-        Notification notification = Notification.show(text, durationInMs, Notification.Position.MIDDLE);
-        notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
-    }
-
-    /**
      * Generates a TextField to be used as a filter in a Grid header
      *
      * @param columnName           name to be displayed in the placeholder text

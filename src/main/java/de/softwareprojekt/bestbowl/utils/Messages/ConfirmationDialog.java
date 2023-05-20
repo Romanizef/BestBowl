@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.utils.Messages;
+package de.softwareprojekt.bestbowl.utils.messages;
 
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.html.Div;
