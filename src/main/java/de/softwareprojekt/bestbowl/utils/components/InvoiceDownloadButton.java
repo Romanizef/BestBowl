@@ -14,7 +14,7 @@ import java.io.ByteArrayInputStream;
  * @author Marten Voß
  */
 public class InvoiceDownloadButton extends Button {
-    private Anchor anchor = null;
+    private byte[] pdfContent;
 
     /**
      * Creates a button that wraps an Anchor which gets created only the first time the button is clicked.
@@ -29,21 +29,18 @@ public class InvoiceDownloadButton extends Button {
         super.addClickListener(e -> {
             if (e.isFromClient()) {
                 getParent().ifPresent(parent -> {
-                    if (anchor == null) {
-                        String fileName = "Rechnung_" + booking.getId() + ".pdf";
-                        byte[] pdfContent = PDFUtils.createInvoicePdf(booking);
-                        ByteArrayInputStream inputStream = new ByteArrayInputStream(pdfContent);
-                        StreamResource streamResource = new StreamResource(fileName, () -> inputStream);
-                        anchor = new Anchor();
-                        anchor.setHref(streamResource);
-                        anchor.getElement().setAttribute("download", fileName);
-                        anchor.getStyle().set("display", "none");
-                        parent.getElement().appendChild(anchor.getElement());
+                    String fileName = "Rechnung_" + booking.getId() + ".pdf";
+                    if (pdfContent == null) {
+                        pdfContent = PDFUtils.createInvoicePdf(booking);
                     }
-                });
-                if (anchor != null) {
+                    ByteArrayInputStream pdfContentStream = new ByteArrayInputStream(pdfContent);
+                    StreamResource streamResource = new StreamResource(fileName, () -> pdfContentStream);
+                    Anchor anchor = new Anchor();
+                    anchor.setHref(streamResource);
+                    anchor.getElement().setAttribute("download", fileName);
+                    parent.getElement().appendChild(anchor.getElement());
                     anchor.getElement().callJsFunction("click");
-                }
+                });
             }
         });
     }

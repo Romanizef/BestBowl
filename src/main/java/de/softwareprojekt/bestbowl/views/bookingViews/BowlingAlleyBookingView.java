@@ -16,9 +16,11 @@ import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.security.AuthenticationContext;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlley;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyRepository;
 import de.softwareprojekt.bestbowl.utils.Utils;
 import de.softwareprojekt.bestbowl.utils.email.MailSenderService;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
@@ -46,12 +48,14 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.showNotification;
 @PermitAll
 public class BowlingAlleyBookingView extends VerticalLayout {
     private final transient BowlingAlleyBookingRepository bowlingAlleyBookingRepository;
+    private final transient BowlingAlleyRepository bowlingAlleyRepository;
     private final transient AuthenticationContext authenticationContext;
     private final transient AlleyBookingChecker alleyBookingChecker = new AlleyBookingChecker();
     private final H1 clientHeader;
     private final Grid<BowlingAlleyBooking> bookingGrid;
     private final Button bookButton;
     private final Button continueToExtrasButton;
+    private final transient MailSenderService mailSenderController = new MailSenderService();
     private DatePicker datePicker;
     private TimePicker timePicker;
     private ComboBox<Duration> durationCB;
@@ -62,12 +66,13 @@ public class BowlingAlleyBookingView extends VerticalLayout {
     private BowlingAlleyBooking latestBooking = null;
     private long gridLowerBound;
     private long gridUpperBound;
-    private MailSenderService mailSenderController = new MailSenderService();
 
     @Autowired
     public BowlingAlleyBookingView(BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
-            AuthenticationContext authenticationContext) {
+                                   BowlingAlleyRepository bowlingAlleyRepository,
+                                   AuthenticationContext authenticationContext) {
         this.bowlingAlleyBookingRepository = bowlingAlleyBookingRepository;
+        this.bowlingAlleyRepository = bowlingAlleyRepository;
         this.authenticationContext = authenticationContext;
         setSizeFull();
         setAlignItems(Alignment.CENTER);
@@ -115,6 +120,10 @@ public class BowlingAlleyBookingView extends VerticalLayout {
         layout.add(datePicker, timePicker, durationCB, checkButton, wholeDayButton);
 
         checkButton.addClickListener(e -> {
+            if (!checkForBowlingAlleys()) {
+                showNotification("Keine Bahn im System angelegt");
+                return;
+            }
             if (verifyTime()) {
                 alleyBookingChecker.setTimeInfo(datePicker.getValue(), timePicker.getValue(),
                         (int) (durationCB.getValue().hours() * 60));
@@ -145,6 +154,10 @@ public class BowlingAlleyBookingView extends VerticalLayout {
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         button.addClickListener(e -> {
+            if (!checkForBowlingAlleys()) {
+                showNotification("Keine Bahn im System angelegt");
+                return;
+            }
             if (verifyTime()) {
                 alleyBookingChecker.setTimeInfo(datePicker.getValue(), timePicker.getValue(),
                         (int) (durationCB.getValue().hours() * 60));
@@ -254,6 +267,11 @@ public class BowlingAlleyBookingView extends VerticalLayout {
         this.selectedClient = selectedClient;
         alleyBookingChecker.setClient(selectedClient);
         updateInitialComponents();
+    }
+
+    private boolean checkForBowlingAlleys() {
+        List<BowlingAlley> bowlingAlleyList = bowlingAlleyRepository.findAll();
+        return !bowlingAlleyList.isEmpty();
     }
 
     private boolean verifyTime() {
