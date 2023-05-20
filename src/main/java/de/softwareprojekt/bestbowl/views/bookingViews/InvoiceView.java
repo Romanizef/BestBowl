@@ -10,6 +10,7 @@ import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
+import de.softwareprojekt.bestbowl.utils.Messages.ErrorNotification;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.extrasElements.DrinkPanel;
 import com.vaadin.flow.component.icon.Icon;
@@ -36,12 +37,13 @@ public final class InvoiceView extends VerticalLayout {
     private TabSheet tabs;
     private HorizontalLayout tabLayout;
     private HorizontalLayout buttonLayout;
-    private Notification errorNotification;
+    private ErrorNotification errorNotification;
     private BowlingAlleyBooking bowlingAlleyBooking;
 
     public InvoiceView() {
         setSizeFull();
         setAlignItems(Alignment.CENTER);
+        errorNotification = new ErrorNotification();
         Component tabComponent = tabConfig();
         Component addButton = addTabAddButton();
         Component subButton = addTabSubButton();
@@ -141,28 +143,11 @@ public final class InvoiceView extends VerticalLayout {
             if (!tabs.getSelectedTab().getLabel().equals("Gesamtrechnung")) {
                 tabs.remove(tabs.getSelectedTab());
             } else {
-                showTabDeletionErrorNotification();
+                errorNotification.setText("Gesamtrechnung nicht löschbar!");
+                errorNotification.showErrorNotification();
             }
         });
         return tabSubButton;
-    }
-
-    //Notification mit text
-    private final Notification showTabDeletionErrorNotification() {
-        errorNotification = new Notification();
-        errorNotification.setPosition(Position.MIDDLE);
-        errorNotification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-
-        Div text = new Div(new Text("Gesamtrechnung nicht löschbar!"));
-        Icon icon = VaadinIcon.WARNING.create();
-
-        HorizontalLayout layout = new HorizontalLayout(icon, text);
-        layout.setAlignItems(Alignment.CENTER);
-
-        errorNotification.add(layout);
-        errorNotification.setDuration(3000);
-        errorNotification.open();
-        return errorNotification;
     }
 
     /**
