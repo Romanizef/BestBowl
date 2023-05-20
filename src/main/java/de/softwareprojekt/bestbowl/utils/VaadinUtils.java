@@ -8,7 +8,10 @@ import com.vaadin.flow.component.combobox.ComboBoxVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.textfield.*;
+import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.SerializableComparator;
@@ -38,8 +41,7 @@ public class VaadinUtils {
      * @param text the text to be displayed
      */
     public static void showNotification(String text) {
-        Notification notification = Notification.show(text, 3000, Notification.Position.MIDDLE);
-        notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
+        showNotification(text, 3000);
     }
 
     /**
@@ -178,7 +180,7 @@ public class VaadinUtils {
                 child.setValue(null);
                 child.setInvalid(false);
             }
-            if (component instanceof NumberField child){
+            if (component instanceof NumberField child) {
                 child.setValue(null);
                 child.setInvalid(false);
             }
