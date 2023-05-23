@@ -32,9 +32,5 @@ public interface BowlingAlleyBookingRepository extends JpaRepository<BowlingAlle
             "ORDER BY bab.bowlingAlley.id")
     List<BowlingAlleyBooking> findAllByTimePeriodsOverlapping(@Param("currentTime") long currentTime);
     List<BowlingAlleyBooking> findAllByClientEquals(Client client);
-
-
-
-
 }
 

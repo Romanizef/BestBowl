@@ -242,10 +242,10 @@ public class PDFUtils {
             contentStream.showText(booking.getClient().getFullName());
             contentStream.newLine();
             contentStream.showText("" + booking.getClient().getAddress().getStreet());
-            contentStream.showText("" + booking.getClient().getAddress().getHouseNr());
+            contentStream.showText(" " + booking.getClient().getAddress().getHouseNr());
             contentStream.newLine();
             contentStream.showText("" + booking.getClient().getAddress().getPostCode());
-            contentStream.showText("" + booking.getClient().getAddress().getCity());
+            contentStream.showText(" " + booking.getClient().getAddress().getCity());
             contentStream.endText();
 
             // Rechnugsnummer etc.
