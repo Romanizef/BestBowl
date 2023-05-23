@@ -16,13 +16,8 @@ import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlley;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.Drink;
-import de.softwareprojekt.bestbowl.jpa.entities.Food;
-import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.DrinkRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.FoodRepository;
+import de.softwareprojekt.bestbowl.jpa.entities.*;
+import de.softwareprojekt.bestbowl.jpa.repositories.*;
 import de.softwareprojekt.bestbowl.utils.VaadinUtils;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.extrasElements.DrinkPanel;
@@ -31,9 +26,7 @@ import de.softwareprojekt.bestbowl.views.extrasElements.ShoePanel;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -47,20 +40,44 @@ public class ExtrasView extends VerticalLayout {
     private final DrinkRepository drinkRepository;
     private final FoodRepository foodRepository;
 
-    private BowlingAlley bowlingAlley;
+    private final DrinkVariantRepository drinkVariantRepository;
 
-    private BowlingAlleyRepository bowlingAlleyRepository;
-    private BowlingAlleyBooking bowlingAlleyBooking;
+    private  FoodBookingRepository foodBookingRepository;
+
+    private DrinkBookingRepository drinkBookingRepository;
+
+    private BowlingAlley bowlingAlley;
+    private int currentBowlingAlleyId;
+    private BowlingAlleyBooking currentBowlingAlleyBooking;
+    private  Map<Integer, Button> buttonMap;
+    private final BowlingAlleyRepository bowlingAlleyRepository;
+    private BowlingAlleyBookingRepository bowlingAlleyBookingRepository;
     private HorizontalLayout alleyLayout;
     private HorizontalLayout tabLayout;
+
     private TabSheet tabs;
+
+    private FormLayout foodFormLayoutForAddItem;
+
+    private VerticalLayout drinkVerticalLayoutForAddItem;
+
+    //todo bookinglisten
 
 
     @Autowired
-    public ExtrasView(DrinkRepository drinkRepository, FoodRepository foodRepository, BowlingAlleyRepository bowlingAlleyRepository) {
+    public ExtrasView(DrinkRepository drinkRepository, FoodRepository foodRepository,
+                      BowlingAlleyRepository bowlingAlleyRepository, BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
+                      FoodBookingRepository foodBookingRepository, DrinkBookingRepository drinkBookingRepository,
+                      DrinkVariantRepository drinkVariantRepository) {
         this.bowlingAlleyRepository = bowlingAlleyRepository;
         this.drinkRepository = drinkRepository;
+        this.drinkVariantRepository = drinkVariantRepository;
         this.foodRepository = foodRepository;
+        this.bowlingAlleyBookingRepository = bowlingAlleyBookingRepository;
+        this.foodBookingRepository = foodBookingRepository;
+        this.drinkBookingRepository = drinkBookingRepository;
+        this.currentBowlingAlleyId = 1;
+        buttonMap = new HashMap<>();
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         Component alleyButtonsComponent = createAlleyButtonsComponent();
@@ -105,6 +122,7 @@ public class ExtrasView extends VerticalLayout {
             verticalLayout.add(new DrinkPanel(drink));
         }
         verticalLayout.setMaxHeight("400px");
+        drinkVerticalLayoutForAddItem = verticalLayout;
         return verticalLayout;
     }
 
@@ -120,6 +138,7 @@ public class ExtrasView extends VerticalLayout {
         }
 
         formLayout.setMaxWidth("1000px");
+        foodFormLayoutForAddItem = formLayout;
         return formLayout;
     }
 
@@ -130,20 +149,48 @@ public class ExtrasView extends VerticalLayout {
         // ToDo Buttons Einzeln erzeugen
 
         List<BowlingAlley> bowlingAlleyList = bowlingAlleyRepository.findAll();
+        if(bowlingAlleyList.isEmpty()){
+            //Todo banner notificition keine Bahnen, geh zu Bahnverwaltung und trage Bahnen ein
+        }
         bowlingAlleyList.sort(Comparator.comparingInt(BowlingAlley::getId));
         long currentTime = System.currentTimeMillis();
         List<BowlingAlley> freeBowlingAlleyList = bowlingAlleyRepository.findAllByNoBookingOverlapBetweenTimeStamps(currentTime, currentTime);
         Set<Integer> freeBowlingAlleyHashSet = freeBowlingAlleyList.stream().map(BowlingAlley::getId).collect(Collectors.toSet());
 
-        for (BowlingAlley bowlingAlley : bowlingAlleyList) {
-            Button bahn = new Button("Bahn " + bowlingAlley.getId());
-            bahn.setEnabled(!freeBowlingAlleyHashSet.contains(bowlingAlley.getId()));
-            alleyLayout.add(bahn);
+        List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository.findAllByTimePeriodsOverlapping(System.currentTimeMillis());
 
+        //Todo exception handling wenn keine bahnen
+
+        for (BowlingAlley bowlingAlley : bowlingAlleyList) {
+            Button alleyButton =  new Button("Bahn " + bowlingAlley.getId());
+            buttonMap.put(bowlingAlley.getId(),alleyButton);
+            alleyButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            alleyButton.setEnabled(!freeBowlingAlleyHashSet.contains(bowlingAlley.getId()));
+            alleyButton.addClickListener(buttonClickEvent -> {
+                changePreviousButtonStyle(currentBowlingAlleyId);
+                currentBowlingAlleyId = Integer.parseInt(alleyButton.getText().replaceAll("\\D+(\\d+)", "$1"));
+                changeCurrentButtonSytle(currentBowlingAlleyId);
+                currentBowlingAlleyBooking =  bowlingAlleyBookingList.stream().filter(bowlingAlleyBooking ->
+                                 bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
+                         .findFirst()
+                         .orElse(null);
+
+            });
+
+            alleyLayout.add(alleyButton);
         }
 
         return alleyLayout;
     }
+
+    private void  changePreviousButtonStyle(int currentBowlAlleyId){
+        buttonMap.get(currentBowlAlleyId).removeThemeVariants(ButtonVariant.LUMO_SUCCESS);
+    }
+
+    private void changeCurrentButtonSytle(int currentBowlAlleyId){
+        buttonMap.get(currentBowlAlleyId).addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+    }
+
 
     private Component createFooterButtons() {
         VerticalLayout layout = new VerticalLayout();
@@ -161,11 +208,17 @@ public class ExtrasView extends VerticalLayout {
         //ToDo Dialog Fenster "Sind Sie sicher das sie Bezahlen wollen?"
 
         addItem.addClickListener(buttonClickEvent -> {
+            //List<FoodBooking> newFoodBookings = new ArrayList<>();
+            addAllNewDrinkBookings();
+            addAllNewFoodBookings();
+
         });
 
         goToBill.addClickListener(buttonClickEvent -> {
-            VaadinUtils.showConfirmationDialog("Alles Gut?", "Ja Suppi", "Bruda nein", () -> {
-                UI.getCurrent().navigate(InvoiceView.class).ifPresent(view -> view.setBowlingAlleyBooking(bowlingAlleyBooking));
+            addAllNewDrinkBookings();
+            addAllNewFoodBookings();
+            VaadinUtils.showConfirmationDialog("Rechnung bezahlen?", "Ja", "Abbrechen", () -> {
+               UI.getCurrent().navigate(InvoiceView.class).ifPresent(view -> view.setBowlingAlleyBooking(currentBowlingAlleyBooking));
             });
         });
 
@@ -173,8 +226,73 @@ public class ExtrasView extends VerticalLayout {
         return layout;
     }
 
-    public void setBowlingAlleyBooking(BowlingAlleyBooking bowlingAlleyBooking) {
+    private void addAllNewDrinkBookings() {
+        drinkVerticalLayoutForAddItem.getChildren().forEach(component -> {
+            if (component instanceof DrinkPanel){
+                DrinkPanel drinkPanel = (DrinkPanel) component;
+
+            }
+        });
+    }
+
+    private void addAllNewFoodBookings() {
+        foodFormLayoutForAddItem.getChildren().forEach(component -> {
+            if (component instanceof FoodPanel foodPanel) {
+                int quantity = foodPanel.getFoodAmountField().getValue(); // Get the value from the IntegerField
+                if (quantity > 0) {
+                    String foodName = foodPanel.getFoodLabel().getText(); // Get the food name
+                    saveNewFoodBooking(foodName, quantity);
+                    foodPanel.resetFoodAmountFieldValue();
+                }
+            }
+        });
+    }
+
+    private void saveNewFoodBooking(String foodName, int amount) {
+        List<Food> foodList = foodRepository.findAll();
+        Food selectedFood = new Food();
+        for (Food food:foodList) {
+            if (food.getName().equals(foodName)){
+                selectedFood = food;
+            }
+        }
+        FoodBooking foodBooking = new FoodBooking();
+        foodBooking.setClient(currentBowlingAlleyBooking.getClient());
+        foodBooking.setAmount(amount);
+        foodBooking.setTimeStamp(System.currentTimeMillis());
+        foodBooking.setCompleted(false);
+        foodBooking.setBowlingAlley(currentBowlingAlleyBooking.getBowlingAlley());
+        foodBooking.setActive(true);
+        foodBooking.setName(selectedFood.getName());
+        foodBooking.setPrice(selectedFood.getPrice());
+        foodBookingRepository.save(foodBooking);
+    }
+
+    private void saveNewDrinkBooking(String drinkName, int amount, int ml){
+        List<Drink> drinkList = drinkRepository.findAll();
+        List<DrinkVariant> drinkVariantList = drinkVariantRepository.findAll();
+
+        Drink selectedDrink = new Drink();
+        DrinkVariant selectedDrinkVariant = new DrinkVariant();
+        for(Drink drink: drinkList){
+            if(drink.getName().equals(drinkName)){
+                selectedDrink = drink;
+            }
+        }
+
+        for (DrinkVariant drinkVariant: selectedDrink.getDrinkVariants()){
+            if (drinkVariant.getMl() == ml){
+                   selectedDrinkVariant = drinkVariant;
+            }
+        }
+
+        DrinkBooking drinkBooking = new DrinkBooking();
+
+        drinkBooking.setActive(true);
+
+    }
+    public void setCurrentBowlingAlleyBooking(BowlingAlleyBooking currentBowlingAlleyBooking) {
         //ToDo hier noch angeben, welche Bahn die mit Bahn Button übergeben wird
-        this.bowlingAlleyBooking = bowlingAlleyBooking;
+        //this.bowlingAlleyBooking = bowlingAlleyBooking;
     }
 }

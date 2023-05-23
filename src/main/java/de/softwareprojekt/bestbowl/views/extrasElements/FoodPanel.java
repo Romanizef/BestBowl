@@ -16,23 +16,30 @@ import de.softwareprojekt.bestbowl.jpa.entities.FoodBooking;
  */
 public class FoodPanel extends HorizontalLayout {
 
-    private Grid<FoodBooking> shoeGrid;
+
+
+
+    private IntegerField foodAmountField;
+
+
+
+    private Label foodLabel;
 
     public FoodPanel(Food food) {
-        Label label = new Label(food.getName());
-        label.setMinWidth("250px");
-        label.setMaxWidth("250px");
+        foodLabel = new Label(food.getName());
+        foodLabel.setMinWidth("250px");
+        foodLabel.setMaxWidth("250px");
 
-        IntegerField shoeAmountField = new IntegerField();
-        shoeAmountField.setValue(0);
-        shoeAmountField.setStepButtonsVisible(true);
-        shoeAmountField.setMin(0);
-        shoeAmountField.setMax(food.getStock());
+        foodAmountField = new IntegerField();
+        foodAmountField.setValue(0);
+        foodAmountField.setStepButtonsVisible(true);
+        foodAmountField.setMin(0);
+        foodAmountField.setMax(food.getStock());
 
         addCSS();
         setAlignItems(Alignment.CENTER);
         setFlexGrow(0);
-        add(label, shoeAmountField);
+        add(foodLabel, foodAmountField);
     }
 
     public FoodPanel(FoodBooking foodBooking) {
@@ -52,6 +59,22 @@ public class FoodPanel extends HorizontalLayout {
         add(label, shoeAmountField);
     }
 
+    public IntegerField getFoodAmountField() {
+        return foodAmountField;
+    }
+    public void setFoodAmountField(IntegerField foodAmountField) {
+        this.foodAmountField = foodAmountField;
+    }
+
+    public Label getFoodLabel() {
+        return foodLabel;
+    }
+    public void setFoodLabel(Label foodLabel) {
+        this.foodLabel = foodLabel;
+    }
+
+
+
     public IntegerField createIntegerField(Food food, FoodBooking foodBooking) {
         IntegerField sizeField = new IntegerField();
         sizeField.setValue(0);
@@ -68,5 +91,9 @@ public class FoodPanel extends HorizontalLayout {
      private void addCSS() {
         getStyle().set("border", "2px solid #b3f542").set("background-color", "#b3f54210").set("padding", "10px")
                 .set("margin-bottom", "10px").set("border-radius", "50px");
+    }
+
+    public void resetFoodAmountFieldValue() {
+        this.foodAmountField.setValue(0);
     }
 }

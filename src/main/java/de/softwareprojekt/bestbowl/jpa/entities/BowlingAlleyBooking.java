@@ -1,11 +1,9 @@
 package de.softwareprojekt.bestbowl.jpa.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author Marten Voß
@@ -26,6 +24,8 @@ public class BowlingAlleyBooking implements Serializable {
     private long endTime;
     private boolean completed;
     private double price;
+
+
 
     private boolean active;
 
@@ -100,4 +100,5 @@ public class BowlingAlleyBooking implements Serializable {
     public void setPrice(double price) {
         this.price = price;
     }
+
 }
