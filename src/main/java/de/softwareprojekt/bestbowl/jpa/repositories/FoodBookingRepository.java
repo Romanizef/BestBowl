@@ -22,7 +22,4 @@ public interface FoodBookingRepository extends JpaRepository<FoodBooking, FoodBo
     List<FoodBooking> findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(Client client, BowlingAlley bowlingAlley, long timeStamp);
     List<FoodBooking> findAllByClientEquals(Client client);
 
-    @Query("from FoodBooking fb where fb.client = :bab.client and fb.bowlingAlley = :bab.bowlingAlley and fb.timeStamp = :bab.timeStamp")
-    List<FoodBooking> findByKey(@Param("bab")BowlingAlleyBooking bab);
-    
 }

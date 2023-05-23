@@ -197,8 +197,8 @@ public class ExtrasView extends VerticalLayout {
         VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
         layout.setAlignItems(Alignment.CENTER);
-        Button addItem = new Button("Hinzufügen");
-        Button goToBill = new Button("Bezahlen");
+        Button addItem = new Button("Bestellung speichern");
+        Button goToBill = new Button("Zur Rechnungserstellung");
         addItem.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addItem.setWidth("55%");
         String bHeight = "55px";
@@ -290,7 +290,7 @@ public class ExtrasView extends VerticalLayout {
         FoodBooking foodBooking = new FoodBooking();
         foodBooking.setClient(currentBowlingAlleyBooking.getClient());
         foodBooking.setAmount(amount);
-        foodBooking.setTimeStamp(System.currentTimeMillis());
+        foodBooking.setTimeStamp(currentBowlingAlleyBooking.getStartTime());
         foodBooking.setBowlingAlley(currentBowlingAlleyBooking.getBowlingAlley());
         foodBooking.setName(selectedFood.getName());
         foodBooking.setPrice(selectedFood.getPrice());

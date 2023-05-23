@@ -22,7 +22,5 @@ public interface BowlingShoeBookingRepository extends JpaRepository<BowlingShoeB
     List<BowlingShoeBooking> findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(Client client, BowlingAlley bowlingAlley, long timeStamp);
     List<BowlingShoeBooking> findAllByClientEquals(Client client);
 
-    @Query("from BowlingShoeBooking bsb where bsb.client = :bab.client and bsb.bowlingAlley = :bab.bowlingAlley and bsb.timeStamp = :bab.timeStamp")
-    List<BowlingShoeBooking> findByKey(@Param("bab")BowlingAlleyBooking bab);
     
 }

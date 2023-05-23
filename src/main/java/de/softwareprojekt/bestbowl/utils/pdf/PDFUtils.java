@@ -67,7 +67,7 @@ public class PDFUtils {
                 if (positionIndex < totalPositions) {
                     List<InvoiceLine> invoiceLineList = createInvoiceLineList(drinkBookingList, foodBookingList,
                             shoeBookingList, positionIndex);
-                    createTableText(document, pdPage, invoiceLineList);
+                    //createTableText(document, pdPage, invoiceLineList);
                     positionIndex += POSITIONS_PER_PAGE;
                 }
                 if (positionIndex < totalPositions) {
@@ -85,24 +85,24 @@ public class PDFUtils {
 
     private static List<InvoiceLine> createInvoiceLineList(List<DrinkBooking> drinkBookingList,
             List<FoodBooking> foodBookingList, List<BowlingShoeBooking> shoeBookingList, int positionIndex) {
-        int offset = 0;
         List<InvoiceLine> invoiceLineList = new ArrayList<>(POSITIONS_PER_PAGE);
         for (int i = 0; i < POSITIONS_PER_PAGE; i++) {
-            if (positionIndex + i < drinkBookingList.size()) {
+            int offset = 0;
+            if (positionIndex + i + offset < drinkBookingList.size()) {
                 DrinkBooking drinkBooking = drinkBookingList.get(positionIndex + i);
                 InvoiceLine invoiceLine = new InvoiceLine("" + positionIndex + 1, drinkBooking.getName(),
                         "" + drinkBooking.getAmount(), "" + drinkBooking.getPrice());
                 invoiceLineList.add(invoiceLine);
             }
             offset += drinkBookingList.size();
-            if (positionIndex + i < foodBookingList.size() + offset) {
+            if (positionIndex + i + offset < foodBookingList.size() + offset) {
                 FoodBooking foodBooking = foodBookingList.get(positionIndex + i + offset);
                 InvoiceLine invoiceLine = new InvoiceLine("" + positionIndex + 1, foodBooking.getName(),
                         "" + foodBooking.getAmount(), "" + foodBooking.getPrice());
                 invoiceLineList.add(invoiceLine);
             }
             offset += foodBookingList.size();
-            if (positionIndex + i < shoeBookingList.size() + offset) {
+            if (positionIndex + i + offset < shoeBookingList.size() + offset) {
                 BowlingShoeBooking shoeBooking = shoeBookingList.get(positionIndex + i + offset);
                 InvoiceLine invoiceLine = new InvoiceLine("" + positionIndex + 1,
                         "Schuhgröße: " + shoeBooking.getBowlingShoe().getSize(),
@@ -126,6 +126,7 @@ public class PDFUtils {
             contentStream.setLeading(20f);
             contentStream.setFont(PDType1Font.TIMES_BOLD, 10);
             // contentStream.newLineAtOffset(initTextCoordinateX + 5, pageHeight - 64);
+            contentStream.endText();
 
             // Rechte Spalte
             contentStream.beginText();

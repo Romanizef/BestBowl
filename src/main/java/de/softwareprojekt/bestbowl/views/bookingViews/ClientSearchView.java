@@ -19,6 +19,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.provider.SortDirection;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -57,7 +58,6 @@ public class ClientSearchView extends VerticalLayout {
     private Label validationErrorLabel;
     private TextField searchField;
     private Button nextStepButton;
-    private Button showStatisticButton;
     private Label selectedClientLabel;
     private Client selectedClient = null;
     private Client newClient = null;
@@ -310,7 +310,11 @@ public class ClientSearchView extends VerticalLayout {
         Grid<Client> grid = new Grid<>(Client.class);
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         grid.removeAllColumns();
-        grid.addColumn("id").setHeader("Kundennummer");
+        grid.addColumn(new ComponentRenderer<>(client -> {
+            HorizontalLayout horizontalLayout = new HorizontalLayout();
+            horizontalLayout.add(createStatisticButton(client), new Label(String.valueOf(client.getId())));
+            return horizontalLayout;
+        })).setHeader("Rechnungsnummer");
         grid.addColumn("firstName").setHeader("Vorname");
         grid.addColumn("lastName").setHeader("Nachname");
         grid.addColumn("email").setHeader("E-Mail");
@@ -366,24 +370,26 @@ public class ClientSearchView extends VerticalLayout {
      * @return {@code Component}
      */
     private Component createFooterComponent() {
-        VerticalLayout layout = new VerticalLayout();
-        layout.setWidthFull();
-        layout.setAlignItems(Alignment.CENTER);
+        VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.setWidthFull();
+        verticalLayout.setAlignItems(Alignment.CENTER);
         selectedClientLabel = new Label();
-        nextStepButton = new Button("Weiter zum Bahn buchen/reservieren");
+        nextStepButton = new Button("Bahn buchen");
         nextStepButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         nextStepButton.setWidth("55%");
-        layout.add(selectedClientLabel, nextStepButton);
         nextStepButton.addClickListener(e -> UI.getCurrent().navigate(BowlingAlleyBookingView.class)
                 .ifPresent(bookingView -> bookingView.setSelectedClient(selectedClient)));
-               
-        showStatisticButton = new Button("Statistik anzeigen");
-        showStatisticButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        showStatisticButton.setWidth("55%");
-        layout.add(showStatisticButton);
+
+        verticalLayout.add(selectedClientLabel, nextStepButton);
+        return verticalLayout;
+    }
+
+    private Button createStatisticButton(Client client) {
+        Button showStatisticButton = new Button();
+        showStatisticButton.setIcon(VaadinIcon.LINE_BAR_CHART.create());
         showStatisticButton.addClickListener(e -> UI.getCurrent().navigate(StatisticsView.class)
-                .ifPresent(statisticsView -> statisticsView.setSelectedClient(selectedClient)));
-        return layout;
+                .ifPresent(statisticsView -> statisticsView.setSelectedClient(client)));
+        return showStatisticButton;
     }
 
     /**
@@ -394,11 +400,9 @@ public class ClientSearchView extends VerticalLayout {
         String template = "Ausgewählter Kunde: ";
         if (selectedClient == null) {
             nextStepButton.setEnabled(false);
-            showStatisticButton.setEnabled(false);
             selectedClientLabel.setText(template);
         } else {
             nextStepButton.setEnabled(true);
-            showStatisticButton.setEnabled(true);
             selectedClientLabel.setText(template + selectedClient.getFirstName() + " " + selectedClient.getLastName());
         }
     }

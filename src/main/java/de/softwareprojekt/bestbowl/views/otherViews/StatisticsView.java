@@ -180,16 +180,22 @@ public class StatisticsView extends VerticalLayout {
     }
 
     private double calculateBookingTotal(BowlingAlleyBooking bowlingAlleyBooking) {
-        List<DrinkBooking> drinkBookingList = drinkBookingRepository.findByKey(bowlingAlleyBooking);
-        List<FoodBooking> foodBookingList = foodBookingRepository.findByKey(bowlingAlleyBooking);
-        List<BowlingShoeBooking> shoeBookingList = shoeBookingRepository.findByKey(bowlingAlleyBooking);
+        List<DrinkBooking> drinkBookingList = drinkBookingRepository
+                .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
+                        bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
+        List<FoodBooking> foodBookingList = foodBookingRepository
+                .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
+                        bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
+        List<BowlingShoeBooking> shoeBookingList = shoeBookingRepository
+                .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
+                        bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
 
         double total = 0.0;
         for (DrinkBooking drinkBooking : drinkBookingList) {
-            total += drinkBooking.getPrice();
+            total += drinkBooking.getPrice() * drinkBooking.getAmount();
         }
         for (FoodBooking foodBooking : foodBookingList) {
-            total += foodBooking.getPrice();
+            total += foodBooking.getPrice() * foodBooking.getAmount();
         }
         for (BowlingShoeBooking shoeBooking : shoeBookingList) {
             total += shoeBooking.getPrice();
@@ -197,6 +203,7 @@ public class StatisticsView extends VerticalLayout {
 
         return total;
     }
+
     private double calculateTotal() {
         List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository
                 .findAllByClientEquals(currentClient);
