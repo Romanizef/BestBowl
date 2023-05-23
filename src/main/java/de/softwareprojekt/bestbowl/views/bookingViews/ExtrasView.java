@@ -19,6 +19,7 @@ import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.jpa.entities.*;
 import de.softwareprojekt.bestbowl.jpa.repositories.*;
 import de.softwareprojekt.bestbowl.utils.VaadinUtils;
+import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.extrasElements.DrinkPanel;
 import de.softwareprojekt.bestbowl.views.extrasElements.FoodPanel;
@@ -246,11 +247,18 @@ public class ExtrasView extends VerticalLayout {
                         (currentBowlingAlleyBooking.getClient(), currentBowlingAlleyBooking.getBowlingAlley(),
                                 currentBowlingAlleyBooking.getStartTime());
 
+
         Map<String, DrinkBooking> drinkBookingMapFromDB = drinkBookingList.stream()
                 .collect(Collectors.toMap(DrinkBooking::getName, Function.identity()));
 
         drinkBookingMap.forEach((name, booking) -> {
-            if(drinkBookingMapFromDB.containsKey(name)){
+            //Drink über name rausholen und dann vergleichen wie viel noch da ist
+            Drink drink = drinkRepository.findByName(name.substring(0, name.lastIndexOf(" ")));
+            if (drink.getStockInMilliliters() - booking.getAmount() > 0) {
+                Notifications.showError("Nicht genügend vom Getränk: " + drink.getName());
+                return;
+            }
+            if (drinkBookingMapFromDB.containsKey(name)) {
                 DrinkBooking drinkBooking = drinkBookingMapFromDB.get(name);
                 booking.setAmount(booking.getAmount() + drinkBooking.getAmount());
             }
