@@ -37,6 +37,14 @@ public class DrinkBooking implements Serializable {
         active = true;
     }
 
+    public DrinkBooking(DrinkVariant drinkVariant, BowlingAlleyBooking bowlingAlleyBooking) {
+        client = bowlingAlleyBooking.getClient();
+        bowlingAlley = bowlingAlleyBooking.getBowlingAlley();
+        timeStamp = bowlingAlleyBooking.getStartTime();
+        name = drinkVariant.getDrink().getName() + " " + drinkVariant.getMl();
+        active = true;
+    }
+
     public Client getClient() {
         return client;
     }

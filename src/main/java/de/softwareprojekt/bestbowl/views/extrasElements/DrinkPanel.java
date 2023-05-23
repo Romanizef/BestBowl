@@ -6,6 +6,7 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.Drink;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
@@ -13,6 +14,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Matija Kopschek
@@ -20,18 +22,20 @@ import java.util.List;
  */
 public class DrinkPanel extends HorizontalLayout {
 
-    public DrinkPanel(Drink drink) {
+    private Label label;
+
+    public DrinkPanel(Drink drink, BowlingAlleyBooking bowlingAlleyBooking, Map<String, DrinkBooking> drinkBookingMap) {
         FormLayout variantLayout = new FormLayout();
         variantLayout.setResponsiveSteps(new ResponsiveStep("200px", 3));
 
-        Label label = new Label(drink.getName());
+        label = new Label(drink.getName());
         label.setMinWidth("250px");
         label.setMaxWidth("250px");
         List<DrinkVariant> drinkVariantList = new ArrayList<>(drink.getDrinkVariants());
         drinkVariantList.sort(Comparator.comparingInt(DrinkVariant::getMl));
 
         for (DrinkVariant drinkVariant : drinkVariantList) {
-            variantLayout.add(createIntegerField(drinkVariant));
+            variantLayout.add(createIntegerField(drinkVariant, bowlingAlleyBooking, drinkBookingMap));
         }
 
         setWidthFull();
@@ -40,7 +44,6 @@ public class DrinkPanel extends HorizontalLayout {
         add(label, variantLayout);
 
     }
-
 
 
     public DrinkPanel(DrinkBooking drinkBooking) {
@@ -60,7 +63,7 @@ public class DrinkPanel extends HorizontalLayout {
         add(label, drinkAmountField);
     }
 
-    public IntegerField createIntegerField(DrinkVariant drinkVariant) {
+    public IntegerField createIntegerField(DrinkVariant drinkVariant, BowlingAlleyBooking bowlingAlleyBooking, Map<String, DrinkBooking> drinkBookingMap) {
         IntegerField mlField = new IntegerField();
         mlField.setValue(0);
         mlField.setStepButtonsVisible(true);
@@ -69,9 +72,21 @@ public class DrinkPanel extends HorizontalLayout {
         mlField.setMax(drinkVariant.getDrink().getStockInMilliliters() / drinkVariant.getMl());
 
         mlField.addValueChangeListener(e -> {
-            //TODO
+            DrinkBooking temp = new DrinkBooking(drinkVariant, bowlingAlleyBooking);
+            DrinkBooking drinkBooking = drinkBookingMap.getOrDefault(temp.getName(), temp);
+
+            drinkBooking.setAmount(e.getValue());
+            drinkBookingMap.put(drinkBooking.getName(), drinkBooking);
         });
         return mlField;
+    }
+
+    public Label getLabel() {
+        return label;
+    }
+
+    public void setLabel(Label label) {
+        this.label = label;
     }
 
     private void addCSS() {
