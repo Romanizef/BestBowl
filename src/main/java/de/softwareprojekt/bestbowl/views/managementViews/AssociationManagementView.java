@@ -22,6 +22,7 @@ import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.jpa.entities.Association;
 import de.softwareprojekt.bestbowl.jpa.repositories.AssociationRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.utils.validators.AssociationValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
@@ -34,7 +35,7 @@ import java.util.Set;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.matches;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
-import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
+import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 
 /**
  * Creates a view for all the associations to be created, managed and
@@ -267,7 +268,7 @@ public class AssociationManagementView extends VerticalLayout {
     private Button cancelButtonConfig(Button cancelButton) {
         cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
         cancelButton.addClickListener(clickEvent -> {
-            showNotification("Bearbeitung abgebrochen");
+            Notifications.showInfo("Bearbeitung abgebrochen");
             resetEditLayout();
         });
         return cancelButton;
@@ -344,7 +345,7 @@ public class AssociationManagementView extends VerticalLayout {
             associationGrid.getListDataView().refreshItem(selectedAssociation);
         }
         resetEditLayout();
-        showNotification("Verein gespeichert");
+        Notifications.showInfo("Verein gespeichert");
     }
 
     private static class AssociationFilter {

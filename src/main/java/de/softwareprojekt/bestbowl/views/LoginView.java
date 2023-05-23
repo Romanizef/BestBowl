@@ -19,11 +19,12 @@ import de.softwareprojekt.bestbowl.beans.UserManager;
 import de.softwareprojekt.bestbowl.jpa.entities.User;
 import de.softwareprojekt.bestbowl.jpa.repositories.UserRepository;
 import de.softwareprojekt.bestbowl.utils.Utils;
+import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
-import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
+import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 
 /**
  * @author Marten Voß
@@ -118,7 +119,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
                 }
             }
             if (selectedUserForPasswordReset == null) {
-                showNotification("Benutzername oder Antwort falsch");
+                Notifications.showInfo("Benutzername oder Antwort falsch");
             } else {
                 userNameField.setValue("");
                 questionField.setValue("");
@@ -132,7 +133,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         });
         saveNewPasswordButton.addClickListener(e -> {
             if (selectedUserForPasswordReset == null) {
-                showNotification("Kein Benutzer ausgewählt");
+                Notifications.showInfo("Kein Benutzer ausgewählt");
             } else {
                 String password1 = passwordField1.getValue();
                 String password2 = passwordField2.getValue();
@@ -142,9 +143,9 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
                     passwordField2.setValue("");
                     selectedUserForPasswordReset = null;
                     dialog.close();
-                    showNotification("Passwort erfolgreich geändert");
+                    Notifications.showInfo("Passwort erfolgreich geändert");
                 } else {
-                    showNotification("Passwörter müssen übereinstimmen");
+                    Notifications.showInfo("Passwörter müssen übereinstimmen");
                 }
             }
         });

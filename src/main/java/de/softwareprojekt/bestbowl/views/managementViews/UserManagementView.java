@@ -28,6 +28,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.User;
 import de.softwareprojekt.bestbowl.jpa.repositories.UserRepository;
 import de.softwareprojekt.bestbowl.utils.Utils;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.utils.validators.UserValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.Resource;
@@ -41,7 +42,7 @@ import java.util.Set;
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
 import static de.softwareprojekt.bestbowl.utils.Utils.matches;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
-import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
+import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 
 /**
  * @author Marten Voß
@@ -197,7 +198,7 @@ public class UserManagementView extends VerticalLayout {
             if (Utils.isStringNotEmpty(passwordField.getValue())) {
                 //saving with a password change
                 if (!isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
-                    showNotification("Das Passwort eines Nutzers kann nur als Admin geändert werden");
+                    Notifications.showInfo("Das Passwort eines Nutzers kann nur als Admin geändert werden");
                     return;
                 }
                 if (writeBean()) {
@@ -307,7 +308,7 @@ public class UserManagementView extends VerticalLayout {
         }
         userManager.updateUsersFromDb();
         resetEditLayout();
-        showNotification("Nutzer gespeichert");
+        Notifications.showInfo("Nutzer gespeichert");
     }
 
     private void resetEditLayout() {

@@ -20,6 +20,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeRepository;
 import de.softwareprojekt.bestbowl.utils.Utils;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.form.BowlingShoeForm;
 import jakarta.annotation.security.RolesAllowed;
@@ -30,7 +31,7 @@ import java.util.Optional;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
-import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
+import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 
 @Route(value = "shoeManagement", layout = MainView.class)
 @PageTitle("Schuhverwaltung")
@@ -153,7 +154,7 @@ public class BowlingShoeManagementView extends VerticalLayout {
             bowlingShoeGrid.getListDataView().refreshItem(selectedShoe);
         }
         resetEditLayout();
-        showNotification("Schuh gespeichert");
+        Notifications.showInfo("Schuh gespeichert");
     }
 
     private void resetEditLayout(){

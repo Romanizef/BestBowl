@@ -24,6 +24,7 @@ import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyRepository;
 import de.softwareprojekt.bestbowl.utils.Utils;
 import de.softwareprojekt.bestbowl.utils.email.MailSenderService;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.utils.other.AlleyBookingChecker;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.PermitAll;
@@ -38,7 +39,7 @@ import java.util.Locale;
 import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
 import static de.softwareprojekt.bestbowl.utils.Utils.toHoursString;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.isCurrentUserInRole;
-import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
+import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 
 /**
  * @author Marten Voß
@@ -121,7 +122,7 @@ public class BowlingAlleyBookingView extends VerticalLayout {
 
         checkButton.addClickListener(e -> {
             if (!checkForBowlingAlleys()) {
-                showNotification("Keine Bahn im System angelegt");
+                Notifications.showInfo("Keine Bahn im System angelegt");
                 return;
             }
             if (verifyTime()) {
@@ -130,9 +131,9 @@ public class BowlingAlleyBookingView extends VerticalLayout {
                 gridLowerBound = alleyBookingChecker.getStartTime();
                 gridUpperBound = alleyBookingChecker.getEndTime();
                 if (alleyBookingChecker.checkAvailability()) {
-                    showNotification("Freie Bahn: Nr. " + alleyBookingChecker.getAvailableAlleyId());
+                    Notifications.showInfo("Freie Bahn: Nr. " + alleyBookingChecker.getAvailableAlleyId());
                 } else {
-                    showNotification("Keine Bahn frei zu der ausgewählten Zeit");
+                    Notifications.showInfo("Keine Bahn frei zu der ausgewählten Zeit");
                 }
                 updateGridItems();
             }
@@ -155,7 +156,7 @@ public class BowlingAlleyBookingView extends VerticalLayout {
 
         button.addClickListener(e -> {
             if (!checkForBowlingAlleys()) {
-                showNotification("Keine Bahn im System angelegt");
+                Notifications.showInfo("Keine Bahn im System angelegt");
                 return;
             }
             if (verifyTime()) {
@@ -164,7 +165,7 @@ public class BowlingAlleyBookingView extends VerticalLayout {
                 gridLowerBound = alleyBookingChecker.getStartTime();
                 gridUpperBound = alleyBookingChecker.getEndTime();
                 if ((latestBooking = alleyBookingChecker.book()) != null) {
-                    showNotification("Bahn Nr. " + alleyBookingChecker.getAvailableAlleyId() + " gebucht");
+                    Notifications.showInfo("Bahn Nr. " + alleyBookingChecker.getAvailableAlleyId() + " gebucht");
                     mailSenderController.sendBookingConfirmationMail(latestBooking);
                 }
                 updateGridItems();
@@ -193,7 +194,7 @@ public class BowlingAlleyBookingView extends VerticalLayout {
                 latestBooking = null;
                 updateGridItems();
                 updateLabelAndButtons();
-                showNotification("Storniert");
+                Notifications.showInfo("Storniert");
             }
         });
         return layout;
@@ -284,7 +285,7 @@ public class BowlingAlleyBookingView extends VerticalLayout {
             if (isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
                 return true;
             }
-            showNotification("Die Buchungszeit darf nicht in der Vergangenheit sein");
+            Notifications.showInfo("Die Buchungszeit darf nicht in der Vergangenheit sein");
             return false;
         }
     }

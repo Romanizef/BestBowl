@@ -27,6 +27,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.Association;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.utils.validators.ClientValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
@@ -40,7 +41,7 @@ import java.util.Set;
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
 import static de.softwareprojekt.bestbowl.utils.Utils.matches;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
-import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
+import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 
 /**
  * Creates a View for the Client Management.
@@ -353,7 +354,7 @@ public class ClientManagementView extends VerticalLayout {
             clientGrid.getListDataView().refreshItem(selectedClient);
         }
         resetEditLayout();
-        showNotification("Kunde gespeichert");
+        Notifications.showInfo("Kunde gespeichert");
     }
 
     /**

@@ -22,6 +22,7 @@ import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlley;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.utils.validators.BowlingAlleyValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
@@ -33,7 +34,7 @@ import java.util.Optional;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.matches;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
-import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
+import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 
 /**
  * @author Matija
@@ -221,7 +222,7 @@ public class AlleyManagementView extends VerticalLayout {
             bowlingAlleyGrid.getListDataView().refreshItem(selectedBowlingAlley);
         }
         resetEditLayout();
-        showNotification("Bahn gespeichert");
+        Notifications.showInfo("Bahn gespeichert");
     }
 
     private static class BowlingAlleyFilter {

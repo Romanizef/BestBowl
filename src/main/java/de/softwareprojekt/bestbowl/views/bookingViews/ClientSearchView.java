@@ -27,6 +27,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.Address;
 import de.softwareprojekt.bestbowl.jpa.entities.Association;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepository;
+import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.utils.validators.ClientValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.otherViews.StatisticsView;
@@ -37,7 +38,7 @@ import java.util.*;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
-import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
+import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 
 /**
  * Creates a View in which the user can search for a Client.
@@ -170,7 +171,7 @@ public class ClientSearchView extends VerticalLayout {
                 clientGrid.deselectAll();
                 clientGrid.select(newClient);
                 selectedClient = newClient;
-                showNotification("Kunde angelegt");
+                Notifications.showInfo("Kunde angelegt");
                 dialog.close();
             }
         });

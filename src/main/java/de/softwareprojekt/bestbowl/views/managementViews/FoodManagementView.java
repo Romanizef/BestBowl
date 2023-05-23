@@ -20,6 +20,7 @@ import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.jpa.entities.Food;
 import de.softwareprojekt.bestbowl.jpa.repositories.FoodRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.form.FoodForm;
 import jakarta.annotation.security.RolesAllowed;
@@ -30,7 +31,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
-import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
+import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 
 @Route(value = "foodManagement", layout = MainView.class)
 @PageTitle("Speiesenverwaltung")
@@ -155,7 +156,7 @@ public class FoodManagementView extends VerticalLayout {
             foodGrid.getListDataView().refreshItem(selectedFood);
         }
         resetEditLayout();
-        showNotification("Speise gespeichert");
+        Notifications.showInfo("Speise gespeichert");
     }
 
     private void resetEditLayout() {

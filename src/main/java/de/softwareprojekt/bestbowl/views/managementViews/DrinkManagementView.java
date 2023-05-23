@@ -23,6 +23,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
 import de.softwareprojekt.bestbowl.jpa.repositories.DrinkRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.DrinkVariantRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.form.DrinkForm;
 import jakarta.annotation.security.RolesAllowed;
@@ -33,7 +34,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
-import static de.softwareprojekt.bestbowl.utils.messages.NotificationSender.showNotification;
+import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 
 @Route(value = "drinkManagement", layout = MainView.class)
 @PageTitle("Getränkeverwaltung")
@@ -191,7 +192,7 @@ public class DrinkManagementView extends VerticalLayout {
             drinkGrid.getListDataView().refreshItem(selectedDrink);
         }
         resetEditLayout();
-        showNotification("Getränk gespeichert");
+        Notifications.showInfo("Getränk gespeichert");
     }
 
     private void resetEditLayout() {
