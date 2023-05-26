@@ -1,6 +1,5 @@
 package de.softwareprojekt.bestbowl.views.otherViews;
 
-import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +10,8 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -20,8 +19,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.StreamResource;
 
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
@@ -35,7 +34,7 @@ import de.softwareprojekt.bestbowl.jpa.repositories.FoodBookingRepository;
 import de.softwareprojekt.bestbowl.utils.Utils;
 import de.softwareprojekt.bestbowl.utils.components.InvoiceDownloadButton;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
-import de.softwareprojekt.bestbowl.utils.pdf.PDFUtils;
+import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.bookingViews.ClientSearchView;
 import jakarta.annotation.security.RolesAllowed;
@@ -48,17 +47,27 @@ import jakarta.annotation.security.RolesAllowed;
 @Route(value = "statistics", layout = MainView.class)
 @PageTitle("Statistiken")
 @RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
+@PreserveOnRefresh
 public class StatisticsView extends VerticalLayout {
     private Grid<BowlingAlleyBooking> bookingGrid;
     private final transient BowlingAlleyBookingRepository bowlingAlleyBookingRepository;
     private final transient DrinkBookingRepository drinkBookingRepository;
     private final transient FoodBookingRepository foodBookingRepository;
     private final transient BowlingShoeBookingRepository shoeBookingRepository;
-    private Client currentClient = null;
+    private Client currentClient;
     private Button lastViewButton;
     private Button refreshButton;
     private final H1 clientHeader;
+    private final H5 sumHeader;
 
+    /**
+     * Constructor for the StatsticView class. Creates all the components
+     * 
+     * @param bookingRepository
+     * @param drinkBookingRepository
+     * @param foodBookingRepository
+     * @param shoeBookingRepository
+     */
     @Autowired
     public StatisticsView(BowlingAlleyBookingRepository bookingRepository,
             DrinkBookingRepository drinkBookingRepository, FoodBookingRepository foodBookingRepository,
@@ -68,6 +77,7 @@ public class StatisticsView extends VerticalLayout {
         this.foodBookingRepository = foodBookingRepository;
         this.shoeBookingRepository = shoeBookingRepository;
         clientHeader = new H1();
+        sumHeader = new H5();
         setSizeFull();
         bookingGrid = createGrid();
         Component footerComponent = createFooterComponent();
@@ -75,18 +85,25 @@ public class StatisticsView extends VerticalLayout {
         updateGridItems();
     }
 
-    // setter für aktuellen Kunden
+    /**
+     * Setter for the current client
+     * 
+     * @param selectedClient
+     */
     public void setSelectedClient(Client selectedClient) {
         this.currentClient = selectedClient;
         updateInitialComponents();
         updateGridItems();
     }
 
-    // Message wenn kein Kunde ausgewählt
-    // Text feld welcher kunde ausgewählt
+    /**
+     * If no client ist selected a message apears. A {@code H1} shows the currently
+     * selected client
+     */
     private void updateInitialComponents() {
         if (currentClient == null) {
-            clientHeader.setText("Statistiken für: (kein Kunde ausgewählt)");
+            Notifications.showError("Kein Kunde ausgewählt!");
+            UI.getCurrent().navigate(ClientSearchView.class);
         } else {
             clientHeader
                     .setText("Statistiken für: " + currentClient.getFirstName() + " " + currentClient.getLastName());
@@ -100,29 +117,49 @@ public class StatisticsView extends VerticalLayout {
      * @return {@code Component}
      */
     private Component createFooterComponent() {
-        VerticalLayout layout = new VerticalLayout();
-        layout.setWidthFull();
-        layout.setAlignItems(Alignment.CENTER);
-        layout.add(createLastViewButton(layout), createRefreshButton(layout));
-        return layout;
+        VerticalLayout verticallayout = new VerticalLayout();
+        verticallayout.setWidth("80%");
+        verticallayout.setAlignItems(Alignment.CENTER);
+        verticallayout.add(createLastViewButton(verticallayout), createRefreshButton(verticallayout));
+
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.setWidthFull();
+        horizontalLayout.setAlignItems(Alignment.CENTER);
+        sumHeader.setText("Summe:\n" + calculateTotal());
+        sumHeader.getStyle().set("border", "5px solid #338CFF").set("background-color", "#6bbafa")
+                .set("padding", "10px").set("border-radius", "30px").set("font-size", "22px");
+        horizontalLayout.add(verticallayout, sumHeader);
+
+        return horizontalLayout;
     }
 
+    /**
+     * Creates a {@code Button} that returns the user to the ClientSearchView
+     * 
+     * @param layout
+     * @return {@code Button} lastViewButton
+     */
     private Button createLastViewButton(VerticalLayout layout) {
         lastViewButton = new Button("Zurück zu Kundensuche");
         lastViewButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         lastViewButton.setIcon(new Icon(VaadinIcon.BACKWARDS));
-        lastViewButton.setWidth("55%");
+        lastViewButton.setWidth("50%");
         lastViewButton.addClickListener(e -> UI.getCurrent().navigate(ClientSearchView.class));
         return lastViewButton;
     }
 
-    // refresh button der updateGridItems aufruft (falls kunde leer nicht
-    // aktuallisieren, zurück zu kundensuche)
+    /**
+     * Creates a refresh button that updates the grid if a client is selected. Else
+     * the user is returned to the ClientSearchView
+     * 
+     * @param layout
+     * @return
+     */
     private Button createRefreshButton(VerticalLayout layout) {
         refreshButton = new Button("Aktualisieren");
         refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         refreshButton.setIcon(new Icon(VaadinIcon.REFRESH));
-        refreshButton.setWidth("55%");
+        refreshButton.setWidth("50%");
         lastViewButton.addClickListener(e -> {
             if (this.currentClient != null) {
                 updateGridItems();
@@ -133,6 +170,9 @@ public class StatisticsView extends VerticalLayout {
         return refreshButton;
     }
 
+    /**
+     * Updates all the grid items to the latest state
+     */
     private void updateGridItems() {
         List<BowlingAlleyBooking> bowlingalleybookinglist = bowlingAlleyBookingRepository
                 .findAllByClientEquals(currentClient);
@@ -142,7 +182,9 @@ public class StatisticsView extends VerticalLayout {
     }
 
     /**
-     * @return
+     * Creates a grid with the clients statistics
+     * 
+     * @return {@code Grid<BowlingAlleyBooking>}
      */
     private Grid<BowlingAlleyBooking> createGrid() {
         Grid<BowlingAlleyBooking> grid = new Grid<>(BowlingAlleyBooking.class);
@@ -165,20 +207,15 @@ public class StatisticsView extends VerticalLayout {
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setSizeFull();
 
-        /*
-         * grid.addSelectionListener(e ->
-         * 
-         * {
-         * if (e.isFromClient()) {
-         * Optional<BowlingAlleyBooking> optionalStatistic = e.getFirstSelectedItem();
-         * selectedBowlingAlleyBooking = optionalStatistic.orElse(null);
-         * updateFooterComponents();
-         * }
-         * });
-         */
         return grid;
     }
 
+    /**
+     * Calculates the total sum of prices for the current booking
+     * 
+     * @param bowlingAlleyBooking
+     * @return {@code double} total
+     */
     private double calculateBookingTotal(BowlingAlleyBooking bowlingAlleyBooking) {
         List<DrinkBooking> drinkBookingList = drinkBookingRepository
                 .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
@@ -204,6 +241,11 @@ public class StatisticsView extends VerticalLayout {
         return total;
     }
 
+    /**
+     * Calculates the total sum of prices for the all the bookings
+     * 
+     * @return {@code double} total
+     */
     private double calculateTotal() {
         List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository
                 .findAllByClientEquals(currentClient);
@@ -216,15 +258,14 @@ public class StatisticsView extends VerticalLayout {
             total += alleyBooking.getPrice();
         }
         for (DrinkBooking drinkBooking : drinkBookingList) {
-            total += drinkBooking.getPrice();
+            total += drinkBooking.getPrice() * drinkBooking.getAmount();
         }
         for (FoodBooking foodBooking : foodBookingList) {
-            total += foodBooking.getPrice();
+            total += foodBooking.getPrice() * foodBooking.getAmount();
         }
         for (BowlingShoeBooking shoeBooking : shoeBookingList) {
             total += shoeBooking.getPrice();
         }
-
         return total;
     }
 
