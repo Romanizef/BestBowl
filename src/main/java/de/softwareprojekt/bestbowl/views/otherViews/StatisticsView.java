@@ -125,7 +125,6 @@ public class StatisticsView extends VerticalLayout {
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.setWidthFull();
         horizontalLayout.setAlignItems(Alignment.CENTER);
-        sumHeader.setText("Summe:\n" + calculateTotal());
         sumHeader.getStyle().set("border", "5px solid #338CFF").set("background-color", "#6bbafa")
                 .set("padding", "10px").set("border-radius", "30px").set("font-size", "22px");
         horizontalLayout.add(verticallayout, sumHeader);
@@ -179,6 +178,7 @@ public class StatisticsView extends VerticalLayout {
         bookingGrid.setItems(
                 bowlingalleybookinglist);
 
+        sumHeader.setText("Summe:\n" + calculateTotal());
     }
 
     /**
