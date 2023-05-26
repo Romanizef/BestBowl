@@ -1,5 +1,7 @@
 package de.softwareprojekt.bestbowl.views.extrasElements;
 
+import java.util.List;
+
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
@@ -8,6 +10,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeBookingRepository;
 
 /**
  * @author Matija Kopschek
@@ -23,10 +26,10 @@ public class ShoePanel extends HorizontalLayout {
         label.setMaxWidth("250px");
 
         IntegerField shoeAmountField = new IntegerField();
-//        shoeAmountField.setValue(bowlingShoeBooking.getAmount());
+        // shoeAmountField.setValue(bowlingShoeBooking.getAmount());
         shoeAmountField.setStepButtonsVisible(true);
         shoeAmountField.setMin(0);
-//        shoeAmountField.setMax(bowlingShoeBooking.getAmount());
+        // shoeAmountField.setMax(bowlingShoeBooking.getAmount());
 
         setWidthFull();
         // addCSS();
@@ -34,16 +37,19 @@ public class ShoePanel extends HorizontalLayout {
         add(label, shoeAmountField);
     }
 
-    public ShoePanel(BowlingShoeBooking bowlingShoeBooking) {
+    public ShoePanel(BowlingShoeBooking bowlingShoeBooking, BowlingShoeBookingRepository shoeBookingRepository) {
         Label label = new Label("" + bowlingShoeBooking.getBowlingShoe().getSize());
         label.setMinWidth("250px");
         label.setMaxWidth("250px");
-        //list mit Schuhen wo der spezifische Client drin steht und alle Elemente in der Liste sind der amount
+        // list mit Schuhen wo der spezifische Client drin steht und alle Elemente in
+        // der Liste sind der amount
+        List<BowlingShoeBooking> shoeBookingList = shoeBookingRepository
+                .findAllByClientEquals(bowlingShoeBooking.getClient());
         IntegerField shoeAmountField = new IntegerField();
-//        shoeAmountField.setValue(bowlingShoeBooking.getAmount());
+        shoeAmountField.setValue(shoeBookingList.size());
         shoeAmountField.setStepButtonsVisible(true);
         shoeAmountField.setMin(0);
-//        shoeAmountField.setMax(bowlingShoeBooking.getAmount());
+        shoeAmountField.setMax(shoeBookingList.size());
 
         setWidthFull();
         // addCSS();
@@ -56,7 +62,7 @@ public class ShoePanel extends HorizontalLayout {
         sizeField.setValue(0);
         sizeField.setStepButtonsVisible(true);
         sizeField.setMin(0);
-//        sizeField.setMax(bowlingShoe.getStock() / bowlingShoeBooking.getAmount());
+        // sizeField.setMax(bowlingShoe.getStock() / bowlingShoeBooking.getAmount());
 
         sizeField.addValueChangeListener(e -> {
             // TODO
