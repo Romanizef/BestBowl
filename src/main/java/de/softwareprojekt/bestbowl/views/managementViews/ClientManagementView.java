@@ -15,9 +15,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.textfield.TextFieldVariant;
+import com.vaadin.flow.component.textfield.*;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
@@ -133,6 +131,7 @@ public class ClientManagementView extends VerticalLayout {
         Grid.Column<Client> firstNameColumn = grid.addColumn("firstName").setHeader("Vorname");
         Grid.Column<Client> lastNameColumn = grid.addColumn("lastName").setHeader("Nachname");
         Grid.Column<Client> emailColumn = grid.addColumn("email").setHeader("E-Mail");
+        Grid.Column<Client> commentColumn = grid.addColumn(Client::getComment).setHeader("Kommentar");
         Grid.Column<Client> associationColumn = grid
                 .addColumn(client -> client.getAssociation() == null ? "" : client.getAssociation().getName())
                 .setHeader("Verein");
@@ -160,6 +159,7 @@ public class ClientManagementView extends VerticalLayout {
                 .setComponent(createFilterHeaderString("Vorname", clientFilter::setFirstName));
         headerRow.getCell(lastNameColumn).setComponent(createFilterHeaderString("Nachname", clientFilter::setLastName));
         headerRow.getCell(emailColumn).setComponent(createFilterHeaderString("E-Mail", clientFilter::setEmail));
+        headerRow.getCell(commentColumn).setComponent(createFilterHeaderString("Kommentar", clientFilter::setComment));
         headerRow.getCell(associationColumn)
                 .setComponent(createFilterHeaderString("Verein", clientFilter::setAssociationName));
         headerRow.getCell(streetColumn).setComponent(createFilterHeaderString("Straße", clientFilter::setStreet));
@@ -213,6 +213,10 @@ public class ClientManagementView extends VerticalLayout {
         emailField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         emailField.setRequiredIndicatorVisible(true);
 
+        TextArea commentArea = new TextArea("Kommentar");
+        commentArea.setWidthFull();
+        commentArea.addThemeVariants(TextAreaVariant.LUMO_SMALL);
+
         ComboBox<Association> associationCB = createAssociationCB("Verein");
         associationCB.setWidthFull();
         associationCB.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
@@ -257,7 +261,7 @@ public class ClientManagementView extends VerticalLayout {
         buttonLayout.add(cancelButton, saveButton);
         buttonLayout.setFlexGrow(1, cancelButton, saveButton);
 
-        layout.add(firstNameField, lastNameField, emailField, associationCB, streetField, houseNrField,
+        layout.add(firstNameField, lastNameField, emailField, commentArea, associationCB, streetField, houseNrField,
                 postCodeField, cityField, checkboxLayout, createValidationLabelLayout(), buttonLayout);
 
         saveButton.addClickListener(clickEvent -> {
@@ -281,6 +285,7 @@ public class ClientManagementView extends VerticalLayout {
         binder.bind(firstNameField, Client::getFirstName, Client::setFirstName);
         binder.bind(lastNameField, Client::getLastName, Client::setLastName);
         binder.bind(emailField, Client::getEmail, Client::setEmail);
+        binder.bind(commentArea, Client::getComment, Client::setComment);
         binder.bind(associationCB,
                 client -> client.getAssociation() == null ? Association.NO_ASSOCIATION : client.getAssociation(),
                 ((client, association) -> {
@@ -395,6 +400,7 @@ public class ClientManagementView extends VerticalLayout {
         private String firstName;
         private String lastName;
         private String email;
+        private String comment;
         private String associationName;
         private String street;
         private String houseNr;
@@ -423,6 +429,7 @@ public class ClientManagementView extends VerticalLayout {
             boolean matchesFirstName = matches(client.getFirstName(), firstName);
             boolean matchesLastName = matches(client.getLastName(), lastName);
             boolean matchesEmail = matches(client.getEmail(), email);
+            boolean matchesComment = matches(client.getComment(), comment);
             boolean matchesAssociationName = !isStringNotEmpty(associationName) ||
                     client.getAssociation() != null && matches(client.getAssociation().getName(), associationName);
             boolean matchesStreet = matches(client.getAddress().getStreet(), street);
@@ -430,7 +437,7 @@ public class ClientManagementView extends VerticalLayout {
             boolean matchesPostCode = matches(String.valueOf(client.getAddress().getPostCode()), postCode);
             boolean matchesCity = matches(client.getAddress().getCity(), city);
             boolean matchesActive = active == null || active == client.isActive();
-            return matchesId && matchesFirstName && matchesLastName && matchesEmail
+            return matchesId && matchesFirstName && matchesLastName && matchesEmail && matchesComment
                     && matchesAssociationName && matchesStreet && matchesHouseNr
                     && matchesPostCode && matchesCity && matchesActive;
         }
@@ -452,6 +459,11 @@ public class ClientManagementView extends VerticalLayout {
 
         public void setEmail(String email) {
             this.email = email;
+            dataView.refreshAll();
+        }
+
+        public void setComment(String comment) {
+            this.comment = comment;
             dataView.refreshAll();
         }
 

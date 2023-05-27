@@ -64,6 +64,8 @@ public class Initializer {
         bowlingCenter.setCity("Bielefeld");
         bowlingCenter.setStartTime(Duration.ofHours(7).toSeconds());
         bowlingCenter.setEndTime(Duration.ofHours(23).toSeconds());
+        bowlingCenter.setBowlingAlleyPricePerHour(10);
+        bowlingCenter.setBowlingShoePrice(4.99);
         bowlingCenter.setEmail("");
         bowlingCenter.setPassword("");
         bowlingCenter.setSmtpHost("");

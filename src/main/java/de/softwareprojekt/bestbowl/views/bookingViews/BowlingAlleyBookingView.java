@@ -30,7 +30,9 @@ import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +41,6 @@ import java.util.Locale;
 import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
 import static de.softwareprojekt.bestbowl.utils.Utils.toHoursString;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.isCurrentUserInRole;
-import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 
 /**
  * @author Marten Voß
@@ -101,11 +102,13 @@ public class BowlingAlleyBookingView extends VerticalLayout {
 
         datePicker = new DatePicker("Tag");
         datePicker.setLocale(Locale.GERMANY);
-        datePicker.setValue(Utils.getCurrentDateTimeRounded().toLocalDate());
+//        datePicker.setValue(Utils.getCurrentDateTimeRounded().toLocalDate());
+        datePicker.setValue(LocalDate.now());
 
         timePicker = new TimePicker("Uhrzeit");
         timePicker.setLocale(Locale.GERMANY);
-        timePicker.setValue(Utils.getCurrentDateTimeRounded().toLocalTime());
+//        timePicker.setValue(Utils.getCurrentDateTimeRounded().toLocalTime());
+        timePicker.setValue(LocalTime.now());
 
         durationCB = new ComboBox<>("Länge");
         durationCB.setAllowCustomValue(false);

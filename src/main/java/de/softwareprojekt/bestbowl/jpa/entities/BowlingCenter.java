@@ -28,6 +28,10 @@ public class BowlingCenter implements Serializable {
     private long startTime; //in seconds after day start
     private long endTime; //in seconds after day start
 
+    //prices
+    private double bowlingAlleyPricePerHour;
+    private double bowlingShoePrice;
+
     //email server data
     private String email;
     private String password;
@@ -107,6 +111,22 @@ public class BowlingCenter implements Serializable {
 
     public void setEndTime(long endTime) {
         this.endTime = endTime;
+    }
+
+    public double getBowlingAlleyPricePerHour() {
+        return bowlingAlleyPricePerHour;
+    }
+
+    public void setBowlingAlleyPricePerHour(double bowlingAlleyPricePerHour) {
+        this.bowlingAlleyPricePerHour = bowlingAlleyPricePerHour;
+    }
+
+    public double getBowlingShoePrice() {
+        return bowlingShoePrice;
+    }
+
+    public void setBowlingShoePrice(double bowlingShoePrice) {
+        this.bowlingShoePrice = bowlingShoePrice;
     }
 
     public String getEmail() {

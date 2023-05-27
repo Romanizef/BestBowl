@@ -6,6 +6,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.data.binder.Binder;
@@ -23,8 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalTime;
 import java.util.Objects;
 
-import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
-
 /**
  * @author Marten Voß
  */
@@ -32,13 +31,11 @@ import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 @PageTitle("Bowlingcenter Verwaltung")
 @RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 public class BowlingCenterManagementView extends VerticalLayout {
-    private final transient BowlingCenterRepository bowlingCenterRepository;
     private final Binder<BowlingCenter> binder = new Binder<>();
-    private BowlingCenter bowlingCenter;
+    private final BowlingCenter bowlingCenter;
 
     @Autowired
     public BowlingCenterManagementView(BowlingCenterRepository bowlingCenterRepository) {
-        this.bowlingCenterRepository = bowlingCenterRepository;
         bowlingCenter = bowlingCenterRepository.getBowlingCenter();
 
         setSizeFull();
@@ -53,6 +50,8 @@ public class BowlingCenterManagementView extends VerticalLayout {
         Label businessTimeLabel = new Label("Geschäftszeiten");
         TimePicker startTimePicker = new TimePicker("Start");
         TimePicker endTimePicker = new TimePicker("Ende");
+        NumberField bowlingAlleyPricePerHourField = new NumberField("Bahnpreis pro Stunde");
+        NumberField bowlingShoePrice = new NumberField("Schuhpreis pro Ausleihe");
         Label emailServerLabel = new Label("E-Mail Server Daten");
         TextField emailField = new TextField("E-Mail");
         TextField passwordField = new TextField("E-Mail Passwort");
@@ -74,7 +73,7 @@ public class BowlingCenterManagementView extends VerticalLayout {
                 bowlingCenterRepository.save(bowlingCenter);
                 Notifications.showInfo("gespeichert");
             } catch (ValidationException ex) {
-                Notifications.showInfo("Validierungsfehler");
+                Notifications.showError("Validierungsfehler");
             }
         });
 
@@ -86,6 +85,8 @@ public class BowlingCenterManagementView extends VerticalLayout {
         binder.bind(cityField, BowlingCenter::getCity, BowlingCenter::setCity);
         binder.bind(startTimePicker, bc -> LocalTime.ofSecondOfDay(bc.getStartTime()), (bc, time) -> bc.setStartTime(time.toSecondOfDay()));
         binder.bind(endTimePicker, bc -> LocalTime.ofSecondOfDay(bc.getEndTime()), (bc, time) -> bc.setEndTime(time.toSecondOfDay()));
+        binder.bind(bowlingAlleyPricePerHourField, BowlingCenter::getBowlingAlleyPricePerHour, BowlingCenter::setBowlingAlleyPricePerHour);
+        binder.bind(bowlingShoePrice, BowlingCenter::getBowlingShoePrice, BowlingCenter::setBowlingShoePrice);
         binder.bind(emailField, BowlingCenter::getEmail, BowlingCenter::setEmail);
         binder.bind(passwordField, BowlingCenter::getPassword, BowlingCenter::setPassword);
         binder.bind(smtpHostField, BowlingCenter::getSmtpHost, BowlingCenter::setSmtpHost);

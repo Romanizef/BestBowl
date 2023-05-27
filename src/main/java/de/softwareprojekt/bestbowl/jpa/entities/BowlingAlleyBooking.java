@@ -1,9 +1,11 @@
 package de.softwareprojekt.bestbowl.jpa.entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author Marten Voß
@@ -22,10 +24,8 @@ public class BowlingAlleyBooking implements Serializable {
     private BowlingAlley bowlingAlley;
     private long startTime;
     private long endTime;
-    private boolean completed;
     private double price;
-
-
+    private boolean completed;
 
     private boolean active;
 
@@ -77,12 +77,12 @@ public class BowlingAlleyBooking implements Serializable {
         this.endTime = endTime;
     }
 
-    public boolean isActive() {
-        return active;
+    public double getPrice() {
+        return price;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public boolean isCompleted() {
@@ -93,12 +93,11 @@ public class BowlingAlleyBooking implements Serializable {
         this.completed = completed;
     }
 
-    public double getPrice() {
-        return price;
+    public boolean isActive() {
+        return active;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public void setActive(boolean active) {
+        this.active = active;
     }
-
 }

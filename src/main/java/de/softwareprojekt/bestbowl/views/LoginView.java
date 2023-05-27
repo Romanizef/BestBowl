@@ -17,6 +17,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.softwareprojekt.bestbowl.beans.UserManager;
 import de.softwareprojekt.bestbowl.jpa.entities.User;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingCenterRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.UserRepository;
 import de.softwareprojekt.bestbowl.utils.Utils;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
@@ -38,7 +39,8 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     private User selectedUserForPasswordReset = null;
 
     @Autowired
-    public LoginView(UserManager userManager, UserRepository userRepository) {
+    public LoginView(UserManager userManager, UserRepository userRepository,
+                     BowlingCenterRepository bowlingCenterRepository) {
         this.userManager = userManager;
         this.userRepository = userRepository;
         addClassName("login-view");
@@ -59,7 +61,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         loginForm.setI18n(loginI18n);
         loginForm.setAction("login");
         loginForm.addForgotPasswordListener(e -> passwordResetDialog.open());
-        add(new H1("BestBowl"), loginForm);
+        add(new H1(bowlingCenterRepository.getBowlingCenter().getDisplayName()), loginForm);
     }
 
     @Override

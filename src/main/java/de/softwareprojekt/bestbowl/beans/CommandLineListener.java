@@ -5,7 +5,6 @@ import de.softwareprojekt.bestbowl.BestBowlApplication;
 import de.softwareprojekt.bestbowl.jpa.entities.*;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.utils.other.DuplicateChecker;
-import de.softwareprojekt.bestbowl.utils.pdf.PDFUtils;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,52 +44,30 @@ public class CommandLineListener {
                         continue;
                     }
 
-                    if (command.equals("shutdown")) {
-                        LOGGER.info("shutting down ...");
-                        BestBowlApplication.shutdown();
-                    } else if (command.equals("addUsers")) {
-                        userManager.addNewUser("admin", "admin", "23.5.1993", "admin@bestbowl.de", UserRole.ADMIN);
-                        userManager.addNewUser("owner", "owner", "7.3.1986", "owner@bestbowl.de", UserRole.OWNER);
-                        userManager.addNewUser("employee", "employee", "19.10.2001", "employee@bestbowl.de",
-                                UserRole.EMPLOYEE);
-                        LOGGER.info("Users added");
-                    } else if (command.equals("generateRandomClients")) {
-                        generateRandomClients(100);
-                        LOGGER.info("Clients generated");
-                    } else if (command.equals("generateRandomAssociations")) {
-                        generateRandomAssociations(10);
-                        LOGGER.info("Associations generated");
-                    } else if (command.equals("connectSomeClientsToAssociations")) {
-                        connectRandomClientsAndAssociations(50);
-                        LOGGER.info("random connections done");
-                    } else if (command.equals("generateRandomFoods")) {
-                        generateRandomFoods(4);
-                        LOGGER.info("Foods generated");
-                    } else if (command.equals("generateRandomDrinks")) {
-                        generateRandomDrinks(4);
-                        LOGGER.info("Drinks generated");
-                    } else if (command.equals("generateRandomShoes")) {
-                        generateRandomShoes(50);
-                        LOGGER.info("Shoes generated");
-                    } else if (command.equals("generateEverything")) {
-                        generateRandomClients(200);
-                        generateRandomAssociations(20);
-                        connectRandomClientsAndAssociations(100);
-                        generateRandomFoods(7);
-                        generateRandomDrinks(7);
-                        generateRandomShoes(100);
-                        LOGGER.info("everything generated");
-                    } else if (command.equals("generateBowlingAlleys")) {
-                        generateBowlingAlleys();
-                        LOGGER.info("BowlingAlleys generated");
+                    switch (command) {
+                        case "shutdown" -> {
+                            LOGGER.info("shutting down ...");
+                            BestBowlApplication.shutdown();
+                        }
+                        case "addUsers" -> {
+                            userManager.addNewUser("admin", "admin", "23.5.1993", "admin@bestbowl.de", UserRole.ADMIN);
+                            userManager.addNewUser("owner", "owner", "7.3.1986", "owner@bestbowl.de", UserRole.OWNER);
+                            userManager.addNewUser("employee", "employee", "19.10.2001", "employee@bestbowl.de",
+                                    UserRole.EMPLOYEE);
+                            LOGGER.info("Users added");
+                        }
+                        case "generate" -> {
+                            generateRandomClients(200);
+                            generateRandomAssociations(20);
+                            connectRandomClientsAndAssociations(100);
+                            generateRandomFoods(7);
+                            generateRandomDrinks(7);
+                            generateRandomShoes(100);
+                            generateBowlingAlleys();
+                            LOGGER.info("everything generated");
+                        }
+                        default -> LOGGER.info("unknown command");
                     }
-                    /*
-                     * else if (command.equals("demoPdf")) {
-                     * PDFUtils.createInvoicePdf();
-                     * LOGGER.info("pdf created");
-                     * }
-                     */
-
                 } catch (Exception e) {
                     if (e.getMessage() != null) {
                         LOGGER.error(e.getMessage());

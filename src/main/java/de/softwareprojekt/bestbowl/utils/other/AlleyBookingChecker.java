@@ -49,11 +49,14 @@ public class AlleyBookingChecker {
             return null;
         }
 
+        double pricePerMinute = Repos.getBowlingCenterRepository().getBowlingCenter().getBowlingAlleyPricePerHour() / 60;
+
         BowlingAlleyBooking booking = new BowlingAlleyBooking();
         booking.setClient(client);
         booking.setBowlingAlley(availableAlley);
         booking.setStartTime(startTime);
         booking.setEndTime(endTime);
+        booking.setPrice(pricePerMinute * booking.getDuration() / 1000 / 60);
 
         Repos.getBowlingAlleyBookingRepository().save(booking);
 

@@ -20,6 +20,9 @@ public class ClientValidator implements Validator<Client> {
         if (!isStringValidEmail(client.getEmail())) {
             return ValidationResult.error("Ungültige E-Mail");
         }
+        if (client.getComment().length() > 255) {
+            return ValidationResult.error("Kommentar darf nicht länger als 255 Zeichen sein");
+        }
         if (client.getAddress() == null) {
             return ValidationResult.error("Adresse ist null");
         }

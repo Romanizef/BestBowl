@@ -15,6 +15,8 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.TextArea;
+import com.vaadin.flow.component.textfield.TextAreaVariant;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -38,8 +40,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.*;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
-import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.clearNumberFieldChildren;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createAssociationCB;
 
 /**
  * Creates a View in which the user can search for a Client.
@@ -57,8 +59,10 @@ public class ClientSearchView extends VerticalLayout {
     private final Grid<Client> clientGrid;
     private Label validationErrorLabel;
     private TextField searchField;
-    private Button nextStepButton;
     private Label selectedClientLabel;
+    private TextArea commentArea;
+    private Button saveCommentButton;
+    private Button nextStepButton;
     private Client selectedClient = null;
     private Client newClient = null;
 
@@ -122,6 +126,8 @@ public class ClientSearchView extends VerticalLayout {
         TextField emailField = new TextField("E-Mail");
         emailField.setWidthFull();
         emailField.setRequiredIndicatorVisible(true);
+        TextArea commentArea = new TextArea("Kommentar");
+        commentArea.setWidthFull();
         HorizontalLayout streetLayout = new HorizontalLayout();
         streetLayout.setWidthFull();
         TextField streetField = new TextField("Straße");
@@ -142,7 +148,7 @@ public class ClientSearchView extends VerticalLayout {
         cityLayout.setFlexGrow(1, cityField);
         ComboBox<Association> associationCB = createAssociationCB("Verein");
         associationCB.setWidthFull();
-        layout.add(firstNameField, lastNameField, emailField, streetLayout, cityLayout, associationCB,
+        layout.add(firstNameField, lastNameField, emailField, commentArea, streetLayout, cityLayout, associationCB,
                 createValidationLabelLayout());
         dialog.add(layout);
 
@@ -191,6 +197,7 @@ public class ClientSearchView extends VerticalLayout {
         binder.bind(firstNameField, Client::getFirstName, Client::setFirstName);
         binder.bind(lastNameField, Client::getLastName, Client::setLastName);
         binder.bind(emailField, Client::getEmail, Client::setEmail);
+        binder.bind(commentArea, Client::getComment, Client::setComment);
         binder.bind(streetField, client -> client.getAddress().getStreet(),
                 ((client, s) -> client.getAddress().setStreet(s)));
         binder.bind(houseNrField, client -> client.getAddress().getHouseNr(),
@@ -312,9 +319,10 @@ public class ClientSearchView extends VerticalLayout {
         grid.removeAllColumns();
         grid.addColumn(new ComponentRenderer<>(client -> {
             HorizontalLayout horizontalLayout = new HorizontalLayout();
+            horizontalLayout.setAlignItems(Alignment.BASELINE);
             horizontalLayout.add(createStatisticButton(client), new Label(String.valueOf(client.getId())));
             return horizontalLayout;
-        })).setHeader("Rechnungsnummer");
+        })).setHeader("Kundennummer");
         grid.addColumn("firstName").setHeader("Vorname");
         grid.addColumn("lastName").setHeader("Nachname");
         grid.addColumn("email").setHeader("E-Mail");
@@ -374,19 +382,42 @@ public class ClientSearchView extends VerticalLayout {
         verticalLayout.setWidthFull();
         verticalLayout.setAlignItems(Alignment.CENTER);
         selectedClientLabel = new Label();
+
+        HorizontalLayout commentLayout = new HorizontalLayout();
+        commentLayout.setWidthFull();
+        commentArea = new TextArea();
+        commentArea.setWidthFull();
+        commentArea.setPlaceholder("Kommentar");
+        commentArea.addThemeVariants(TextAreaVariant.LUMO_SMALL);
+        saveCommentButton = new Button();
+        saveCommentButton.setIcon(VaadinIcon.HARDDRIVE.create());
+        commentLayout.add(commentArea, saveCommentButton);
+
         nextStepButton = new Button("Bahn buchen");
         nextStepButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         nextStepButton.setWidth("55%");
+
+        verticalLayout.add(selectedClientLabel, commentLayout, nextStepButton);
+
         nextStepButton.addClickListener(e -> UI.getCurrent().navigate(BowlingAlleyBookingView.class)
                 .ifPresent(bookingView -> bookingView.setSelectedClient(selectedClient)));
-
-        verticalLayout.add(selectedClientLabel, nextStepButton);
+        saveCommentButton.addClickListener(e -> {
+            String comment = commentArea.getValue();
+            if (comment == null || comment.length() > 255) {
+                Notifications.showError("Der Kommentar darf nicht länger als 255 Zeichen sein");
+                return;
+            }
+            selectedClient.setComment(comment);
+            clientRepository.save(selectedClient);
+            Notifications.showInfo("Kommentar gespeichert");
+        });
         return verticalLayout;
     }
 
     private Button createStatisticButton(Client client) {
         Button showStatisticButton = new Button();
         showStatisticButton.setIcon(VaadinIcon.LINE_BAR_CHART.create());
+        showStatisticButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
         showStatisticButton.addClickListener(e -> UI.getCurrent().navigate(StatisticsView.class)
                 .ifPresent(statisticsView -> statisticsView.setSelectedClient(client)));
         return showStatisticButton;
@@ -401,9 +432,15 @@ public class ClientSearchView extends VerticalLayout {
         if (selectedClient == null) {
             nextStepButton.setEnabled(false);
             selectedClientLabel.setText(template);
+            commentArea.setValue("");
+            commentArea.setEnabled(false);
+            saveCommentButton.setEnabled(false);
         } else {
             nextStepButton.setEnabled(true);
             selectedClientLabel.setText(template + selectedClient.getFirstName() + " " + selectedClient.getLastName());
+            commentArea.setEnabled(true);
+            commentArea.setValue(selectedClient.getComment());
+            saveCommentButton.setEnabled(true);
         }
     }
 

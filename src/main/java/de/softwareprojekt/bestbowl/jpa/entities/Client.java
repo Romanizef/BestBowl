@@ -23,10 +23,12 @@ public class Client implements Serializable {
     private Address address;
     @ManyToOne
     private Association association;
+    private String comment;
 
     private boolean active;
 
     public Client() {
+        comment = "";
         active = true;
     }
 
@@ -85,6 +87,14 @@ public class Client implements Serializable {
 
     public void setAssociation(Association association) {
         this.association = association;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public boolean isActive() {
