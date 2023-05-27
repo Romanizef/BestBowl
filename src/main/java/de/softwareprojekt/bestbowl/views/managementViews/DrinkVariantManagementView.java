@@ -116,10 +116,12 @@ public class DrinkVariantManagementView extends VerticalLayout {
         variantField.setWidthFull();
         variantField.setSuffixComponent(new Span("ml"));
         variantField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        variantField.setRequired(true);
 
         priceField.setWidthFull();
         priceField.setSuffixComponent(new Span("EUR"));
         priceField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        priceField.setRequired(true);
 
 
         HorizontalLayout buttonLayout = new HorizontalLayout();

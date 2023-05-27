@@ -44,12 +44,15 @@ public class DrinkForm extends FormLayout {
     public DrinkForm(Binder<Drink> drinkBinder) {
         nameField.setWidthFull();
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        nameField.setRequired(true);
         stockField.setWidthFull();
         stockField.setSuffixComponent(new Span("ml"));
         stockField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        stockField.setRequired(true);
         reorderPointField.setWidthFull();
         reorderPointField.setSuffixComponent(new Span("ml"));
         reorderPointField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        reorderPointField.setRequired(true);
 
         HorizontalLayout checkboxLayout = new HorizontalLayout();
         checkboxLayout.setAlignItems(FlexComponent.Alignment.CENTER);

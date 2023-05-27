@@ -1,8 +1,11 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
-
+import com.vaadin.flow.component.accordion.Accordion;
+import com.vaadin.flow.component.accordion.AccordionPanel;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.details.DetailsVariant;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -29,43 +32,61 @@ import java.util.Objects;
  */
 @Route(value = "bowlingCenterManagement", layout = MainView.class)
 @PageTitle("Bowlingcenter Verwaltung")
-@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
-public class BowlingCenterManagementView extends VerticalLayout {
+@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
+public class BowlingCenterManagementView extends Div {
     private final Binder<BowlingCenter> binder = new Binder<>();
     private final BowlingCenter bowlingCenter;
 
     @Autowired
     public BowlingCenterManagementView(BowlingCenterRepository bowlingCenterRepository) {
         bowlingCenter = bowlingCenterRepository.getBowlingCenter();
-
         setSizeFull();
+        Accordion accordion = new Accordion();
 
         TextField displayNameField = new TextField("Anzeigename");
         TextField businessNameField = new TextField("Geschäftsname");
-        Label addressLabel = new Label("Adresse");
+        VerticalLayout centerInformationLayout = new VerticalLayout(displayNameField,
+                businessNameField);
+        AccordionPanel centerInformationPanel = accordion.add("Bowlingcenterinformationen", centerInformationLayout);
+        centerInformationPanel.addThemeVariants(DetailsVariant.FILLED);
+
         TextField streetField = new TextField("Straße");
         IntegerField houseNrField = new IntegerField("Hausnummer");
         IntegerField postCodeField = new IntegerField("PLZ");
         TextField cityField = new TextField("Stadt");
-        Label businessTimeLabel = new Label("Geschäftszeiten");
+        VerticalLayout centerAddressLayout = new VerticalLayout(streetField,
+                houseNrField, postCodeField, cityField);
+        AccordionPanel centerAddressPanel = accordion.add("Adresse", centerAddressLayout);
+        centerAddressPanel.addThemeVariants(DetailsVariant.FILLED);
+
         TimePicker startTimePicker = new TimePicker("Start");
         TimePicker endTimePicker = new TimePicker("Ende");
+        VerticalLayout centerBusinessHoursLayout = new VerticalLayout(startTimePicker,
+                endTimePicker);
+        AccordionPanel centerBusinessHoursPanel = accordion.add("Geschäftszeiten", centerBusinessHoursLayout);
+        centerBusinessHoursPanel.addThemeVariants(DetailsVariant.FILLED);
+
         NumberField bowlingAlleyPricePerHourField = new NumberField("Bahnpreis pro Stunde");
         NumberField bowlingShoePrice = new NumberField("Schuhpreis pro Ausleihe");
-        Label emailServerLabel = new Label("E-Mail Server Daten");
+        VerticalLayout centerPriceLayout = new VerticalLayout(bowlingAlleyPricePerHourField,
+                bowlingShoePrice);
+        AccordionPanel centerPricePanel = accordion.add("Bahn und Schuhpreise", centerPriceLayout);
+        centerPricePanel.addThemeVariants(DetailsVariant.FILLED);
+
         TextField emailField = new TextField("E-Mail");
         TextField passwordField = new TextField("E-Mail Passwort");
         TextField smtpHostField = new TextField("SMTP Host");
         TextField smtpPortField = new TextField("SMTP Port");
+        VerticalLayout centerEmailLayout = new VerticalLayout(emailField,
+                passwordField, smtpHostField, smtpPortField);
+        AccordionPanel centerEmailPanel = accordion.add("E-Mail Server Daten", centerEmailLayout);
+        centerEmailPanel.addThemeVariants(DetailsVariant.FILLED);
 
         Button saveButton = new Button("Sichern");
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.getStyle().set("margin-left", "10px").set("margin-top", "10px");
 
-        add(displayNameField, businessNameField,
-                addressLabel, streetField, houseNrField, postCodeField, cityField,
-                businessTimeLabel, startTimePicker, endTimePicker,
-                emailServerLabel, emailField, passwordField, smtpHostField, smtpPortField,
-                saveButton);
+        add(accordion, saveButton);
 
         saveButton.addClickListener(e -> {
             try {
@@ -80,12 +101,17 @@ public class BowlingCenterManagementView extends VerticalLayout {
         binder.bind(displayNameField, BowlingCenter::getDisplayName, BowlingCenter::setDisplayName);
         binder.bind(businessNameField, BowlingCenter::getBusinessName, BowlingCenter::setBusinessName);
         binder.bind(streetField, BowlingCenter::getStreet, BowlingCenter::setStreet);
-        binder.bind(houseNrField, BowlingCenter::getHouseNr, (bc, i) -> bc.setHouseNr(Objects.requireNonNullElse(i, 0)));
-        binder.bind(postCodeField, BowlingCenter::getPostCode, (bc, i) -> bc.setPostCode(Objects.requireNonNullElse(i, 0)));
+        binder.bind(houseNrField, BowlingCenter::getHouseNr,
+                (bc, i) -> bc.setHouseNr(Objects.requireNonNullElse(i, 0)));
+        binder.bind(postCodeField, BowlingCenter::getPostCode,
+                (bc, i) -> bc.setPostCode(Objects.requireNonNullElse(i, 0)));
         binder.bind(cityField, BowlingCenter::getCity, BowlingCenter::setCity);
-        binder.bind(startTimePicker, bc -> LocalTime.ofSecondOfDay(bc.getStartTime()), (bc, time) -> bc.setStartTime(time.toSecondOfDay()));
-        binder.bind(endTimePicker, bc -> LocalTime.ofSecondOfDay(bc.getEndTime()), (bc, time) -> bc.setEndTime(time.toSecondOfDay()));
-        binder.bind(bowlingAlleyPricePerHourField, BowlingCenter::getBowlingAlleyPricePerHour, BowlingCenter::setBowlingAlleyPricePerHour);
+        binder.bind(startTimePicker, bc -> LocalTime.ofSecondOfDay(bc.getStartTime()),
+                (bc, time) -> bc.setStartTime(time.toSecondOfDay()));
+        binder.bind(endTimePicker, bc -> LocalTime.ofSecondOfDay(bc.getEndTime()),
+                (bc, time) -> bc.setEndTime(time.toSecondOfDay()));
+        binder.bind(bowlingAlleyPricePerHourField, BowlingCenter::getBowlingAlleyPricePerHour,
+                BowlingCenter::setBowlingAlleyPricePerHour);
         binder.bind(bowlingShoePrice, BowlingCenter::getBowlingShoePrice, BowlingCenter::setBowlingShoePrice);
         binder.bind(emailField, BowlingCenter::getEmail, BowlingCenter::setEmail);
         binder.bind(passwordField, BowlingCenter::getPassword, BowlingCenter::setPassword);

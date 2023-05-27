@@ -36,15 +36,19 @@ public class FoodForm extends FormLayout {
     public FoodForm(Binder<Food> foodBinder) {
         nameField.setWidthFull();
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        nameField.setRequired(true);
         stockField.setWidthFull();
         stockField.setSuffixComponent(new Span("Stück"));
         stockField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        stockField.setRequired(true);
         reorderPointField.setWidthFull();
         reorderPointField.setSuffixComponent(new Span("Stück"));
         reorderPointField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        reorderPointField.setRequired(true);
         priceField.setWidthFull();
         priceField.setSuffixComponent(new Span("EUR"));
         priceField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        priceField.setRequired(true);
 
         HorizontalLayout checkboxLayout = new HorizontalLayout();
         checkboxLayout.setAlignItems(FlexComponent.Alignment.CENTER);

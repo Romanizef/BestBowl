@@ -148,20 +148,24 @@ public class UserManagementView extends VerticalLayout {
         nameField.setWidthFull();
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         nameField.setRequiredIndicatorVisible(true);
+        nameField.setRequired(true);
 
         TextField emailField = new TextField("E-Mail");
         emailField.setWidthFull();
         emailField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         emailField.setRequiredIndicatorVisible(true);
+        emailField.setRequired(true);
 
         passwordField = new PasswordField("Passwort");
         passwordField.setWidthFull();
         passwordField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        passwordField.setRequired(true);
 
         TextField securityQuestionAnswerField = new TextField("Sicherheitsfragenantwort");
         securityQuestionAnswerField.setWidthFull();
         securityQuestionAnswerField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         securityQuestionAnswerField.setRequiredIndicatorVisible(true);
+        securityQuestionAnswerField.setRequired(true);
 
         ComboBox<String> roleCB = new ComboBox<>("Nutzerrolle");
         roleCB.setWidthFull();
@@ -169,6 +173,7 @@ public class UserManagementView extends VerticalLayout {
         roleCB.setItems(UserRole.getAllValues());
         roleCB.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
         roleCB.setRequiredIndicatorVisible(true);
+        roleCB.setRequired(true);
 
         HorizontalLayout checkboxLayout = new HorizontalLayout();
         checkboxLayout.setAlignItems(Alignment.CENTER);

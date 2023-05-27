@@ -45,6 +45,7 @@ public class BowlingShoeForm extends FormLayout {
         sizeField.setWidthFull();
         sizeField.setSuffixComponent(new Span("Größe"));
         sizeField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        sizeField.setRequired(true);
 
         HorizontalLayout checkboxLayout = new HorizontalLayout();
         checkboxLayout.setAlignItems(FlexComponent.Alignment.CENTER);

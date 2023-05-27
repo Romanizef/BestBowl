@@ -20,6 +20,7 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlley;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
@@ -41,7 +42,7 @@ import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
  */
 @Route(value = "alleyManagement", layout = MainView.class)
 @PageTitle("Bahnverwaltung")
-@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
+@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
 public class AlleyManagementView extends VerticalLayout {
     private final Binder<BowlingAlley> binder = new Binder<>();
     private final BowlingAlleyRepository bowlingAlleyRepository;
@@ -96,6 +97,7 @@ public class AlleyManagementView extends VerticalLayout {
         grid.setWidth("75%");
         grid.setHeight("100%");
 
+
         List<BowlingAlley> bowlingAlleyList = bowlingAlleyRepository.findAll();
         GridListDataView<BowlingAlley> dataView = grid.setItems(bowlingAlleyList);
         BowlingAlleyFilter associationFilter = new BowlingAlleyFilter(dataView);
@@ -129,6 +131,7 @@ public class AlleyManagementView extends VerticalLayout {
         IntegerField idField = new IntegerField("ID");
         idField.setWidthFull();
         idField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        idField.setRequired(true);
 
         HorizontalLayout checkboxLayout = new HorizontalLayout();
         checkboxLayout.setAlignItems(Alignment.CENTER);

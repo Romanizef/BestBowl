@@ -183,10 +183,12 @@ public class AssociationManagementView extends VerticalLayout {
         TextField nameField = new TextField("Name");
         nameField.setWidthFull();
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        nameField.setRequired(true);
 
         TextField discountField = new TextField("Rabatt");
         discountField.setWidthFull();
         discountField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        discountField.setRequired(true);
 
         HorizontalLayout checkboxLayout = new HorizontalLayout();
         checkboxLayout.setAlignItems(Alignment.CENTER);
