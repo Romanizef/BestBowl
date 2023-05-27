@@ -46,6 +46,14 @@ public class DrinkBooking implements Serializable {
         active = true;
     }
 
+    public String getDrinkName() {
+        return name.substring(0, name.lastIndexOf(" "));
+    }
+
+    public int getMl() {
+        return Integer.parseInt(name.substring(name.lastIndexOf(" ") + 1, name.length() - 2));
+    }
+
     public Client getClient() {
         return client;
     }
