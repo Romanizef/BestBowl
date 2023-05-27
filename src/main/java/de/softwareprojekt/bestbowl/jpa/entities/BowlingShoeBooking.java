@@ -25,6 +25,7 @@ public class BowlingShoeBooking implements Serializable {
     @Id
     private long timeStamp;
 
+    @Id
     @ManyToOne
     private BowlingShoe bowlingShoe;
     private boolean completed;

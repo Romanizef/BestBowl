@@ -15,6 +15,7 @@ public class FoodBookingId implements Serializable {
     private Client client;
     private BowlingAlley bowlingAlley;
     private long timeStamp;
+    private String name;
 
     public FoodBookingId() {
     }
@@ -43,16 +44,24 @@ public class FoodBookingId implements Serializable {
         this.timeStamp = timeStamp;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FoodBookingId that = (FoodBookingId) o;
-        return timeStamp == that.timeStamp && Objects.equals(client, that.client) && Objects.equals(bowlingAlley, that.bowlingAlley);
+        return timeStamp == that.timeStamp && Objects.equals(client, that.client) && Objects.equals(bowlingAlley, that.bowlingAlley) && Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(client, bowlingAlley, timeStamp);
+        return Objects.hash(client, bowlingAlley, timeStamp, name);
     }
 }

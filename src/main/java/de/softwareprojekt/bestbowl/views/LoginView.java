@@ -24,8 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
-import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
-
 /**
  * @author Marten Voß
  */
@@ -77,12 +75,12 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     private Dialog createPasswordResetDialog() {
         Dialog dialog = new Dialog();
         dialog.setWidth("350px");
-        dialog.setHeaderTitle("Passwort zurücksetzen");
+        dialog.setHeaderTitle("Sicherheitsabfrage");
         dialog.setCloseOnOutsideClick(false);
         dialog.setCloseOnEsc(true);
         VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
-        TextField userNameField = new TextField("Nutzername");
+        TextField userNameField = new TextField("Benutzername");
         userNameField.setWidthFull();
         TextField questionField = new TextField("Geburtstag");
         questionField.setWidthFull();

@@ -25,6 +25,7 @@ public class FoodBooking implements Serializable {
     @Id
     private long timeStamp;
 
+    @Id
     private String name;
     private int amount;
     private boolean completed;
