@@ -16,5 +16,6 @@ public interface FoodRepository extends JpaRepository<Food, Integer> {
     @Query("select f.name from Food f")
     Set<String> findAllNames();
 
+    Food findByName(String name);
 
 }

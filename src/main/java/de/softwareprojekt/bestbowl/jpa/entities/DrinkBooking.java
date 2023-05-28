@@ -49,7 +49,7 @@ public class DrinkBooking implements Serializable {
     }
 
     public int getMl() {
-        return Integer.parseInt(name.substring(name.lastIndexOf(" ") + 1, name.length() - 2));
+        return Integer.parseInt(name.substring(name.lastIndexOf(" ") + 1));
     }
 
     public Client getClient() {

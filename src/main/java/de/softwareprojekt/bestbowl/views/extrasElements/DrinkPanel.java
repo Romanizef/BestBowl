@@ -24,8 +24,10 @@ public class DrinkPanel extends HorizontalLayout {
 
     private Label label;
 
+    private FormLayout variantLayout;
+
     public DrinkPanel(Drink drink, BowlingAlleyBooking bowlingAlleyBooking, Map<String, DrinkBooking> drinkBookingMap) {
-        FormLayout variantLayout = new FormLayout();
+        variantLayout = new FormLayout();
         variantLayout.setResponsiveSteps(new ResponsiveStep("200px", 3));
 
         label = new Label(drink.getName());
@@ -79,6 +81,14 @@ public class DrinkPanel extends HorizontalLayout {
             drinkBookingMap.put(drinkBooking.getName(), drinkBooking);
         });
         return mlField;
+    }
+
+    public void resetIntegerField(){
+        variantLayout.getChildren().forEach(component -> {
+            if (component instanceof IntegerField integerField){
+                integerField.setValue(0);
+            }
+        });
     }
 
     public Label getLabel() {

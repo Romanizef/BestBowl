@@ -1,11 +1,13 @@
 package de.softwareprojekt.bestbowl.views.bookingViews;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -15,6 +17,7 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.jpa.entities.*;
 import de.softwareprojekt.bestbowl.jpa.repositories.*;
@@ -38,45 +41,51 @@ import java.util.stream.Collectors;
 @Route(value = "extras", layout = MainView.class)
 @PageTitle("Extras")
 @PermitAll
+@PreserveOnRefresh
 public class ExtrasView extends VerticalLayout {
     private final DrinkRepository drinkRepository;
     private final FoodRepository foodRepository;
 
+    private final BowlingShoeRepository bowlingShoeRepository;
     private final DrinkVariantRepository drinkVariantRepository;
-
     private final Map<String, DrinkBooking> drinkBookingMap = new HashMap<>();
     private final BowlingAlleyRepository bowlingAlleyRepository;
     private FoodBookingRepository foodBookingRepository;
+
+    private BowlingShoeBookingRepository bowlingShoeBookingRepository;
     private DrinkBookingRepository drinkBookingRepository;
-    private BowlingAlley bowlingAlley;
     private int currentBowlingAlleyId;
     private BowlingAlleyBooking currentBowlingAlleyBooking;
     private Map<Integer, Button> buttonMap;
     private BowlingAlleyBookingRepository bowlingAlleyBookingRepository;
     private HorizontalLayout alleyLayout;
     private HorizontalLayout tabLayout;
-
     private TabSheet tabs;
+    private Div drinkDiv;
+    private Div foodDiv;
+
+    private ShoePanel shoePanel;
+    private Div shoeDiv;
 
     private FormLayout foodFormLayoutForAddItem;
-
     private VerticalLayout drinkVerticalLayoutForAddItem;
-
-    //todo bookinglisten
 
 
     @Autowired
     public ExtrasView(DrinkRepository drinkRepository, FoodRepository foodRepository,
                       BowlingAlleyRepository bowlingAlleyRepository, BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
                       FoodBookingRepository foodBookingRepository, DrinkBookingRepository drinkBookingRepository,
-                      DrinkVariantRepository drinkVariantRepository) {
+                      DrinkVariantRepository drinkVariantRepository, BowlingShoeRepository bowlingShoeRepository,
+                      BowlingShoeBookingRepository bowlingShoeBookingRepository) {
         this.bowlingAlleyRepository = bowlingAlleyRepository;
         this.drinkRepository = drinkRepository;
         this.drinkVariantRepository = drinkVariantRepository;
         this.foodRepository = foodRepository;
+        this.bowlingShoeRepository = bowlingShoeRepository;
         this.bowlingAlleyBookingRepository = bowlingAlleyBookingRepository;
         this.foodBookingRepository = foodBookingRepository;
         this.drinkBookingRepository = drinkBookingRepository;
+        this.bowlingShoeBookingRepository = bowlingShoeBookingRepository;
         this.currentBowlingAlleyId = 1;
         buttonMap = new HashMap<>();
         setSizeFull();
@@ -91,27 +100,31 @@ public class ExtrasView extends VerticalLayout {
     private Component createArticlePanelComponent() {
         tabs = new TabSheet();
         tabLayout = new HorizontalLayout();
-        Tab drink = new Tab(VaadinIcon.COFFEE.create(), new Span("Getränke"));
-        Tab food = new Tab(VaadinIcon.CROSS_CUTLERY.create(), new Span("Speisen"));
-        Tab shoe = new Tab(VaadinIcon.RETWEET.create(), new Span("Schuhe"));
-
         tabs.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED,
                 TabSheetVariant.MATERIAL_BORDERED,
                 TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
-        tabs.add(drink, createDrinkPanel());
-        tabs.add(food, createFoodPanel());
-        tabs.add(shoe, createShoePanel());
+        Tab drink = new Tab(VaadinIcon.COFFEE.create(), new Span("Getränke"));
+        Tab food = new Tab(VaadinIcon.CROSS_CUTLERY.create(), new Span("Speisen"));
+        Tab shoe = new Tab(VaadinIcon.RETWEET.create(), new Span("Schuhe"));
+        drinkDiv = new Div(new Text("Keine Bahn ausgewählt"));
+        foodDiv = new Div(new Text("Keine Bahn ausgewählt"));
+        shoeDiv = new Div(new Text("Keine Bahn ausgewählt"));
+        shoeDiv.getStyle().set("text-align", "center");
+        foodDiv.getStyle().set("text-align", "center");
+        drinkDiv.getStyle().set("text-align", "center");
+        tabs.add(drink, drinkDiv);
+        tabs.add(food, foodDiv);
+        tabs.add(shoe, shoeDiv);
         tabLayout.add(tabs);
         return tabLayout;
     }
 
 
     private Component createShoePanel() {
-        ShoePanel shoePanel = new ShoePanel();
+        shoePanel = new ShoePanel(bowlingShoeRepository);
 
         return shoePanel;
     }
-
 
     private Component createDrinkPanel() {
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -130,14 +143,10 @@ public class ExtrasView extends VerticalLayout {
     private Component createFoodPanel() {
         FormLayout formLayout = new FormLayout();
         formLayout.setResponsiveSteps(new ResponsiveStep("100px", 2));
-
-
         List<Food> foodList = foodRepository.findAll();
-
         for (Food food : foodList) {
             formLayout.add(new FoodPanel(food));
         }
-
         formLayout.setMaxWidth("1000px");
         foodFormLayoutForAddItem = formLayout;
         return formLayout;
@@ -147,11 +156,10 @@ public class ExtrasView extends VerticalLayout {
         alleyLayout = new HorizontalLayout();
         alleyLayout.setPadding(true);
         alleyLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        // ToDo Buttons Einzeln erzeugen
 
         List<BowlingAlley> bowlingAlleyList = bowlingAlleyRepository.findAll();
         if (bowlingAlleyList.isEmpty()) {
-            //Todo banner notificition keine Bahnen, geh zu Bahnverwaltung und trage Bahnen ein
+            Notifications.showError("Es sind keine Bahnen im System vorhanden./nBitte trage Bahnen ins System ein.");
         }
         bowlingAlleyList.sort(Comparator.comparingInt(BowlingAlley::getId));
         long currentTime = System.currentTimeMillis();
@@ -176,12 +184,24 @@ public class ExtrasView extends VerticalLayout {
                         .findFirst()
                         .orElse(null);
 
+
+                changeTabs();
             });
 
             alleyLayout.add(alleyButton);
         }
 
         return alleyLayout;
+    }
+
+    private void changeTabs() {
+        drinkDiv.removeAll();
+        foodDiv.removeAll();
+        shoeDiv.removeAll();
+
+        drinkDiv.add(createDrinkPanel());
+        foodDiv.add(createFoodPanel());
+        shoeDiv.add(createShoePanel());
     }
 
     private void changePreviousButtonStyle(int currentBowlAlleyId) {
@@ -212,6 +232,7 @@ public class ExtrasView extends VerticalLayout {
             //List<FoodBooking> newFoodBookings = new ArrayList<>();
             addAllNewDrinkBookings();
             addAllNewFoodBookings();
+            addAllNewShoeBookings();
 
         });
 
@@ -220,6 +241,7 @@ public class ExtrasView extends VerticalLayout {
             addAllNewFoodBookings(); //TODO Check ob Stock vorhanden ist
             VaadinUtils.showConfirmationDialog("Rechnung bezahlen?", "Ja", "Abbrechen", () -> {
                 UI.getCurrent().navigate(InvoiceView.class).ifPresent(view -> view.setBowlingAlleyBooking(currentBowlingAlleyBooking));
+                //TODO zu neuer View mit Allen Rechnungen die Uncompleted sind
             });
         });
 
@@ -227,43 +249,65 @@ public class ExtrasView extends VerticalLayout {
         return layout;
     }
 
-    private void addAllNewDrinkBookings() {
-        //drinkVerticalLayoutForAddItem.getChildren().forEach(component -> {
-        //    if (component instanceof DrinkPanel drinkPanel) {
-        //        drinkPanel.getChildren().forEach(intergerField -> {
-        //            if (intergerField instanceof IntegerField integerField) {
-        //                int amount = integerField.getValue();
-        //                String amountAsString = String.valueOf(integerField.getSuffixComponent());
-        //                if (Integer.parseInt(amountAsString.replaceAll("[^0-9]", "")) > 0) {
-        //                    String drinkName = drinkPanel.getLabel().getText();
-        //                }
-        //            }
-        //        });
+    private void addAllNewShoeBookings() {
+        int stock = shoePanel.getShoeSizeAmountMap().get(shoePanel.getShoeSizeField().getValue()) - shoePanel.getShoeAmountField().getValue();
+        if(stock < 0){
+            Notifications.showError("Nicht genügend Schuhe in Größe: " + shoePanel.getShoeSizeField().getValue());
+            return;
+        }
 
-        //    }
-        //});
+        List<BowlingShoe> bowlingShoeList= bowlingShoeRepository.findAllByClientIsNullAndActiveIsTrue();
+        BowlingShoe bowlingShoe = new BowlingShoe();
+        for (BowlingShoe bowlingShoe1:bowlingShoeList) {
+            if(bowlingShoe1.getSize() == shoePanel.getShoeSizeField().getValue()){
+                bowlingShoe = bowlingShoe1;
+            }
+        }
+
+        bowlingShoe.setClient(currentBowlingAlleyBooking.getClient());
+        BowlingShoeBooking bowlingShoeBooking = new BowlingShoeBooking();
+        bowlingShoeBooking.setBowlingAlley(currentBowlingAlleyBooking.getBowlingAlley());
+        bowlingShoeBooking.setClient(currentBowlingAlleyBooking.getClient());
+        bowlingShoeBooking.setTimeStamp(System.currentTimeMillis());
+        bowlingShoeBooking.setBowlingShoe(bowlingShoe);
+        bowlingShoeBookingRepository.save(bowlingShoeBooking);
+        shoePanel.updateShoeSizeAmountMap();
+        shoePanel.resetIntergerfield();
+    }
+
+    private void addAllNewDrinkBookings() {
         List<DrinkBooking> drinkBookingList = drinkBookingRepository
                 .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals
                         (currentBowlingAlleyBooking.getClient(), currentBowlingAlleyBooking.getBowlingAlley(),
                                 currentBowlingAlleyBooking.getStartTime());
-
-
         Map<String, DrinkBooking> drinkBookingMapFromDB = drinkBookingList.stream()
                 .collect(Collectors.toMap(DrinkBooking::getName, Function.identity()));
 
         drinkBookingMap.forEach((name, booking) -> {
             //Drink über name rausholen und dann vergleichen wie viel noch da ist
-            Drink drink = drinkRepository.findByName(name.substring(0, name.lastIndexOf(" ")));
-            if (drink.getStockInMilliliters() - booking.getAmount() > 0) {
+            Drink drink = drinkRepository.findByName(booking.getDrinkName());
+            int newStock = drink.getStockInMilliliters() - booking.getAmount() * booking.getMl();
+            if (newStock < 0) { //Todo Booking kriegt noch ml
                 Notifications.showError("Nicht genügend vom Getränk: " + drink.getName());
                 return;
+            } else {
+                drink.setStockInMilliliters(newStock);
+                drinkRepository.save(drink);
             }
             if (drinkBookingMapFromDB.containsKey(name)) {
                 DrinkBooking drinkBooking = drinkBookingMapFromDB.get(name);
                 booking.setAmount(booking.getAmount() + drinkBooking.getAmount());
             }
+
             drinkBookingRepository.save(booking);
         });
+        drinkVerticalLayoutForAddItem.getChildren().forEach(component -> {
+            if (component instanceof DrinkPanel drinkPanel) {
+                drinkPanel.resetIntegerField();
+            }
+        });
+
+        drinkBookingMap.clear();
     }
 
     private void addAllNewFoodBookings() {
@@ -271,9 +315,14 @@ public class ExtrasView extends VerticalLayout {
             if (component instanceof FoodPanel foodPanel) {
                 int amount = foodPanel.getFoodAmountField().getValue(); // Get the value from the IntegerField
                 if (amount > 0) {
-                    String foodName = foodPanel.getFoodLabel().getText(); // Get the food name
-                    saveNewFoodBooking(foodName, amount);
-                    foodPanel.resetFoodAmountFieldValue();
+                    String foodName = foodPanel.getFoodLabel().getText();
+                    int newStock = foodRepository.findByName(foodName).getStock() - amount;
+                    if (newStock < 0) {
+                        Notifications.showError("Nicht genügend von der Speise: " + foodName);
+                    } else {
+                        saveNewFoodBooking(foodName, amount);
+                        foodPanel.resetFoodAmountFieldValue();
+                    }
                 }
             }
         });
@@ -294,35 +343,11 @@ public class ExtrasView extends VerticalLayout {
         foodBooking.setBowlingAlley(currentBowlingAlleyBooking.getBowlingAlley());
         foodBooking.setName(selectedFood.getName());
         foodBooking.setPrice(selectedFood.getPrice());
+        System.out.println(foodBooking.toString());
         foodBookingRepository.save(foodBooking);
     }
 
-    /*private void saveNewDrinkBooking(String drinkName, int amount, int ml) {
-        List<Drink> drinkList = drinkRepository.findAll();
-        List<DrinkVariant> drinkVariantList = drinkVariantRepository.findAll();
-        Drink selectedDrink = new Drink();
-        DrinkVariant selectedDrinkVariant = new DrinkVariant();
-        for (Drink drink : drinkList) {
-            if (drink.getName().equals(drinkName)) {
-                selectedDrink = drink;
-            }
-        }
 
-        for (DrinkVariant drinkVariant : selectedDrink.getDrinkVariants()) {
-            if (drinkVariant.getMl() == ml) {
-                selectedDrinkVariant = drinkVariant;
-            }
-        }
-        DrinkBooking drinkBooking = new DrinkBooking();
-        drinkBooking.setAmount(amount);
-        drinkBooking.setName(selectedDrink.getName());
-        drinkBooking.setClient(currentBowlingAlleyBooking.getClient());
-        drinkBooking.setPrice(selectedDrinkVariant.getPrice());
-        drinkBooking.setTimeStamp(System.currentTimeMillis());
-        drinkBooking.setBowlingAlley(currentBowlingAlleyBooking.getBowlingAlley());
-        drinkBookingRepository.save(drinkBooking);
-    }
-*/
     public void setCurrentBowlingAlleyBooking(BowlingAlleyBooking currentBowlingAlleyBooking) {
         this.currentBowlingAlleyBooking = currentBowlingAlleyBooking;
     }

@@ -33,7 +33,7 @@ public class BowlingShoeBooking implements Serializable {
     private boolean active;
 
     public BowlingShoeBooking() {
-        active = true;
+        active = true; price = 10;
     }
 
     public Client getClient() {
@@ -76,9 +76,7 @@ public class BowlingShoeBooking implements Serializable {
         this.active = active;
     }
 
-    public double getPrice() {
-        return price;
-    }
+    public double getPrice() { return price;}
 
     public void setPrice(double price) {
         this.price = price;
