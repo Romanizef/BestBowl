@@ -15,14 +15,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.FoodBooking;
  * @author Ali aus Mali
  */
 public class FoodPanel extends HorizontalLayout {
-
-
-
-
     private IntegerField foodAmountField;
-
-
-
     private Label foodLabel;
 
     public FoodPanel(Food food) {
@@ -47,16 +40,16 @@ public class FoodPanel extends HorizontalLayout {
         label.setMinWidth("250px");
         label.setMaxWidth("250px");
 
-        IntegerField shoeAmountField = new IntegerField();
-        shoeAmountField.setValue(foodBooking.getAmount());
-        shoeAmountField.setStepButtonsVisible(true);
-        shoeAmountField.setMin(0);
-        shoeAmountField.setMax(foodBooking.getAmount());
+        IntegerField foodAmountField = new IntegerField();
+        foodAmountField.setValue(foodBooking.getAmount());
+        foodAmountField.setStepButtonsVisible(true);
+        foodAmountField.setMin(0);
+        foodAmountField.setMax(foodBooking.getAmount());
 
         setWidthFull();
-        // addCSS();
+        addCSS();
         setAlignItems(Alignment.CENTER);
-        add(label, shoeAmountField);
+        add(label, foodAmountField);
     }
 
     public IntegerField getFoodAmountField() {
@@ -72,8 +65,6 @@ public class FoodPanel extends HorizontalLayout {
     public void setFoodLabel(Label foodLabel) {
         this.foodLabel = foodLabel;
     }
-
-
 
     public IntegerField createIntegerField(Food food, FoodBooking foodBooking) {
         IntegerField sizeField = new IntegerField();

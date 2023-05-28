@@ -49,6 +49,9 @@ public class DrinkPanel extends HorizontalLayout {
 
 
     public DrinkPanel(DrinkBooking drinkBooking) {
+        variantLayout = new FormLayout();
+        variantLayout.setResponsiveSteps(new ResponsiveStep("200px", 3));
+        
         Label label = new Label(drinkBooking.getName());
         label.setMinWidth("250px");
         label.setMaxWidth("250px");

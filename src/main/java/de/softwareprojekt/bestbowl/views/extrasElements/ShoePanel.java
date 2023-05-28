@@ -24,7 +24,6 @@ public class ShoePanel extends HorizontalLayout {
     private FormLayout kachelLayout;
     private Grid<BowlingShoeBooking> shoeGrid;
 
-
     private IntegerField shoeSizeField;
     private IntegerField shoeAmountField;
 
@@ -33,7 +32,7 @@ public class ShoePanel extends HorizontalLayout {
     private HorizontalLayout sizeLayout;
     private BowlingShoeRepository bowlingShoeRepository;
 
-    private Map<Integer,Integer> shoeSizeAmountMap;
+    private Map<Integer, Integer> shoeSizeAmountMap;
 
     public ShoePanel(BowlingShoeRepository bowlingShoeRepository) {
         this.bowlingShoeRepository = bowlingShoeRepository;
@@ -41,18 +40,18 @@ public class ShoePanel extends HorizontalLayout {
         int value;
         shoeSizeAmountMap = new HashMap<>();
         for (int i = 30; i < 51; i++) {
-            shoeSizeAmountMap.put(i,0);
+            shoeSizeAmountMap.put(i, 0);
         }
-        for (BowlingShoe shoe: shoeList) {
-            if(shoe.isActive()){
-                if(shoeSizeAmountMap.containsKey(shoe.getSize())){
+        for (BowlingShoe shoe : shoeList) {
+            if (shoe.isActive()) {
+                if (shoeSizeAmountMap.containsKey(shoe.getSize())) {
                     value = shoeSizeAmountMap.get(shoe.getSize());
                     value++;
                     shoeSizeAmountMap.put(shoe.getSize(), value);
                 }
             }
         }
-        VerticalLayout panelLayout =  new VerticalLayout();
+        VerticalLayout panelLayout = new VerticalLayout();
         Label sizeLabel = new Label("Schuhgröße");
         HorizontalLayout sizeLayout = new HorizontalLayout();
         sizeLabel.setMinWidth("250px");
@@ -62,7 +61,7 @@ public class ShoePanel extends HorizontalLayout {
         shoeSizeField.setMax(50);
         shoeSizeField.setValue(40);
         shoeSizeField.setStepButtonsVisible(true);
-        sizeLayout.add(sizeLabel,shoeSizeField);
+        sizeLayout.add(sizeLabel, shoeSizeField);
         HorizontalLayout amountLayout = new HorizontalLayout();
         Label amountLabel = new Label("Menge");
         amountLabel.setMinWidth("250px");
@@ -72,7 +71,7 @@ public class ShoePanel extends HorizontalLayout {
         shoeAmountField.setMin(0);
         shoeAmountField.setMax(shoeSizeAmountMap.get(shoeSizeField.getValue()));
         shoeAmountField.setStepButtonsVisible(true);
-        amountLayout.add(amountLabel,shoeAmountField);
+        amountLayout.add(amountLabel, shoeAmountField);
         setWidthFull();
         addCSS();
         setAlignItems(Alignment.CENTER);
@@ -86,35 +85,50 @@ public class ShoePanel extends HorizontalLayout {
     }
 
     public ShoePanel(BowlingShoeBooking bowlingShoeBooking, BowlingShoeBookingRepository shoeBookingRepository) {
-        Label label = new Label("" + bowlingShoeBooking.getBowlingShoe().getSize());
-        label.setMinWidth("250px");
-        label.setMaxWidth("250px");
-        // list mit Schuhen wo der spezifische Client drin steht und alle Elemente in
-        // der Liste sind der amount
         List<BowlingShoeBooking> shoeBookingList = shoeBookingRepository
                 .findAllByClientEquals(bowlingShoeBooking.getClient());
+
+        VerticalLayout panelLayout = new VerticalLayout();
+        Label sizeLabel = new Label("Schuhgröße: " + bowlingShoeBooking.getBowlingShoe().getSize());
+        HorizontalLayout sizeLayout = new HorizontalLayout();
+        sizeLabel.setMinWidth("250px");
+        sizeLabel.setMaxWidth("250px");
+        shoeSizeField = new IntegerField();
+        shoeSizeField.setMin(30);
+        shoeSizeField.setMax(50);
+        shoeSizeField.setValue(40);
+        shoeSizeField.setStepButtonsVisible(true);
+        sizeLayout.add(sizeLabel, shoeSizeField);
+
+        HorizontalLayout amountLayout = new HorizontalLayout();
+        Label amountLabel = new Label("Menge");
+        amountLabel.setMinWidth("250px");
+        amountLabel.setMaxWidth("250px");
         IntegerField shoeAmountField = new IntegerField();
         shoeAmountField.setValue(shoeBookingList.size());
         shoeAmountField.setStepButtonsVisible(true);
         shoeAmountField.setMin(0);
         shoeAmountField.setMax(shoeBookingList.size());
+        amountLayout.add(amountLabel, shoeAmountField);
+
 
         setWidthFull();
-        // addCSS();
+        addCSS();
         setAlignItems(Alignment.CENTER);
-        add(label, shoeAmountField);
+        panelLayout.add(sizeLayout, amountLayout);
+        add(panelLayout);
     }
 
-    public void updateShoeSizeAmountMap(){
+    public void updateShoeSizeAmountMap() {
         List<BowlingShoe> shoeList = bowlingShoeRepository.findAllByClientIsNullAndActiveIsTrue();
         int value;
         shoeSizeAmountMap = new HashMap<>();
         for (int i = 30; i < 51; i++) {
-            shoeSizeAmountMap.put(i,0);
+            shoeSizeAmountMap.put(i, 0);
         }
-        for (BowlingShoe shoe: shoeList) {
-            if(shoe.isActive()){
-                if(shoeSizeAmountMap.containsKey(shoe.getSize())){
+        for (BowlingShoe shoe : shoeList) {
+            if (shoe.isActive()) {
+                if (shoeSizeAmountMap.containsKey(shoe.getSize())) {
                     value = shoeSizeAmountMap.get(shoe.getSize());
                     value++;
                     shoeSizeAmountMap.put(shoe.getSize(), value);
@@ -122,7 +136,8 @@ public class ShoePanel extends HorizontalLayout {
             }
         }
     }
-    public void resetIntergerfield(){
+
+    public void resetIntergerfield() {
         shoeAmountField.setValue(0);
     }
 
