@@ -8,7 +8,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import de.softwareprojekt.bestbowl.views.MainView;
-import de.softwareprojekt.bestbowl.views.managementViews.*;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,16 +33,16 @@ public class ManagementView extends VerticalLayout {
         setAlignItems(Alignment.CENTER);
         addCSS();
 
-        HorizontalLayout firstRowButtonLayout = createFirstRowButtonLayout();
-        HorizontalLayout secondRowButtonLayout = createSecondRowButtonLayout();
-        HorizontalLayout thirdRowButtonLayout = createThirdRowButtonLayout();
-        HorizontalLayout fourthRowButtonLayout = createFourthRowButtonLayout();
-        HorizontalLayout fifthRowButtonLayout = createFifthRowButtonLayout();
+        HorizontalLayout alleyRowButtonLayout = createAlleyRowButtonLayout();
+        HorizontalLayout clientAndOrgRowButtonLayout = createClientAndOrgRowButtonLayout();
+        HorizontalLayout drinkRowButtonLayout = createDrinkRowButtonLayout();
+        HorizontalLayout foodAndShoeRowButtonLayout = createFoodAndShoeRowButtonLayout();
+        HorizontalLayout userAndCenterRowButtonLayout = createUserAndCenterRowButtonLayout();
 
-        add(firstRowButtonLayout, secondRowButtonLayout, thirdRowButtonLayout, fourthRowButtonLayout, fifthRowButtonLayout);
+        add(alleyRowButtonLayout, clientAndOrgRowButtonLayout,userAndCenterRowButtonLayout, drinkRowButtonLayout, foodAndShoeRowButtonLayout);
     }
 
-    private HorizontalLayout createFirstRowButtonLayout() {
+    private HorizontalLayout createAlleyRowButtonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         Button alleyBookingViewButton = new Button("Bahn Buchungs" + VERWALTUNG);
         alleyBookingViewButton.addClickListener(buttonClickEvent -> UI.getCurrent().navigate(AlleyBookingView.class));
@@ -57,7 +56,7 @@ public class ManagementView extends VerticalLayout {
         return buttonLayout;
     }
 
-    private HorizontalLayout createSecondRowButtonLayout() {
+    private HorizontalLayout createClientAndOrgRowButtonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         Button clientManagementViewButton = new Button("Kunden" + VERWALTUNG);
         clientManagementViewButton.addClickListener(buttonClickEvent -> UI.getCurrent().navigate(ClientManagementView.class));
@@ -71,7 +70,7 @@ public class ManagementView extends VerticalLayout {
         return buttonLayout;
     }
 
-    private HorizontalLayout createThirdRowButtonLayout() {
+    private HorizontalLayout createDrinkRowButtonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         Button drinkViewButton = new Button("Getränke" + VERWALTUNG);
         drinkViewButton.addClickListener(buttonClickEvent -> UI.getCurrent().navigate(DrinkManagementView.class));
@@ -85,7 +84,7 @@ public class ManagementView extends VerticalLayout {
         return buttonLayout;
     }
 
-    private HorizontalLayout createFourthRowButtonLayout(){
+    private HorizontalLayout createFoodAndShoeRowButtonLayout(){
         HorizontalLayout buttonLayout = new HorizontalLayout();
         Button foodViewButton = new Button("Speise" + VERWALTUNG);
         foodViewButton.addClickListener(buttonClickEvent -> UI.getCurrent().navigate(FoodManagementView.class));
@@ -99,7 +98,7 @@ public class ManagementView extends VerticalLayout {
         return buttonLayout;
     }
 
-    private HorizontalLayout createFifthRowButtonLayout() {
+    private HorizontalLayout createUserAndCenterRowButtonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         Button userManagementViewButton = new Button("Nutzer" + VERWALTUNG);
         userManagementViewButton.addClickListener(buttonClickEvent -> UI.getCurrent().navigate(UserManagementView.class));

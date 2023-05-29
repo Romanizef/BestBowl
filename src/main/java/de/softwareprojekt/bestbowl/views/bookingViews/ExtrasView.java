@@ -72,7 +72,19 @@ public class ExtrasView extends VerticalLayout {
     private Button addItem;
     private Button goToBill;
 
-
+    /**
+     * Creates a new instance of the ExtrasView.
+     *
+     * @param drinkRepository               the repository for drinks
+     * @param foodRepository                the repository for food
+     * @param bowlingAlleyRepository        the repository for bowling alleys
+     * @param bowlingAlleyBookingRepository the repository for bowling alley bookings
+     * @param foodBookingRepository         the repository for food bookings
+     * @param drinkBookingRepository        the repository for drink bookings
+     * @param drinkVariantRepository        the repository for drink variants
+     * @param bowlingShoeRepository         the repository for bowling shoes
+     * @param bowlingShoeBookingRepository  the repository for bowling shoe bookings
+     */
     @Autowired
     public ExtrasView(DrinkRepository drinkRepository, FoodRepository foodRepository,
                       BowlingAlleyRepository bowlingAlleyRepository, BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
@@ -100,7 +112,11 @@ public class ExtrasView extends VerticalLayout {
         add(alleyButtonsComponent, articlePanelComponent, footerButtons);
     }
 
-
+    /**
+     * Creates the article panel component.
+     *
+     * @return The article panel component.
+     */
     private Component createArticlePanelComponent() {
         tabs = new TabSheet();
         tabLayout = new HorizontalLayout();
@@ -123,13 +139,21 @@ public class ExtrasView extends VerticalLayout {
         return tabLayout;
     }
 
-
+    /**
+     * Creates the shoe panel component.
+     *
+     * @return The shoe panel component.
+     */
     private Component createShoePanel() {
         shoePanel = new ShoePanel(bowlingShoeRepository, currentBowlingAlleyBooking.getClient());
-
         return shoePanel;
     }
 
+    /**
+     * Creates the drink panel component.
+     *
+     * @return The drink panel component.
+     */
     private Component createDrinkPanel() {
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setAlignItems(Alignment.CENTER);
@@ -144,6 +168,11 @@ public class ExtrasView extends VerticalLayout {
         return verticalLayout;
     }
 
+    /**
+     * Creates the food panel component.
+     *
+     * @return The food panel component.
+     */
     private Component createFoodPanel() {
         FormLayout formLayout = new FormLayout();
         formLayout.setResponsiveSteps(new ResponsiveStep("100px", 2));
@@ -156,6 +185,11 @@ public class ExtrasView extends VerticalLayout {
         return formLayout;
     }
 
+    /**
+     * Creates the alley buttons component.
+     *
+     * @return The alley buttons component.
+     */
     private final Component createAlleyButtonsComponent() {
         alleyLayout = new HorizontalLayout();
         alleyLayout.setPadding(true);
@@ -200,6 +234,10 @@ public class ExtrasView extends VerticalLayout {
         return alleyLayout;
     }
 
+    /**
+     * Changes the tabs in the article panel based on the current bowling alley selection.
+     * Necessary because there is no bowling alley selected at the start
+     */
     private void changeTabs() {
         drinkDiv.removeAll();
         foodDiv.removeAll();
@@ -210,15 +248,29 @@ public class ExtrasView extends VerticalLayout {
         shoeDiv.add(createShoePanel());
     }
 
+    /**
+     * Changes the style of the previous bowling alley button.
+     *
+     * @param currentBowlAlleyId The ID of the current bowling alley.
+     */
     private void changePreviousButtonStyle(int currentBowlAlleyId) {
         buttonMap.get(currentBowlAlleyId).removeThemeVariants(ButtonVariant.LUMO_SUCCESS);
     }
 
+    /**
+     * Changes the style of the current bowling alley button.
+     *
+     * @param currentBowlAlleyId The ID of the current bowling alley.
+     */
     private void changeCurrentButtonSytle(int currentBowlAlleyId) {
         buttonMap.get(currentBowlAlleyId).addThemeVariants(ButtonVariant.LUMO_SUCCESS);
     }
 
-
+    /**
+     * Creates the footer buttons component.
+     *
+     * @return The footer buttons component.
+     */
     private Component createFooterButtons() {
         VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
@@ -255,6 +307,9 @@ public class ExtrasView extends VerticalLayout {
         return layout;
     }
 
+    /**
+     * Adds all new shoe bookings for the current bowling alley booking.
+     */
     private void addAllNewShoeBookings() {
         int stock = shoePanel.getShoeSizeAmountMap().get(shoePanel.getShoeSizeField().getValue()) - shoePanel.getShoeAmountField().getValue();
         if (stock < 0) {
@@ -282,6 +337,9 @@ public class ExtrasView extends VerticalLayout {
         shoePanel.resetIntergerfield();
     }
 
+    /**
+     * Adds all new drink bookings for the current bowling alley booking.
+     */
     private void addAllNewDrinkBookings() {
         List<DrinkBooking> drinkBookingList = drinkBookingRepository
                 .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals
@@ -317,6 +375,9 @@ public class ExtrasView extends VerticalLayout {
         drinkBookingMap.clear();
     }
 
+    /**
+     * Adds all new food bookings for the current bowling alley booking.
+     */
     private void addAllNewFoodBookings() {
         foodFormLayoutForAddItem.getChildren().forEach(component -> {
             if (component instanceof FoodPanel foodPanel) {
@@ -335,6 +396,12 @@ public class ExtrasView extends VerticalLayout {
         });
     }
 
+    /**
+     * Saves a new food booking for the given food name and amount.
+     *
+     * @param foodName The name of the food.
+     * @param amount   The amount of the food to be booked.
+     */
     private void saveNewFoodBooking(String foodName, int amount) {
         List<Food> foodList = foodRepository.findAll();
         Food selectedFood = new Food();
@@ -354,6 +421,9 @@ public class ExtrasView extends VerticalLayout {
         foodBookingRepository.save(foodBooking);
     }
 
+    /**
+     * Setter for currentBowlingAlleyBooking
+     * */
     public void setCurrentBowlingAlleyBooking(BowlingAlleyBooking currentBowlingAlleyBooking) {
         this.currentBowlingAlleyBooking = currentBowlingAlleyBooking;
     }
