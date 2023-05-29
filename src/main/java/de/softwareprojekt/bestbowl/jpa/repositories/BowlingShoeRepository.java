@@ -1,6 +1,7 @@
 package de.softwareprojekt.bestbowl.jpa.repositories;
 
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoe;
+import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +15,5 @@ public interface BowlingShoeRepository extends JpaRepository<BowlingShoe, Intege
 
     BowlingShoe findBySizeAndActiveIsTrueAndClientIsNull(int size);
     List<BowlingShoe> findAllByClientIsNullAndActiveIsTrue();
+    List<BowlingShoe> findAllByClientEqualsAndActiveIsTrue(Client client);
 }

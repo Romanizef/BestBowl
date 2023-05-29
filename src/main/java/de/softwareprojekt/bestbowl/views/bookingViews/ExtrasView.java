@@ -69,6 +69,8 @@ public class ExtrasView extends VerticalLayout {
 
     private FormLayout foodFormLayoutForAddItem;
     private VerticalLayout drinkVerticalLayoutForAddItem;
+    private Button addItem;
+    private Button goToBill;
 
 
     @Autowired
@@ -93,6 +95,8 @@ public class ExtrasView extends VerticalLayout {
         Component alleyButtonsComponent = createAlleyButtonsComponent();
         Component articlePanelComponent = createArticlePanelComponent();
         Component footerButtons = createFooterButtons();
+        goToBill.setEnabled(false);
+        addItem.setEnabled(false);
         add(alleyButtonsComponent, articlePanelComponent, footerButtons);
     }
 
@@ -121,7 +125,7 @@ public class ExtrasView extends VerticalLayout {
 
 
     private Component createShoePanel() {
-        shoePanel = new ShoePanel(bowlingShoeRepository);
+        shoePanel = new ShoePanel(bowlingShoeRepository, currentBowlingAlleyBooking.getClient());
 
         return shoePanel;
     }
@@ -186,6 +190,8 @@ public class ExtrasView extends VerticalLayout {
 
 
                 changeTabs();
+                goToBill.setEnabled(true);
+                addItem.setEnabled(true);
             });
 
             alleyLayout.add(alleyButton);
@@ -217,8 +223,8 @@ public class ExtrasView extends VerticalLayout {
         VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
         layout.setAlignItems(Alignment.CENTER);
-        Button addItem = new Button("Bestellung speichern");
-        Button goToBill = new Button("Zur Rechnungserstellung");
+        addItem = new Button("Bestellung speichern");
+        goToBill = new Button("Zur Rechnungserstellung");
         addItem.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addItem.setWidth("55%");
         String bHeight = "55px";
@@ -229,10 +235,10 @@ public class ExtrasView extends VerticalLayout {
         //ToDo Dialog Fenster "Sind Sie sicher das sie Bezahlen wollen?"
 
         addItem.addClickListener(buttonClickEvent -> {
-            //List<FoodBooking> newFoodBookings = new ArrayList<>();
             addAllNewDrinkBookings();
             addAllNewFoodBookings();
             addAllNewShoeBookings();
+            changeTabs();
 
         });
 
@@ -251,25 +257,26 @@ public class ExtrasView extends VerticalLayout {
 
     private void addAllNewShoeBookings() {
         int stock = shoePanel.getShoeSizeAmountMap().get(shoePanel.getShoeSizeField().getValue()) - shoePanel.getShoeAmountField().getValue();
-        if(stock < 0){
+        if (stock < 0) {
             Notifications.showError("Nicht genügend Schuhe in Größe: " + shoePanel.getShoeSizeField().getValue());
             return;
         }
 
-        List<BowlingShoe> bowlingShoeList= bowlingShoeRepository.findAllByClientIsNullAndActiveIsTrue();
-        BowlingShoe bowlingShoe = new BowlingShoe();
-        for (BowlingShoe bowlingShoe1:bowlingShoeList) {
-            if(bowlingShoe1.getSize() == shoePanel.getShoeSizeField().getValue()){
-                bowlingShoe = bowlingShoe1;
+        List<BowlingShoe> bowlingShoeList = bowlingShoeRepository.findAllByClientIsNullAndActiveIsTrue();
+        BowlingShoe bowlingShoeForBooking = new BowlingShoe();
+        for (BowlingShoe bowlingShoeInList : bowlingShoeList) {
+            if (bowlingShoeInList.getSize() == shoePanel.getShoeSizeField().getValue()) {
+                bowlingShoeForBooking = bowlingShoeInList;
             }
         }
 
-        bowlingShoe.setClient(currentBowlingAlleyBooking.getClient());
+        bowlingShoeForBooking.setClient(currentBowlingAlleyBooking.getClient());
+        bowlingShoeRepository.save(bowlingShoeForBooking);
         BowlingShoeBooking bowlingShoeBooking = new BowlingShoeBooking();
         bowlingShoeBooking.setBowlingAlley(currentBowlingAlleyBooking.getBowlingAlley());
         bowlingShoeBooking.setClient(currentBowlingAlleyBooking.getClient());
         bowlingShoeBooking.setTimeStamp(System.currentTimeMillis());
-        bowlingShoeBooking.setBowlingShoe(bowlingShoe);
+        bowlingShoeBooking.setBowlingShoe(bowlingShoeForBooking);
         bowlingShoeBookingRepository.save(bowlingShoeBooking);
         shoePanel.updateShoeSizeAmountMap();
         shoePanel.resetIntergerfield();
@@ -346,7 +353,6 @@ public class ExtrasView extends VerticalLayout {
         System.out.println(foodBooking.toString());
         foodBookingRepository.save(foodBooking);
     }
-
 
     public void setCurrentBowlingAlleyBooking(BowlingAlleyBooking currentBowlingAlleyBooking) {
         this.currentBowlingAlleyBooking = currentBowlingAlleyBooking;
