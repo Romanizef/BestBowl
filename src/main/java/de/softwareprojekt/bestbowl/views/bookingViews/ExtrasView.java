@@ -45,13 +45,12 @@ import java.util.stream.Collectors;
 public class ExtrasView extends VerticalLayout {
     private final DrinkRepository drinkRepository;
     private final FoodRepository foodRepository;
-
     private final BowlingShoeRepository bowlingShoeRepository;
     private final DrinkVariantRepository drinkVariantRepository;
     private final Map<String, DrinkBooking> drinkBookingMap = new HashMap<>();
+    private final Map<String, FoodBooking> foodBookingMap = new HashMap<>();
     private final BowlingAlleyRepository bowlingAlleyRepository;
     private FoodBookingRepository foodBookingRepository;
-
     private BowlingShoeBookingRepository bowlingShoeBookingRepository;
     private DrinkBookingRepository drinkBookingRepository;
     private int currentBowlingAlleyId;
@@ -63,10 +62,8 @@ public class ExtrasView extends VerticalLayout {
     private TabSheet tabs;
     private Div drinkDiv;
     private Div foodDiv;
-
     private ShoePanel shoePanel;
     private Div shoeDiv;
-
     private FormLayout foodFormLayoutForAddItem;
     private VerticalLayout drinkVerticalLayoutForAddItem;
     private Button addItem;
@@ -178,7 +175,7 @@ public class ExtrasView extends VerticalLayout {
         formLayout.setResponsiveSteps(new ResponsiveStep("100px", 2));
         List<Food> foodList = foodRepository.findAll();
         for (Food food : foodList) {
-            formLayout.add(new FoodPanel(food));
+            formLayout.add(new FoodPanel(food, currentBowlingAlleyBooking, foodBookingMap));
         }
         formLayout.setMaxWidth("1000px");
         foodFormLayoutForAddItem = formLayout;
@@ -197,7 +194,7 @@ public class ExtrasView extends VerticalLayout {
 
         List<BowlingAlley> bowlingAlleyList = bowlingAlleyRepository.findAll();
         if (bowlingAlleyList.isEmpty()) {
-            Notifications.showError("Es sind keine Bahnen im System vorhanden./nBitte trage Bahnen ins System ein.");
+            Notifications.showError("Es sind keine Bahnen im System vorhanden.\nBitte trage Bahnen ins System ein.");
         }
         bowlingAlleyList.sort(Comparator.comparingInt(BowlingAlley::getId));
         long currentTime = System.currentTimeMillis();
@@ -289,7 +286,6 @@ public class ExtrasView extends VerticalLayout {
             addAllNewFoodBookings();
             addAllNewShoeBookings();
             changeTabs();
-
         });
 
         goToBill.addClickListener(buttonClickEvent -> {
@@ -314,13 +310,13 @@ public class ExtrasView extends VerticalLayout {
             return;
         }
         for (int i = 0; i < shoePanel.getShoeAmountField().getValue(); i++) {
-            List<BowlingShoe> bowlingShoeList =  bowlingShoeRepository.findAllBySizeEqualsAndActiveIsTrueAndClientIsNull(shoePanel.getShoeSizeField().getValue());
+            List<BowlingShoe> bowlingShoeList = bowlingShoeRepository.findAllBySizeEqualsAndActiveIsTrueAndClientIsNull(shoePanel.getShoeSizeField().getValue());
             BowlingShoe bowlingShoeForBooking = bowlingShoeList.get(0);
             bowlingShoeRepository.updateClientById(bowlingShoeForBooking.getId(), currentBowlingAlleyBooking.getClient());
             BowlingShoeBooking bowlingShoeBooking = new BowlingShoeBooking();
             bowlingShoeBooking.setBowlingAlley(currentBowlingAlleyBooking.getBowlingAlley());
             bowlingShoeBooking.setClient(currentBowlingAlleyBooking.getClient());
-            bowlingShoeBooking.setTimeStamp(System.currentTimeMillis());
+            bowlingShoeBooking.setTimeStamp(currentBowlingAlleyBooking.getStartTime());
             bowlingShoeBooking.setBowlingShoe(bowlingShoeForBooking);
             bowlingShoeBookingRepository.save(bowlingShoeBooking);
         }
@@ -370,46 +366,40 @@ public class ExtrasView extends VerticalLayout {
      * Adds all new food bookings for the current bowling alley booking.
      */
     private void addAllNewFoodBookings() {
+        List<FoodBooking> foodBookingList = foodBookingRepository
+                .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals
+                        (currentBowlingAlleyBooking.getClient(), currentBowlingAlleyBooking.getBowlingAlley(),
+                                currentBowlingAlleyBooking.getStartTime());
+        Map<String, FoodBooking> foodBookingMapFromDB = foodBookingList.stream()
+                .collect(Collectors.toMap(FoodBooking::getName, Function.identity()));
+        foodBookingMap.forEach((name, booking) -> {
+            //Food über name rausholen und dann vergleichen wie viel noch da ist
+            Food selectedFood = foodRepository.findByName(booking.getName());
+            int newStock = selectedFood.getStock() - booking.getAmount();
+            if (newStock < 0) {
+                Notifications.showError("Nicht genügend von der Speise: " + selectedFood.getName());
+                return;
+            } else {
+                selectedFood.setStock(newStock);
+                foodRepository.updateStockById(selectedFood.getId(), newStock);
+            }
+            if (foodBookingMapFromDB.containsKey(name)) {
+                FoodBooking foodBooking = foodBookingMapFromDB.get(name);
+                booking.setAmount(booking.getAmount() + foodBooking.getAmount());
+            }
+            foodBookingRepository.save(booking);
+        });
         foodFormLayoutForAddItem.getChildren().forEach(component -> {
             if (component instanceof FoodPanel foodPanel) {
-                int amount = foodPanel.getFoodAmountField().getValue(); // Get the value from the IntegerField
-                if (amount > 0) {
-                    String foodName = foodPanel.getFoodLabel().getText();
-                    int newStock = foodRepository.findByName(foodName).getStock() - amount;
-                    if (newStock < 0) {
-                        Notifications.showError("Nicht genügend von der Speise: " + foodName);
-                    } else {
-                        saveNewFoodBooking(foodName, amount);
-                        foodPanel.resetFoodAmountFieldValue();
-                    }
-                }
+                foodPanel.resetFoodAmountFieldValue();
             }
         });
-    }
-
-    /**
-     * Saves a new food booking for the given food name and amount.
-     *
-     * @param foodName The name of the food.
-     * @param amount   The amount of the food to be booked.
-     */
-    private void saveNewFoodBooking(String foodName, int amount) {
-        Food selectedFood = foodRepository.findByName(foodName);
-        int newStock = selectedFood.getStock() - amount;
-        foodRepository.updateStockById(selectedFood.getId(), newStock);
-        FoodBooking foodBooking = new FoodBooking();
-        foodBooking.setClient(currentBowlingAlleyBooking.getClient());
-        foodBooking.setTimeStamp(System.currentTimeMillis());
-        foodBooking.setBowlingAlley(currentBowlingAlleyBooking.getBowlingAlley());
-        foodBooking.setAmount(amount);
-        foodBooking.setName(selectedFood.getName());
-        foodBooking.setPrice(selectedFood.getPrice());
-        foodBookingRepository.save(foodBooking);
+        foodBookingMap.clear();
     }
 
     /**
      * Setter for currentBowlingAlleyBooking
-     * */
+     */
     public void setCurrentBowlingAlleyBooking(BowlingAlleyBooking currentBowlingAlleyBooking) {
         this.currentBowlingAlleyBooking = currentBowlingAlleyBooking;
     }

@@ -1,11 +1,5 @@
 package de.softwareprojekt.bestbowl.views.bookingViews;
 
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -27,7 +21,6 @@ import com.vaadin.flow.component.tabs.TabVariant;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
-
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
@@ -44,10 +37,15 @@ import de.softwareprojekt.bestbowl.views.extrasElements.DrinkPanel;
 import de.softwareprojekt.bestbowl.views.extrasElements.FoodPanel;
 import de.softwareprojekt.bestbowl.views.extrasElements.ShoePanel;
 import jakarta.annotation.security.PermitAll;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
 
 /**
  * Creates a view for all booked elements to be displayed in a invoice and paid
- * 
+ *
  * @author Matija Kopschek
  */
 @Route(value = "invoice", layout = MainView.class)
@@ -56,13 +54,13 @@ import jakarta.annotation.security.PermitAll;
 @PreserveOnRefresh
 public final class InvoiceView extends VerticalLayout {
     private final transient MailSenderService mailSenderController;
-    private BowlingAlleyBooking bowlingAlleyBooking;
     private final transient BowlingAlleyBookingRepository bowlingAlleyBookingRepository;
     private final transient DrinkBookingRepository drinkBookingRepository;
     private final transient FoodBookingRepository foodBookingRepository;
     private final transient BowlingShoeBookingRepository shoeBookingRepository;
     private final H1 clientHeader;
     private final H1 alleyHeader;
+    private BowlingAlleyBooking bowlingAlleyBooking;
     private Tab totalInvoice;
     private Tab partialInvoice;
     private TabSheet invoiceTabSheet;
@@ -72,8 +70,8 @@ public final class InvoiceView extends VerticalLayout {
      */
     @Autowired
     public InvoiceView(BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
-            DrinkBookingRepository drinkBookingRepository, FoodBookingRepository foodBookingRepository,
-            BowlingShoeBookingRepository shoeBookingRepository) {
+                       DrinkBookingRepository drinkBookingRepository, FoodBookingRepository foodBookingRepository,
+                       BowlingShoeBookingRepository shoeBookingRepository) {
         this.bowlingAlleyBookingRepository = bowlingAlleyBookingRepository;
         this.drinkBookingRepository = drinkBookingRepository;
         this.foodBookingRepository = foodBookingRepository;
@@ -142,7 +140,7 @@ public final class InvoiceView extends VerticalLayout {
             for (BowlingShoeBooking bowlingShoeBooking : shoeList) {
                 formLayout.add(new ShoePanel(bowlingShoeBooking, shoeBookingRepository));
             }
-        } 
+        }
         formLayout.add(createTotalInvoiceFooter());
         return formLayout;
     }
@@ -195,7 +193,7 @@ public final class InvoiceView extends VerticalLayout {
 
     /**
      * Calculates the total sum of prices for the current booking
-     * 
+     *
      * @param bowlingAlleyBooking
      * @return {@code double} total
      */

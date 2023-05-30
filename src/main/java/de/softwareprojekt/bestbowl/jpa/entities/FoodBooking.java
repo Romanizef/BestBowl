@@ -36,6 +36,15 @@ public class FoodBooking implements Serializable {
         active = true;
     }
 
+    public FoodBooking(Food food, BowlingAlleyBooking bowlingAlleyBooking){
+        client = bowlingAlleyBooking.getClient();
+        bowlingAlley = bowlingAlleyBooking.getBowlingAlley();
+        timeStamp = bowlingAlleyBooking.getStartTime();
+        name = food.getName();
+        price = food.getPrice();
+        active = true;
+    }
+
     public Client getClient() {
         return client;
     }

@@ -2,6 +2,7 @@ package de.softwareprojekt.bestbowl.jpa.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import java.io.Serializable;
@@ -13,8 +14,9 @@ import java.io.Serializable;
 public class Food implements Serializable {
     private static final long serialVersionUID = 8272575838721537250L;
 
+
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String name;

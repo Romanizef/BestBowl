@@ -20,6 +20,7 @@ import java.util.List;
 public interface FoodBookingRepository extends JpaRepository<FoodBooking, FoodBookingId> {
 
     List<FoodBooking> findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(Client client, BowlingAlley bowlingAlley, long timeStamp);
+
     List<FoodBooking> findAllByClientEquals(Client client);
 
 }

@@ -4,8 +4,11 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.Food;
 import de.softwareprojekt.bestbowl.jpa.entities.FoodBooking;
+
+import java.util.Map;
 
 /**
  * @author Matija Kopschek
@@ -15,7 +18,7 @@ public class FoodPanel extends HorizontalLayout {
     private IntegerField foodAmountField;
     private Label foodLabel;
 
-    public FoodPanel(Food food) {
+    public FoodPanel(Food food, BowlingAlleyBooking bowlingAlleyBooking, Map<String,FoodBooking> foodBookingMap) {
         foodLabel = new Label(food.getName());
         foodLabel.setMinWidth("250px");
         foodLabel.setMaxWidth("250px");
@@ -25,6 +28,13 @@ public class FoodPanel extends HorizontalLayout {
         foodAmountField.setStepButtonsVisible(true);
         foodAmountField.setMin(0);
         foodAmountField.setMax(food.getStock());
+
+        foodAmountField.addValueChangeListener(e -> {
+            FoodBooking temp = new FoodBooking(food,bowlingAlleyBooking);
+            FoodBooking foodBooking = foodBookingMap.getOrDefault(temp.getName(), temp);
+            foodBooking.setAmount(e.getValue());
+            foodBookingMap.put(foodBooking.getName(), foodBooking);
+        });
 
         addCSS();
         setAlignItems(Alignment.CENTER);
