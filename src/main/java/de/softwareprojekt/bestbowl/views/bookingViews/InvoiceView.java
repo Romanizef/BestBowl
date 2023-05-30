@@ -83,27 +83,17 @@ public final class InvoiceView extends VerticalLayout {
         mailSenderController = new MailSenderService();
         clientHeader = new H1();
         alleyHeader = new H1();
-        Component tabComponent = createTabs();
-        add(clientHeader, alleyHeader, tabComponent);
+        invoiceTabSheet = new TabSheet();
+        add(clientHeader, alleyHeader, invoiceTabSheet);
     }
 
     private Component createTabs() {
-        invoiceTabSheet = new TabSheet();
-
         invoiceTabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED,
                 // TabSheetVariant.MATERIAL_BORDERED,
                 TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
-        totalInvoice = new Tab(VaadinIcon.MONEY.create(), new Span("Gesamtrechnung"));
-        invoiceTabSheet.setSelectedTab(invoiceTabSheet.add(totalInvoice, createTotalInvoicePanels()));
-        totalInvoice.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
-        totalInvoice.getElement().addEventListener("click", e -> {
-            updateTotalInvoice();
-        });
 
-        partialInvoice = new Tab(VaadinIcon.MONEY.create(), new Span("Teilrechnung"));
-        invoiceTabSheet.add(partialInvoice, createPartialInvoicePanels());
-        partialInvoice.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
-
+        createTotalTab();
+        createPartialTab();
         invoiceTabSheet.getStyle().set("border", "3px solid blue").set("border-radius", "10px");
         invoiceTabSheet.setMaxWidth("100%");
         return invoiceTabSheet;
@@ -129,7 +119,7 @@ public final class InvoiceView extends VerticalLayout {
     private final Component createTotalInvoicePanels() {
         FormLayout formLayout = new FormLayout();
         formLayout.setResponsiveSteps(new ResponsiveStep("200px", 2));
-        // formLayout.setMaxWidth("100%");
+        formLayout.setMaxWidth("1000px");
         if (bowlingAlleyBooking != null) {
             List<DrinkBooking> drinkBookingList = drinkBookingRepository
                     .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
@@ -152,8 +142,7 @@ public final class InvoiceView extends VerticalLayout {
             for (BowlingShoeBooking bowlingShoeBooking : shoeList) {
                 formLayout.add(new ShoePanel(bowlingShoeBooking, shoeBookingRepository));
             }
-        }
-        else {System.out.println("bla");}
+        } 
         formLayout.add(createTotalInvoiceFooter());
         return formLayout;
     }
@@ -161,7 +150,7 @@ public final class InvoiceView extends VerticalLayout {
     private final Component createPartialInvoicePanels() {
         FormLayout formLayout = new FormLayout();
         formLayout.setResponsiveSteps(new ResponsiveStep("200px", 2));
-        // formLayout.setMaxWidth("1000px");
+        formLayout.setMaxWidth("1000px");
         if (bowlingAlleyBooking != null) {
             List<DrinkBooking> drinkBookingList = drinkBookingRepository
                     .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
@@ -192,6 +181,7 @@ public final class InvoiceView extends VerticalLayout {
     public final void setBowlingAlleyBooking(BowlingAlleyBooking bowlingAlleyBooking) {
         this.bowlingAlleyBooking = bowlingAlleyBooking;
         updateInitialComponents();
+        createTabs();
     }
 
     private final void updateInitialComponents() {

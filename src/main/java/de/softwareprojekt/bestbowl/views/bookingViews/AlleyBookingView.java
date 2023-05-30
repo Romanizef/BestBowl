@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views.managementViews;
+package de.softwareprojekt.bestbowl.views.bookingViews;
 
 
 import com.vaadin.flow.component.button.Button;
@@ -45,8 +45,6 @@ public class AlleyBookingView extends VerticalLayout {
         add(newBowlingAlleyBookingButton, gridLayout);
         updateEditLayoutState();
     }
-
-
 
     private HorizontalLayout createGridLayout() {
         HorizontalLayout layout = new HorizontalLayout();
@@ -97,70 +95,9 @@ public class AlleyBookingView extends VerticalLayout {
         return grid;
     }
 
-    private FormLayout createEditLayout() {
-        FormLayout layout = new FormLayout();
-        layout.setWidth("25%");
-
-        IntegerField idField = new IntegerField("ID");
-        idField.setWidthFull();
-        idField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-
-        HorizontalLayout checkboxLayout = new HorizontalLayout();
-        checkboxLayout.setAlignItems(Alignment.CENTER);
-        checkboxLayout.setWidthFull();
-        checkboxLayout.setHeight("50px");
-
-        Checkbox activeCheckbox = new Checkbox("Aktiv");
-        checkboxLayout.add(activeCheckbox);
-        layout.add(idField, checkboxLayout, createValidationLabelLayout(), buttonLayoutConfig());
-
-        binder.withValidator(new BowlingAlleyValidator());
-        binder.bind(idField, BowlingAlley::getId, (alley, i) -> alley.setId(Objects.requireNonNullElse(i, 0)));
-        binder.bind(activeCheckbox, BowlingAlley::isActive, BowlingAlley::setActive);
-        return layout;
-    }
-
-    private HorizontalLayout buttonLayoutConfig() {
-        HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.setWidthFull();
-        Button saveButton = new Button("Speichern");
-        Button cancelButton = new Button("Abbrechen");
-        buttonLayout.add(cancelButtonConfig(cancelButton), saveButtonConfig(saveButton));
-        buttonLayout.setFlexGrow(1, cancelButton, saveButton);
-        return buttonLayout;
-    }
-
-    private Button saveButtonConfig(Button saveButton) {
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
-        saveButton.addClickListener(clickEvent -> {
-        if (writeBean()) {
-        saveToDb();
-        }
-        });
-        return saveButton;
-    }
-
-    private Button cancelButtonConfig(Button cancelButton) {
-        cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
-        cancelButton.addClickListener(clickEvent -> resetEditLayout());
-        return cancelButton;
-    }
-
     private void updateEditLayoutState() {
         validationErrorLabel.setText("");
         setChildrenEnabled(editLayout.getChildren(), selectedBowlingAlley != null);
-    }
-
-    private void resetEditLayout() {
-        bowlingAlleyGrid.deselectAll();
-        selectedBowlingAlley = null;
-
-        BowlingAlley bowlingAlley = new BowlingAlley();
-        binder.readBean(bowlingAlley);
-
-        updateEditLayoutState();
-        setValueForIntegerFieldChildren(editLayout.getChildren(), null);
     }
 
     private VerticalLayout createValidationLabelLayout() {
@@ -175,29 +112,6 @@ public class AlleyBookingView extends VerticalLayout {
 
         validationLabelLayout.add(validationErrorLabel);
         return validationLabelLayout;
-    }
-
-    private boolean writeBean() {
-        try {
-        binder.writeBean(selectedBowlingAlley);
-        return true;
-        } catch (ValidationException e) {
-        if (!e.getValidationErrors().isEmpty()) {
-        validationErrorLabel.setText(e.getValidationErrors().get(0).getErrorMessage());
-        }
-        }
-        return false;
-    }
-
-    private void saveToDb() {
-        bowlingAlleyRepository.save(selectedBowlingAlley);
-        if (editingNewBowlingAlley) {
-        bowlingAlleyGrid.getListDataView().addItem(selectedBowlingAlley);
-        } else {
-        bowlingAlleyGrid.getListDataView().refreshItem(selectedBowlingAlley);
-        }
-        resetEditLayout();
-        showNotification("Bahn gespeichert");
     }
 */
 }

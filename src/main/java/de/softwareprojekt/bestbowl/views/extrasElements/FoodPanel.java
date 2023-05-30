@@ -43,7 +43,6 @@ public class FoodPanel extends HorizontalLayout {
         foodAmountField.setMin(0);
         foodAmountField.setMax(foodBooking.getAmount());
 
-        setWidthFull();
         addCSS();
         setAlignItems(Alignment.CENTER);
         add(label, foodAmountField);

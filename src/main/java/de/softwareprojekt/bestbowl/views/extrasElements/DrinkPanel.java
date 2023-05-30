@@ -49,10 +49,7 @@ public class DrinkPanel extends HorizontalLayout {
     }
 
 
-    public DrinkPanel(DrinkBooking drinkBooking) {
-        variantLayout = new FormLayout();
-        variantLayout.setResponsiveSteps(new ResponsiveStep("200px", 3));
-        
+    public DrinkPanel(DrinkBooking drinkBooking) {    
         Label label = new Label(drinkBooking.getName());
         label.setMinWidth("250px");
         label.setMaxWidth("250px");
@@ -65,6 +62,7 @@ public class DrinkPanel extends HorizontalLayout {
 
         setWidthFull();
         addCSS();
+        addMarginCSS();
         setAlignItems(Alignment.CENTER);
         add(label, drinkAmountField);
     }
@@ -107,5 +105,9 @@ public class DrinkPanel extends HorizontalLayout {
         getStyle().set("border", "2px solid #338CFF")
                 .set("background-color", "#338CFF10").set("padding", "10px")
                 .set("border-radius", "30px");
+    }
+
+    private void addMarginCSS() {
+        getStyle().set("margin-bottom", "10px");
     }
 }
