@@ -42,7 +42,6 @@ import java.util.Set;
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
 import static de.softwareprojekt.bestbowl.utils.Utils.matches;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
-import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 
 /**
  * @author Marten Voß
@@ -104,6 +103,7 @@ public class UserManagementView extends VerticalLayout {
         Grid.Column<User> idColumn = grid.addColumn("id").setHeader("ID");
         Grid.Column<User> nameColumn = grid.addColumn("name").setHeader("Name");
         Grid.Column<User> emailColumn = grid.addColumn("email").setHeader("E-Mail");
+        Grid.Column<User> questionColumn = grid.addColumn("securityQuestion").setHeader("Sicherheitsfrage");
         Grid.Column<User> answerColumn = grid.addColumn("securityQuestionAnswer").setHeader("Sicherheitsfragenantwort");
         Grid.Column<User> roleColumn = grid.addColumn("role").setHeader("Nutzerrolle");
         Grid.Column<User> activeColumn = grid.addColumn(user -> user.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
@@ -120,6 +120,7 @@ public class UserManagementView extends VerticalLayout {
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", userFilter::setId));
         headerRow.getCell(nameColumn).setComponent(createFilterHeaderString("Name", userFilter::setName));
         headerRow.getCell(emailColumn).setComponent(createFilterHeaderString("E-Mail", userFilter::setEmail));
+        headerRow.getCell(questionColumn).setComponent(createFilterHeaderString("Sicherheitsfrage", userFilter::setSecurityQuestion));
         headerRow.getCell(answerColumn).setComponent(createFilterHeaderString("Sicherheitsfragenantwort", userFilter::setSecurityQuestionAnswer));
         headerRow.getCell(roleColumn).setComponent(createFilterHeaderString("Rolle", userFilter::setRole));
         headerRow.getCell(activeColumn).setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", userFilter::setActive));
@@ -161,6 +162,12 @@ public class UserManagementView extends VerticalLayout {
         passwordField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         passwordField.setRequired(true);
 
+        TextField securityQuestionField = new TextField("Sicherheitsfrage");
+        securityQuestionField.setWidthFull();
+        securityQuestionField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        securityQuestionField.setRequiredIndicatorVisible(true);
+        securityQuestionField.setRequired(true);
+
         TextField securityQuestionAnswerField = new TextField("Sicherheitsfragenantwort");
         securityQuestionAnswerField.setWidthFull();
         securityQuestionAnswerField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
@@ -195,8 +202,8 @@ public class UserManagementView extends VerticalLayout {
         buttonLayout.add(cancelButton, saveButton);
         buttonLayout.setFlexGrow(1, cancelButton, saveButton);
 
-        layout.add(nameField, emailField, passwordField, securityQuestionAnswerField, roleCB, checkboxLayout,
-                createValidationLabelLayout(), buttonLayout);
+        layout.add(nameField, emailField, passwordField, securityQuestionField, securityQuestionAnswerField, roleCB,
+                checkboxLayout, createValidationLabelLayout(), buttonLayout);
 
         saveButton.addClickListener(clickEvent -> {
             User uneditedUser = new User(selectedUser);
@@ -231,6 +238,7 @@ public class UserManagementView extends VerticalLayout {
         binder.bind(nameField, User::getName, User::setName);
         binder.bind(emailField, User::getEmail, User::setEmail);
         binder.bind(passwordField, user -> "", (user, s) -> user.setEncodedPassword(userManager.encodePassword(s)));
+        binder.bind(securityQuestionField, User::getSecurityQuestion, User::setSecurityQuestion);
         binder.bind(securityQuestionAnswerField, User::getSecurityQuestionAnswer, User::setSecurityQuestionAnswer);
         binder.bind(roleCB, User::getRole, User::setRole);
         binder.bind(activeCheckbox, User::isActive, User::setActive);
@@ -335,6 +343,7 @@ public class UserManagementView extends VerticalLayout {
         private String id;
         private String name;
         private String email;
+        private String securityQuestion;
         private String securityQuestionAnswer;
         private String role;
         private Boolean active;
@@ -348,10 +357,12 @@ public class UserManagementView extends VerticalLayout {
             boolean matchesId = matches(String.valueOf(user.getId()), id);
             boolean matchesName = matches(user.getName(), name);
             boolean matchesEmail = matches(user.getEmail(), email);
+            boolean matchesQuestion = matches(user.getSecurityQuestion(), securityQuestion);
             boolean matchesAnswer = matches(user.getSecurityQuestionAnswer(), securityQuestionAnswer);
             boolean matchesRole = matches(user.getRole(), role);
             boolean matchesActive = active == null || active == user.isActive();
-            return matchesId && matchesName && matchesEmail && matchesAnswer && matchesRole && matchesActive;
+            return matchesId && matchesName && matchesEmail && matchesQuestion && matchesAnswer
+                    && matchesRole && matchesActive;
         }
 
         public void setId(String id) {
@@ -366,6 +377,11 @@ public class UserManagementView extends VerticalLayout {
 
         public void setEmail(String email) {
             this.email = email;
+            dataView.refreshAll();
+        }
+
+        public void setSecurityQuestion(String securityQuestion) {
+            this.securityQuestion = securityQuestion;
             dataView.refreshAll();
         }
 

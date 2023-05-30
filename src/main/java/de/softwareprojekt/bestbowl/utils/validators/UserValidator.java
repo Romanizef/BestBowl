@@ -22,8 +22,11 @@ public class UserValidator implements Validator<User> {
         if (!isStringNotEmpty(user.getEncodedPassword())) {
             return ValidationResult.error("Passwort darf nicht leer sein");
         }
-        if (!isStringMinNChars(user.getSecurityQuestionAnswer(), 3)) {
-            return ValidationResult.error("Sicherheitsantwort muss min. 3 Zeichen lang sein");
+        if (!isStringMinNChars(user.getSecurityQuestion(), 3)) {
+            return ValidationResult.error("Sicherheitsfrage muss min. 3 Zeichen lang sein");
+        }
+        if (!isStringMinNChars(user.getSecurityQuestionAnswer(), 1)) {
+            return ValidationResult.error("Sicherheitsantwort muss min. 1 Zeichen lang sein");
         }
         if (!isStringNotEmpty(user.getRole())) {
             return ValidationResult.error("Der Nutzer muss einer Rolle zugeordnet sein");

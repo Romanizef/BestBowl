@@ -22,6 +22,7 @@ public class User implements Serializable {
     private String name;
     private String email;
     private String encodedPassword;
+    private String securityQuestion;
     private String securityQuestionAnswer;
     private String role;
 
@@ -38,6 +39,7 @@ public class User implements Serializable {
         this.name = other.name;
         this.email = other.email;
         this.encodedPassword = other.encodedPassword;
+        this.securityQuestion = other.securityQuestion;
         this.securityQuestionAnswer = other.securityQuestionAnswer;
         this.role = other.role;
         this.darkMode = other.darkMode;
@@ -49,6 +51,7 @@ public class User implements Serializable {
         this.name = other.name;
         this.email = other.email;
         this.encodedPassword = other.encodedPassword;
+        this.securityQuestion = other.securityQuestion;
         this.securityQuestionAnswer = other.securityQuestionAnswer;
         this.role = other.role;
         this.darkMode = other.darkMode;
@@ -85,6 +88,14 @@ public class User implements Serializable {
 
     public void setEncodedPassword(String encodedPassword) {
         this.encodedPassword = encodedPassword;
+    }
+
+    public String getSecurityQuestion() {
+        return securityQuestion;
+    }
+
+    public void setSecurityQuestion(String securityQuestion) {
+        this.securityQuestion = securityQuestion;
     }
 
     public String getSecurityQuestionAnswer() {

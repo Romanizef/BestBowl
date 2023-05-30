@@ -4,6 +4,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -37,6 +38,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     private final transient UserManager userManager;
     private final transient UserRepository userRepository;
     private User selectedUserForPasswordReset = null;
+    private int passwordResetDialogStage = 1;
 
     @Autowired
     public LoginView(UserManager userManager, UserRepository userRepository,
@@ -77,63 +79,68 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     private Dialog createPasswordResetDialog() {
         Dialog dialog = new Dialog();
         dialog.setWidth("350px");
-        dialog.setHeaderTitle("Sicherheitsabfrage");
+        dialog.setHeaderTitle("Passwort zurücksetzen Dialog");
         dialog.setCloseOnOutsideClick(false);
         dialog.setCloseOnEsc(true);
         VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
         TextField userNameField = new TextField("Benutzername");
         userNameField.setWidthFull();
-        TextField questionField = new TextField("Geburtstag");
-        questionField.setWidthFull();
+        TextField answerField = new TextField("answer");
+        answerField.setWidthFull();
         PasswordField passwordField1 = new PasswordField("Neues Passwort");
         passwordField1.setWidthFull();
         PasswordField passwordField2 = new PasswordField("Neues Passwort wiederholen");
         passwordField2.setWidthFull();
-        layout.add(userNameField, questionField, passwordField1, passwordField2);
+        Label errorLabel = new Label();
+        errorLabel.getStyle().set("color", "red");
+        layout.add(userNameField, answerField, passwordField1, passwordField2, errorLabel);
         dialog.add(layout);
         HorizontalLayout footerLayout = new HorizontalLayout();
         footerLayout.setWidthFull();
         Button cancelButton = new Button("Abbrechen");
         Button continueButton = new Button("Weiter");
         continueButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        Button saveNewPasswordButton = new Button("Sichern");
-        saveNewPasswordButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        footerLayout.add(cancelButton, continueButton, saveNewPasswordButton);
-        footerLayout.setFlexGrow(1, cancelButton, continueButton, saveNewPasswordButton);
+        footerLayout.add(cancelButton, continueButton);
+        footerLayout.setFlexGrow(1, cancelButton, continueButton);
         dialog.getFooter().add(footerLayout);
-        cancelButton.addClickListener(e -> {
-            selectedUserForPasswordReset = null;
-            dialog.close();
-        });
-        continueButton.addClickListener(e -> {
+
+        Runnable stageOneAction = () -> {
             String userName = userNameField.getValue();
-            String answer = questionField.getValue();
-            if (Utils.isStringNotEmpty(userName, answer)) {
+            if (Utils.isStringNotEmpty(userName)) {
                 Optional<User> optionalUser = userRepository.findByName(userName);
-                if (optionalUser.isPresent()) {
-                    User user = optionalUser.get();
-                    if (user.getSecurityQuestionAnswer().equals(answer)) {
-                        selectedUserForPasswordReset = user;
-                    }
-                }
+                optionalUser.ifPresent(user -> {
+                    selectedUserForPasswordReset = user;
+                    passwordResetDialogStage = 2;
+                });
             }
             if (selectedUserForPasswordReset == null) {
-                Notifications.showInfo("Benutzername oder Antwort falsch");
+                errorLabel.setText("Der Benutzer existiert nicht!");
             } else {
                 userNameField.setValue("");
-                questionField.setValue("");
                 userNameField.setVisible(false);
-                questionField.setVisible(false);
+                answerField.setVisible(true);
+                answerField.setLabel(selectedUserForPasswordReset.getSecurityQuestion());
+                errorLabel.setText("");
+            }
+        };
+        Runnable stageTwoAction = () -> {
+            String answer = answerField.getValue();
+            if (Utils.isStringNotEmpty(answer) && answer.equals(selectedUserForPasswordReset.getSecurityQuestionAnswer())) {
+                passwordResetDialogStage = 3;
+                answerField.setValue("");
+                answerField.setVisible(false);
                 passwordField1.setVisible(true);
                 passwordField2.setVisible(true);
-                continueButton.setVisible(false);
-                saveNewPasswordButton.setVisible(true);
+                continueButton.setText("Sichern");
+                errorLabel.setText("");
+            } else {
+                errorLabel.setText("Falsche Antwort!");
             }
-        });
-        saveNewPasswordButton.addClickListener(e -> {
-            if (selectedUserForPasswordReset == null) {
-                Notifications.showInfo("Kein Benutzer ausgewählt");
+        };
+        Runnable saveAction = () -> {
+            if (selectedUserForPasswordReset == null || passwordResetDialogStage != 3) {
+                Notifications.showError("Kein Benutzer ausgewählt, Rufe den Dialog neu auf!");
             } else {
                 String password1 = passwordField1.getValue();
                 String password2 = passwordField2.getValue();
@@ -142,25 +149,60 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
                     passwordField1.setValue("");
                     passwordField2.setValue("");
                     selectedUserForPasswordReset = null;
+                    passwordResetDialogStage = 1;
                     dialog.close();
-                    Notifications.showInfo("Passwort erfolgreich geändert");
+                    Notifications.showInfo("Passwort erfolgreich geändert!");
                 } else {
-                    Notifications.showInfo("Passwörter müssen übereinstimmen");
+                    errorLabel.setText("Passwörter müssen übereinstimmen!");
+                }
+            }
+        };
+
+        continueButton.addClickListener(e -> {
+            if (e.isFromClient()) {
+                if (passwordResetDialogStage == 1) {
+                    stageOneAction.run();
+                } else if (passwordResetDialogStage == 2) {
+                    stageTwoAction.run();
+                } else {
+                    saveAction.run();
                 }
             }
         });
+        userNameField.addValueChangeListener(e -> {
+            if (e.isFromClient())
+                stageOneAction.run();
+        });
+        answerField.addValueChangeListener(e -> {
+            if (e.isFromClient())
+                stageTwoAction.run();
+        });
+        passwordField2.addValueChangeListener(e -> {
+            if (e.isFromClient())
+                saveAction.run();
+        });
+
+        cancelButton.addClickListener(e -> {
+            if (e.isFromClient()) {
+                selectedUserForPasswordReset = null;
+                passwordResetDialogStage = 1;
+                dialog.close();
+            }
+        });
+
         dialog.addOpenedChangeListener(e -> {
             selectedUserForPasswordReset = null;
+            passwordResetDialogStage = 1;
             userNameField.setValue("");
-            questionField.setValue("");
+            answerField.setValue("");
             passwordField1.setValue("");
             passwordField2.setValue("");
             userNameField.setVisible(true);
-            questionField.setVisible(true);
+            answerField.setVisible(false);
             passwordField1.setVisible(false);
             passwordField2.setVisible(false);
-            continueButton.setVisible(true);
-            saveNewPasswordButton.setVisible(false);
+            continueButton.setText("Weiter");
+            errorLabel.setText("");
         });
         return dialog;
     }

@@ -399,8 +399,7 @@ public class ClientSearchView extends VerticalLayout {
 
         verticalLayout.add(selectedClientLabel, commentLayout, nextStepButton);
 
-        nextStepButton.addClickListener(e -> UI.getCurrent().navigate(BowlingAlleyBookingView.class)
-                .ifPresent(bookingView -> bookingView.setSelectedClient(selectedClient)));
+        nextStepButton.addClickListener(e -> UI.getCurrent().navigate(BowlingAlleyBookingView.class, selectedClient.getId()));
         saveCommentButton.addClickListener(e -> {
             String comment = commentArea.getValue();
             if (comment == null || comment.length() > 255) {

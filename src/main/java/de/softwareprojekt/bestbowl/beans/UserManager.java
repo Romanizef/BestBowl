@@ -61,10 +61,11 @@ public class UserManager {
      * @param email    e-mail of the user
      * @param userRole role of the user
      */
-    public void addNewUser(String name, String password, String securityQuestionAnswer, String email, String userRole) {
+    public void addNewUser(String name, String password, String securityQuestion, String securityQuestionAnswer, String email, String userRole) {
         User user = new User();
         user.setName(name);
         user.setEncodedPassword(passwordEncoder.encode(password));
+        user.setSecurityQuestion(securityQuestion);
         user.setSecurityQuestionAnswer(securityQuestionAnswer);
         user.setEmail(email);
         user.setRole(userRole);

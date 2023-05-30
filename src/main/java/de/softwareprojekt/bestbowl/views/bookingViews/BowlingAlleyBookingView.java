@@ -13,11 +13,12 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.timepicker.TimePicker;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.*;
 import com.vaadin.flow.spring.security.AuthenticationContext;
+import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlley;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyRepository;
@@ -37,6 +38,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
 import static de.softwareprojekt.bestbowl.utils.Utils.toHoursString;
@@ -48,7 +50,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.isCurrentUserInRole;
 @Route(value = "bowlingAlleyBooking", layout = MainView.class)
 @PageTitle("Bahn buchen")
 @PermitAll
-public class BowlingAlleyBookingView extends VerticalLayout {
+public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlParameter<Integer> {
     private final transient BowlingAlleyBookingRepository bowlingAlleyBookingRepository;
     private final transient BowlingAlleyRepository bowlingAlleyRepository;
     private final transient AuthenticationContext authenticationContext;
@@ -101,14 +103,10 @@ public class BowlingAlleyBookingView extends VerticalLayout {
         layout.setAlignItems(Alignment.BASELINE);
 
         datePicker = new DatePicker("Tag");
-        datePicker.setLocale(Locale.GERMANY);
-//        datePicker.setValue(Utils.getCurrentDateTimeRounded().toLocalDate());
-        datePicker.setValue(LocalDate.now());
+        configureDatePicker(datePicker);
 
         timePicker = new TimePicker("Uhrzeit");
-        timePicker.setLocale(Locale.GERMANY);
-//        timePicker.setValue(Utils.getCurrentDateTimeRounded().toLocalTime());
-        timePicker.setValue(LocalTime.now());
+        configureTimePicker(timePicker);
 
         durationCB = new ComboBox<>("Länge");
         durationCB.setAllowCustomValue(false);
@@ -128,9 +126,9 @@ public class BowlingAlleyBookingView extends VerticalLayout {
                 Notifications.showInfo("Keine Bahn im System angelegt");
                 return;
             }
-            if (verifyTime()) {
-                alleyBookingChecker.setTimeInfo(datePicker.getValue(), timePicker.getValue(),
-                        (int) (durationCB.getValue().hours() * 60));
+            alleyBookingChecker.setTimeInfo(datePicker.getValue(), timePicker.getValue(),
+                    (int) (durationCB.getValue().hours() * 60));
+            if (alleyBookingChecker.verifyTime(authenticationContext)) {
                 gridLowerBound = alleyBookingChecker.getStartTime();
                 gridUpperBound = alleyBookingChecker.getEndTime();
                 if (alleyBookingChecker.checkAvailability()) {
@@ -152,6 +150,24 @@ public class BowlingAlleyBookingView extends VerticalLayout {
         return layout;
     }
 
+    private void configureDatePicker(DatePicker datePicker) {
+        datePicker.setLocale(Locale.GERMANY);
+//        datePicker.setValue(Utils.getCurrentDateTimeRounded().toLocalDate());
+        datePicker.setValue(LocalDate.now());
+        if (!isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
+            datePicker.setMin(LocalDate.now());
+        }
+    }
+
+    private void configureTimePicker(TimePicker timePicker) {
+        BowlingCenter bowlingCenter = Repos.getBowlingCenterRepository().getBowlingCenter();
+        timePicker.setLocale(Locale.GERMANY);
+        timePicker.setMin(LocalTime.ofSecondOfDay(bowlingCenter.getStartTime()));
+        timePicker.setMax(LocalTime.ofSecondOfDay(bowlingCenter.getEndTime()));
+//        timePicker.setValue(Utils.getCurrentDateTimeRounded().toLocalTime());
+        timePicker.setValue(LocalTime.now());
+    }
+
     private Button createBookButton() {
         Button button = new Button("Zeit buchen");
         button.setWidth("65%");
@@ -162,9 +178,9 @@ public class BowlingAlleyBookingView extends VerticalLayout {
                 Notifications.showInfo("Keine Bahn im System angelegt");
                 return;
             }
-            if (verifyTime()) {
-                alleyBookingChecker.setTimeInfo(datePicker.getValue(), timePicker.getValue(),
-                        (int) (durationCB.getValue().hours() * 60));
+            alleyBookingChecker.setTimeInfo(datePicker.getValue(), timePicker.getValue(),
+                    (int) (durationCB.getValue().hours() * 60));
+            if (alleyBookingChecker.verifyTime(authenticationContext)) {
                 gridLowerBound = alleyBookingChecker.getStartTime();
                 gridUpperBound = alleyBookingChecker.getEndTime();
                 if ((latestBooking = alleyBookingChecker.book()) != null) {
@@ -226,9 +242,7 @@ public class BowlingAlleyBookingView extends VerticalLayout {
         Button button = new Button("Weiter zum Extras buchen");
         button.setWidth("55%");
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        button.addClickListener(e -> UI.getCurrent().navigate(ExtrasView.class).ifPresent(extrasView -> {
-            extrasView.setCurrentBowlingAlleyBooking(latestBooking);
-        }));
+        button.addClickListener(e -> UI.getCurrent().navigate(ExtrasView.class, latestBooking.getId()));
         return button;
     }
 
@@ -267,30 +281,24 @@ public class BowlingAlleyBookingView extends VerticalLayout {
         }
     }
 
-    public void setSelectedClient(Client selectedClient) {
-        this.selectedClient = selectedClient;
-        alleyBookingChecker.setClient(selectedClient);
-        updateInitialComponents();
-    }
-
     private boolean checkForBowlingAlleys() {
         List<BowlingAlley> bowlingAlleyList = bowlingAlleyRepository.findAll();
         return !bowlingAlleyList.isEmpty();
     }
 
-    private boolean verifyTime() {
-        LocalDateTime selectedStartTime = LocalDateTime.of(datePicker.getValue(), timePicker.getValue());
-        LocalDateTime currentTime = Utils.getCurrentDateTimeRounded();
-        if (selectedStartTime.isAfter(currentTime)) {
-            return true;
-        } else {
-            // admin can book in the past for testing purposes
-            if (isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
-                return true;
-            }
-            Notifications.showInfo("Die Buchungszeit darf nicht in der Vergangenheit sein");
-            return false;
+    @Override
+    public void setParameter(BeforeEvent event, @OptionalParameter Integer parameter) {
+        if (parameter == null) {
+            return;
         }
+        Optional<Client> optionalClient = Repos.getClientRepository().findById(parameter);
+        optionalClient.ifPresent(client -> {
+            if (client.isActive()) {
+                selectedClient = client;
+                alleyBookingChecker.setClient(client);
+                updateInitialComponents();
+            }
+        });
     }
 
     private record Duration(double hours) {

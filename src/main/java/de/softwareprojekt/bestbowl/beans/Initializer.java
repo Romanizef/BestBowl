@@ -87,9 +87,10 @@ public class Initializer {
     private User createDefaultAdminUser() {
         User user = new User();
         user.setName("admin");
-        user.setEmail("");
+        user.setEmail("-");
         user.setEncodedPassword(userManager.encodePassword(DEFAULT_ADMIN_PASSWORD));
-        user.setSecurityQuestionAnswer("");
+        user.setSecurityQuestion("admin");
+        user.setSecurityQuestionAnswer("admin");
         user.setRole(UserRole.ADMIN);
         return user;
     }

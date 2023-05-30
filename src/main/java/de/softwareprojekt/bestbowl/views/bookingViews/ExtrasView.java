@@ -16,9 +16,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.PreserveOnRefresh;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.*;
 import de.softwareprojekt.bestbowl.jpa.entities.*;
 import de.softwareprojekt.bestbowl.jpa.repositories.*;
 import de.softwareprojekt.bestbowl.utils.VaadinUtils;
@@ -41,8 +39,7 @@ import java.util.stream.Collectors;
 @Route(value = "extras", layout = MainView.class)
 @PageTitle("Extras")
 @PermitAll
-@PreserveOnRefresh
-public class ExtrasView extends VerticalLayout {
+public class ExtrasView extends VerticalLayout implements HasUrlParameter<Integer> {
     private final DrinkRepository drinkRepository;
     private final FoodRepository foodRepository;
     private final BowlingShoeRepository bowlingShoeRepository;
@@ -218,8 +215,6 @@ public class ExtrasView extends VerticalLayout {
                                 bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
                         .findFirst()
                         .orElse(null);
-
-                setCurrentBowlingAlleyBooking(currentBowlingAlleyBooking);
                 changeTabs();
                 goToBill.setEnabled(true);
                 addItem.setEnabled(true);
@@ -292,7 +287,7 @@ public class ExtrasView extends VerticalLayout {
             addAllNewDrinkBookings();
             addAllNewFoodBookings();
             VaadinUtils.showConfirmationDialog("Rechnung bezahlen?", "Ja", "Abbrechen", () -> {
-                UI.getCurrent().navigate(InvoiceView.class).ifPresent(view -> view.setBowlingAlleyBooking(currentBowlingAlleyBooking));
+                UI.getCurrent().navigate(InvoiceView.class, currentBowlingAlleyBooking.getId());
             });
         });
 
@@ -397,10 +392,16 @@ public class ExtrasView extends VerticalLayout {
         foodBookingMap.clear();
     }
 
-    /**
-     * Setter for currentBowlingAlleyBooking
-     */
-    public void setCurrentBowlingAlleyBooking(BowlingAlleyBooking currentBowlingAlleyBooking) {
-        this.currentBowlingAlleyBooking = currentBowlingAlleyBooking;
+    @Override
+    public void setParameter(BeforeEvent event, @OptionalParameter Integer parameter) {
+        if(parameter == null) {
+            return;
+        }
+        Optional<BowlingAlleyBooking> bowlingAlleyBookingOptional = bowlingAlleyBookingRepository.findById(parameter);
+        bowlingAlleyBookingOptional.ifPresent(booking -> {
+            if (booking.isActive()) {
+                currentBowlingAlleyBooking = booking;
+            }
+        });
     }
 }

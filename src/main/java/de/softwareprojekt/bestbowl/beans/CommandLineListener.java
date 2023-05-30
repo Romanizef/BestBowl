@@ -50,10 +50,12 @@ public class CommandLineListener {
                             BestBowlApplication.shutdown();
                         }
                         case "addUsers" -> {
-                            userManager.addNewUser("admin", "admin", "23.5.1993", "admin@bestbowl.de", UserRole.ADMIN);
-                            userManager.addNewUser("owner", "owner", "7.3.1986", "owner@bestbowl.de", UserRole.OWNER);
-                            userManager.addNewUser("employee", "employee", "19.10.2001", "employee@bestbowl.de",
-                                    UserRole.EMPLOYEE);
+                            userManager.addNewUser("admin", "admin", "10 + 5 = ?",
+                                    "15", "admin@bestbowl.de", UserRole.ADMIN);
+                            userManager.addNewUser("owner", "owner", "2 - 3 = ?",
+                                    "-1", "owner@bestbowl.de", UserRole.OWNER);
+                            userManager.addNewUser("employee", "employee", "5 * 7 = ?",
+                                    "35", "employee@bestbowl.de", UserRole.EMPLOYEE);
                             LOGGER.info("Users added");
                         }
                         case "generate" -> {

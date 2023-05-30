@@ -18,9 +18,7 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.component.tabs.TabVariant;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.PreserveOnRefresh;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.*;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
@@ -40,6 +38,7 @@ import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Optional;
 
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
 
@@ -51,8 +50,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
 @Route(value = "invoice", layout = MainView.class)
 @PageTitle("Rechnung")
 @PermitAll
-@PreserveOnRefresh
-public final class InvoiceView extends VerticalLayout {
+public final class InvoiceView extends VerticalLayout implements HasUrlParameter<Integer> {
     private final transient MailSenderService mailSenderController;
     private final transient BowlingAlleyBookingRepository bowlingAlleyBookingRepository;
     private final transient DrinkBookingRepository drinkBookingRepository;
@@ -174,12 +172,6 @@ public final class InvoiceView extends VerticalLayout {
         }
         formLayout.add(createPartialInvoiceFooter());
         return formLayout;
-    }
-
-    public final void setBowlingAlleyBooking(BowlingAlleyBooking bowlingAlleyBooking) {
-        this.bowlingAlleyBooking = bowlingAlleyBooking;
-        updateInitialComponents();
-        createTabs();
     }
 
     private final void updateInitialComponents() {
@@ -306,5 +298,20 @@ public final class InvoiceView extends VerticalLayout {
     // muss die gesamtrechnung aktualisiert werden
     private void updateTotalInvoice() {
 
+    }
+
+    @Override
+    public void setParameter(BeforeEvent event, @OptionalParameter Integer parameter) {
+        if (parameter == null) {
+            return;
+        }
+        Optional<BowlingAlleyBooking> bowlingAlleyBookingOptional = bowlingAlleyBookingRepository.findById(parameter);
+        bowlingAlleyBookingOptional.ifPresent(booking -> {
+            if (booking.isActive()) {
+                bowlingAlleyBooking = booking;
+                updateInitialComponents();
+                createTabs();
+            }
+        });
     }
 }

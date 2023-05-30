@@ -6,7 +6,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -29,10 +28,11 @@ import java.util.Objects;
 
 /**
  * @author Marten Voß
+ * @author Matija Kopschek
  */
 @Route(value = "bowlingCenterManagement", layout = MainView.class)
 @PageTitle("Bowlingcenter Verwaltung")
-@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
+@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 public class BowlingCenterManagementView extends Div {
     private final Binder<BowlingCenter> binder = new Binder<>();
     private final BowlingCenter bowlingCenter;
@@ -67,9 +67,9 @@ public class BowlingCenterManagementView extends Div {
         centerBusinessHoursPanel.addThemeVariants(DetailsVariant.FILLED);
 
         NumberField bowlingAlleyPricePerHourField = new NumberField("Bahnpreis pro Stunde");
-        NumberField bowlingShoePrice = new NumberField("Schuhpreis pro Ausleihe");
+        NumberField bowlingShoePriceField = new NumberField("Schuhpreis pro Ausleihe");
         VerticalLayout centerPriceLayout = new VerticalLayout(bowlingAlleyPricePerHourField,
-                bowlingShoePrice);
+                bowlingShoePriceField);
         AccordionPanel centerPricePanel = accordion.add("Bahn und Schuhpreise", centerPriceLayout);
         centerPricePanel.addThemeVariants(DetailsVariant.FILLED);
 
@@ -112,7 +112,7 @@ public class BowlingCenterManagementView extends Div {
                 (bc, time) -> bc.setEndTime(time.toSecondOfDay()));
         binder.bind(bowlingAlleyPricePerHourField, BowlingCenter::getBowlingAlleyPricePerHour,
                 BowlingCenter::setBowlingAlleyPricePerHour);
-        binder.bind(bowlingShoePrice, BowlingCenter::getBowlingShoePrice, BowlingCenter::setBowlingShoePrice);
+        binder.bind(bowlingShoePriceField, BowlingCenter::getBowlingShoePrice, BowlingCenter::setBowlingShoePrice);
         binder.bind(emailField, BowlingCenter::getEmail, BowlingCenter::setEmail);
         binder.bind(passwordField, BowlingCenter::getPassword, BowlingCenter::setPassword);
         binder.bind(smtpHostField, BowlingCenter::getSmtpHost, BowlingCenter::setSmtpHost);
