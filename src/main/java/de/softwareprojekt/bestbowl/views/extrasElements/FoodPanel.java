@@ -1,11 +1,8 @@
 package de.softwareprojekt.bestbowl.views.extrasElements;
 
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 
 import de.softwareprojekt.bestbowl.jpa.entities.Food;
 import de.softwareprojekt.bestbowl.jpa.entities.FoodBooking;
@@ -64,19 +61,6 @@ public class FoodPanel extends HorizontalLayout {
     }
     public void setFoodLabel(Label foodLabel) {
         this.foodLabel = foodLabel;
-    }
-
-    public IntegerField createIntegerField(Food food, FoodBooking foodBooking) {
-        IntegerField sizeField = new IntegerField();
-        sizeField.setValue(0);
-        sizeField.setStepButtonsVisible(true);
-        sizeField.setMin(0);
-        sizeField.setMax(food.getStock()/ foodBooking.getAmount());
-
-        sizeField.addValueChangeListener(e -> {
-            // TODO
-        });
-        return sizeField;
     }
 
      private void addCSS() {

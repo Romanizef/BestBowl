@@ -1,5 +1,7 @@
 package de.softwareprojekt.bestbowl.views.bookingViews;
 
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +37,6 @@ import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeBookingRepository
 import de.softwareprojekt.bestbowl.jpa.repositories.DrinkBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.FoodBookingRepository;
 import de.softwareprojekt.bestbowl.utils.VaadinUtils;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
 import de.softwareprojekt.bestbowl.utils.email.MailSenderService;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
@@ -92,8 +93,17 @@ public final class InvoiceView extends VerticalLayout {
         invoiceTabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED,
                 // TabSheetVariant.MATERIAL_BORDERED,
                 TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
-        createTotalTab();
-        createPartialTab();
+        totalInvoice = new Tab(VaadinIcon.MONEY.create(), new Span("Gesamtrechnung"));
+        invoiceTabSheet.setSelectedTab(invoiceTabSheet.add(totalInvoice, createTotalInvoicePanels()));
+        totalInvoice.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
+        totalInvoice.getElement().addEventListener("click", e -> {
+            updateTotalInvoice();
+        });
+
+        partialInvoice = new Tab(VaadinIcon.MONEY.create(), new Span("Teilrechnung"));
+        invoiceTabSheet.add(partialInvoice, createPartialInvoicePanels());
+        partialInvoice.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
+
         invoiceTabSheet.getStyle().set("border", "3px solid blue").set("border-radius", "10px");
         invoiceTabSheet.setMaxWidth("100%");
         return invoiceTabSheet;
@@ -143,6 +153,7 @@ public final class InvoiceView extends VerticalLayout {
                 formLayout.add(new ShoePanel(bowlingShoeBooking, shoeBookingRepository));
             }
         }
+        else {System.out.println("bla");}
         formLayout.add(createTotalInvoiceFooter());
         return formLayout;
     }
@@ -176,10 +187,6 @@ public final class InvoiceView extends VerticalLayout {
         }
         formLayout.add(createPartialInvoiceFooter());
         return formLayout;
-    }
-
-    public final BowlingAlleyBooking getBowlingAlleyBooking() {
-        return bowlingAlleyBooking;
     }
 
     public final void setBowlingAlleyBooking(BowlingAlleyBooking bowlingAlleyBooking) {

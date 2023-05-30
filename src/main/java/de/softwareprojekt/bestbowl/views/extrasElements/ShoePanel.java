@@ -1,5 +1,10 @@
 package de.softwareprojekt.bestbowl.views.extrasElements;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
@@ -9,19 +14,12 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.provider.ListDataProvider;
+
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
-import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeRepository;
-
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Matija Kopschek
@@ -152,19 +150,6 @@ public class ShoePanel extends VerticalLayout {
 
     public void resetIntergerfield() {
         shoeAmountField.setValue(0);
-    }
-
-    public IntegerField createIntegerField(BowlingShoe bowlingShoe, BowlingShoeBooking bowlingShoeBooking) {
-        IntegerField sizeField = new IntegerField();
-        sizeField.setValue(0);
-        sizeField.setStepButtonsVisible(true);
-        sizeField.setMin(0);
-        // sizeField.setMax(bowlingShoe.getStock() / bowlingShoeBooking.getAmount());
-
-        sizeField.addValueChangeListener(e -> {
-            // TODO
-        });
-        return sizeField;
     }
 
     public FormLayout addPanelComponent() {
