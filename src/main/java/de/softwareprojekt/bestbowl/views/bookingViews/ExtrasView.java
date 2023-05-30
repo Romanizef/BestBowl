@@ -222,7 +222,7 @@ public class ExtrasView extends VerticalLayout {
                         .findFirst()
                         .orElse(null);
 
-
+                setCurrentBowlingAlleyBooking(currentBowlingAlleyBooking);
                 changeTabs();
                 goToBill.setEnabled(true);
                 addItem.setEnabled(true);
@@ -284,8 +284,6 @@ public class ExtrasView extends VerticalLayout {
         goToBill.setWidth("40%");
         goToBill.setHeight(bHeight);
 
-        //ToDo Dialog Fenster "Sind Sie sicher das sie Bezahlen wollen?"
-
         addItem.addClickListener(buttonClickEvent -> {
             addAllNewDrinkBookings();
             addAllNewFoodBookings();
@@ -295,11 +293,10 @@ public class ExtrasView extends VerticalLayout {
         });
 
         goToBill.addClickListener(buttonClickEvent -> {
-            addAllNewDrinkBookings();//TODO Check ob Stock vorhanden ist
-            addAllNewFoodBookings(); //TODO Check ob Stock vorhanden ist
+            addAllNewDrinkBookings();
+            addAllNewFoodBookings();
             VaadinUtils.showConfirmationDialog("Rechnung bezahlen?", "Ja", "Abbrechen", () -> {
                 UI.getCurrent().navigate(InvoiceView.class).ifPresent(view -> view.setBowlingAlleyBooking(currentBowlingAlleyBooking));
-                //TODO zu neuer View mit Allen Rechnungen die Uncompleted sind
             });
         });
 
