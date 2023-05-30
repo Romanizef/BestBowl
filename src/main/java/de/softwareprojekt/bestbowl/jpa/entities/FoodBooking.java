@@ -91,4 +91,17 @@ public class FoodBooking implements Serializable {
     public void setActive(boolean active) {
         this.active = active;
     }
+
+    @Override
+    public String toString() {
+        return "FoodBooking{" +
+                "client=" + client +
+                ", bowlingAlley=" + bowlingAlley +
+                ", timeStamp=" + timeStamp +
+                ", name='" + name + '\'' +
+                ", amount=" + amount +
+                ", price=" + price +
+                ", active=" + active +
+                '}';
+    }
 }

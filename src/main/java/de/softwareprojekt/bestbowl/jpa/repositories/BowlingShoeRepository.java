@@ -3,7 +3,11 @@ package de.softwareprojekt.bestbowl.jpa.repositories;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -13,7 +17,14 @@ import java.util.List;
 @Repository
 public interface BowlingShoeRepository extends JpaRepository<BowlingShoe, Integer> {
 
-    BowlingShoe findBySizeAndActiveIsTrueAndClientIsNull(int size);
+    List<BowlingShoe> findAllBySizeEqualsAndActiveIsTrueAndClientIsNull(int size);
     List<BowlingShoe> findAllByClientIsNullAndActiveIsTrue();
     List<BowlingShoe> findAllByClientEqualsAndActiveIsTrue(Client client);
+
+
+
+    @Transactional
+    @Modifying
+    @Query("update BowlingShoe bs set bs.client = :client where bs.id = :shoeId")
+    void updateClientById(@Param("shoeId") int id, @Param("client") Client client );
 }

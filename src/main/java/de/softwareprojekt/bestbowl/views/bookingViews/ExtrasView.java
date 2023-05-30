@@ -313,23 +313,17 @@ public class ExtrasView extends VerticalLayout {
             Notifications.showError("Nicht genügend Schuhe in Größe: " + shoePanel.getShoeSizeField().getValue());
             return;
         }
-
-        List<BowlingShoe> bowlingShoeList = bowlingShoeRepository.findAllByClientIsNullAndActiveIsTrue();
-        BowlingShoe bowlingShoeForBooking = new BowlingShoe();
-        for (BowlingShoe bowlingShoeInList : bowlingShoeList) {
-            if (bowlingShoeInList.getSize() == shoePanel.getShoeSizeField().getValue()) {
-                bowlingShoeForBooking = bowlingShoeInList;
-            }
+        for (int i = 0; i < shoePanel.getShoeAmountField().getValue(); i++) {
+            List<BowlingShoe> bowlingShoeList =  bowlingShoeRepository.findAllBySizeEqualsAndActiveIsTrueAndClientIsNull(shoePanel.getShoeSizeField().getValue());
+            BowlingShoe bowlingShoeForBooking = bowlingShoeList.get(0);
+            bowlingShoeRepository.updateClientById(bowlingShoeForBooking.getId(), currentBowlingAlleyBooking.getClient());
+            BowlingShoeBooking bowlingShoeBooking = new BowlingShoeBooking();
+            bowlingShoeBooking.setBowlingAlley(currentBowlingAlleyBooking.getBowlingAlley());
+            bowlingShoeBooking.setClient(currentBowlingAlleyBooking.getClient());
+            bowlingShoeBooking.setTimeStamp(System.currentTimeMillis());
+            bowlingShoeBooking.setBowlingShoe(bowlingShoeForBooking);
+            bowlingShoeBookingRepository.save(bowlingShoeBooking);
         }
-
-        bowlingShoeForBooking.setClient(currentBowlingAlleyBooking.getClient());
-        bowlingShoeRepository.save(bowlingShoeForBooking);
-        BowlingShoeBooking bowlingShoeBooking = new BowlingShoeBooking();
-        bowlingShoeBooking.setBowlingAlley(currentBowlingAlleyBooking.getBowlingAlley());
-        bowlingShoeBooking.setClient(currentBowlingAlleyBooking.getClient());
-        bowlingShoeBooking.setTimeStamp(System.currentTimeMillis());
-        bowlingShoeBooking.setBowlingShoe(bowlingShoeForBooking);
-        bowlingShoeBookingRepository.save(bowlingShoeBooking);
         shoePanel.updateShoeSizeAmountMap();
         shoePanel.resetIntergerfield();
     }
@@ -400,21 +394,16 @@ public class ExtrasView extends VerticalLayout {
      * @param amount   The amount of the food to be booked.
      */
     private void saveNewFoodBooking(String foodName, int amount) {
-        List<Food> foodList = foodRepository.findAll();
-        Food selectedFood = new Food();
-        for (Food food : foodList) {
-            if (food.getName().equals(foodName)) {
-                selectedFood = food;
-            }
-        }
+        Food selectedFood = foodRepository.findByName(foodName);
+        int newStock = selectedFood.getStock() - amount;
+        foodRepository.updateStockById(selectedFood.getId(), newStock);
         FoodBooking foodBooking = new FoodBooking();
         foodBooking.setClient(currentBowlingAlleyBooking.getClient());
-        foodBooking.setAmount(amount);
-        foodBooking.setTimeStamp(currentBowlingAlleyBooking.getStartTime());
+        foodBooking.setTimeStamp(System.currentTimeMillis());
         foodBooking.setBowlingAlley(currentBowlingAlleyBooking.getBowlingAlley());
+        foodBooking.setAmount(amount);
         foodBooking.setName(selectedFood.getName());
         foodBooking.setPrice(selectedFood.getPrice());
-        System.out.println(foodBooking.toString());
         foodBookingRepository.save(foodBooking);
     }
 

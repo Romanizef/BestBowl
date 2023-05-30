@@ -206,7 +206,6 @@ public class ShoePanel extends VerticalLayout {
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS,
                 GridVariant.LUMO_ROW_STRIPES);
-
         grid.setItems(bowlingShoeList);
         return grid;
     }
