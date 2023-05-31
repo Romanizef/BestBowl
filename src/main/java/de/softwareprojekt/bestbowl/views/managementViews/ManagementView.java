@@ -1,15 +1,17 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+
+import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.views.MainView;
-import de.softwareprojekt.bestbowl.views.bookingViews.AlleyBookingView;
-import jakarta.annotation.security.PermitAll;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.security.RolesAllowed;
 
 
 /**
@@ -17,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = "verwaltungen", layout = MainView.class)
 @PageTitle("Verwaltungen")
-@PermitAll
+@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 public class ManagementView extends VerticalLayout {
 
     private static final String VERWALTUNG = "verwaltung";
@@ -43,15 +45,15 @@ public class ManagementView extends VerticalLayout {
 
     private HorizontalLayout createAlleyRowButtonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
-        Button alleyBookingViewButton = new Button("Bahn Buchungs" + VERWALTUNG);
-        alleyBookingViewButton.addClickListener(buttonClickEvent -> UI.getCurrent().navigate(AlleyBookingView.class));
+/*         Button alleyBookingViewButton = new Button("Bahn Buchungs" + VERWALTUNG);
+        alleyBookingViewButton.addClickListener(buttonClickEvent -> UI.getCurrent().navigate(AlleyBookingView.class)); */
         Button alleyManagementViewButton = new Button("Bahn" + VERWALTUNG);
         alleyManagementViewButton.addClickListener(buttonClickEvent -> UI.getCurrent().navigate(AlleyManagementView.class));
-        alleyBookingViewButton.setWidth(width);
-        alleyBookingViewButton.setHeight(height);
+/*         alleyBookingViewButton.setWidth(width);
+        alleyBookingViewButton.setHeight(height); */
         alleyManagementViewButton.setWidth(width);
         alleyManagementViewButton.setHeight(height);
-        buttonLayout.add(alleyBookingViewButton, alleyManagementViewButton);
+        buttonLayout.add(alleyManagementViewButton);
         return buttonLayout;
     }
 

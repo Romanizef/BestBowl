@@ -1,5 +1,12 @@
 package de.softwareprojekt.bestbowl.views;
 
+import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -18,22 +25,15 @@ import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.Lumo;
+
 import de.softwareprojekt.bestbowl.BestBowlApplication;
 import de.softwareprojekt.bestbowl.beans.SecurityService;
 import de.softwareprojekt.bestbowl.beans.UserManager;
+import de.softwareprojekt.bestbowl.views.bookingViews.AlleyBookingView;
 import de.softwareprojekt.bestbowl.views.bookingViews.ClientSearchView;
 import de.softwareprojekt.bestbowl.views.bookingViews.ExtrasView;
-import de.softwareprojekt.bestbowl.views.bookingViews.InvoiceView;
 import de.softwareprojekt.bestbowl.views.managementViews.ManagementView;
 import de.softwareprojekt.bestbowl.views.otherViews.DatabaseRedirectView;
-import de.softwareprojekt.bestbowl.views.otherViews.StatisticsView;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Optional;
-
-import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
 
 /**
  * Is the main template for all the other views and incorporates them as tabs
@@ -106,8 +106,8 @@ public class MainView extends AppLayout implements AppShellConfigurator {
      */
     private Tab[] createMenuItems() {
         return new Tab[]{
-                createTab("Kunde suchen", ClientSearchView.class),
-                createTab("Extras bestellen", ExtrasView.class),
+                createTab("Kundensuche", ClientSearchView.class),
+                createTab("Extras", ExtrasView.class),
                 createTab("Verwaltungen", ManagementView.class),
                 createTab("Datenbank", DatabaseRedirectView.class)
         };

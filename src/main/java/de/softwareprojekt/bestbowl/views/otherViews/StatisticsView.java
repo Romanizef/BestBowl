@@ -159,7 +159,7 @@ public class StatisticsView extends VerticalLayout {
         refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         refreshButton.setIcon(new Icon(VaadinIcon.REFRESH));
         refreshButton.setWidth("50%");
-        lastViewButton.addClickListener(e -> {
+        refreshButton.addClickListener(e -> {
             if (this.currentClient != null) {
                 updateGridItems();
             } else {

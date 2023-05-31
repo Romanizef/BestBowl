@@ -72,7 +72,8 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
      * @param drinkRepository               the repository for drinks
      * @param foodRepository                the repository for food
      * @param bowlingAlleyRepository        the repository for bowling alleys
-     * @param bowlingAlleyBookingRepository the repository for bowling alley bookings
+     * @param bowlingAlleyBookingRepository the repository for bowling alley
+     *                                      bookings
      * @param foodBookingRepository         the repository for food bookings
      * @param drinkBookingRepository        the repository for drink bookings
      * @param drinkVariantRepository        the repository for drink variants
@@ -81,10 +82,10 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
      */
     @Autowired
     public ExtrasView(DrinkRepository drinkRepository, FoodRepository foodRepository,
-                      BowlingAlleyRepository bowlingAlleyRepository, BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
-                      FoodBookingRepository foodBookingRepository, DrinkBookingRepository drinkBookingRepository,
-                      DrinkVariantRepository drinkVariantRepository, BowlingShoeRepository bowlingShoeRepository,
-                      BowlingShoeBookingRepository bowlingShoeBookingRepository) {
+            BowlingAlleyRepository bowlingAlleyRepository, BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
+            FoodBookingRepository foodBookingRepository, DrinkBookingRepository drinkBookingRepository,
+            DrinkVariantRepository drinkVariantRepository, BowlingShoeRepository bowlingShoeRepository,
+            BowlingShoeBookingRepository bowlingShoeBookingRepository) {
         this.bowlingAlleyRepository = bowlingAlleyRepository;
         this.drinkRepository = drinkRepository;
         this.drinkVariantRepository = drinkVariantRepository;
@@ -195,12 +196,15 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
         }
         bowlingAlleyList.sort(Comparator.comparingInt(BowlingAlley::getId));
         long currentTime = System.currentTimeMillis();
-        List<BowlingAlley> freeBowlingAlleyList = bowlingAlleyRepository.findAllByNoBookingOverlapBetweenTimeStamps(currentTime, currentTime);
-        Set<Integer> freeBowlingAlleyHashSet = freeBowlingAlleyList.stream().map(BowlingAlley::getId).collect(Collectors.toSet());
+        List<BowlingAlley> freeBowlingAlleyList = bowlingAlleyRepository
+                .findAllByNoBookingOverlapBetweenTimeStamps(currentTime, currentTime);
+        Set<Integer> freeBowlingAlleyHashSet = freeBowlingAlleyList.stream().map(BowlingAlley::getId)
+                .collect(Collectors.toSet());
 
-        List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository.findAllByTimePeriodsOverlapping(System.currentTimeMillis());
+        List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository
+                .findAllByTimePeriodsOverlapping(System.currentTimeMillis());
 
-        //Todo exception handling wenn keine bahnen
+        // Todo exception handling wenn keine bahnen
 
         for (BowlingAlley bowlingAlley : bowlingAlleyList) {
             Button alleyButton = new Button("Bahn " + bowlingAlley.getId());
@@ -211,8 +215,8 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
                 changePreviousButtonStyle(currentBowlingAlleyId);
                 currentBowlingAlleyId = Integer.parseInt(alleyButton.getText().replaceAll("\\D+(\\d+)", "$1"));
                 changeCurrentButtonSytle(currentBowlingAlleyId);
-                currentBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(bowlingAlleyBooking ->
-                                bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
+                currentBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(
+                        bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
                         .findFirst()
                         .orElse(null);
                 changeTabs();
@@ -227,7 +231,8 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
     }
 
     /**
-     * Changes the tabs in the article panel based on the current bowling alley selection.
+     * Changes the tabs in the article panel based on the current bowling alley
+     * selection.
      * Necessary because there is no bowling alley selected at the start
      */
     private void changeTabs() {
@@ -286,6 +291,7 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
         goToBill.addClickListener(buttonClickEvent -> {
             addAllNewDrinkBookings();
             addAllNewFoodBookings();
+            addAllNewShoeBookings();
             VaadinUtils.showConfirmationDialog("Rechnung bezahlen?", "Ja", "Abbrechen", () -> {
                 UI.getCurrent().navigate(InvoiceView.class, currentBowlingAlleyBooking.getId());
             });
@@ -299,15 +305,18 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
      * Adds all new shoe bookings for the current bowling alley booking.
      */
     private void addAllNewShoeBookings() {
-        int stock = shoePanel.getShoeSizeAmountMap().get(shoePanel.getShoeSizeField().getValue()) - shoePanel.getShoeAmountField().getValue();
+        int stock = shoePanel.getShoeSizeAmountMap().get(shoePanel.getShoeSizeField().getValue())
+                - shoePanel.getShoeAmountField().getValue();
         if (stock < 0) {
             Notifications.showError("Nicht genügend Schuhe in Größe: " + shoePanel.getShoeSizeField().getValue());
             return;
         }
         for (int i = 0; i < shoePanel.getShoeAmountField().getValue(); i++) {
-            List<BowlingShoe> bowlingShoeList = bowlingShoeRepository.findAllBySizeEqualsAndActiveIsTrueAndClientIsNull(shoePanel.getShoeSizeField().getValue());
+            List<BowlingShoe> bowlingShoeList = bowlingShoeRepository
+                    .findAllBySizeEqualsAndActiveIsTrueAndClientIsNull(shoePanel.getShoeSizeField().getValue());
             BowlingShoe bowlingShoeForBooking = bowlingShoeList.get(0);
-            bowlingShoeRepository.updateClientById(bowlingShoeForBooking.getId(), currentBowlingAlleyBooking.getClient());
+            bowlingShoeRepository.updateClientById(bowlingShoeForBooking.getId(),
+                    currentBowlingAlleyBooking.getClient());
             BowlingShoeBooking bowlingShoeBooking = new BowlingShoeBooking();
             bowlingShoeBooking.setBowlingAlley(currentBowlingAlleyBooking.getBowlingAlley());
             bowlingShoeBooking.setClient(currentBowlingAlleyBooking.getClient());
@@ -324,17 +333,17 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
      */
     private void addAllNewDrinkBookings() {
         List<DrinkBooking> drinkBookingList = drinkBookingRepository
-                .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals
-                        (currentBowlingAlleyBooking.getClient(), currentBowlingAlleyBooking.getBowlingAlley(),
-                                currentBowlingAlleyBooking.getStartTime());
+                .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(currentBowlingAlleyBooking.getClient(),
+                        currentBowlingAlleyBooking.getBowlingAlley(),
+                        currentBowlingAlleyBooking.getStartTime());
         Map<String, DrinkBooking> drinkBookingMapFromDB = drinkBookingList.stream()
                 .collect(Collectors.toMap(DrinkBooking::getName, Function.identity()));
 
         drinkBookingMap.forEach((name, booking) -> {
-            //Drink über name rausholen und dann vergleichen wie viel noch da ist
+            // Drink über name rausholen und dann vergleichen wie viel noch da ist
             Drink drink = drinkRepository.findByName(booking.getDrinkName());
             int newStock = drink.getStockInMilliliters() - booking.getAmount() * booking.getMl();
-            if (newStock < 0) { //Todo Booking kriegt noch ml
+            if (newStock < 0) { // Todo Booking kriegt noch ml
                 Notifications.showError("Nicht genügend vom Getränk: " + drink.getName());
                 return;
             } else {
@@ -362,13 +371,13 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
      */
     private void addAllNewFoodBookings() {
         List<FoodBooking> foodBookingList = foodBookingRepository
-                .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals
-                        (currentBowlingAlleyBooking.getClient(), currentBowlingAlleyBooking.getBowlingAlley(),
-                                currentBowlingAlleyBooking.getStartTime());
+                .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(currentBowlingAlleyBooking.getClient(),
+                        currentBowlingAlleyBooking.getBowlingAlley(),
+                        currentBowlingAlleyBooking.getStartTime());
         Map<String, FoodBooking> foodBookingMapFromDB = foodBookingList.stream()
                 .collect(Collectors.toMap(FoodBooking::getName, Function.identity()));
         foodBookingMap.forEach((name, booking) -> {
-            //Food über name rausholen und dann vergleichen wie viel noch da ist
+            // Food über name rausholen und dann vergleichen wie viel noch da ist
             Food selectedFood = foodRepository.findByName(booking.getName());
             int newStock = selectedFood.getStock() - booking.getAmount();
             if (newStock < 0) {
@@ -394,7 +403,7 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
 
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter Integer parameter) {
-        if(parameter == null) {
+        if (parameter == null) {
             return;
         }
         Optional<BowlingAlleyBooking> bowlingAlleyBookingOptional = bowlingAlleyBookingRepository.findById(parameter);

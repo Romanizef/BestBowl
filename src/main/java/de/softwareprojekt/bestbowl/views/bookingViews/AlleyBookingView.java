@@ -1,120 +1,224 @@
 package de.softwareprojekt.bestbowl.views.bookingViews;
 
-
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.grid.dataview.GridListDataView;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.data.binder.Binder;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlley;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyBookingRepository;
-
 import java.util.List;
 
-import static de.softwareprojekt.bestbowl.utils.Utils.matches;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.PreserveOnRefresh;
+import com.vaadin.flow.router.Route;
+
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.Client;
+import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.FoodBooking;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.DrinkBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.FoodBookingRepository;
+import de.softwareprojekt.bestbowl.utils.Utils;
+import de.softwareprojekt.bestbowl.utils.VaadinUtils;
+import de.softwareprojekt.bestbowl.utils.messages.Notifications;
+import de.softwareprojekt.bestbowl.views.MainView;
+import jakarta.annotation.security.PermitAll;
 
 /**
- * @author Ali
+ * Creates a View with all the not yet paid bookings
+ * 
+ * @author Matija
  */
+@Route(value = "alleyBookingView", layout = MainView.class)
+@PageTitle("Buchungen ansehen")
+@PermitAll
+@PreserveOnRefresh
 public class AlleyBookingView extends VerticalLayout {
-/*
-    private final Binder<BowlingAlleyBooking> binder = new Binder<>();
 
-    private final BowlingAlleyBookingRepository bowlingAlleyRepository;
+    private final transient BowlingAlleyBookingRepository bowlingAlleyBookingRepository;
+    private final transient DrinkBookingRepository drinkBookingRepository;
+    private final transient FoodBookingRepository foodBookingRepository;
+    private final transient BowlingShoeBookingRepository shoeBookingRepository;
+    private Grid<BowlingAlleyBooking> bookingGrid;
+    private Button payButton;
+    private Button lastViewButton;
+    private BowlingAlleyBooking currentBowlingAlleyBooking;
+    private final H1 clientHeader;
+    private Client currentClient;
 
-    private Grid<BowlingAlley> bowlingAlleyGrid;
-
-    private FormLayout editLayout;
-
-    private BowlingAlley selectedBowlingAlley = null;
-
-    private Label validationErrorLabel;
-
-    private boolean editingNewBowlingAlley = false;
-
-    public AlleyBookingView(BowlingAlleyBookingRepository bowlingAlleyRepository) {
-        this.bowlingAlleyRepository = bowlingAlleyRepository;
+    @Autowired
+    public AlleyBookingView(BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
+    DrinkBookingRepository drinkBookingRepository, FoodBookingRepository foodBookingRepository,
+    BowlingShoeBookingRepository shoeBookingRepository) {
+        this.bowlingAlleyBookingRepository = bowlingAlleyBookingRepository;
+        this.drinkBookingRepository = drinkBookingRepository;
+        this.foodBookingRepository = foodBookingRepository;
+        this.shoeBookingRepository = shoeBookingRepository;
         setSizeFull();
-        Button newBowlingAlleyBookingButton = createNewBowlingAlleyButton();
+        clientHeader = new H1();
         HorizontalLayout gridLayout = createGridLayout();
-        add(newBowlingAlleyBookingButton, gridLayout);
-        updateEditLayoutState();
+        Component footerComponent = createFooterComponent();
+        add(clientHeader, gridLayout, footerComponent);
+    }
+
+    /**
+     * Setter for the current client
+     * 
+     * @param selectedClient
+     */
+    public void setSelectedClient(Client selectedClient) {
+        this.currentClient = selectedClient;
+        updateInitialComponents();
+        updateGridItems();
+        currentBowlingAlleyBooking =  new BowlingAlleyBooking();
+        currentBowlingAlleyBooking.setClient(selectedClient);
+    }
+
+    /**
+     * Updates all the grid items to the latest state
+     */
+    private void updateGridItems() {
+        List<BowlingAlleyBooking> bowlingalleybookinglist = bowlingAlleyBookingRepository
+                .findAllByClientEquals(currentClient);
+        bookingGrid.setItems(
+                bowlingalleybookinglist);
+
+    }
+
+    /**
+     * If no client ist selected a message apears. A {@code H1} shows the currently
+     * selected client
+     */
+    private void updateInitialComponents() {
+        if (currentClient == null) {
+            Notifications.showError("Kein Kunde ausgewählt!");
+            UI.getCurrent().navigate(ClientSearchView.class);
+        } else {
+            clientHeader
+                    .setText("Nicht bezahlte Buchungen von: " + currentClient.getFirstName() + " "
+                            + currentClient.getLastName());
+        }
     }
 
     private HorizontalLayout createGridLayout() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setSizeFull();
-        bowlingAlleyGrid = createGrid();
-        editLayout = createEditLayout();
-        layout.add(bowlingAlleyGrid, editLayout);
+        bookingGrid = createGrid();
+        layout.add(bookingGrid);
         return layout;
     }
 
+    /**
+     * Creates a grid with the clients statistics
+     * 
+     * @return {@code Grid<BowlingAlleyBooking>}
+     */
     private Grid<BowlingAlleyBooking> createGrid() {
         Grid<BowlingAlleyBooking> grid = new Grid<>(BowlingAlleyBooking.class);
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         grid.removeAllColumns();
-        Grid.Column<BowlingAlleyBooking> idColumn = grid.addColumn("id").setHeader("ID");
-        Grid.Column<BowlingAlleyBooking> activeColumn = grid
-        .addColumn(association -> association.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
-        Grid.Column<BowlingAlleyBooking> startTime = grid.addColumn("startTime").setHeader("Start Zeit");
-        Grid.Column<BowlingAlleyBooking> endTime = grid.addColumn("endTime").setHeader("End Zeit");
+
+        grid.addColumn("id").setHeader("Buchungsnummer");
+        grid.addColumn(booking -> booking.getClient() == null ? "" : booking.getClient().getId())
+                .setHeader("Kundennummer").setSortable(true);
+        grid.addColumn(booking -> booking.getClient() == null ? "" : booking.getClient().getLastName())
+                .setHeader("Kundennachname").setSortable(true);
+        grid.addColumn(booking -> Utils.toDateString(booking.getStartTime())).setHeader("Datum");
+        grid.addColumn(booking -> calculateBookingTotal(booking)).setHeader("Summe");
+        grid.addColumn("completed").setHeader("Bezahlt?");
+
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
-        grid.setWidth("75%");
-        grid.setHeight("100%");
+        grid.setSizeFull();
 
-        List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyRepository.findAll();
-        GridListDataView<BowlingAlleyBooking> dataView = grid.setItems(bowlingAlleyBookingList);
-        BowlingAlleyBookingFilter associationFilter = new BowlingAlleyBookingFilter(dataView);
-        grid.getHeaderRows().clear();
-        HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", associationFilter::setId));
-        headerRow.getCell(activeColumn)
-        .setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", associationFilter::setActive));
-        associationFilter.setActive(true);
-
-        grid.addSelectionListener(e -> {
-        if (e.isFromClient()) {
-        Optional<BowlingAlley> optionalBowlingAlley = e.getFirstSelectedItem();
-        if (optionalBowlingAlley.isPresent()) {
-        selectedBowlingAlley = optionalBowlingAlley.get();
-        binder.readBean(selectedBowlingAlley);
-        editingNewBowlingAlley = false;
-        updateEditLayoutState();
-        } else {
-        resetEditLayout();
-        }
-        }
-        });
         return grid;
     }
 
-    private void updateEditLayoutState() {
-        validationErrorLabel.setText("");
-        setChildrenEnabled(editLayout.getChildren(), selectedBowlingAlley != null);
+    /**
+     * 
+     *
+     * @return {@code Component}
+     */
+    private Component createFooterComponent() {
+        VerticalLayout verticallayout = new VerticalLayout();
+        verticallayout.setWidth("80%");
+        verticallayout.setAlignItems(Alignment.CENTER);
+        verticallayout.add(createPayButton(verticallayout), createLastViewButton(verticallayout));
+
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.setWidthFull();
+        horizontalLayout.setAlignItems(Alignment.CENTER);
+        horizontalLayout.add(verticallayout);
+
+        return horizontalLayout;
     }
 
-    private VerticalLayout createValidationLabelLayout() {
-        VerticalLayout validationLabelLayout = new VerticalLayout();
-        validationLabelLayout.setWidthFull();
-        validationLabelLayout.setPadding(false);
-        validationLabelLayout.setMargin(false);
-        validationLabelLayout.setAlignItems(Alignment.CENTER);
+    private Button createPayButton(VerticalLayout layout) {
+        payButton = new Button("Bezahlen");
+        payButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        payButton.setIcon(new Icon(VaadinIcon.MONEY_EXCHANGE));
+        payButton.setWidth("50%");
+        payButton.addClickListener(e -> {
 
-        validationErrorLabel = new Label();
-        validationErrorLabel.getStyle().set("color", "red");
-
-        validationLabelLayout.add(validationErrorLabel);
-        return validationLabelLayout;
+            VaadinUtils.showConfirmationDialog("Rechnung bezahlen?", "Ja", "Abbrechen", () -> {
+                UI.getCurrent().navigate(InvoiceView.class, currentBowlingAlleyBooking.getId());
+            });
+        });
+        return payButton;
     }
-*/
+
+    /**
+     * Creates a {@code Button} that returns the user to the ClientSearchView
+     * 
+     * @param layout
+     * @return {@code Button} lastViewButton
+     */
+    private Button createLastViewButton(VerticalLayout layout) {
+        lastViewButton = new Button("Zurück zu Kundensuche");
+        lastViewButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        lastViewButton.setIcon(new Icon(VaadinIcon.BACKWARDS));
+        lastViewButton.setWidth("50%");
+        lastViewButton.addClickListener(e -> UI.getCurrent().navigate(ClientSearchView.class));
+        return lastViewButton;
+    }
+
+        /**
+     * Calculates the total sum of prices for the current booking
+     * 
+     * @param bowlingAlleyBooking
+     * @return {@code double} total
+     */
+    private double calculateBookingTotal(BowlingAlleyBooking bowlingAlleyBooking) {
+        List<DrinkBooking> drinkBookingList = drinkBookingRepository
+                .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
+                        bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
+        List<FoodBooking> foodBookingList = foodBookingRepository
+                .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
+                        bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
+        List<BowlingShoeBooking> shoeBookingList = shoeBookingRepository
+                .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
+                        bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
+
+        double total = 0.0;
+        for (DrinkBooking drinkBooking : drinkBookingList) {
+            total += drinkBooking.getPrice() * drinkBooking.getAmount();
+        }
+        for (FoodBooking foodBooking : foodBookingList) {
+            total += foodBooking.getPrice() * foodBooking.getAmount();
+        }
+        for (BowlingShoeBooking shoeBooking : shoeBookingList) {
+            total += shoeBooking.getPrice();
+        }
+        return total;
+    }
 }
-
-
-
