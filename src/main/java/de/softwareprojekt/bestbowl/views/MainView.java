@@ -6,6 +6,8 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -23,11 +25,9 @@ import de.softwareprojekt.bestbowl.beans.SecurityService;
 import de.softwareprojekt.bestbowl.beans.UserManager;
 import de.softwareprojekt.bestbowl.views.bookingViews.ClientSearchView;
 import de.softwareprojekt.bestbowl.views.bookingViews.ExtrasView;
-import de.softwareprojekt.bestbowl.views.bookingViews.InvoiceView;
+import de.softwareprojekt.bestbowl.views.bookingViews.PendingBookingView;
 import de.softwareprojekt.bestbowl.views.managementViews.ManagementView;
 import de.softwareprojekt.bestbowl.views.otherViews.DatabaseRedirectView;
-import de.softwareprojekt.bestbowl.views.otherViews.StatisticsView;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -70,7 +70,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
                 .set("margin", "var(--lumo-space-m) var(--lumo-space-l)");
 
         HorizontalLayout headerLayout = createHeaderContent();
-        headerLayout.add(new Button("Shutdown", e -> startThread(BestBowlApplication::shutdown, "shutdown", true)));
+        headerLayout.add(new Button(VaadinIcon.POWER_OFF.create(), e -> startThread(BestBowlApplication::shutdown, "shutdown", true)));
         headerLayout.add(createDarkModeToggle());
         if (securityService.getAuthenticatedUser() != null) {
             Button logoutButton = new Button("Logout", click -> securityService.logout());
@@ -86,15 +86,23 @@ public class MainView extends AppLayout implements AppShellConfigurator {
     }
 
     /**
-     * Creates a new {@code Tab} Component
-     *
-     * @param text
-     * @param navigationTarget
-     * @return {@code tab}
+     * @param navigationTarget target view
+     * @param text             link text
+     * @param vaadinIcon       icon of the link
+     * @return menu entry
      */
-    private static Tab createTab(String text, Class<? extends Component> navigationTarget) {
+    private static Tab createTab(Class<? extends Component> navigationTarget, String text, VaadinIcon vaadinIcon) {
         final Tab tab = new Tab();
-        tab.add(new RouterLink(text, navigationTarget));
+        final RouterLink routerLink = new RouterLink();
+        final Icon icon = vaadinIcon.create();
+        icon.getStyle().set("box-sizing", "border-box")
+                .set("margin-inline-end", "var(--lumo-space-m)")
+                .set("margin-inline-start", "var(--lumo-space-xs)")
+                .set("padding", "var(--lumo-space-xs)");
+        final Label label = new Label(text);
+        routerLink.add(icon, label);
+        routerLink.setRoute(navigationTarget);
+        tab.add(routerLink);
         ComponentUtil.setData(tab, Class.class, navigationTarget);
         return tab;
     }
@@ -106,10 +114,11 @@ public class MainView extends AppLayout implements AppShellConfigurator {
      */
     private Tab[] createMenuItems() {
         return new Tab[]{
-                createTab("Kunde suchen", ClientSearchView.class),
-                createTab("Extras bestellen", ExtrasView.class),
-                createTab("Verwaltungen", ManagementView.class),
-                createTab("Datenbank", DatabaseRedirectView.class)
+                createTab(ClientSearchView.class, "Kunde suchen", VaadinIcon.USERS),
+                createTab(ExtrasView.class, "Extras bestellen", VaadinIcon.FORM),
+                createTab(PendingBookingView.class, "Offene Buchungen", VaadinIcon.INVOICE),
+                createTab(ManagementView.class, "Verwaltungen", VaadinIcon.DESKTOP),
+                createTab(DatabaseRedirectView.class, "Datenbank", VaadinIcon.DATABASE)
         };
     }
 
@@ -134,14 +143,17 @@ public class MainView extends AppLayout implements AppShellConfigurator {
 
     private Button createDarkModeToggle() {
         Button button = new Button();
-        button.setIcon(VaadinIcon.LIGHTBULB.create());
+        button.setIcon(userManager.getDarkModeStateForUser(getAuthenticatedUserNameOrDefault()) ?
+                VaadinIcon.SUN_O.create() : VaadinIcon.MOON_O.create());
         button.addClickListener(e -> {
             ThemeList themeList = getElement().getThemeList();
             if (themeList.contains(Lumo.DARK)) {
                 themeList.remove(Lumo.DARK);
+                button.setIcon(VaadinIcon.MOON_O.create());
                 userManager.setDarkModeStateForUser(getAuthenticatedUserNameOrDefault(), false);
             } else {
                 themeList.add(Lumo.DARK);
+                button.setIcon(VaadinIcon.SUN_O.create());
                 userManager.setDarkModeStateForUser(getAuthenticatedUserNameOrDefault(), true);
             }
         });
