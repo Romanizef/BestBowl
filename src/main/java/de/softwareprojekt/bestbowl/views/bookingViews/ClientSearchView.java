@@ -63,7 +63,6 @@ public class ClientSearchView extends VerticalLayout {
     private TextArea commentArea;
     private Button saveCommentButton;
     private Button nextStepButton;
-    private Button bookingsButton;
     private Client selectedClient = null;
     private Client newClient = null;
 
@@ -394,21 +393,13 @@ public class ClientSearchView extends VerticalLayout {
         saveCommentButton.setIcon(VaadinIcon.CHECK_CIRCLE.create());
         commentLayout.add(commentArea, saveCommentButton);
 
-        HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.setWidthFull();
-        nextStepButton = new Button("Bahn buchen");
+        nextStepButton = new Button("Zum Bahn buchen");
         nextStepButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        nextStepButton.setWidth("50%");
+        nextStepButton.setWidth("55%");
 
-        bookingsButton= new Button("Buchungen");
-        bookingsButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        bookingsButton.setWidth("50%");
-        buttonLayout.add(nextStepButton, bookingsButton);
-
-        verticalLayout.add(selectedClientLabel, commentLayout, buttonLayout);
+        verticalLayout.add(selectedClientLabel, commentLayout, nextStepButton);
 
         nextStepButton.addClickListener(e -> UI.getCurrent().navigate(BowlingAlleyBookingView.class, selectedClient.getId()));
-        bookingsButton.addClickListener(e -> UI.getCurrent().navigate(PendingBookingView.class).ifPresent(alleyBookingView -> alleyBookingView.setSelectedClient(selectedClient)));
         saveCommentButton.addClickListener(e -> {
             String comment = commentArea.getValue();
             if (comment == null || comment.length() > 255) {
@@ -439,14 +430,12 @@ public class ClientSearchView extends VerticalLayout {
         String template = "Ausgewählter Kunde: ";
         if (selectedClient == null) {
             nextStepButton.setEnabled(false);
-            bookingsButton.setEnabled(false);
             selectedClientLabel.setText(template);
             commentArea.setValue("");
             commentArea.setEnabled(false);
             saveCommentButton.setEnabled(false);
         } else {
             nextStepButton.setEnabled(true);
-            bookingsButton.setEnabled(true);
             selectedClientLabel.setText(template + selectedClient.getFirstName() + " " + selectedClient.getLastName());
             commentArea.setEnabled(true);
             commentArea.setValue(selectedClient.getComment());

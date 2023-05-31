@@ -6,312 +6,329 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.component.tabs.TabVariant;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.*;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.FoodBooking;
-import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyBookingRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeBookingRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.DrinkBookingRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.FoodBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.entities.*;
+import de.softwareprojekt.bestbowl.jpa.repositories.*;
 import de.softwareprojekt.bestbowl.utils.VaadinUtils;
 import de.softwareprojekt.bestbowl.utils.email.MailSenderService;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
-import de.softwareprojekt.bestbowl.views.extrasElements.DrinkPanel;
-import de.softwareprojekt.bestbowl.views.extrasElements.FoodPanel;
-import de.softwareprojekt.bestbowl.views.extrasElements.ShoePanel;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
+import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
+import static de.softwareprojekt.bestbowl.utils.Utils.toHourOnlyString;
 
 /**
- * Creates a view for all booked elements to be displayed in a invoice and paid
+ * Creates a view for all booked elements to be displayed in an invoice and paid
  *
+ * @author Marten Voß
  * @author Matija Kopschek
  */
 @Route(value = "invoice", layout = MainView.class)
 @PageTitle("Rechnung")
 @PermitAll
 public final class InvoiceView extends VerticalLayout implements HasUrlParameter<Integer> {
-    private final transient MailSenderService mailSenderController;
+    private final transient MailSenderService mailSenderService;
     private final transient BowlingAlleyBookingRepository bowlingAlleyBookingRepository;
     private final transient DrinkBookingRepository drinkBookingRepository;
     private final transient FoodBookingRepository foodBookingRepository;
-    private final transient BowlingShoeBookingRepository shoeBookingRepository;
-    private final H1 clientHeader;
-    private final H1 alleyHeader;
-    private BowlingAlleyBooking bowlingAlleyBooking;
-    private Tab totalInvoice;
-    private Tab partialInvoice;
-    private TabSheet invoiceTabSheet;
+    private final transient BowlingShoeBookingRepository bowlingShoeBookingRepository;
+    private final transient BowlingShoeRepository bowlingShoeRepository;
+    private final H2 header;
+    private final TabSheet invoiceTabSheet;
+    private final List<Map<String, Article>> itemAmountList = new ArrayList<>();
+    private final Map<Integer, Label> sumLabelMap = new HashMap<>();
+    private final Map<Integer, List<IntegerField>> integerFieldMap = new HashMap<>();
+    private Div totalTabContent;
+    private BowlingAlleyBooking booking;
+    private List<DrinkBooking> drinkBookingList;
+    private List<FoodBooking> foodBookingList;
+    private List<BowlingShoeBooking> bowlingShoeBookingList;
+    private List<BowlingShoe> bowlingShoeList;
 
     /**
      * Constructor for the InvoiceView class. Creates all the components
      */
     @Autowired
+
     public InvoiceView(BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
                        DrinkBookingRepository drinkBookingRepository, FoodBookingRepository foodBookingRepository,
-                       BowlingShoeBookingRepository shoeBookingRepository) {
+                       BowlingShoeBookingRepository bowlingShoeBookingRepository,
+                       BowlingShoeRepository bowlingShoeRepository) {
         this.bowlingAlleyBookingRepository = bowlingAlleyBookingRepository;
         this.drinkBookingRepository = drinkBookingRepository;
         this.foodBookingRepository = foodBookingRepository;
-        this.shoeBookingRepository = shoeBookingRepository;
+        this.bowlingShoeBookingRepository = bowlingShoeBookingRepository;
+        this.bowlingShoeRepository = bowlingShoeRepository;
+
         setSizeFull();
         setAlignItems(Alignment.CENTER);
-        mailSenderController = new MailSenderService();
-        clientHeader = new H1();
-        alleyHeader = new H1();
-        invoiceTabSheet = new TabSheet();
-        add(clientHeader, alleyHeader, invoiceTabSheet);
+
+        mailSenderService = new MailSenderService();
+
+        header = new H2();
+        invoiceTabSheet = createTabSheet();
+        Component footer = createFooterComponent();
+        add(header, invoiceTabSheet, footer);
     }
 
-    private Component createTabs() {
-        invoiceTabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED,
-                // TabSheetVariant.MATERIAL_BORDERED,
-                TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
+    private TabSheet createTabSheet() {
+        TabSheet tabSheet = new TabSheet();
+        tabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED, TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
+        tabSheet.getStyle().set("border", "1px solid #dadfe4");
+        tabSheet.setSizeFull();
+        return tabSheet;
+    }
 
-        createTotalTab();
-        createPartialTab();
-        invoiceTabSheet.getStyle().set("border", "3px solid blue").set("border-radius", "10px");
-        invoiceTabSheet.setMaxWidth("100%");
-        return invoiceTabSheet;
+    private Component createFooterComponent() {
+        Button button = new Button("Rechnung abschließen");
+        button.setIcon(VaadinIcon.CART.create());
+        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        button.setWidth("55%");
+        button.addClickListener(e -> {
+            VaadinUtils.showConfirmationDialog("Rechnung abschließen?", "Ja", "Abbrechen", () -> {
+                //free up shoes for reuse
+                bowlingShoeList.forEach(bs -> bs.setClient(null));
+                bowlingShoeRepository.saveAll(bowlingShoeList);
+                //complete booking
+                booking.setCompleted(true);
+                bowlingAlleyBookingRepository.save(booking);
+                mailSenderService.sendInvoiceMail(booking);
+                Notifications.showInfo("Rechnung abgeschlossen");
+                UI.getCurrent().navigate(ExtrasView.class);
+            });
+        });
+        return button;
     }
 
     private Tab createTotalTab() {
-        totalInvoice = new Tab(VaadinIcon.MONEY.create(), new Span("Gesamtrechnung"));
-        invoiceTabSheet.setSelectedTab(invoiceTabSheet.add(totalInvoice, createTotalInvoicePanels()));
-        totalInvoice.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
-        totalInvoice.getElement().addEventListener("click", e -> {
-            updateTotalInvoice();
-        });
-        return totalInvoice;
+        Tab tab = new Tab(VaadinIcon.MONEY.create(), new Span("Gesamtrechnung"));
+        tab.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
+        tab.getElement().addEventListener("click", e -> replaceTotalTabContent());
+        return tab;
+    }
+
+    private Div createTotalTabContent() {
+        totalTabContent = new Div();
+
+        HashMap<String, Article> amountMap = new HashMap<>();
+        amountMap.put("Bowling Bahn (Anteil in %)", new Article(100, booking.getPrice() / 100));
+        for (DrinkBooking drinkBooking : drinkBookingList) {
+            amountMap.put(drinkBooking.getName(), new Article(drinkBooking.getAmount(), drinkBooking.getPrice()));
+        }
+        for (FoodBooking foodBooking : foodBookingList) {
+            amountMap.put(foodBooking.getName(), new Article(foodBooking.getAmount(), foodBooking.getPrice()));
+        }
+        for (BowlingShoeBooking bowlingShoeBooking : bowlingShoeBookingList) {
+            amountMap.put("Bowling Schuhe, Größe: " + bowlingShoeBooking.getBowlingShoe().getSize(),
+                    new Article(1, bowlingShoeBooking.getPrice()));
+        }
+        itemAmountList.add(amountMap);
+
+        replaceTotalTabContent();
+        return totalTabContent;
+    }
+
+    private void replaceTotalTabContent() {
+        VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.setAlignItems(Alignment.CENTER);
+
+        FormLayout formLayout = new FormLayout();
+        formLayout.setResponsiveSteps(new ResponsiveStep("200px", 2));
+        formLayout.setMaxWidth("1000px");
+        itemAmountList.get(0).forEach((name, article) -> formLayout.add(createTotalPanel(name, article.amount())));
+
+        Label sumLabel = createNewSumLabel();
+        sumLabel.setText(calculatePartialSumString(0));
+
+        verticalLayout.add(formLayout, sumLabel);
+
+        //replace old content
+        totalTabContent.removeAll();
+        totalTabContent.add(verticalLayout);
     }
 
     private Tab createPartialTab() {
-        partialInvoice = new Tab(VaadinIcon.MONEY.create(), new Span("Teilrechnung"));
-        invoiceTabSheet.add(partialInvoice, createPartialInvoicePanels());
-        partialInvoice.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
-        return partialInvoice;
+        Tab tab = new Tab(VaadinIcon.MONEY.create(), new Span("Teilrechnung " + itemAmountList.size()));
+        tab.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
+        return tab;
     }
 
-    private final Component createTotalInvoicePanels() {
+    private VerticalLayout createPartialTabContent() {
+        VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.setAlignItems(Alignment.CENTER);
+
+        HashMap<String, Article> amountMap = new HashMap<>();
+        itemAmountList.get(0).forEach((name, article) -> {
+            if (article.amount() > 0) {
+                amountMap.put(name, new Article(article.amount(), article.price()));
+            }
+        });
+        itemAmountList.add(amountMap);
+        integerFieldMap.put(itemAmountList.size() - 1, new ArrayList<>());
+
         FormLayout formLayout = new FormLayout();
         formLayout.setResponsiveSteps(new ResponsiveStep("200px", 2));
         formLayout.setMaxWidth("1000px");
-        if (bowlingAlleyBooking != null) {
-            List<DrinkBooking> drinkBookingList = drinkBookingRepository
-                    .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
-                            bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
+        amountMap.forEach((name, amount) ->
+                formLayout.add(createPartialPanel(name, amount, itemAmountList.size() - 1)));
 
-            for (DrinkBooking drinkBooking : drinkBookingList) {
-                formLayout.add(new DrinkPanel(drinkBooking));
-            }
-
-            List<FoodBooking> foodList = foodBookingRepository
-                    .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
-                            bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
-            for (FoodBooking foodBooking : foodList) {
-                formLayout.add(new FoodPanel(foodBooking));
-            }
-
-            List<BowlingShoeBooking> shoeList = shoeBookingRepository
-                    .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
-                            bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
-            for (BowlingShoeBooking bowlingShoeBooking : shoeList) {
-                formLayout.add(new ShoePanel(bowlingShoeBooking, shoeBookingRepository));
-            }
-        }
-        formLayout.add(createTotalInvoiceFooter());
-        return formLayout;
-    }
-
-    private final Component createPartialInvoicePanels() {
-        FormLayout formLayout = new FormLayout();
-        formLayout.setResponsiveSteps(new ResponsiveStep("200px", 2));
-        formLayout.setMaxWidth("1000px");
-        if (bowlingAlleyBooking != null) {
-            List<DrinkBooking> drinkBookingList = drinkBookingRepository
-                    .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
-                            bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
-
-            for (DrinkBooking drinkBooking : drinkBookingList) {
-                formLayout.add(new DrinkPanel(drinkBooking));
-            }
-
-            List<FoodBooking> foodList = foodBookingRepository
-                    .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
-                            bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
-            for (FoodBooking foodBooking : foodList) {
-                formLayout.add(new FoodPanel(foodBooking));
-            }
-
-            List<BowlingShoeBooking> shoeList = shoeBookingRepository
-                    .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
-                            bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
-            for (BowlingShoeBooking bowlingShoeBooking : shoeList) {
-                formLayout.add(new ShoePanel(bowlingShoeBooking, shoeBookingRepository));
-            }
-        }
-        formLayout.add(createPartialInvoiceFooter());
-        return formLayout;
-    }
-
-    private final void updateInitialComponents() {
-        clientHeader
-                .setText("Rechnung für: " + bowlingAlleyBooking.getClient().getFirstName() + " "
-                        + bowlingAlleyBooking.getClient().getLastName());
-        alleyHeader
-                .setText("Bahn " + bowlingAlleyBooking.getBowlingAlley().getId() + ": "
-                        + bowlingAlleyBooking.getPrice() + " €");
-    }
-
-    /**
-     * Calculates the total sum of prices for the current booking
-     *
-     * @param bowlingAlleyBooking
-     * @return {@code double} total
-     */
-
-    private double calculateBookingTotal() {
-        double total = 0.0;
-        if (bowlingAlleyBooking != null) {
-            List<DrinkBooking> drinkBookingList = drinkBookingRepository
-                    .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(
-                            bowlingAlleyBooking.getClient(),
-                            bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
-            List<FoodBooking> foodBookingList = foodBookingRepository
-                    .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(
-                            bowlingAlleyBooking.getClient(),
-                            bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
-            List<BowlingShoeBooking> shoeBookingList = shoeBookingRepository
-                    .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(
-                            bowlingAlleyBooking.getClient(),
-                            bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
-
-            for (DrinkBooking drinkBooking : drinkBookingList) {
-                total += drinkBooking.getPrice() * drinkBooking.getAmount();
-            }
-            for (FoodBooking foodBooking : foodBookingList) {
-                total += foodBooking.getPrice() * foodBooking.getAmount();
-            }
-            for (BowlingShoeBooking shoeBooking : shoeBookingList) {
-                total += shoeBooking.getPrice();
-            }
-            total += bowlingAlleyBooking.getPrice();
-        }
-        return total;
-    }
-
-    private final Component createTotalInvoiceFooter() {
-        VerticalLayout verticallayout = new VerticalLayout();
-        verticallayout.setWidth("100%");
-        verticallayout.setAlignItems(Alignment.CENTER);
-        verticallayout.add(createPayButton());
-        return verticallayout;
-    }
-
-    private final Component createPartialInvoiceFooter() {
-        VerticalLayout verticallayout = new VerticalLayout();
-        verticallayout.setWidth("100%");
-        verticallayout.setAlignItems(Alignment.CENTER);
-        verticallayout.add(createPartialPayButton());
-        return verticallayout;
-    }
-
-    /**
-     * All Configurations of the pay button
-     */
-    private final HorizontalLayout createPartialPayButton() {
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.setMaxWidth("100%");
-        horizontalLayout.setAlignItems(FlexComponent.Alignment.BASELINE);
-
-        Button partialpayButton = new Button("BEZAHLEN");
-        partialpayButton.setIcon(new Icon(VaadinIcon.CART));
-        partialpayButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY,
-                ButtonVariant.LUMO_LARGE);
-        partialpayButton.setDisableOnClick(true);
-        partialpayButton.addClickListener(clickEvent -> {
-            VaadinUtils.showConfirmationDialog("Teilrechnung bezahlen?", "Ja", "Abbrechen", () -> {
-                Notifications.showInfo("Teilrechnung bezahlt");
-            });
-            setChildrenEnabled(partialInvoice.getChildren(), false);
-            createPartialTab();
-        });
-        horizontalLayout.add(partialpayButton, createSumHeader());
-        return horizontalLayout;
-    }
-
-    /**
-     * All Configurations of the pay button
-     */
-    private final HorizontalLayout createPayButton() {
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.setMaxWidth("100%");
-        horizontalLayout.setAlignItems(FlexComponent.Alignment.BASELINE);
-
-        Button payButton = new Button("BEZAHLEN");
-        payButton.setIcon(new Icon(VaadinIcon.CART));
-        payButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY,
-                ButtonVariant.LUMO_LARGE);
-        payButton.setDisableOnClick(true);
-        payButton.addClickListener(clickEvent -> {
-            VaadinUtils.showConfirmationDialog("Rechnung bezahlen?", "Ja", "Abbrechen", () -> {
-                Notifications.showInfo("Rechnung bezahlt");
-            });
-            mailSenderController.sendInvoiceMail(bowlingAlleyBooking);
-            bowlingAlleyBooking.setCompleted(true);
-            UI.getCurrent().navigate(ExtrasView.class);
+        Button completePartialInvoiceButton = new Button("Teilrechnung abschließen");
+        completePartialInvoiceButton.setDisableOnClick(true);
+        completePartialInvoiceButton.addClickListener(e -> {
+            completePartialInvoiceButton.setVisible(false);
+            integerFieldMap.get(itemAmountList.size() - 1).forEach(integerField -> integerField.setReadOnly(true));
+            invoiceTabSheet.add(createPartialTab(), createPartialTabContent());
         });
 
-        horizontalLayout.add(payButton, createSumHeader());
-        return horizontalLayout;
+        Label sumLabel = createNewSumLabel();
+        sumLabelMap.put(itemAmountList.size() - 1, sumLabel);
+
+        verticalLayout.add(formLayout, sumLabel, completePartialInvoiceButton);
+        return verticalLayout;
     }
 
-    private Paragraph createSumHeader() {
-        Paragraph sumHeader = new Paragraph();
-        sumHeader.getStyle().set("border", "3px solid #338CFF").set("background-color", "#338CFF")
-                .set("padding", "7px").set("border-radius", "10px").set("font-weight", "bold");
-        sumHeader.setText("SUMME: " + calculateBookingTotal());
-        return sumHeader;
-    }
-
-    // TODO wenn teilrechnung bezahlt wird und der Gesamtrechnungstab geclickt wird
-    // muss die gesamtrechnung aktualisiert werden
-    private void updateTotalInvoice() {
-
+    private Label createNewSumLabel() {
+        Label label = new Label("Summe: 0,00€");
+        label.getStyle().set("border", "3px solid #338CFF")
+                .set("background-color", "#338CFF")
+                .set("padding", "7px")
+                .set("border-radius", "10px")
+                .set("font-weight", "bold");
+        return label;
     }
 
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter Integer parameter) {
         if (parameter == null) {
+            header.setText("Keine Rechnung ausgewählt");
             return;
         }
         Optional<BowlingAlleyBooking> bowlingAlleyBookingOptional = bowlingAlleyBookingRepository.findById(parameter);
-        bowlingAlleyBookingOptional.ifPresent(booking -> {
-            if (booking.isActive()) {
-                bowlingAlleyBooking = booking;
-                updateInitialComponents();
-                createTabs();
+        if (bowlingAlleyBookingOptional.isPresent()) {
+            BowlingAlleyBooking bowlingAlleyBooking = bowlingAlleyBookingOptional.get();
+            if (bowlingAlleyBooking.isActive() && !bowlingAlleyBooking.isCompleted()) {
+                this.booking = bowlingAlleyBooking;
+                getBookingDataFromDB();
+                initializeComponents();
+            } else {
+                header.setText("Diese Rechnung ist bereits abgeschlossen");
             }
+        } else {
+            header.setText("Es existiert keine Rechnung mit dieser ID");
+        }
+    }
+
+    private void getBookingDataFromDB() {
+        drinkBookingList = drinkBookingRepository
+                .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(
+                        booking.getClient(), booking.getBowlingAlley(), booking.getStartTime());
+        foodBookingList = foodBookingRepository
+                .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(
+                        booking.getClient(), booking.getBowlingAlley(), booking.getStartTime());
+        bowlingShoeBookingList = bowlingShoeBookingRepository
+                .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(
+                        booking.getClient(), booking.getBowlingAlley(), booking.getStartTime());
+        bowlingShoeBookingList.sort(Comparator.comparingInt(shoe -> shoe.getBowlingShoe().getSize()));
+        bowlingShoeList = bowlingShoeBookingList.stream().map(BowlingShoeBooking::getBowlingShoe).toList();
+    }
+
+    private void initializeComponents() {
+        String text = "Rechnung Nr: " + booking.getId() + " , " +
+                booking.getClient().getFullName() + " , " +
+                "Bahn: " + booking.getBowlingAlley().getId() + " , " +
+                toDateString(booking.getStartTime()) + " - " +
+                toHourOnlyString(booking.getEndTime() + 1);
+        header.setText(text);
+
+        invoiceTabSheet.add(createTotalTab(), createTotalTabContent());
+        invoiceTabSheet.add(createPartialTab(), createPartialTabContent());
+    }
+
+    private HorizontalLayout createTotalPanel(String name, int amount) {
+        HorizontalLayout layout = new HorizontalLayout();
+
+        Label label = new Label(name);
+        label.setMinWidth("250px");
+        label.setMaxWidth("250px");
+
+        IntegerField amountField = new IntegerField();
+        amountField.setValue(amount);
+        amountField.setStepButtonsVisible(true);
+        amountField.setReadOnly(true);
+
+        layout.setWidthFull();
+        layout.setAlignItems(Alignment.CENTER);
+        layout.add(label, amountField);
+        addCSS(layout);
+        return layout;
+    }
+
+    private HorizontalLayout createPartialPanel(String name, Article article, int tabIndex) {
+        HorizontalLayout layout = new HorizontalLayout();
+
+        Label label = new Label(name);
+        label.setMinWidth("250px");
+        label.setMaxWidth("250px");
+
+        IntegerField amountField = new IntegerField();
+        amountField.setValue(0);
+        amountField.setStepButtonsVisible(true);
+        amountField.setMin(0);
+        amountField.setMax(article.amount());
+        amountField.addValueChangeListener(e -> {
+            Integer value = e.getValue();
+            if (value == null) {
+                value = 0;
+            }
+            if (value < amountField.getMin() || value > amountField.getMax()) {
+                amountField.setValue(e.getOldValue());
+                return;
+            }
+            itemAmountList.get(0).put(name, new Article(amountField.getMax() - value, article.price()));
+            itemAmountList.get(tabIndex).put(name, new Article(value, article.price()));
+            sumLabelMap.get(tabIndex).setText(calculatePartialSumString(tabIndex));
         });
+        integerFieldMap.get(tabIndex).add(amountField);
+
+        layout.setWidthFull();
+        layout.setAlignItems(Alignment.CENTER);
+        layout.add(label, amountField);
+        addCSS(layout);
+        return layout;
+    }
+
+    private void addCSS(Component component) {
+        component.getStyle()
+                .set("border", "2px solid #338CFF")
+                .set("background-color", "#338CFF10").set("padding", "10px")
+                .set("border-radius", "30px")
+                .set("margin-bottom", "10px");
+    }
+
+    private String calculatePartialSumString(int tabIndex) {
+        double sum = 0;
+        for (Article article : itemAmountList.get(tabIndex).values()) {
+            sum += article.amount() * article.price();
+        }
+        return "Summe: " + String.format(Locale.GERMANY, "%.2f", sum) + "€";
+    }
+
+    private record Article(int amount, double price) {
     }
 }

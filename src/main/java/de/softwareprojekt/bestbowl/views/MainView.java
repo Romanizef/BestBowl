@@ -1,12 +1,5 @@
 package de.softwareprojekt.bestbowl.views;
 
-import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
-
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -27,13 +20,11 @@ import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.Lumo;
-
 import de.softwareprojekt.bestbowl.BestBowlApplication;
 import de.softwareprojekt.bestbowl.beans.SecurityService;
 import de.softwareprojekt.bestbowl.beans.UserManager;
 import de.softwareprojekt.bestbowl.views.bookingViews.ClientSearchView;
 import de.softwareprojekt.bestbowl.views.bookingViews.ExtrasView;
-
 import de.softwareprojekt.bestbowl.views.bookingViews.PendingBookingView;
 import de.softwareprojekt.bestbowl.views.managementViews.ManagementView;
 import de.softwareprojekt.bestbowl.views.otherViews.DatabaseRedirectView;
@@ -125,6 +116,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         return new Tab[]{
                 createTab(ClientSearchView.class, "Kunde suchen", VaadinIcon.USERS),
                 createTab(ExtrasView.class, "Extras bestellen", VaadinIcon.FORM),
+                createTab(PendingBookingView.class, "Offene Buchungen", VaadinIcon.CREDIT_CARD),
                 createTab(ManagementView.class, "Verwaltungen", VaadinIcon.DESKTOP),
                 createTab(DatabaseRedirectView.class, "Datenbank", VaadinIcon.DATABASE)
         };

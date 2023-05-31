@@ -128,14 +128,10 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
             }
             alleyBookingChecker.setTimeInfo(datePicker.getValue(), timePicker.getValue(),
                     (int) (durationCB.getValue().hours() * 60));
-            if (alleyBookingChecker.verifyTime(authenticationContext)) {
+            if (alleyBookingChecker.checkTime(authenticationContext)) {
                 gridLowerBound = alleyBookingChecker.getStartTime();
                 gridUpperBound = alleyBookingChecker.getEndTime();
-                if (alleyBookingChecker.checkAvailability()) {
-                    Notifications.showInfo("Freie Bahn: Nr. " + alleyBookingChecker.getAvailableAlleyId());
-                } else {
-                    Notifications.showInfo("Keine Bahn frei zu der ausgewählten Zeit");
-                }
+                alleyBookingChecker.checkAvailability();
                 updateGridItems();
             }
         });
@@ -175,12 +171,12 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
 
         button.addClickListener(e -> {
             if (!checkForBowlingAlleys()) {
-                Notifications.showInfo("Keine Bahn im System angelegt");
+                Notifications.showError("Keine Bahn im System angelegt");
                 return;
             }
             alleyBookingChecker.setTimeInfo(datePicker.getValue(), timePicker.getValue(),
                     (int) (durationCB.getValue().hours() * 60));
-            if (alleyBookingChecker.verifyTime(authenticationContext)) {
+            if (alleyBookingChecker.checkTime(authenticationContext)) {
                 gridLowerBound = alleyBookingChecker.getStartTime();
                 gridUpperBound = alleyBookingChecker.getEndTime();
                 if ((latestBooking = alleyBookingChecker.book()) != null) {
@@ -220,10 +216,9 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
     }
 
     private Grid<BowlingAlleyBooking> createBookingGrid() {
-        Grid<BowlingAlleyBooking> grid = new Grid<>(BowlingAlleyBooking.class);
+        Grid<BowlingAlleyBooking> grid = new Grid<>(BowlingAlleyBooking.class, false);
         grid.setSizeFull();
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
-        grid.removeAllColumns();
         grid.addColumn(booking -> booking.getBowlingAlley().getId()).setHeader("Bahn");
         grid.addColumn(booking -> booking.getClient().getFullName()).setHeader("Kunde");
         grid.addColumn(booking -> toDateString(booking.getStartTime())).setHeader("Startzeit");

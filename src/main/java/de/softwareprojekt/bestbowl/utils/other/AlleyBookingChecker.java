@@ -32,7 +32,7 @@ public class AlleyBookingChecker {
         endTime = startTime + durationInMin * 60 * 1000L - 1; // -1ms to avoid overlap
     }
 
-    public boolean verifyTime(AuthenticationContext authenticationContext) {
+    public boolean checkTime(AuthenticationContext authenticationContext) {
         // admin can book at any time (mainly for testing)
         if (isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
             return true;
@@ -63,9 +63,11 @@ public class AlleyBookingChecker {
         List<BowlingAlley> freeAlleyList = Repos.getBowlingAlleyRepository().findAllByNoBookingOverlapBetweenTimeStamps(startTime, endTime);
         if (freeAlleyList.isEmpty()) {
             availableAlley = null;
+            Notifications.showInfo("Keine Bahn frei zu der ausgewählten Zeit");
             return false;
         } else {
             availableAlley = freeAlleyList.get(0);
+            Notifications.showInfo("Freie Bahn: Nr. " + availableAlley.getId());
             return true;
         }
     }

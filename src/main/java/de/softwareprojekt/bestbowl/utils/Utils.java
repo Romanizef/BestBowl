@@ -168,6 +168,14 @@ public class Utils {
     }
 
     /**
+     * @param ms unix timestamp
+     * @return date string with day, month, year, hour and minute
+     */
+    public static String toHourOnlyString(Long ms) {
+        return toDateString(ms, "HH:mm");
+    }
+
+    /**
      * @param ms     unix timestamp
      * @param format format of the date parsable by SimpleDateFormat
      * @return formatted date string
