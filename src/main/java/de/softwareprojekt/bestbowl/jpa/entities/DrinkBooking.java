@@ -41,6 +41,7 @@ public class DrinkBooking implements Serializable {
         bowlingAlley = bowlingAlleyBooking.getBowlingAlley();
         timeStamp = bowlingAlleyBooking.getStartTime();
         name = drinkVariant.getDrink().getName() + " " + drinkVariant.getMl();
+        price = drinkVariant.getPrice();
         active = true;
     }
 
