@@ -114,7 +114,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
      */
     private Tab[] createMenuItems() {
         return new Tab[]{
-                createTab(ClientSearchView.class, "Kunde suchen", VaadinIcon.USERS),
+                createTab(ClientSearchView.class, "Kundensuche", VaadinIcon.USERS),
                 createTab(ExtrasView.class, "Extras bestellen", VaadinIcon.FORM),
                 createTab(PendingBookingView.class, "Offene Buchungen", VaadinIcon.CREDIT_CARD),
                 createTab(ManagementView.class, "Verwaltungen", VaadinIcon.DESKTOP),

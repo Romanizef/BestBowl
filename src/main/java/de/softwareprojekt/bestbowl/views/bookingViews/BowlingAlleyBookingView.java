@@ -108,11 +108,11 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         timePicker = new TimePicker("Uhrzeit");
         configureTimePicker(timePicker);
 
-        durationCB = new ComboBox<>("Länge");
+        durationCB = new ComboBox<>("Dauer");
         durationCB.setAllowCustomValue(false);
         List<Duration> durationList = generateDurationList();
         durationCB.setItems(durationList);
-        durationCB.setValue(durationList.get(2));
+        durationCB.setValue(durationList.get(1));
 
         checkButton = new Button("Zeit prüfen");
         checkButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -247,8 +247,8 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
 
     private List<Duration> generateDurationList() {
         List<Duration> durationList = new ArrayList<>();
-        for (int i = 2; i <= 32; i++) {
-            durationList.add(new Duration((double) i / 4));
+        for (int i = 1; i <= 16; i++) {
+            durationList.add(new Duration((double) i / 2));
         }
         return durationList;
     }
