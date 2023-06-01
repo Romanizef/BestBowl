@@ -1,9 +1,5 @@
 package de.softwareprojekt.bestbowl.views.otherViews;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -18,15 +14,9 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.PreserveOnRefresh;
-import com.vaadin.flow.router.Route;
-
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.Client;
-import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.FoodBooking;
+import com.vaadin.flow.router.*;
+import de.softwareprojekt.bestbowl.beans.Repos;
+import de.softwareprojekt.bestbowl.jpa.entities.*;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.DrinkBookingRepository;
@@ -38,31 +28,34 @@ import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.bookingViews.ClientSearchView;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 /**
  * Creates a view for all bookings to be displayed and downloaded
- * 
+ *
  * @author Matija Kopschek
  */
 @Route(value = "statistics", layout = MainView.class)
 @PageTitle("Statistiken")
-@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
+@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 @PreserveOnRefresh
-public class StatisticsView extends VerticalLayout {
-    private Grid<BowlingAlleyBooking> bookingGrid;
+public class StatisticsView extends VerticalLayout implements HasUrlParameter<Integer> {
     private final transient BowlingAlleyBookingRepository bowlingAlleyBookingRepository;
     private final transient DrinkBookingRepository drinkBookingRepository;
     private final transient FoodBookingRepository foodBookingRepository;
     private final transient BowlingShoeBookingRepository shoeBookingRepository;
-    private Client currentClient;
-    private Button lastViewButton;
-    private Button refreshButton;
     private final H1 clientHeader;
     private final H5 sumHeader;
+    private final Grid<BowlingAlleyBooking> bookingGrid;
+    private Client currentClient;
 
     /**
      * Constructor for the StatsticView class. Creates all the components
-     * 
+     *
      * @param bookingRepository
      * @param drinkBookingRepository
      * @param foodBookingRepository
@@ -70,8 +63,8 @@ public class StatisticsView extends VerticalLayout {
      */
     @Autowired
     public StatisticsView(BowlingAlleyBookingRepository bookingRepository,
-            DrinkBookingRepository drinkBookingRepository, FoodBookingRepository foodBookingRepository,
-            BowlingShoeBookingRepository shoeBookingRepository) {
+                          DrinkBookingRepository drinkBookingRepository, FoodBookingRepository foodBookingRepository,
+                          BowlingShoeBookingRepository shoeBookingRepository) {
         this.bowlingAlleyBookingRepository = bookingRepository;
         this.drinkBookingRepository = drinkBookingRepository;
         this.foodBookingRepository = foodBookingRepository;
@@ -82,17 +75,6 @@ public class StatisticsView extends VerticalLayout {
         bookingGrid = createGrid();
         Component footerComponent = createFooterComponent();
         add(clientHeader, bookingGrid, footerComponent);
-        updateGridItems();
-    }
-
-    /**
-     * Setter for the current client
-     * 
-     * @param selectedClient
-     */
-    public void setSelectedClient(Client selectedClient) {
-        this.currentClient = selectedClient;
-        updateInitialComponents();
         updateGridItems();
     }
 
@@ -120,7 +102,7 @@ public class StatisticsView extends VerticalLayout {
         VerticalLayout verticallayout = new VerticalLayout();
         verticallayout.setWidth("80%");
         verticallayout.setAlignItems(Alignment.CENTER);
-        verticallayout.add(createLastViewButton(verticallayout), createRefreshButton(verticallayout));
+        verticallayout.add(createLastViewButton(verticallayout), createRefreshButton());
 
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.setWidthFull();
@@ -134,11 +116,12 @@ public class StatisticsView extends VerticalLayout {
 
     /**
      * Creates a {@code Button} that returns the user to the ClientSearchView
-     * 
+     *
      * @param layout
      * @return {@code Button} lastViewButton
      */
     private Button createLastViewButton(VerticalLayout layout) {
+        Button lastViewButton;
         lastViewButton = new Button("Zurück zu Kundensuche");
         lastViewButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         lastViewButton.setIcon(new Icon(VaadinIcon.BACKWARDS));
@@ -150,11 +133,12 @@ public class StatisticsView extends VerticalLayout {
     /**
      * Creates a refresh button that updates the grid if a client is selected. Else
      * the user is returned to the ClientSearchView
-     * 
+     *
      * @param layout
      * @return
      */
-    private Button createRefreshButton(VerticalLayout layout) {
+    private Button createRefreshButton() {
+        Button refreshButton;
         refreshButton = new Button("Aktualisieren");
         refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         refreshButton.setIcon(new Icon(VaadinIcon.REFRESH));
@@ -183,7 +167,7 @@ public class StatisticsView extends VerticalLayout {
 
     /**
      * Creates a grid with the clients statistics
-     * 
+     *
      * @return {@code Grid<BowlingAlleyBooking>}
      */
     private Grid<BowlingAlleyBooking> createGrid() {
@@ -201,7 +185,7 @@ public class StatisticsView extends VerticalLayout {
         grid.addColumn(booking -> booking.getClient() == null ? "" : booking.getClient().getLastName())
                 .setHeader("Kundennachname").setSortable(true);
         grid.addColumn(booking -> Utils.toDateString(booking.getStartTime())).setHeader("Datum");
-        grid.addColumn(booking -> calculateBookingTotal(booking)).setHeader("Summe");
+        grid.addColumn(this::calculateBookingTotal).setHeader("Summe");
 
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
@@ -212,11 +196,11 @@ public class StatisticsView extends VerticalLayout {
 
     /**
      * Calculates the total sum of prices for the current booking
-     * 
+     *
      * @param bowlingAlleyBooking
      * @return {@code double} total
      */
-    private double calculateBookingTotal(BowlingAlleyBooking bowlingAlleyBooking) {
+    private String calculateBookingTotal(BowlingAlleyBooking bowlingAlleyBooking) {
         List<DrinkBooking> drinkBookingList = drinkBookingRepository
                 .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
                         bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
@@ -227,7 +211,7 @@ public class StatisticsView extends VerticalLayout {
                 .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
                         bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
 
-        double total = 0.0;
+        double total = bowlingAlleyBooking.getPrice();
         for (DrinkBooking drinkBooking : drinkBookingList) {
             total += drinkBooking.getPrice() * drinkBooking.getAmount();
         }
@@ -238,15 +222,15 @@ public class StatisticsView extends VerticalLayout {
             total += shoeBooking.getPrice();
         }
 
-        return total;
+        return String.format(Locale.GERMANY, "%.2f", total) + "€";
     }
 
     /**
      * Calculates the total sum of prices for the all the bookings
-     * 
+     *
      * @return {@code double} total
      */
-    private double calculateTotal() {
+    private String calculateTotal() {
         List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository
                 .findAllByClientEquals(currentClient);
         List<DrinkBooking> drinkBookingList = drinkBookingRepository.findAllByClientEquals(currentClient);
@@ -266,7 +250,21 @@ public class StatisticsView extends VerticalLayout {
         for (BowlingShoeBooking shoeBooking : shoeBookingList) {
             total += shoeBooking.getPrice();
         }
-        return total;
+        return String.format(Locale.GERMANY, "%.2f", total) + "€";
     }
 
+    @Override
+    public void setParameter(BeforeEvent event, @OptionalParameter Integer parameter) {
+        if (parameter == null) {
+            return;
+        }
+        Optional<Client> optionalClient = Repos.getClientRepository().findById(parameter);
+        optionalClient.ifPresent(client -> {
+            if (client.isActive()) {
+                currentClient = client;
+                updateInitialComponents();
+                updateGridItems();
+            }
+        });
+    }
 }

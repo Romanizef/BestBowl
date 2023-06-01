@@ -63,11 +63,9 @@ public class AlleyBookingChecker {
         List<BowlingAlley> freeAlleyList = Repos.getBowlingAlleyRepository().findAllByNoBookingOverlapBetweenTimeStamps(startTime, endTime);
         if (freeAlleyList.isEmpty()) {
             availableAlley = null;
-            Notifications.showInfo("Keine Bahn frei zu der ausgewählten Zeit");
             return false;
         } else {
             availableAlley = freeAlleyList.get(0);
-            Notifications.showInfo("Freie Bahn: Nr. " + availableAlley.getId());
             return true;
         }
     }
@@ -78,6 +76,7 @@ public class AlleyBookingChecker {
 
     public BowlingAlleyBooking book() {
         if (client == null || !checkAvailability()) {
+            Notifications.showInfo("Keine Bahn frei zu der ausgewählten Zeit");
             return null;
         }
 

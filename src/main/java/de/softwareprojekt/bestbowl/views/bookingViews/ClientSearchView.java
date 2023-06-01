@@ -417,8 +417,7 @@ public class ClientSearchView extends VerticalLayout {
         Button showStatisticButton = new Button();
         showStatisticButton.setIcon(VaadinIcon.LINE_BAR_CHART.create());
         showStatisticButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-        showStatisticButton.addClickListener(e -> UI.getCurrent().navigate(StatisticsView.class)
-                .ifPresent(statisticsView -> statisticsView.setSelectedClient(client)));
+        showStatisticButton.addClickListener(e -> UI.getCurrent().navigate(StatisticsView.class, client.getId()));
         return showStatisticButton;
     }
 

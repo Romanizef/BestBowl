@@ -131,7 +131,11 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
             if (alleyBookingChecker.checkTime(authenticationContext)) {
                 gridLowerBound = alleyBookingChecker.getStartTime();
                 gridUpperBound = alleyBookingChecker.getEndTime();
-                alleyBookingChecker.checkAvailability();
+                if (alleyBookingChecker.checkAvailability()) {
+                    Notifications.showInfo("Freie Bahn: Nr. " + alleyBookingChecker.getAvailableAlleyId());
+                } else {
+                    Notifications.showInfo("Keine Bahn frei zu der ausgewählten Zeit");
+                }
                 updateGridItems();
             }
         });
