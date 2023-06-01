@@ -19,6 +19,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingCenterRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
+import de.softwareprojekt.bestbowl.utils.validators.BowlingCenterValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,30 +45,40 @@ public class BowlingCenterManagementView extends Div {
         Accordion accordion = new Accordion();
 
         TextField displayNameField = new TextField("Anzeigename");
+        displayNameField.setRequiredIndicatorVisible(true);
         TextField businessNameField = new TextField("Geschäftsname");
+        businessNameField.setRequiredIndicatorVisible(true);
         VerticalLayout centerInformationLayout = new VerticalLayout(displayNameField,
                 businessNameField);
         AccordionPanel centerInformationPanel = accordion.add("Bowlingcenterinformationen", centerInformationLayout);
         centerInformationPanel.addThemeVariants(DetailsVariant.FILLED);
 
         TextField streetField = new TextField("Straße");
+        streetField.setRequiredIndicatorVisible(true);
         IntegerField houseNrField = new IntegerField("Hausnummer");
+        houseNrField.setRequiredIndicatorVisible(true);
         IntegerField postCodeField = new IntegerField("PLZ");
+        postCodeField.setRequiredIndicatorVisible(true);
         TextField cityField = new TextField("Stadt");
+        cityField.setRequiredIndicatorVisible(true);
         VerticalLayout centerAddressLayout = new VerticalLayout(streetField,
                 houseNrField, postCodeField, cityField);
         AccordionPanel centerAddressPanel = accordion.add("Adresse", centerAddressLayout);
         centerAddressPanel.addThemeVariants(DetailsVariant.FILLED);
 
         TimePicker startTimePicker = new TimePicker("Start");
+        startTimePicker.setRequiredIndicatorVisible(true);
         TimePicker endTimePicker = new TimePicker("Ende");
+        endTimePicker.setRequiredIndicatorVisible(true);
         VerticalLayout centerBusinessHoursLayout = new VerticalLayout(startTimePicker,
                 endTimePicker);
         AccordionPanel centerBusinessHoursPanel = accordion.add("Geschäftszeiten", centerBusinessHoursLayout);
         centerBusinessHoursPanel.addThemeVariants(DetailsVariant.FILLED);
 
         NumberField bowlingAlleyPricePerHourField = new NumberField("Bahnpreis pro Stunde");
+        bowlingAlleyPricePerHourField.setRequiredIndicatorVisible(true);
         NumberField bowlingShoePriceField = new NumberField("Schuhpreis pro Ausleihe");
+        bowlingShoePriceField.setRequiredIndicatorVisible(true);
         VerticalLayout centerPriceLayout = new VerticalLayout(bowlingAlleyPricePerHourField,
                 bowlingShoePriceField);
         AccordionPanel centerPricePanel = accordion.add("Bahn und Schuhpreise", centerPriceLayout);
@@ -94,10 +105,13 @@ public class BowlingCenterManagementView extends Div {
                 bowlingCenterRepository.save(bowlingCenter);
                 Notifications.showInfo("gespeichert");
             } catch (ValidationException ex) {
-                Notifications.showError("Validierungsfehler");
+                if (!ex.getValidationErrors().isEmpty()) {
+                    Notifications.showError(ex.getValidationErrors().get(0).getErrorMessage());
+                }
             }
         });
 
+        binder.withValidator(new BowlingCenterValidator());
         binder.bind(displayNameField, BowlingCenter::getDisplayName, BowlingCenter::setDisplayName);
         binder.bind(businessNameField, BowlingCenter::getBusinessName, BowlingCenter::setBusinessName);
         binder.bind(streetField, BowlingCenter::getStreet, BowlingCenter::setStreet);
