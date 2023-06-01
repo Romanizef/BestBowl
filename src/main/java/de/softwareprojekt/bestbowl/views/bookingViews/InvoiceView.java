@@ -95,8 +95,9 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
     private TabSheet createTabSheet() {
         TabSheet tabSheet = new TabSheet();
         tabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED, TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
-        tabSheet.getStyle().set("border", "1px solid #dadfe4");
-        tabSheet.setSizeFull();
+        tabSheet.getStyle()
+                .set("border", "1px solid #dadfe4")
+                .set("height", "calc(100vh - 200px)");
         return tabSheet;
     }
 

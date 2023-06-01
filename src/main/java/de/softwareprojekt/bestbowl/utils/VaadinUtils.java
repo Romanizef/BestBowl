@@ -205,9 +205,15 @@ public class VaadinUtils {
         dialog.open();
     }
 
+    /**
+     * @param stepSizePx step size in pixel
+     * @param steps      amount of steps to be created
+     * @return an array containing the steps
+     */
     public static FormLayout.ResponsiveStep[] createResponsiveSteps(int stepSizePx, int steps) {
         FormLayout.ResponsiveStep[] responsiveSteps = new FormLayout.ResponsiveStep[steps];
-        for (int i = 0; i < steps; i++) {
+        responsiveSteps[0] = new FormLayout.ResponsiveStep("0px", 1);
+        for (int i = 1; i < steps; i++) {
             responsiveSteps[i] = new FormLayout.ResponsiveStep((stepSizePx * (i + 1)) + "px", i + 1);
         }
         return responsiveSteps;
