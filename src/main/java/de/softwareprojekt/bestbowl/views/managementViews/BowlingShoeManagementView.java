@@ -31,7 +31,6 @@ import java.util.Optional;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
-import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 
 @Route(value = "shoeManagement", layout = MainView.class)
 @PageTitle("Schuhverwaltung")
@@ -39,13 +38,13 @@ import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 public class BowlingShoeManagementView extends VerticalLayout {
     private final BowlingShoeRepository bowlingShoeRepository;
     private final Binder<BowlingShoe> bowlingShoeBinder = new Binder<>();
+    private final Button saveButton = new Button("Sichern");
+    private final Button cancelButton = new Button("Abbrechen");
     private Grid<BowlingShoe> bowlingShoeGrid;
     private BowlingShoeForm bowlingShoeForm;
     private BowlingShoe selectedShoe = null;
     private Label validationErrorLabel;
     private boolean editingNewBowlingShoe = false;
-    private final Button saveButton = new Button("Sichern");
-    private final Button cancelButton = new Button("Abbrechen");
 
     @Autowired
     public BowlingShoeManagementView(BowlingShoeRepository bowlingShoeRepository) {
@@ -87,7 +86,7 @@ public class BowlingShoeManagementView extends VerticalLayout {
         return layout;
     }
 
-    private VerticalLayout createBowlingShoeFormLayout(){
+    private VerticalLayout createBowlingShoeFormLayout() {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
         layout.setWidth("25%");
@@ -96,7 +95,7 @@ public class BowlingShoeManagementView extends VerticalLayout {
         return layout;
     }
 
-    private VerticalLayout createValidationLabelLayout(){
+    private VerticalLayout createValidationLabelLayout() {
         VerticalLayout validationLabelLayout = new VerticalLayout();
         validationLabelLayout.setWidthFull();
         validationLabelLayout.setPadding(false);
@@ -110,19 +109,19 @@ public class BowlingShoeManagementView extends VerticalLayout {
         return validationLabelLayout;
     }
 
-    private boolean writeBean(){
-        try{
+    private boolean writeBean() {
+        try {
             bowlingShoeBinder.writeBean(selectedShoe);
             return true;
         } catch (ValidationException e) {
-            if(!e.getValidationErrors().isEmpty()){
-            validationErrorLabel.setText(e.getValidationErrors().get(0).getErrorMessage());
+            if (!e.getValidationErrors().isEmpty()) {
+                validationErrorLabel.setText(e.getValidationErrors().get(0).getErrorMessage());
             }
         }
         return false;
     }
 
-    public Component createButton(){
+    public Component createButton() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setWidthFull();
         saveButton.setEnabled(false);
@@ -133,11 +132,11 @@ public class BowlingShoeManagementView extends VerticalLayout {
 
         saveButton.addClickListener(clickEvent -> {
             BowlingShoe undeditedBowlingShoe = new BowlingShoe();
-            if(writeBean()){
-                    saveToDnAndUpdateBowlingShoe();
-                } else {
-                    selectedShoe.copyValueOf(undeditedBowlingShoe);
-                }
+            if (writeBean()) {
+                saveToDnAndUpdateBowlingShoe();
+            } else {
+                selectedShoe.copyValueOf(undeditedBowlingShoe);
+            }
         });
         cancelButton.addClickListener(clickEvent -> resetEditLayout());
 
@@ -146,9 +145,9 @@ public class BowlingShoeManagementView extends VerticalLayout {
         return buttonLayout;
     }
 
-    private void saveToDnAndUpdateBowlingShoe(){
+    private void saveToDnAndUpdateBowlingShoe() {
         bowlingShoeRepository.save(selectedShoe);
-        if(editingNewBowlingShoe){
+        if (editingNewBowlingShoe) {
             bowlingShoeGrid.getListDataView().addItem(selectedShoe);
         } else {
             bowlingShoeGrid.getListDataView().refreshItem(selectedShoe);
@@ -157,7 +156,7 @@ public class BowlingShoeManagementView extends VerticalLayout {
         Notifications.showInfo("Schuh gespeichert");
     }
 
-    private void resetEditLayout(){
+    private void resetEditLayout() {
         bowlingShoeGrid.deselectAll();
         selectedShoe = null;
         editingNewBowlingShoe = false;

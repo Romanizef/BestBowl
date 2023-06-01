@@ -201,16 +201,12 @@ public class Utils {
 
     /**
      * @return a LocalDateTime of the current time with the minute rounded to the
-     * next 1/4 hour
+     * previous 1/4 hour
      */
     public static LocalDateTime getCurrentDateTimeRounded() {
-        LocalDateTime localDateTime = LocalDateTime.now().withNano(0).withSecond(0);
-        int newMinute = localDateTime.getMinute() + (75 - localDateTime.getMinute()) % 15;
-        if (newMinute == 60) {
-            return localDateTime.withMinute(0).plusHours(1);
-        } else {
-            return localDateTime.withMinute(newMinute);
-        }
+        LocalDateTime localDateTime = LocalDateTime.now();
+        int newMinute = localDateTime.getMinute() - (localDateTime.getMinute() % 15);
+        return localDateTime.withMinute(newMinute).withSecond(0).withNano(0);
     }
 
     /**

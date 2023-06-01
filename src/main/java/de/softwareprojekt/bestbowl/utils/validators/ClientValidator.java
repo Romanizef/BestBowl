@@ -32,8 +32,8 @@ public class ClientValidator implements Validator<Client> {
         if (client.getAddress().getHouseNr() <= 0) {
             return ValidationResult.error("Hausnummer muss größer als 0 sein");
         }
-        if (client.getAddress().getPostCode() <= 0) {
-            return ValidationResult.error("PLZ muss größer als 0 sein");
+        if (client.getAddress().getPostCode() <= 1000 && client.getAddress().getPostCode() > 99_999) {
+            return ValidationResult.error("PLZ muss zwischen 1001 und 99999 sein");
         }
         if (!isStringMinNChars(client.getAddress().getCity(), 3)) {
             return ValidationResult.error("Stadt muss min. 3 Zeichen lang sein");

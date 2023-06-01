@@ -152,20 +152,33 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
 
     private void configureDatePicker(DatePicker datePicker) {
         datePicker.setLocale(Locale.GERMANY);
-//        datePicker.setValue(Utils.getCurrentDateTimeRounded().toLocalDate());
-        datePicker.setValue(LocalDate.now());
+        datePicker.setValue(Utils.getCurrentDateTimeRounded().toLocalDate());
         if (!isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
             datePicker.setMin(LocalDate.now());
         }
+        datePicker.addValueChangeListener(e -> {
+            if (!isCurrentUserInRole(authenticationContext, UserRole.ADMIN) &&
+                    (e.getValue().isBefore(datePicker.getMin()))) {
+                datePicker.setValue(e.getOldValue());
+            }
+        });
     }
 
     private void configureTimePicker(TimePicker timePicker) {
-        BowlingCenter bowlingCenter = Repos.getBowlingCenterRepository().getBowlingCenter();
         timePicker.setLocale(Locale.GERMANY);
-        timePicker.setMin(LocalTime.ofSecondOfDay(bowlingCenter.getStartTime()));
-        timePicker.setMax(LocalTime.ofSecondOfDay(bowlingCenter.getEndTime()));
-//        timePicker.setValue(Utils.getCurrentDateTimeRounded().toLocalTime());
-        timePicker.setValue(LocalTime.now());
+        timePicker.setStep(java.time.Duration.ofMinutes(30));
+        timePicker.setValue(Utils.getCurrentDateTimeRounded().toLocalTime());
+        if (!isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
+            BowlingCenter bowlingCenter = Repos.getBowlingCenterRepository().getBowlingCenter();
+            timePicker.setMin(LocalTime.ofSecondOfDay(bowlingCenter.getStartTime()));
+            timePicker.setMax(LocalTime.ofSecondOfDay(bowlingCenter.getEndTime()));
+        }
+        timePicker.addValueChangeListener(e -> {
+            if (!isCurrentUserInRole(authenticationContext, UserRole.ADMIN) &&
+                    (e.getValue().isBefore(timePicker.getMin()) || e.getValue().isAfter(timePicker.getMax()))) {
+                timePicker.setValue(e.getOldValue());
+            }
+        });
     }
 
     private Button createBookButton() {
@@ -183,7 +196,9 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
             if (alleyBookingChecker.checkTime(authenticationContext)) {
                 gridLowerBound = alleyBookingChecker.getStartTime();
                 gridUpperBound = alleyBookingChecker.getEndTime();
-                if ((latestBooking = alleyBookingChecker.book()) != null) {
+                BowlingAlleyBooking newBooking = alleyBookingChecker.book();
+                if (newBooking != null) {
+                    latestBooking = newBooking;
                     Notifications.showInfo("Bahn Nr. " + alleyBookingChecker.getAvailableAlleyId() + " gebucht");
                     mailSenderController.sendBookingConfirmationMail(latestBooking);
                 }

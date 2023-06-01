@@ -21,7 +21,6 @@ import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.jpa.entities.Drink;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
 import de.softwareprojekt.bestbowl.jpa.repositories.DrinkRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.DrinkVariantRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
@@ -34,18 +33,16 @@ import java.util.Optional;
 import java.util.Set;
 
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
-import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 
 @Route(value = "drinkManagement", layout = MainView.class)
 @PageTitle("Getränkeverwaltung")
 @RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 public class DrinkManagementView extends VerticalLayout {
-    private final DrinkRepository drinkRepository;
-    private final DrinkVariantRepository drinkVariantRepository;
+    private final transient DrinkRepository drinkRepository;
     private final Binder<Drink> drinkBinder = new Binder<>();
     private final Button saveButton = new Button("Sichern");
     private final Button cancelButton = new Button("Abbrechen");
-    private final Button saveAndOpenDrinkVariantButton = new Button("Sicher & neue Variante anlegen");
+    private final Button saveAndOpenDrinkVariantButton = new Button("Sichern & neue Variante anlegen");
     private Grid<Drink> drinkGrid;
     private DrinkForm drinkForm;
     private Drink selectedDrink = null;
@@ -53,9 +50,8 @@ public class DrinkManagementView extends VerticalLayout {
     private boolean editingNewDrink = false;
 
     @Autowired
-    public DrinkManagementView(DrinkRepository drinkRepository, DrinkVariantRepository drinkVariantRepository) {
+    public DrinkManagementView(DrinkRepository drinkRepository) {
         this.drinkRepository = drinkRepository;
-        this.drinkVariantRepository = drinkVariantRepository;
         setSizeFull();
         Button newDrinkButton = createNewDrinkButton();
         HorizontalLayout drinkGridFormLayout = createDrinkGridFormLayout();
@@ -99,11 +95,11 @@ public class DrinkManagementView extends VerticalLayout {
         layout.setSizeFull();
         layout.setWidth("25%");
         drinkForm = new DrinkForm(drinkBinder);
-        layout.add(drinkForm, createValiationLabelLayout(), createButton());
+        layout.add(drinkForm, createValidationLabelLayout(), createButton());
         return layout;
     }
 
-    private VerticalLayout createValiationLabelLayout() {
+    private VerticalLayout createValidationLabelLayout() {
         VerticalLayout validationLabelLayout = new VerticalLayout();
         validationLabelLayout.setWidthFull();
         validationLabelLayout.setPadding(false);

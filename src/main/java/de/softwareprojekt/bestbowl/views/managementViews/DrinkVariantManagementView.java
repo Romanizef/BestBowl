@@ -30,6 +30,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
 import de.softwareprojekt.bestbowl.jpa.repositories.DrinkVariantRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
+import de.softwareprojekt.bestbowl.utils.validators.DrinkVariantValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,25 +41,17 @@ import java.util.Optional;
 import java.util.Set;
 
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
-import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 
 @Route(value = "drinkVariantManagement", layout = MainView.class)
 @PageTitle("Getränkevariantenverwaltung")
 @RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 public class DrinkVariantManagementView extends VerticalLayout {
-    private final DrinkVariantRepository drinkVariantRepository;
+    private final transient DrinkVariantRepository drinkVariantRepository;
     private final Binder<DrinkVariant> drinkVariantBinder = new Binder<>();
     private final Binder<Drink> drinkBinder = new Binder<>();
     private Grid<DrinkVariant> drinkVariantGrid;
     private FormLayout drinkVariantForm;
     private ComboBox<Drink> drinkCB;
-
-    public void setSelectedDrinkVariant(DrinkVariant selectedDrinkVariant) {
-        this.selectedDrinkVariant = selectedDrinkVariant;
-        updateEditDrinkVariantLayoutState();
-        drinkVariantBinder.readBean(selectedDrinkVariant);
-    }
-
     private DrinkVariant selectedDrinkVariant = null;
     private Label validationErrorLabel;
     private boolean editingNewDrinkVariant = false;
@@ -70,6 +63,12 @@ public class DrinkVariantManagementView extends VerticalLayout {
         Button newDrinkVariantButton = createNewDrinkVariantButton();
         add(newDrinkVariantButton, createGridFormLayout());
         updateEditDrinkVariantLayoutState();
+    }
+
+    public void setSelectedDrinkVariant(DrinkVariant selectedDrinkVariant) {
+        this.selectedDrinkVariant = selectedDrinkVariant;
+        updateEditDrinkVariantLayoutState();
+        drinkVariantBinder.readBean(selectedDrinkVariant);
     }
 
     private Button createNewDrinkVariantButton() {
@@ -148,6 +147,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
         drinkVariantlayout.add(drinkCB, variantField, priceField, createValidationLabelLayout(),
                 buttonLayout);
 
+        drinkVariantBinder.withValidator(new DrinkVariantValidator());
         drinkVariantBinder.bind(drinkCB,
                 drinkVariant -> drinkVariant.getDrink() == null ? Drink.NO_DRINK : drinkVariant.getDrink(),
                 ((drinkVariant, drink) -> {
@@ -219,7 +219,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
             drinkVariantGrid.getListDataView().refreshItem(selectedDrinkVariant);
         }
         resetEditLayout();
-        Notifications.showInfo("Getränkvariante gespeichert");
+        Notifications.showInfo("Getränkevariante gespeichert");
     }
 
     private void resetEditLayout() {
@@ -250,35 +250,35 @@ public class DrinkVariantManagementView extends VerticalLayout {
             drinkVariantMlSet.remove(drinkVariant.getMl());
         });
         if (drinkVariantMlSet.contains(selectedDrinkVariant.getMl())) {
-            validationErrorLabel.setText("Ein Getränkvariante mit dieser größe existiert bereits");
+            validationErrorLabel.setText("Ein Getränkevariante mit dieser größe existiert bereits");
             return false;
         }
         return true;
     }
 
     private Grid<DrinkVariant> createDrinkVariantGrid() {
-        Grid<DrinkVariant> drinkVariantGrid = new Grid<>(DrinkVariant.class);
-        drinkVariantGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
-        drinkVariantGrid.removeAllColumns();
-        Grid.Column<DrinkVariant> idColumn = drinkVariantGrid.addColumn(DrinkVariant::getId).setHeader("ID");
-        Grid.Column<DrinkVariant> nameColum = drinkVariantGrid.addColumn(DrinkVariant ->
-                DrinkVariant.getDrink() == null ? "" : DrinkVariant.getDrink().getName()).setHeader("Getränk");
-        Grid.Column<DrinkVariant> mlColumn = drinkVariantGrid.addColumn(DrinkVariant::getMl).setHeader("Variante");
-        Grid.Column<DrinkVariant> priceColumn = drinkVariantGrid.addColumn(DrinkVariant::getPrice).setHeader("Preis");
+        Grid<DrinkVariant> grid = new Grid<>(DrinkVariant.class);
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        grid.removeAllColumns();
+        Grid.Column<DrinkVariant> idColumn = grid.addColumn(DrinkVariant::getId).setHeader("ID");
+        Grid.Column<DrinkVariant> nameColum = grid.addColumn(drinkVariant ->
+                drinkVariant.getDrink() == null ? "" : drinkVariant.getDrink().getName()).setHeader("Getränk");
+        Grid.Column<DrinkVariant> mlColumn = grid.addColumn(DrinkVariant::getMl).setHeader("Variante");
+        Grid.Column<DrinkVariant> priceColumn = grid.addColumn(DrinkVariant::getPrice).setHeader("Preis");
         Grid.Column<DrinkVariant> activeColumn =
-                drinkVariantGrid.addColumn(DrinkVariant ->
-                        DrinkVariant.getDrink() == null ? "" : DrinkVariant.getDrink().isActive() ? "Aktiv" : "Inaktiv").setHeader("Getränk Aktiv");
-        drinkVariantGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
-        drinkVariantGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
-        drinkVariantGrid.setWidth("75%");
-        drinkVariantGrid.setHeight("100%");
+                grid.addColumn(drinkVariant ->
+                        drinkVariant.getDrink() == null ? "" : drinkVariant.getDrink().isActive() ? "Aktiv" : "Inaktiv").setHeader("Getränk Aktiv");
+        grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
+        grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+        grid.setWidth("75%");
+        grid.setHeight("100%");
 
         List<DrinkVariant> drinkVariantList = drinkVariantRepository.findAll();
-        GridListDataView<DrinkVariant> dataView = drinkVariantGrid.setItems(drinkVariantList);
+        GridListDataView<DrinkVariant> dataView = grid.setItems(drinkVariantList);
 
         DrinkVariantManagementView.DrinkVariantFilter drinkVariantFilter = new DrinkVariantManagementView.DrinkVariantFilter(dataView);
-        drinkVariantGrid.getHeaderRows().clear();
-        HeaderRow headerRow = drinkVariantGrid.appendHeaderRow();
+        grid.getHeaderRows().clear();
+        HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", drinkVariantFilter::setId));
         headerRow.getCell(nameColum).setComponent(createFilterHeaderString("Getränk", drinkVariantFilter::setName));
         headerRow.getCell(mlColumn).setComponent(createFilterHeaderInteger("Variante", drinkVariantFilter::setMl));
@@ -286,7 +286,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
         headerRow.getCell(activeColumn)
                 .setComponent(createFilterHeaderBoolean("Aktive", "Inaktiv", drinkVariantFilter::setActive));
 
-        drinkVariantGrid.addSelectionListener(e -> {
+        grid.addSelectionListener(e -> {
             if (e.isFromClient()) {
                 Optional<DrinkVariant> optionalDrinkVariant = e.getFirstSelectedItem();
                 if (optionalDrinkVariant.isPresent()) {
@@ -300,11 +300,11 @@ public class DrinkVariantManagementView extends VerticalLayout {
             }
             updateEditDrinkVariantLayoutState();
         });
-        return drinkVariantGrid;
+        return grid;
     }
 
     private static class DrinkVariantFilter {
-        private final GridListDataView<de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant> dataView;
+        private final GridListDataView<DrinkVariant> dataView;
         private String id;
         private String name;
         private String milliliter;

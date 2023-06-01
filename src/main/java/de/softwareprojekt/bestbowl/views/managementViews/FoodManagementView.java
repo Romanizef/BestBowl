@@ -31,21 +31,20 @@ import java.util.Optional;
 import java.util.Set;
 
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
-import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 
 @Route(value = "foodManagement", layout = MainView.class)
 @PageTitle("Speiesenverwaltung")
 @RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 public class FoodManagementView extends VerticalLayout {
-    private final FoodRepository foodRepository;
+    private final transient FoodRepository foodRepository;
     private final Binder<Food> foodBinder = new Binder<>();
+    private final Button saveButton = new Button("Sichern");
+    private final Button cancelButton = new Button("Abbrechen");
     private Grid<Food> foodGrid;
     private FoodForm foodForm;
     private Food selectedFood = null;
     private Label validationErrorLabel;
     private boolean editingNewFood = false;
-    private final Button saveButton = new Button("Sichern");
-    private final Button cancelButton = new Button("Abbrechen");
 
     @Autowired
     public FoodManagementView(FoodRepository foodRepository) {
@@ -83,11 +82,11 @@ public class FoodManagementView extends VerticalLayout {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setSizeFull();
         foodGrid = createFoodGrid();
-        layout.add(foodGrid,createFoodFormLayout());
+        layout.add(foodGrid, createFoodFormLayout());
         return layout;
     }
 
-    private VerticalLayout createFoodFormLayout(){
+    private VerticalLayout createFoodFormLayout() {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
         layout.setWidth("25%");
@@ -130,10 +129,10 @@ public class FoodManagementView extends VerticalLayout {
         saveButton.setIcon(new Icon(VaadinIcon.ARROW_CIRCLE_DOWN));
         cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
 
-        saveButton.addClickListener(clickEvent ->{
+        saveButton.addClickListener(clickEvent -> {
             Food uneditedFood = new Food(selectedFood);
-            if(writeBean()){
-                if(validateFoodSave()){
+            if (writeBean()) {
+                if (validateFoodSave()) {
                     saveToDbAndUpdateFood();
                 } else {
                     selectedFood.copyValuesOf(uneditedFood);
@@ -150,7 +149,7 @@ public class FoodManagementView extends VerticalLayout {
 
     private void saveToDbAndUpdateFood() {
         foodRepository.save(selectedFood);
-        if(editingNewFood){
+        if (editingNewFood) {
             foodGrid.getListDataView().addItem(selectedFood);
         } else {
             foodGrid.getListDataView().refreshItem(selectedFood);
@@ -170,13 +169,13 @@ public class FoodManagementView extends VerticalLayout {
         clearNumberFieldChildren(foodForm.getChildren());
     }
 
-    private boolean validateFoodSave(){
+    private boolean validateFoodSave() {
         Optional<Food> dbFood = foodRepository.findById(selectedFood.getId());
         Set<String> foodNameSet = foodRepository.findAllNames();
         dbFood.ifPresent(food -> {
             foodNameSet.remove(food.getName());
         });
-        if(foodNameSet.contains(selectedFood.getName())){
+        if (foodNameSet.contains(selectedFood.getName())) {
             validationErrorLabel.setText("Eine Speise mit diesem Namen existiert bereits");
             return false;
         }
@@ -193,7 +192,7 @@ public class FoodManagementView extends VerticalLayout {
         Grid.Column<Food> stockColumn = foodGrid.addColumn("stock").setHeader("Bestand");
         Grid.Column<Food> reorderPointColumn = foodGrid.addColumn("reorderPoint").setHeader("Meldebestand");
         Grid.Column<Food> priceColumn = foodGrid.addColumn("price").setHeader("Preis");
-        Grid.Column<Food> activeColumn = foodGrid.addColumn(s -> s.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
+        Grid.Column<Food> activeColumn = foodGrid.addColumn(food -> food.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
         foodGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
         foodGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         foodGrid.setWidth("75%");
