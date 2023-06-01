@@ -30,32 +30,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
-import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
-import static de.softwareprojekt.bestbowl.utils.Utils.toHourOnlyString;
+import static de.softwareprojekt.bestbowl.utils.Utils.*;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createResponsiveSteps;
 
 /**
  * Creates a view for all booked elements to be displayed in an invoice and paid
  *
  * @author Marten Voß
- * @author Matija Kopschek
  */
 @Route(value = "invoice", layout = MainView.class)
 @PageTitle("Rechnung")
 @PermitAll
 public final class InvoiceView extends VerticalLayout implements HasUrlParameter<Integer> {
+    private static final String NAME_LABEL_WIDTH = "250px";
+    private static final String SUM_LABEL_WIDTH = "55px";
+
     private final transient MailSenderService mailSenderService;
     private final transient BowlingAlleyBookingRepository bowlingAlleyBookingRepository;
     private final transient DrinkBookingRepository drinkBookingRepository;
     private final transient FoodBookingRepository foodBookingRepository;
     private final transient BowlingShoeBookingRepository bowlingShoeBookingRepository;
     private final transient BowlingShoeRepository bowlingShoeRepository;
+    private final ResponsiveStep[] responsiveSteps;
     private final H2 header;
     private final TabSheet invoiceTabSheet;
     private final Button completeInvoiceButton;
+    private final List<Div> tabContentList = new ArrayList<>();
     private final List<Map<Integer, Article>> articlePerTabList = new ArrayList<>();
-    private final Map<Integer, Label> sumLabelMap = new HashMap<>();
-    private final Map<Integer, List<IntegerField>> integerFieldMap = new HashMap<>();
-    private Div totalTabContent;
+    private Label lastTabSumLabel;
+
     private BowlingAlleyBooking booking;
     private List<DrinkBooking> drinkBookingList;
     private List<FoodBooking> foodBookingList;
@@ -81,6 +84,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
         setAlignItems(Alignment.CENTER);
 
         mailSenderService = new MailSenderService();
+        responsiveSteps = createResponsiveSteps(600, 5);
 
         header = new H2();
         invoiceTabSheet = createTabSheet();
@@ -121,18 +125,19 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
     private Tab createTotalTab() {
         Tab tab = new Tab(VaadinIcon.MONEY.create(), new Span("Gesamtrechnung"));
         tab.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
-        tab.getElement().addEventListener("click", e -> replaceTotalTabContent());
+        tab.getElement().addEventListener("click", e -> replaceTabContent(0));
         return tab;
     }
 
-    private Div createTotalTabContent() {
-        totalTabContent = new Div();
+    private Component createTotalTabContent() {
+        Div tabContent = new Div();
+        tabContentList.add(tabContent);
 
         Map<Integer, Article> articleMap = createArticleMap();
         articlePerTabList.add(articleMap);
 
-        replaceTotalTabContent();
-        return totalTabContent;
+        replaceTabContent(0);
+        return tabContent;
     }
 
     private Map<Integer, Article> createArticleMap() {
@@ -153,23 +158,23 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
         return articleMap;
     }
 
-    private void replaceTotalTabContent() {
+    private void replaceTabContent(int tabIndex) {
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setAlignItems(Alignment.CENTER);
 
         FormLayout formLayout = new FormLayout();
-        formLayout.setResponsiveSteps(new ResponsiveStep("200px", 2));
-        formLayout.setMaxWidth("1000px");
-        articlePerTabList.get(0).forEach((i, article) -> formLayout.add(createTotalPanel(article)));
+        formLayout.setResponsiveSteps(responsiveSteps);
+        articlePerTabList.get(tabIndex).forEach((i, article) -> formLayout.add(createDisplayPanel(article)));
 
         Label sumLabel = createNewSumLabel();
-        sumLabel.setText(calculatePartialSumString(0));
+        sumLabel.setText(calculatePartialSumString(tabIndex));
 
         verticalLayout.add(formLayout, sumLabel);
 
         //replace old content
-        totalTabContent.removeAll();
-        totalTabContent.add(verticalLayout);
+        Div tabContent = tabContentList.get(tabIndex);
+        tabContent.removeAll();
+        tabContent.add(verticalLayout);
     }
 
     private Tab createPartialTab() {
@@ -178,41 +183,51 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
         return tab;
     }
 
-    private VerticalLayout createPartialTabContent() {
+    private Component createPartialTabContent() {
+        Div tabContent = new Div();
+        tabContentList.add(tabContent);
+
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setAlignItems(Alignment.CENTER);
 
         Map<Integer, Article> articleMap = new TreeMap<>();
         articlePerTabList.get(0).forEach((i, article) -> {
-            if (article.amount() > 0) {
-                articleMap.put(i, new Article(article.name(), article.amount(), article.price()));
+            if (article.getAmount() > 0) {
+                articleMap.put(i, new Article(article));
             }
         });
         articlePerTabList.add(articleMap);
-        integerFieldMap.put(articlePerTabList.size() - 1, new ArrayList<>());
 
         if (!articleMap.isEmpty()) {
             FormLayout formLayout = new FormLayout();
-            formLayout.setResponsiveSteps(new ResponsiveStep("200px", 2));
-            formLayout.setMaxWidth("1000px");
-            articleMap.forEach((name, amount) ->
-                    formLayout.add(createPartialPanel(name, amount, articlePerTabList.size() - 1)));
+            formLayout.setResponsiveSteps(responsiveSteps);
+            articleMap.forEach((name, article) -> {
+                formLayout.add(createEditPanel(name, article, articlePerTabList.size() - 1));
+                article.setAmount(0);
+            });
 
             Button completePartialInvoiceButton = new Button("Teilrechnung abschließen");
             completePartialInvoiceButton.setDisableOnClick(true);
             completePartialInvoiceButton.addClickListener(e -> {
-                completePartialInvoiceButton.setVisible(false);
-                integerFieldMap.get(articlePerTabList.size() - 1).forEach(integerField -> integerField.setReadOnly(true));
+                removeAmount0ArticlesFromTab(articlePerTabList.size() - 1);
+                replaceTabContent(tabContentList.size() - 1);
                 invoiceTabSheet.add(createPartialTab(), createPartialTabContent());
             });
 
             Label sumLabel = createNewSumLabel();
-            sumLabelMap.put(articlePerTabList.size() - 1, sumLabel);
+            lastTabSumLabel = sumLabel;
             verticalLayout.add(formLayout, sumLabel, completePartialInvoiceButton);
         } else {
             verticalLayout.add(new Label("Es gibt keine offenen Positionen mehr"));
         }
-        return verticalLayout;
+
+        tabContent.add(verticalLayout);
+        return tabContent;
+    }
+
+    private void removeAmount0ArticlesFromTab(int tabIndex) {
+        Map<Integer, Article> articleMap = articlePerTabList.get(tabIndex);
+        articleMap.entrySet().removeIf(entry -> entry.getValue().getAmount() == 0);
     }
 
     private Label createNewSumLabel() {
@@ -275,37 +290,48 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
         invoiceTabSheet.add(createPartialTab(), createPartialTabContent());
     }
 
-    private HorizontalLayout createTotalPanel(Article article) {
+    private HorizontalLayout createDisplayPanel(Article article) {
         HorizontalLayout layout = new HorizontalLayout();
+        layout.setWidthFull();
+        layout.setAlignItems(Alignment.CENTER);
 
-        Label label = new Label(article.name());
-        label.setMinWidth("250px");
-        label.setMaxWidth("250px");
+        Label nameLabel = new Label(article.getName());
+        nameLabel.setMinWidth(NAME_LABEL_WIDTH);
+        nameLabel.setMaxWidth(NAME_LABEL_WIDTH);
 
         IntegerField amountField = new IntegerField();
-        amountField.setValue(article.amount());
+        amountField.setValue(article.getAmount());
         amountField.setStepButtonsVisible(true);
         amountField.setReadOnly(true);
 
-        layout.setWidthFull();
-        layout.setAlignItems(Alignment.CENTER);
-        layout.add(label, amountField);
+        Label articleSumLabel = new Label(formatDouble(article.getAmount() * article.getPrice()) + "€");
+        articleSumLabel.setMinWidth(SUM_LABEL_WIDTH);
+        articleSumLabel.setMaxWidth(SUM_LABEL_WIDTH);
+
+        layout.add(nameLabel, amountField, articleSumLabel);
+        layout.expand(amountField);
         addCSS(layout);
         return layout;
     }
 
-    private HorizontalLayout createPartialPanel(int articleIndex, Article article, int tabIndex) {
+    private HorizontalLayout createEditPanel(int articleIndex, Article article, int tabIndex) {
         HorizontalLayout layout = new HorizontalLayout();
+        layout.setWidthFull();
+        layout.setAlignItems(Alignment.CENTER);
 
-        Label label = new Label(article.name());
-        label.setMinWidth("250px");
-        label.setMaxWidth("250px");
+        Label nameLabel = new Label(article.getName());
+        nameLabel.setMinWidth(NAME_LABEL_WIDTH);
+        nameLabel.setMaxWidth(NAME_LABEL_WIDTH);
+
+        Label articleSumLabel = new Label("0,00€");
+        articleSumLabel.setMinWidth(SUM_LABEL_WIDTH);
+        articleSumLabel.setMaxWidth(SUM_LABEL_WIDTH);
 
         IntegerField amountField = new IntegerField();
         amountField.setValue(0);
         amountField.setStepButtonsVisible(true);
         amountField.setMin(0);
-        amountField.setMax(article.amount());
+        amountField.setMax(article.getAmount());
         amountField.addValueChangeListener(e -> {
             Integer value = e.getValue();
             if (value == null) {
@@ -315,15 +341,14 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
                 amountField.setValue(e.getOldValue());
                 return;
             }
-            articlePerTabList.get(0).put(articleIndex, new Article(article.name(), amountField.getMax() - value, article.price()));
-            articlePerTabList.get(tabIndex).put(articleIndex, new Article(article.name(), value, article.price()));
-            sumLabelMap.get(tabIndex).setText(calculatePartialSumString(tabIndex));
+            articlePerTabList.get(0).get(articleIndex).setAmount(amountField.getMax() - value);
+            articlePerTabList.get(tabIndex).get(articleIndex).setAmount(value);
+            articleSumLabel.setText(formatDouble(value * article.getPrice()) + "€");
+            lastTabSumLabel.setText(calculatePartialSumString(tabIndex));
         });
-        integerFieldMap.get(tabIndex).add(amountField);
 
-        layout.setWidthFull();
-        layout.setAlignItems(Alignment.CENTER);
-        layout.add(label, amountField);
+        layout.add(nameLabel, amountField, articleSumLabel);
+        layout.expand(amountField);
         addCSS(layout);
         return layout;
     }
@@ -331,7 +356,8 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
     private void addCSS(Component component) {
         component.getStyle()
                 .set("border", "2px solid #338CFF")
-                .set("background-color", "#338CFF10").set("padding", "10px")
+                .set("background-color", "#338CFF10")
+                .set("padding", "10px")
                 .set("border-radius", "30px")
                 .set("margin-bottom", "10px");
     }
@@ -339,11 +365,42 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
     private String calculatePartialSumString(int tabIndex) {
         double sum = 0;
         for (Article article : articlePerTabList.get(tabIndex).values()) {
-            sum += article.amount() * article.price();
+            sum += article.getAmount() * article.getPrice();
         }
-        return "Summe: " + String.format(Locale.GERMANY, "%.2f", sum) + "€";
+        return "Summe: " + formatDouble(sum) + "€";
     }
 
-    private record Article(String name, int amount, double price) {
+    private static final class Article {
+        private final String name;
+        private final double price;
+        private int amount;
+
+        private Article(String name, int amount, double price) {
+            this.name = name;
+            this.amount = amount;
+            this.price = price;
+        }
+
+        public Article(Article other) {
+            this.name = other.name;
+            this.price = other.price;
+            this.amount = other.amount;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getAmount() {
+            return amount;
+        }
+
+        public void setAmount(int amount) {
+            this.amount = amount;
+        }
+
+        public double getPrice() {
+            return price;
+        }
     }
 }

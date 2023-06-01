@@ -6,6 +6,7 @@ import com.vaadin.flow.component.HasOrderedComponents;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.ComboBoxVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -202,5 +203,13 @@ public class VaadinUtils {
         dialog.addConfirmListener(event -> onConfirm.run());
 
         dialog.open();
+    }
+
+    public static FormLayout.ResponsiveStep[] createResponsiveSteps(int stepSizePx, int steps) {
+        FormLayout.ResponsiveStep[] responsiveSteps = new FormLayout.ResponsiveStep[steps];
+        for (int i = 0; i < steps; i++) {
+            responsiveSteps[i] = new FormLayout.ResponsiveStep((stepSizePx * (i + 1)) + "px", i + 1);
+        }
+        return responsiveSteps;
     }
 }
