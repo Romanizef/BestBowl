@@ -30,13 +30,13 @@ public class MailSenderService {
             return;
         }
 
-        String senderMail = bowlingCenter.getEmail(); // The E-Mail of the transmitter
+        String senderMail = bowlingCenter.getSenderEmail(); // The E-Mail of the transmitter
         String password = bowlingCenter.getPassword(); // specific password created for this program
         String smtphost = bowlingCenter.getSmtpHost(); // smtp.gmail.com: host is gmail.com
         String smtpport = bowlingCenter.getSmtpPort(); // 465: is the port number for SSL, if TLS is being used then 587
 
         // String recepientMail = booking.getClient().getEmail(); // From class Customer
-        String recepientMail = "bestbowl11@gmailcom"; // TODO nur zum testen nachher wieder rausnehmen
+        String recepientMail = bowlingCenter.getReceiverEmail(); // Nur zu test Zwecken
         String recepientLastName = booking.getClient().getLastName(); // From class Customer
         String recepientFirstName = booking.getClient().getFirstName(); // From class Customer
         int invoiceNumber = booking.getId(); // BookingID as invoiceNumber
@@ -66,13 +66,13 @@ public class MailSenderService {
             return;
         }
 
-        String senderMail = bowlingCenter.getEmail(); // The E-Mail of the transmitter
+        String senderMail = bowlingCenter.getSenderEmail(); // The E-Mail of the transmitter
         String password = bowlingCenter.getPassword(); // specific password created for this program
         String smtphost = bowlingCenter.getSmtpHost(); // smtp.gmail.com: host is gmail.com
         String smtpport = bowlingCenter.getSmtpPort(); // 465: is the port number for SSL, if TLS is being used then 587
 
         // String recepientMail = booking.getClient().getEmail(); // From class Customer
-        String recepientMail = "bestbowl11@gmail.com"; // TODO nur zum testen nachher wieder rausnehmen
+        String recepientMail = bowlingCenter.getReceiverEmail(); // Nur zu test Zwecken
         String recepientLastName = booking.getClient().getLastName(); // From class Customer
         String recepientFirstName = booking.getClient().getFirstName(); // From class Customer
         int bookingNumber = booking.getId(); // BookingID as bookingNumber
@@ -103,13 +103,13 @@ public class MailSenderService {
             return;
         }
 
-        String senderMail = bowlingCenter.getEmail(); // The E-Mail of the transmitter
+        String senderMail = bowlingCenter.getSenderEmail(); // The E-Mail of the transmitter
         String password = bowlingCenter.getPassword(); // specific password created for this program
         String smtphost = bowlingCenter.getSmtpHost(); // smtp.gmail.com: host is gmail.com
         String smtpport = bowlingCenter.getSmtpPort(); // 465: is the port number for SSL, if TLS is being used then 587
 
         // String recepientMail = booking.getClient().getEmail(); // From class Customer
-        String recepientMail = "bestbowl11@gmail.com"; // TODO nur zum testen nachher wieder rausnehmen
+        String recepientMail = bowlingCenter.getReceiverEmail(); // Nur zu test Zwecken
         String recepientLastName = booking.getClient().getLastName(); // From class Customer
         String recepientFirstName = booking.getClient().getFirstName(); // From class Customer
         int bookingNumber = booking.getId(); // BookingID as bookingNumber
@@ -137,7 +137,7 @@ public class MailSenderService {
         if (bowlingCenter == null) {
             return false;
         }
-        return (isStringNotEmpty(bowlingCenter.getEmail(), bowlingCenter.getPassword(),
+        return (isStringNotEmpty(bowlingCenter.getSenderEmail(), bowlingCenter.getPassword(),
                 bowlingCenter.getSmtpHost(), bowlingCenter.getSmtpPort()));
     }
 }

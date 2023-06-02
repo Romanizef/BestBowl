@@ -66,7 +66,7 @@ public class Initializer {
         bowlingCenter.setEndTime(Duration.ofHours(23).toSeconds());
         bowlingCenter.setBowlingAlleyPricePerHour(10);
         bowlingCenter.setBowlingShoePrice(4.99);
-        bowlingCenter.setEmail("");
+        bowlingCenter.setSenderEmail("");
         bowlingCenter.setPassword("");
         bowlingCenter.setSmtpHost("");
         bowlingCenter.setSmtpPort("");

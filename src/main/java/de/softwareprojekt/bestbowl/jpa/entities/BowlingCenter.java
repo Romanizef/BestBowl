@@ -18,22 +18,23 @@ public class BowlingCenter implements Serializable {
     private String displayName;
     private String businessName;
 
-    //address
+    // address
     private String street;
     private int houseNr;
     private int postCode;
     private String city;
 
-    //business hours
-    private long startTime; //in seconds after day start
-    private long endTime; //in seconds after day start
+    // business hours
+    private long startTime; // in seconds after day start
+    private long endTime; // in seconds after day start
 
-    //prices
+    // prices
     private double bowlingAlleyPricePerHour;
     private double bowlingShoePrice;
 
-    //email server data
-    private String email;
+    // email server data
+    private String senderEmail;
+    private String receiverEmail;
     private String password;
     private String smtpHost;
     private String smtpPort;
@@ -129,12 +130,20 @@ public class BowlingCenter implements Serializable {
         this.bowlingShoePrice = bowlingShoePrice;
     }
 
-    public String getEmail() {
-        return email;
+    public String getSenderEmail() {
+        return senderEmail;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setSenderEmail(String email) {
+        this.senderEmail = email;
+    }
+
+    public String getReceiverEmail() {
+        return receiverEmail;
+    }
+
+    public void setReceiverEmail(String email) {
+        this.receiverEmail = email;
     }
 
     public String getPassword() {

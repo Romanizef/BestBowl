@@ -36,7 +36,10 @@ public class BowlingCenterValidator implements Validator<BowlingCenter> {
         if (bowlingCenter.getBowlingShoePrice() < 0) {
             return ValidationResult.error("Der Bowling Schuh Preis muss positiv sein");
         }
-        if (bowlingCenter.getEmail() != null && bowlingCenter.getEmail().length() > 0 && isStringValidEmail(bowlingCenter.getEmail())) {
+        if (bowlingCenter.getSenderEmail() != null && bowlingCenter.getSenderEmail().length() > 0 && !isStringValidEmail(bowlingCenter.getSenderEmail())) {
+            return ValidationResult.error("Ungültige E-Mail");
+        }
+        if (bowlingCenter.getReceiverEmail() != null && bowlingCenter.getReceiverEmail().length() > 0 && !isStringValidEmail(bowlingCenter.getReceiverEmail())) {
             return ValidationResult.error("Ungültige E-Mail");
         }
         return ValidationResult.ok();
