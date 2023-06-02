@@ -1,5 +1,16 @@
 package de.softwareprojekt.bestbowl.views.bookingViews;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
@@ -14,9 +25,28 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
-import com.vaadin.flow.router.*;
-import de.softwareprojekt.bestbowl.jpa.entities.*;
-import de.softwareprojekt.bestbowl.jpa.repositories.*;
+import com.vaadin.flow.router.BeforeEvent;
+import com.vaadin.flow.router.HasUrlParameter;
+import com.vaadin.flow.router.OptionalParameter;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
+
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlley;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoe;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.Drink;
+import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.Food;
+import de.softwareprojekt.bestbowl.jpa.entities.FoodBooking;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.DrinkBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.DrinkRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.FoodBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.FoodRepository;
 import de.softwareprojekt.bestbowl.utils.VaadinUtils;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
@@ -24,14 +54,10 @@ import de.softwareprojekt.bestbowl.views.extrasElements.DrinkPanel;
 import de.softwareprojekt.bestbowl.views.extrasElements.FoodPanel;
 import de.softwareprojekt.bestbowl.views.extrasElements.ShoePanel;
 import jakarta.annotation.security.PermitAll;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
- * @author Matija Kopschek
+ * Creates a View for the extra bookings, like food, drinks and shoes.
+ * 
  * @author Ali aus Mali
  */
 @Route(value = "extras", layout = MainView.class)
@@ -75,13 +101,13 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
      */
     @Autowired
     public ExtrasView(DrinkRepository drinkRepository,
-                      FoodRepository foodRepository,
-                      BowlingAlleyRepository bowlingAlleyRepository,
-                      BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
-                      FoodBookingRepository foodBookingRepository,
-                      DrinkBookingRepository drinkBookingRepository,
-                      BowlingShoeRepository bowlingShoeRepository,
-                      BowlingShoeBookingRepository bowlingShoeBookingRepository) {
+            FoodRepository foodRepository,
+            BowlingAlleyRepository bowlingAlleyRepository,
+            BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
+            FoodBookingRepository foodBookingRepository,
+            DrinkBookingRepository drinkBookingRepository,
+            BowlingShoeRepository bowlingShoeRepository,
+            BowlingShoeBookingRepository bowlingShoeBookingRepository) {
         this.bowlingAlleyRepository = bowlingAlleyRepository;
         this.drinkRepository = drinkRepository;
         this.foodRepository = foodRepository;
@@ -215,7 +241,7 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
                 currentBowlingAlleyId = Integer.parseInt(alleyButton.getText().replaceAll("\\D+(\\d+)", "$1"));
                 changeCurrentButtonStyle(currentBowlingAlleyId);
                 currentBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(
-                                bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
+                        bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
                         .findFirst()
                         .orElse(null);
                 changeTabs();
