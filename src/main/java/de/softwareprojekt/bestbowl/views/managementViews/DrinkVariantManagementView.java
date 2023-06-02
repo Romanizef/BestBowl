@@ -2,6 +2,7 @@ package de.softwareprojekt.bestbowl.views.managementViews;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.ComboBoxVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -13,6 +14,7 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -110,6 +112,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
 
         NumberField priceField = new NumberField("Preis");
         IntegerField variantField = new IntegerField("Variante");
+
         Button saveButton = new Button("Speichern");
         Button cancelButton = new Button("Abbrechen");
 
@@ -122,6 +125,13 @@ public class DrinkVariantManagementView extends VerticalLayout {
         priceField.setSuffixComponent(new Span("EUR"));
         priceField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         priceField.setRequired(true);
+
+        HorizontalLayout checkboxLayout = new HorizontalLayout();
+        checkboxLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        checkboxLayout.setWidthFull();
+        checkboxLayout.setHeight("50px");
+        Checkbox activeCheckbox = new Checkbox("Aktiv");
+        checkboxLayout.add(activeCheckbox);
 
 
         HorizontalLayout buttonLayout = new HorizontalLayout();
@@ -145,7 +155,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
         buttonLayout.add(cancelButton, saveButton);
         buttonLayout.setFlexGrow(1, cancelButton, saveButton);
 
-        drinkVariantlayout.add(drinkCB, variantField, priceField, createValidationLabelLayout(),
+        drinkVariantlayout.add(drinkCB, variantField, priceField, checkboxLayout, createValidationLabelLayout(),
                 buttonLayout);
 
         drinkVariantBinder.withValidator(new DrinkVariantValidator());
@@ -160,6 +170,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
                 }));
         drinkVariantBinder.bind(priceField, DrinkVariant::getPrice, DrinkVariant::setPrice);
         drinkVariantBinder.bind(variantField, DrinkVariant::getMl, DrinkVariant::setMl);
+        drinkVariantBinder.bind(activeCheckbox, DrinkVariant::isActive, DrinkVariant::setActive);
         return drinkVariantlayout;
     }
 
@@ -268,8 +279,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
         Grid.Column<DrinkVariant> priceColumn =
                 grid.addColumn(drinkVariant -> formatDouble(drinkVariant.getPrice()) + "€").setHeader("Preis");
         Grid.Column<DrinkVariant> activeColumn =
-                grid.addColumn(drinkVariant ->
-                        drinkVariant.getDrink() == null ? "" : drinkVariant.getDrink().isActive() ? "Aktiv" : "Inaktiv").setHeader("Getränk Aktiv");
+                grid.addColumn(drinkVariant -> drinkVariant.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setWidth("75%");

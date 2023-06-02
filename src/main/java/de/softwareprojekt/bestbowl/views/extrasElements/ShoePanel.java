@@ -1,7 +1,6 @@
 package de.softwareprojekt.bestbowl.views.extrasElements;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Label;
@@ -26,10 +25,9 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_SHOE;
  * @author Ali aus Mali
  */
 public class ShoePanel extends VerticalLayout {
-    private FormLayout kachelLayout;
-    private IntegerField shoeSizeField;
-    private IntegerField shoeAmountField;
-    private BowlingShoeRepository bowlingShoeRepository;
+    private final transient BowlingShoeRepository bowlingShoeRepository;
+    private final IntegerField shoeSizeField;
+    private final IntegerField shoeAmountField;
     private Map<Integer, Integer> shoeSizeAmountMap;
 
     /**
@@ -115,12 +113,10 @@ public class ShoePanel extends VerticalLayout {
             shoeSizeAmountMap.put(i, 0);
         }
         for (BowlingShoe shoe : shoeList) {
-            if (shoe.isActive()) {
-                if (shoeSizeAmountMap.containsKey(shoe.getSize())) {
-                    value = shoeSizeAmountMap.get(shoe.getSize());
-                    value++;
-                    shoeSizeAmountMap.put(shoe.getSize(), value);
-                }
+            if (shoe.isActive() && (shoeSizeAmountMap.containsKey(shoe.getSize()))) {
+                value = shoeSizeAmountMap.get(shoe.getSize());
+                value++;
+                shoeSizeAmountMap.put(shoe.getSize(), value);
             }
         }
     }
@@ -128,7 +124,7 @@ public class ShoePanel extends VerticalLayout {
     /**
      * Resets the shoeAmountField to the value 0.
      */
-    public void resetIntergerfield() {
+    public void resetIntegerField() {
         shoeAmountField.setValue(0);
     }
 

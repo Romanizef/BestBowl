@@ -88,6 +88,9 @@ public class AlleyBookingChecker {
         booking.setStartTime(startTime);
         booking.setEndTime(endTime);
         booking.setPrice(pricePerMinute * booking.getDuration() / 1000 / 60);
+        if (client.getAssociation() != null) {
+            booking.setDiscount(client.getAssociation().getDiscount());
+        }
 
         Repos.getBowlingAlleyBookingRepository().save(booking);
 

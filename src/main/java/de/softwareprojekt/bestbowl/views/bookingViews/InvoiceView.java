@@ -1,23 +1,5 @@
 package de.softwareprojekt.bestbowl.views.bookingViews;
 
-import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
-import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
-import static de.softwareprojekt.bestbowl.utils.Utils.toHourOnlyString;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_ALLEY;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_DRINK;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_FOOD;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_SHOE;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.VAADIN_PRIMARY_BLUE;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -34,27 +16,20 @@ import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.component.tabs.TabVariant;
 import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.router.BeforeEvent;
-import com.vaadin.flow.router.HasUrlParameter;
-import com.vaadin.flow.router.OptionalParameter;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoe;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.FoodBooking;
-import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyBookingRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeBookingRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.DrinkBookingRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.FoodBookingRepository;
+import com.vaadin.flow.router.*;
+import de.softwareprojekt.bestbowl.jpa.entities.*;
+import de.softwareprojekt.bestbowl.jpa.repositories.*;
 import de.softwareprojekt.bestbowl.utils.VaadinUtils;
 import de.softwareprojekt.bestbowl.utils.email.MailSenderService;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.PermitAll;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.*;
+
+import static de.softwareprojekt.bestbowl.utils.Utils.*;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * Creates a view for all booked elements to be displayed in an invoice and paid
@@ -89,7 +64,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
     /**
      * Constructor for the InvoiceView class. Creates all the components.
-     * 
+     *
      * @param bowlingAlleyBookingRepository
      * @param drinkBookingRepository
      * @param foodBookingRepository
@@ -100,9 +75,9 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
      */
     @Autowired
     public InvoiceView(BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
-            DrinkBookingRepository drinkBookingRepository, FoodBookingRepository foodBookingRepository,
-            BowlingShoeBookingRepository bowlingShoeBookingRepository,
-            BowlingShoeRepository bowlingShoeRepository) {
+                       DrinkBookingRepository drinkBookingRepository, FoodBookingRepository foodBookingRepository,
+                       BowlingShoeBookingRepository bowlingShoeBookingRepository,
+                       BowlingShoeRepository bowlingShoeRepository) {
         this.bowlingAlleyBookingRepository = bowlingAlleyBookingRepository;
         this.drinkBookingRepository = drinkBookingRepository;
         this.foodBookingRepository = foodBookingRepository;
@@ -122,7 +97,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
     /**
      * Creates a {@code TabSheet} tabSheet
-     * 
+     *
      * @return {@code TabSheet}
      */
     private TabSheet createTabSheet() {
@@ -137,7 +112,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
     /**
      * Creates a {@code Button} that sets the complete invoice as paid
-     * 
+     *
      * @return {@code Button}
      */
     private Button createCompleteInvoiceButton() {
@@ -164,7 +139,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
     /**
      * Creates a {@code Tab} that shows the total invoice
-     * 
+     *
      * @return {@code Tab}
      */
     private Tab createTotalTab() {
@@ -176,9 +151,9 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
     /**
      * Creates a {@code Div} tabContent that shows all the conents of a tab
-     * 
-     * @see #replaceTabContent(int)
+     *
      * @return {@code Div}
+     * @see #replaceTabContent(int)
      */
     private Component createTotalTabContent() {
         Div tabContent = new Div();
@@ -194,14 +169,15 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
     /**
      * Creates a {@code Map<Integer, Article>} articleMap that contains all the
      * bookings of the current bookings
-     * 
+     *
      * @return {@code Map<Integer, Article>}
      */
     private Map<Integer, Article> createArticleMap() {
         Map<Integer, Article> articleMap = new TreeMap<>();
         int sortIndex = 0;
         articleMap.put(sortIndex++,
-                new Article("Bowling Bahn (Anteil in %)", 100, booking.getPrice() / 100, PANEL_COLOR_ALLEY));
+                new Article("Bowling Bahn (Anteil in %)", 100,
+                        booking.getPriceWithDiscount() / 100, PANEL_COLOR_ALLEY));
         for (DrinkBooking drinkBooking : drinkBookingList) {
             articleMap.put(sortIndex++, new Article(drinkBooking.getName(), drinkBooking.getAmount(),
                     drinkBooking.getPrice(), PANEL_COLOR_DRINK));
@@ -220,7 +196,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
     /**
      * Replaces the content of an old tab with the content of the current tab
-     * 
+     *
      * @param tabIndex
      */
     private void replaceTabContent(int tabIndex) {
@@ -242,7 +218,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
     /**
      * Creates a {@code Tab} that shows the partial invoice
-     * 
+     *
      * @return {@code Tab}
      */
     private Tab createPartialTab() {
@@ -254,13 +230,13 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
     /**
      * Creates a {@code Div} tabContent that shows all the contents of a partial
      * inovice tab
-     * 
+     *
+     * @return {@code Div}
      * @see #createEditPanel(int, Article, int)
      * @see #replaceTabContent(int)
      * @see #createPartialTab()
      * @see #createPartialTabContent()
      * @see #createNewSumLabel()
-     * @return {@code Div}
      */
     private Component createPartialTabContent() {
         Div tabContent = new Div();
@@ -305,7 +281,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
     /**
      * Removes all articles from a {@code Map<Integer, Article>} that have an amount
      * of 0.
-     * 
+     *
      * @param tabIndex
      */
     private void removeAmount0ArticlesFromTab(int tabIndex) {
@@ -365,7 +341,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
     /**
      * Initializes the components of the view.
-     * 
+     *
      * @see #createTotalTab()
      * @see #createTotalTabContent()
      * @see #createPartialTab()
@@ -387,7 +363,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
     /**
      * Creates a {@code HorizontalLayout} layout that displays the name, amount and
      * articlesum of an article.
-     * 
+     *
      * @param article
      * @return {@code HorizontalLayout}
      */
@@ -419,7 +395,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
     /**
      * Creates a {@code HorizontalLayout} layout that displays the name, amount and
      * articlesum of an article and allows the user to edit the amount.
-     * 
+     *
      * @param articleIndex
      * @param article
      * @param tabIndex
@@ -467,7 +443,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
     /**
      * Adds CSS style to a {@code Component}.
-     * 
+     *
      * @param component
      * @param color
      */
@@ -484,7 +460,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
     /**
      * Calculates the sum of the article amounts multiplied with its price of a
      * specific tab.
-     * 
+     *
      * @param tabIndex
      * @return {@code double}
      */
@@ -504,7 +480,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
         /**
          * Constructor for the Article class.
-         * 
+         *
          * @param name
          * @param amount
          * @param price
@@ -519,7 +495,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
         /**
          * Second constructor for the Article class.
-         * 
+         *
          * @param other
          */
         public Article(Article other) {
@@ -531,7 +507,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
         /**
          * Getter for the name of an article.
-         * 
+         *
          * @return {@code String}
          */
         public String getName() {
@@ -540,7 +516,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
         /**
          * Getter for the amount of articles.
-         * 
+         *
          * @return {@code int}
          */
         public int getAmount() {
@@ -549,7 +525,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
         /**
          * Setter for the amount of articles.
-         * 
+         *
          * @param amount
          */
         public void setAmount(int amount) {
@@ -558,7 +534,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
         /**
          * Getter for the price of an article.
-         * 
+         *
          * @return {@code double}
          */
         public double getPrice() {
@@ -567,7 +543,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
         /**
          * Getter for the color of an article.
-         * 
+         *
          * @return {@code String}
          */
         public String getColor() {

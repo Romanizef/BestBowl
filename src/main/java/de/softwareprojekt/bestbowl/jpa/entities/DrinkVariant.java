@@ -20,22 +20,27 @@ public class DrinkVariant implements Serializable {
     private int ml;
     private double price;
 
+    private boolean active;
+
     public DrinkVariant() {
+        active = true;
     }
 
-    public DrinkVariant(DrinkVariant other){
+    public DrinkVariant(DrinkVariant other) {
         this.id = other.id;
+        this.drink = other.drink;
         this.ml = other.ml;
         this.price = other.price;
+        this.active = other.active;
     }
 
-    public void copyValueOf(DrinkVariant other){
+    public void copyValueOf(DrinkVariant other) {
         this.id = other.id;
+        this.drink = other.drink;
         this.ml = other.ml;
         this.price = other.price;
+        this.active = other.active;
     }
-
-
 
     public int getId() {
         return id;
@@ -67,5 +72,13 @@ public class DrinkVariant implements Serializable {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }
