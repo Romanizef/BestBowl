@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 @Route(value = "drinkVariantManagement", layout = MainView.class)
@@ -109,7 +110,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
 
         NumberField priceField = new NumberField("Preis");
         IntegerField variantField = new IntegerField("Variante");
-        Button saveButton = new Button("Sichern");
+        Button saveButton = new Button("Speichern");
         Button cancelButton = new Button("Abbrechen");
 
         variantField.setWidthFull();
@@ -264,7 +265,8 @@ public class DrinkVariantManagementView extends VerticalLayout {
         Grid.Column<DrinkVariant> nameColum = grid.addColumn(drinkVariant ->
                 drinkVariant.getDrink() == null ? "" : drinkVariant.getDrink().getName()).setHeader("Getränk");
         Grid.Column<DrinkVariant> mlColumn = grid.addColumn(DrinkVariant::getMl).setHeader("Variante");
-        Grid.Column<DrinkVariant> priceColumn = grid.addColumn(DrinkVariant::getPrice).setHeader("Preis");
+        Grid.Column<DrinkVariant> priceColumn =
+                grid.addColumn(drinkVariant -> formatDouble(drinkVariant.getPrice()) + "€").setHeader("Preis");
         Grid.Column<DrinkVariant> activeColumn =
                 grid.addColumn(drinkVariant ->
                         drinkVariant.getDrink() == null ? "" : drinkVariant.getDrink().isActive() ? "Aktiv" : "Inaktiv").setHeader("Getränk Aktiv");

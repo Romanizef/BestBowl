@@ -393,7 +393,7 @@ public class ClientSearchView extends VerticalLayout {
         saveCommentButton.setIcon(VaadinIcon.CHECK_CIRCLE.create());
         commentLayout.add(commentArea, saveCommentButton);
 
-        nextStepButton = new Button("Zum Bahn buchen");
+        nextStepButton = new Button("Zur Buchung");
         nextStepButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         nextStepButton.setWidth("55%");
 

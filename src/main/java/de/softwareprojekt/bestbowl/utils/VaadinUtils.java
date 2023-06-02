@@ -31,6 +31,12 @@ import java.util.stream.Stream;
  * @author Marten Voß
  */
 public class VaadinUtils {
+    public static final String PANEL_COLOR_ALLEY = "#ff7377";
+    public static final String PANEL_COLOR_DRINK = "#338cff";
+    public static final String PANEL_COLOR_FOOD = "#b3f542";
+    public static final String PANEL_COLOR_SHOE = "#ffae1a";
+    public static final String VAADIN_PRIMARY_BLUE = "#0065e9";
+
     private VaadinUtils() {
     }
 

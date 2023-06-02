@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.VAADIN_PRIMARY_BLUE;
+
 /**
  * Creates a view for all bookings to be displayed and downloaded
  *
@@ -107,8 +109,12 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.setWidthFull();
         horizontalLayout.setAlignItems(Alignment.CENTER);
-        sumHeader.getStyle().set("border", "5px solid #338CFF").set("background-color", "#6bbafa")
-                .set("padding", "10px").set("border-radius", "30px").set("font-size", "22px");
+        sumHeader.getStyle()
+                .set("border", "5px solid " + VAADIN_PRIMARY_BLUE)
+                .set("background-color", VAADIN_PRIMARY_BLUE + "60")
+                .set("padding", "10px")
+                .set("border-radius", "30px")
+                .set("font-size", "22px");
         horizontalLayout.add(verticallayout, sumHeader);
 
         return horizontalLayout;

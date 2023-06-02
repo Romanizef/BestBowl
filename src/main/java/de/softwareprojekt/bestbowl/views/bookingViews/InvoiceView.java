@@ -4,8 +4,6 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Label;
@@ -31,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.*;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.*;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createResponsiveSteps;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * Creates a view for all booked elements to be displayed in an invoice and paid
@@ -51,7 +49,6 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
     private final transient FoodBookingRepository foodBookingRepository;
     private final transient BowlingShoeBookingRepository bowlingShoeBookingRepository;
     private final transient BowlingShoeRepository bowlingShoeRepository;
-    private final ResponsiveStep[] responsiveSteps;
     private final H2 header;
     private final TabSheet invoiceTabSheet;
     private final Button completeInvoiceButton;
@@ -84,7 +81,6 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
         setAlignItems(Alignment.CENTER);
 
         mailSenderService = new MailSenderService();
-        responsiveSteps = createResponsiveSteps(600, 5);
 
         header = new H2();
         invoiceTabSheet = createTabSheet();
@@ -94,10 +90,11 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
     private TabSheet createTabSheet() {
         TabSheet tabSheet = new TabSheet();
-        tabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED, TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
-        tabSheet.getStyle()
-                .set("border", "1px solid #dadfe4")
-                .set("height", "calc(100vh - 200px)");
+        tabSheet.addThemeVariants(
+                TabSheetVariant.LUMO_TABS_CENTERED,
+                TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS,
+                TabSheetVariant.MATERIAL_BORDERED);
+        tabSheet.setHeight("calc(100vh - 200px)");
         return tabSheet;
     }
 
@@ -144,17 +141,17 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
     private Map<Integer, Article> createArticleMap() {
         Map<Integer, Article> articleMap = new TreeMap<>();
         int sortIndex = 0;
-        articleMap.put(sortIndex++, new Article("Bowling Bahn (Anteil in %)", 100, booking.getPrice() / 100));
+        articleMap.put(sortIndex++, new Article("Bowling Bahn (Anteil in %)", 100, booking.getPrice() / 100, PANEL_COLOR_ALLEY));
         for (DrinkBooking drinkBooking : drinkBookingList) {
-            articleMap.put(sortIndex++, new Article(drinkBooking.getName(), drinkBooking.getAmount(), drinkBooking.getPrice()));
+            articleMap.put(sortIndex++, new Article(drinkBooking.getName(), drinkBooking.getAmount(), drinkBooking.getPrice(), PANEL_COLOR_DRINK));
         }
         for (FoodBooking foodBooking : foodBookingList) {
-            articleMap.put(sortIndex++, new Article(foodBooking.getName(), foodBooking.getAmount(), foodBooking.getPrice()));
+            articleMap.put(sortIndex++, new Article(foodBooking.getName(), foodBooking.getAmount(), foodBooking.getPrice(), PANEL_COLOR_FOOD));
         }
         for (BowlingShoeBooking bowlingShoeBooking : bowlingShoeBookingList) {
             articleMap.put(sortIndex++,
                     new Article("Bowling Schuhe, Größe: " + bowlingShoeBooking.getBowlingShoe().getSize(),
-                            1, bowlingShoeBooking.getPrice()));
+                            1, bowlingShoeBooking.getPrice(), PANEL_COLOR_SHOE));
         }
         return articleMap;
     }
@@ -163,14 +160,12 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setAlignItems(Alignment.CENTER);
 
-        FormLayout formLayout = new FormLayout();
-        formLayout.setResponsiveSteps(responsiveSteps);
-        articlePerTabList.get(tabIndex).forEach((i, article) -> formLayout.add(createDisplayPanel(article)));
+        articlePerTabList.get(tabIndex).forEach((i, article) -> verticalLayout.add(createDisplayPanel(article)));
 
         Label sumLabel = createNewSumLabel();
         sumLabel.setText(calculatePartialSumString(tabIndex));
 
-        verticalLayout.add(formLayout, sumLabel);
+        verticalLayout.add(sumLabel);
 
         //replace old content
         Div tabContent = tabContentList.get(tabIndex);
@@ -200,10 +195,8 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
         articlePerTabList.add(articleMap);
 
         if (!articleMap.isEmpty()) {
-            FormLayout formLayout = new FormLayout();
-            formLayout.setResponsiveSteps(responsiveSteps);
             articleMap.forEach((name, article) -> {
-                formLayout.add(createEditPanel(name, article, articlePerTabList.size() - 1));
+                verticalLayout.add(createEditPanel(name, article, articlePerTabList.size() - 1));
                 article.setAmount(0);
             });
 
@@ -217,7 +210,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
             Label sumLabel = createNewSumLabel();
             lastTabSumLabel = sumLabel;
-            verticalLayout.add(formLayout, sumLabel, completePartialInvoiceButton);
+            verticalLayout.add(sumLabel, completePartialInvoiceButton);
         } else {
             verticalLayout.add(new Label("Es gibt keine offenen Positionen mehr"));
         }
@@ -233,8 +226,8 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
     private Label createNewSumLabel() {
         Label label = new Label("Summe: 0,00€");
-        label.getStyle().set("border", "3px solid #338CFF")
-                .set("background-color", "#338CFF")
+        label.getStyle().set("border", "3px solid " + VAADIN_PRIMARY_BLUE)
+                .set("background-color", VAADIN_PRIMARY_BLUE + "60")
                 .set("padding", "7px")
                 .set("border-radius", "10px")
                 .set("font-weight", "bold");
@@ -308,10 +301,11 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
         Label articleSumLabel = new Label(formatDouble(article.getAmount() * article.getPrice()) + "€");
         articleSumLabel.setMinWidth(SUM_LABEL_WIDTH);
         articleSumLabel.setMaxWidth(SUM_LABEL_WIDTH);
+        articleSumLabel.getStyle().set("text-align", "right");
 
         layout.add(nameLabel, amountField, articleSumLabel);
         layout.expand(amountField);
-        addCSS(layout);
+        addCSS(layout, article.getColor());
         return layout;
     }
 
@@ -327,6 +321,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
         Label articleSumLabel = new Label("0,00€");
         articleSumLabel.setMinWidth(SUM_LABEL_WIDTH);
         articleSumLabel.setMaxWidth(SUM_LABEL_WIDTH);
+        articleSumLabel.getStyle().set("text-align", "right");
 
         IntegerField amountField = new IntegerField();
         amountField.setValue(0);
@@ -350,17 +345,18 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
         layout.add(nameLabel, amountField, articleSumLabel);
         layout.expand(amountField);
-        addCSS(layout);
+        addCSS(layout, article.getColor());
         return layout;
     }
 
-    private void addCSS(Component component) {
+    private void addCSS(Component component, String color) {
         component.getStyle()
-                .set("border", "2px solid #338CFF")
-                .set("background-color", "#338CFF10")
-                .set("padding", "10px")
+                .set("border", "2px solid " + color)
                 .set("border-radius", "30px")
-                .set("margin-bottom", "10px");
+                .set("background-color", color + "10")
+                .set("padding", "10px")
+                .set("padding-left", "15px")
+                .set("padding-right", "15px");
     }
 
     private String calculatePartialSumString(int tabIndex) {
@@ -374,18 +370,21 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
     private static final class Article {
         private final String name;
         private final double price;
+        private final String color;
         private int amount;
 
-        private Article(String name, int amount, double price) {
+        private Article(String name, int amount, double price, String color) {
             this.name = name;
             this.amount = amount;
             this.price = price;
+            this.color = color;
         }
 
         public Article(Article other) {
             this.name = other.name;
             this.price = other.price;
             this.amount = other.amount;
+            this.color = other.color;
         }
 
         public String getName() {
@@ -402,6 +401,10 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
 
         public double getPrice() {
             return price;
+        }
+
+        public String getColor() {
+            return color;
         }
     }
 }

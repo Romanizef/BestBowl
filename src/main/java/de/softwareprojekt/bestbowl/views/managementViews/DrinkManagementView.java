@@ -40,9 +40,9 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 public class DrinkManagementView extends VerticalLayout {
     private final transient DrinkRepository drinkRepository;
     private final Binder<Drink> drinkBinder = new Binder<>();
-    private final Button saveButton = new Button("Sichern");
+    private final Button saveButton = new Button("Speichern");
     private final Button cancelButton = new Button("Abbrechen");
-    private final Button saveAndOpenDrinkVariantButton = new Button("Sichern & neue Variante anlegen");
+    private final Button saveAndOpenDrinkVariantButton = new Button("Speichern & neue Variante anlegen");
     private Grid<Drink> drinkGrid;
     private DrinkForm drinkForm;
     private Drink selectedDrink = null;

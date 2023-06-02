@@ -33,23 +33,23 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
 import static de.softwareprojekt.bestbowl.utils.Utils.matches;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
-import static de.softwareprojekt.bestbowl.utils.messages.Notifications.showInfo;
 
 /**
  * Creates a view for all the associations to be created, managed and
  * inactivated
- * 
+ *
  * @author Matija Kopschek
  * @author Marten Voß
  */
 @Route(value = "associationManagement", layout = MainView.class)
 @PageTitle("Vereinsverwaltung")
-@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
+@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 public class AssociationManagementView extends VerticalLayout {
+    private final transient AssociationRepository associationRepository;
     private final Binder<Association> binder = new Binder<>();
-    private final AssociationRepository associationRepository;
     private Grid<Association> associationGrid;
     private FormLayout editLayout;
     private Association selectedAssociation = null;
@@ -60,10 +60,10 @@ public class AssociationManagementView extends VerticalLayout {
      * Constructor for the AssociationManagementView.
      * Instantiates the grid Layout, the new association button
      * and the association repo
-     * 
+     *
+     * @param associationRepository
      * @see #createNewAssociationButton()
      * @see #createGridLayout()
-     * @param associationRepository
      */
     @Autowired
     public AssociationManagementView(AssociationRepository associationRepository) {
@@ -79,9 +79,9 @@ public class AssociationManagementView extends VerticalLayout {
      * Creates a new button for adding a new association.
      * If the button is clicked the editing Layout becomes available
      * and a new association with all the needed data is added.
-     * 
-     * @see #updateEditLayoutState()
+     *
      * @return {@code button}
+     * @see #updateEditLayoutState()
      */
     private Button createNewAssociationButton() {
         Button button = new Button("Neuen Verein hinzufügen");
@@ -100,10 +100,10 @@ public class AssociationManagementView extends VerticalLayout {
 
     /**
      * Creates a new {@code HorizontalLayout} for the grid and the editing Layout
-     * 
+     *
+     * @return {@code layout}
      * @see #createGrid()
      * @see #createEditLayout()
-     * @return {@code layout}
      */
     private HorizontalLayout createGridLayout() {
         HorizontalLayout layout = new HorizontalLayout();
@@ -120,10 +120,10 @@ public class AssociationManagementView extends VerticalLayout {
      * {@code If} one of the gridlines is selected the editing Layout is refreshed
      * with all the data out of the currently selected line.
      * {@code Else} the editing Layout is reset to default.
-     * 
+     *
+     * @return {@code grid}
      * @see #updateEditLayoutState()
      * @see #resetEditLayout()
-     * @return {@code grid}
      */
     private Grid<Association> createGrid() {
         Grid<Association> grid = new Grid<>(Association.class);
@@ -131,10 +131,11 @@ public class AssociationManagementView extends VerticalLayout {
         grid.removeAllColumns();
         Grid.Column<Association> idColumn = grid.addColumn("id").setHeader("ID");
         Grid.Column<Association> nameColumn = grid.addColumn("name").setHeader("Name");
-        Grid.Column<Association> discountColumn = grid.addColumn("discount").setHeader("Rabatt");
-        Grid.Column<Association> activeColumn = grid
-                .addColumn(association -> association.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
-        grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
+        Grid.Column<Association> discountColumn =
+                grid.addColumn(association -> formatDouble(association.getDiscount()) + "%").setHeader("Rabatt");
+        Grid.Column<Association> activeColumn =
+                grid.addColumn(association -> association.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
+        grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setWidth("75%");
         grid.setHeight("100%");
@@ -173,7 +174,7 @@ public class AssociationManagementView extends VerticalLayout {
      * the active option.
      * Validates all Inputs and binds them with the association class in
      * the database.
-     * 
+     *
      * @return {@code layout}
      */
     private FormLayout createEditLayout() {
@@ -210,11 +211,10 @@ public class AssociationManagementView extends VerticalLayout {
     /**
      * Ceates a new {@code HorizontalLayout} for the {@code cancelButton} and
      * {@code saveButton}
-     * 
+     *
+     * @return {@code buttonLayout}
      * @see #cancelButtonConfig(Button)
      * @see #saveButtonConfig(Button)
-     * 
-     * @return {@code buttonLayout}
      */
     private HorizontalLayout buttonLayoutConfig() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
@@ -230,12 +230,11 @@ public class AssociationManagementView extends VerticalLayout {
      * Creates a {@code saveButton} for the editing Layout.
      * When pressed it shows a confirmation notification
      * and saves all User input to the database
-     * 
-     * @see #saveToDb()
-     * @see #writeBean()
-     * 
+     *
      * @param saveButton
      * @return {@code saveButton}
+     * @see #saveToDb()
+     * @see #writeBean()
      */
     private Button saveButtonConfig(Button saveButton) {
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -261,11 +260,10 @@ public class AssociationManagementView extends VerticalLayout {
     /**
      * Creates a {@code cancelButton} for the editing Layout.
      * When pressed it shows a confirmation notification and deletes all user input
-     * 
-     * @see #resetEditLayout()
-     * 
+     *
      * @param cancelButton
      * @return {@code cancelButton}
+     * @see #resetEditLayout()
      */
     private Button cancelButtonConfig(Button cancelButton) {
         cancelButton.setIcon(new Icon(VaadinIcon.ARROW_BACKWARD));
@@ -277,7 +275,7 @@ public class AssociationManagementView extends VerticalLayout {
     }
 
     /**
-     * 
+     *
      */
     private void updateEditLayoutState() {
         validationErrorLabel.setText("");
@@ -303,7 +301,7 @@ public class AssociationManagementView extends VerticalLayout {
     /**
      * If the input is missing or wrong this layout
      * with the {@code validationErrorLabel} is portrayed
-     * 
+     *
      * @return {@code validationLabelLayout}
      */
     private VerticalLayout createValidationLabelLayout() {
@@ -359,7 +357,7 @@ public class AssociationManagementView extends VerticalLayout {
 
         /**
          * Constructor for AssociationFilter
-         * 
+         *
          * @param dataView
          */
         public AssociationFilter(GridListDataView<Association> dataView) {
@@ -369,10 +367,10 @@ public class AssociationManagementView extends VerticalLayout {
 
         /**
          * Cheking if grid filter row names match association-class fields
-         * 
+         *
          * @param association
          * @return {@code matchesId} {@code matchesName} {@code matchesDiscount}
-         *         {@code matchesActive}
+         * {@code matchesActive}
          */
         public boolean test(Association association) {
             boolean matchesId = matches(String.valueOf(association.getId()), id);
@@ -384,7 +382,7 @@ public class AssociationManagementView extends VerticalLayout {
 
         /**
          * Setter for association id
-         * 
+         *
          * @param id
          */
         public void setId(String id) {
@@ -394,7 +392,7 @@ public class AssociationManagementView extends VerticalLayout {
 
         /**
          * Setter for association name
-         * 
+         *
          * @param name
          */
         public void setName(String name) {
@@ -404,7 +402,7 @@ public class AssociationManagementView extends VerticalLayout {
 
         /**
          * Setter for association discount
-         * 
+         *
          * @param discount
          */
         public void setDiscount(String discount) {
@@ -414,7 +412,7 @@ public class AssociationManagementView extends VerticalLayout {
 
         /**
          * Setter for active setting of association
-         * 
+         *
          * @param active
          */
         public void setActive(Boolean active) {

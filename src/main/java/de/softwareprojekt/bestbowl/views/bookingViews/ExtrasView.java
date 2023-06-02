@@ -5,8 +5,6 @@ import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -40,29 +38,25 @@ import java.util.stream.Collectors;
 @PageTitle("Extras")
 @PermitAll
 public class ExtrasView extends VerticalLayout implements HasUrlParameter<Integer> {
-    private final DrinkRepository drinkRepository;
-    private final FoodRepository foodRepository;
-    private final BowlingShoeRepository bowlingShoeRepository;
-    private final DrinkVariantRepository drinkVariantRepository;
+    private final transient DrinkRepository drinkRepository;
+    private final transient FoodRepository foodRepository;
+    private final transient BowlingShoeRepository bowlingShoeRepository;
+    private final transient BowlingAlleyRepository bowlingAlleyRepository;
+    private final transient FoodBookingRepository foodBookingRepository;
+    private final transient BowlingShoeBookingRepository bowlingShoeBookingRepository;
+    private final transient DrinkBookingRepository drinkBookingRepository;
+    private final transient BowlingAlleyBookingRepository bowlingAlleyBookingRepository;
     private final Map<String, DrinkBooking> drinkBookingMap = new HashMap<>();
     private final Map<String, FoodBooking> foodBookingMap = new HashMap<>();
-    private final BowlingAlleyRepository bowlingAlleyRepository;
-    private FoodBookingRepository foodBookingRepository;
-    private BowlingShoeBookingRepository bowlingShoeBookingRepository;
-    private DrinkBookingRepository drinkBookingRepository;
+    private final Map<Integer, Button> buttonMap;
     private int currentBowlingAlleyId;
     private BowlingAlleyBooking currentBowlingAlleyBooking;
-    private Map<Integer, Button> buttonMap;
-    private BowlingAlleyBookingRepository bowlingAlleyBookingRepository;
-    private HorizontalLayout alleyLayout;
-    private HorizontalLayout tabLayout;
-    private TabSheet tabs;
     private Div drinkDiv;
     private Div foodDiv;
     private ShoePanel shoePanel;
     private Div shoeDiv;
-    private FormLayout foodFormLayoutForAddItem;
-    private VerticalLayout drinkVerticalLayoutForAddItem;
+    private VerticalLayout foodLayoutForAddItem;
+    private VerticalLayout drinkLayoutForAddItem;
     private Button addItem;
     private Button goToBill;
 
@@ -76,19 +70,20 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
      *                                      bookings
      * @param foodBookingRepository         the repository for food bookings
      * @param drinkBookingRepository        the repository for drink bookings
-     * @param drinkVariantRepository        the repository for drink variants
      * @param bowlingShoeRepository         the repository for bowling shoes
      * @param bowlingShoeBookingRepository  the repository for bowling shoe bookings
      */
     @Autowired
-    public ExtrasView(DrinkRepository drinkRepository, FoodRepository foodRepository,
-            BowlingAlleyRepository bowlingAlleyRepository, BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
-            FoodBookingRepository foodBookingRepository, DrinkBookingRepository drinkBookingRepository,
-            DrinkVariantRepository drinkVariantRepository, BowlingShoeRepository bowlingShoeRepository,
-            BowlingShoeBookingRepository bowlingShoeBookingRepository) {
+    public ExtrasView(DrinkRepository drinkRepository,
+                      FoodRepository foodRepository,
+                      BowlingAlleyRepository bowlingAlleyRepository,
+                      BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
+                      FoodBookingRepository foodBookingRepository,
+                      DrinkBookingRepository drinkBookingRepository,
+                      BowlingShoeRepository bowlingShoeRepository,
+                      BowlingShoeBookingRepository bowlingShoeBookingRepository) {
         this.bowlingAlleyRepository = bowlingAlleyRepository;
         this.drinkRepository = drinkRepository;
-        this.drinkVariantRepository = drinkVariantRepository;
         this.foodRepository = foodRepository;
         this.bowlingShoeRepository = bowlingShoeRepository;
         this.bowlingAlleyBookingRepository = bowlingAlleyBookingRepository;
@@ -113,11 +108,13 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
      * @return The article panel component.
      */
     private Component createArticlePanelComponent() {
+        TabSheet tabs;
         tabs = new TabSheet();
-        tabLayout = new HorizontalLayout();
-        tabs.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED,
-                TabSheetVariant.MATERIAL_BORDERED,
-                TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS);
+        tabs.addThemeVariants(
+                TabSheetVariant.LUMO_TABS_CENTERED,
+                TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS,
+                TabSheetVariant.MATERIAL_BORDERED);
+        tabs.setHeight("calc(100vh - 360px)");
         Tab drink = new Tab(VaadinIcon.COFFEE.create(), new Span("Getränke"));
         Tab food = new Tab(VaadinIcon.CROSS_CUTLERY.create(), new Span("Speisen"));
         Tab shoe = new Tab(VaadinIcon.RETWEET.create(), new Span("Schuhe"));
@@ -130,8 +127,7 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
         tabs.add(drink, drinkDiv);
         tabs.add(food, foodDiv);
         tabs.add(shoe, shoeDiv);
-        tabLayout.add(tabs);
-        return tabLayout;
+        return tabs;
     }
 
     /**
@@ -150,17 +146,17 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
      * @return The drink panel component.
      */
     private Component createDrinkPanel() {
-        VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.setAlignItems(Alignment.CENTER);
-        verticalLayout.setWidthFull();
-        List<Drink> drinkList = drinkRepository.findAll();
+        VerticalLayout layout = new VerticalLayout();
+        layout.setWidthFull();
+        layout.setAlignItems(Alignment.CENTER);
 
+        List<Drink> drinkList = drinkRepository.findAll();
         for (Drink drink : drinkList) {
-            verticalLayout.add(new DrinkPanel(drink, currentBowlingAlleyBooking, drinkBookingMap));
+            layout.add(new DrinkPanel(drink, currentBowlingAlleyBooking, drinkBookingMap));
         }
-        verticalLayout.setMaxHeight("400px");
-        drinkVerticalLayoutForAddItem = verticalLayout;
-        return verticalLayout;
+
+        drinkLayoutForAddItem = layout;
+        return layout;
     }
 
     /**
@@ -169,15 +165,17 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
      * @return The food panel component.
      */
     private Component createFoodPanel() {
-        FormLayout formLayout = new FormLayout();
-        formLayout.setResponsiveSteps(new ResponsiveStep("100px", 2));
+        VerticalLayout layout = new VerticalLayout();
+        layout.setWidthFull();
+        layout.setAlignItems(Alignment.CENTER);
+
         List<Food> foodList = foodRepository.findAll();
         for (Food food : foodList) {
-            formLayout.add(new FoodPanel(food, currentBowlingAlleyBooking, foodBookingMap));
+            layout.add(new FoodPanel(food, currentBowlingAlleyBooking, foodBookingMap));
         }
-        formLayout.setMaxWidth("1000px");
-        foodFormLayoutForAddItem = formLayout;
-        return formLayout;
+
+        foodLayoutForAddItem = layout;
+        return layout;
     }
 
     /**
@@ -186,6 +184,7 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
      * @return The alley buttons component.
      */
     private final Component createAlleyButtonsComponent() {
+        HorizontalLayout alleyLayout;
         alleyLayout = new HorizontalLayout();
         alleyLayout.setPadding(true);
         alleyLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
@@ -214,9 +213,9 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
             alleyButton.addClickListener(buttonClickEvent -> {
                 changePreviousButtonStyle(currentBowlingAlleyId);
                 currentBowlingAlleyId = Integer.parseInt(alleyButton.getText().replaceAll("\\D+(\\d+)", "$1"));
-                changeCurrentButtonSytle(currentBowlingAlleyId);
+                changeCurrentButtonStyle(currentBowlingAlleyId);
                 currentBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(
-                        bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
+                                bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
                         .findFirst()
                         .orElse(null);
                 changeTabs();
@@ -259,7 +258,7 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
      *
      * @param currentBowlAlleyId The ID of the current bowling alley.
      */
-    private void changeCurrentButtonSytle(int currentBowlAlleyId) {
+    private void changeCurrentButtonStyle(int currentBowlAlleyId) {
         buttonMap.get(currentBowlAlleyId).addThemeVariants(ButtonVariant.LUMO_SUCCESS);
     }
 
@@ -357,7 +356,7 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
 
             drinkBookingRepository.save(booking);
         });
-        drinkVerticalLayoutForAddItem.getChildren().forEach(component -> {
+        drinkLayoutForAddItem.getChildren().forEach(component -> {
             if (component instanceof DrinkPanel drinkPanel) {
                 drinkPanel.resetIntegerField();
             }
@@ -393,7 +392,7 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
             }
             foodBookingRepository.save(booking);
         });
-        foodFormLayoutForAddItem.getChildren().forEach(component -> {
+        foodLayoutForAddItem.getChildren().forEach(component -> {
             if (component instanceof FoodPanel foodPanel) {
                 foodPanel.resetFoodAmountFieldValue();
             }

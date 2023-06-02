@@ -1,39 +1,39 @@
 package de.softwareprojekt.bestbowl.views.extrasElements;
 
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.Drink;
+import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.IntegerField;
-
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.Drink;
-import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_DRINK;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createResponsiveSteps;
 
 /**
  * @author Matija Kopschek
  * @author Ali aus Mali
  */
 public class DrinkPanel extends HorizontalLayout {
-
-    private Label label;
-
-    private FormLayout variantLayout;
+    private final FormLayout variantLayout;
 
     public DrinkPanel(Drink drink, BowlingAlleyBooking bowlingAlleyBooking, Map<String, DrinkBooking> drinkBookingMap) {
         variantLayout = new FormLayout();
-        variantLayout.setResponsiveSteps(new ResponsiveStep("200px", 3));
+        variantLayout.setResponsiveSteps(createResponsiveSteps(200, 5));
 
-        label = new Label(drink.getName());
+        Label label = new Label(drink.getName());
         label.setMinWidth("250px");
         label.setMaxWidth("250px");
+        label.getStyle().set("text-align", "left");
+
         List<DrinkVariant> drinkVariantList = new ArrayList<>(drink.getDrinkVariants());
         drinkVariantList.sort(Comparator.comparingInt(DrinkVariant::getMl));
 
@@ -41,30 +41,10 @@ public class DrinkPanel extends HorizontalLayout {
             variantLayout.add(createIntegerField(drinkVariant, bowlingAlleyBooking, drinkBookingMap));
         }
 
-        setWidthFull();
         addCSS();
         setAlignItems(Alignment.CENTER);
+        setFlexGrow(0);
         add(label, variantLayout);
-
-    }
-
-
-    public DrinkPanel(DrinkBooking drinkBooking) {    
-        Label label = new Label(drinkBooking.getName());
-        label.setMinWidth("250px");
-        label.setMaxWidth("250px");
-
-        IntegerField drinkAmountField = new IntegerField();
-        drinkAmountField.setValue(drinkBooking.getAmount());
-        drinkAmountField.setStepButtonsVisible(true);
-        drinkAmountField.setMin(0);
-        drinkAmountField.setMax(drinkBooking.getAmount());
-
-        setWidthFull();
-        addCSS();
-        addMarginCSS();
-        setAlignItems(Alignment.CENTER);
-        add(label, drinkAmountField);
     }
 
     public IntegerField createIntegerField(DrinkVariant drinkVariant, BowlingAlleyBooking bowlingAlleyBooking, Map<String, DrinkBooking> drinkBookingMap) {
@@ -85,29 +65,21 @@ public class DrinkPanel extends HorizontalLayout {
         return mlField;
     }
 
-    public void resetIntegerField(){
+    public void resetIntegerField() {
         variantLayout.getChildren().forEach(component -> {
-            if (component instanceof IntegerField integerField){
+            if (component instanceof IntegerField integerField) {
                 integerField.setValue(0);
             }
         });
     }
 
-    public Label getLabel() {
-        return label;
-    }
-
-    public void setLabel(Label label) {
-        this.label = label;
-    }
-
     private void addCSS() {
-        getStyle().set("border", "2px solid #338CFF")
-                .set("background-color", "#338CFF10").set("padding", "10px")
-                .set("border-radius", "30px");
-    }
-
-    private void addMarginCSS() {
-        getStyle().set("margin-bottom", "10px");
+        getStyle()
+                .set("border", "2px solid " + PANEL_COLOR_DRINK)
+                .set("border-radius", "30px")
+                .set("background-color", PANEL_COLOR_DRINK + "10")
+                .set("padding", "10px")
+                .set("padding-left", "15px")
+                .set("padding-right", "20px");
     }
 }

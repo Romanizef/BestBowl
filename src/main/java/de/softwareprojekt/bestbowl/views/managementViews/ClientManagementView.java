@@ -144,7 +144,7 @@ public class ClientManagementView extends VerticalLayout {
         Grid.Column<Client> cityColumn = grid.addColumn(client -> client.getAddress().getCity()).setHeader("Stadt");
         Grid.Column<Client> activeColumn = grid.addColumn(client -> client.isActive() ? "Aktiv" : "Inaktiv")
                 .setHeader("Aktiv");
-        grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
+        grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setWidth("75%");
         grid.setHeight("100%");

@@ -6,9 +6,11 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.data.binder.Binder;
@@ -33,109 +35,111 @@ import java.util.Objects;
  */
 @Route(value = "bowlingCenterManagement", layout = MainView.class)
 @PageTitle("Bowlingcenter Verwaltung")
-@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
+@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 public class BowlingCenterManagementView extends Div {
-        private final Binder<BowlingCenter> binder = new Binder<>();
-        private final BowlingCenter bowlingCenter;
+    private final Binder<BowlingCenter> binder = new Binder<>();
+    private final BowlingCenter bowlingCenter;
 
-        @Autowired
-        public BowlingCenterManagementView(BowlingCenterRepository bowlingCenterRepository) {
-                bowlingCenter = bowlingCenterRepository.getBowlingCenter();
-                setSizeFull();
-                Accordion accordion = new Accordion();
+    @Autowired
+    public BowlingCenterManagementView(BowlingCenterRepository bowlingCenterRepository) {
+        bowlingCenter = bowlingCenterRepository.getBowlingCenter();
+        setSizeFull();
+        Accordion accordion = new Accordion();
 
-                TextField displayNameField = new TextField("Anzeigename");
-                displayNameField.setRequiredIndicatorVisible(true);
-                TextField businessNameField = new TextField("Geschäftsname");
-                businessNameField.setRequiredIndicatorVisible(true);
-                VerticalLayout centerInformationLayout = new VerticalLayout(displayNameField,
-                                businessNameField);
-                AccordionPanel centerInformationPanel = accordion.add("Bowlingcenterinformationen",
-                                centerInformationLayout);
-                centerInformationPanel.addThemeVariants(DetailsVariant.FILLED);
+        TextField displayNameField = new TextField("Anzeigename");
+        displayNameField.setRequiredIndicatorVisible(true);
+        TextField businessNameField = new TextField("Geschäftsname");
+        businessNameField.setRequiredIndicatorVisible(true);
+        VerticalLayout centerInformationLayout = new VerticalLayout(displayNameField,
+                businessNameField);
+        AccordionPanel centerInformationPanel = accordion.add("Bowlingcenterinformationen",
+                centerInformationLayout);
+        centerInformationPanel.addThemeVariants(DetailsVariant.FILLED);
 
-                TextField streetField = new TextField("Straße");
-                streetField.setRequiredIndicatorVisible(true);
-                IntegerField houseNrField = new IntegerField("Hausnummer");
-                houseNrField.setRequiredIndicatorVisible(true);
-                IntegerField postCodeField = new IntegerField("PLZ");
-                postCodeField.setRequiredIndicatorVisible(true);
-                TextField cityField = new TextField("Stadt");
-                cityField.setRequiredIndicatorVisible(true);
-                VerticalLayout centerAddressLayout = new VerticalLayout(streetField,
-                                houseNrField, postCodeField, cityField);
-                AccordionPanel centerAddressPanel = accordion.add("Adresse", centerAddressLayout);
-                centerAddressPanel.addThemeVariants(DetailsVariant.FILLED);
+        TextField streetField = new TextField("Straße");
+        streetField.setRequiredIndicatorVisible(true);
+        IntegerField houseNrField = new IntegerField("Hausnummer");
+        houseNrField.setRequiredIndicatorVisible(true);
+        IntegerField postCodeField = new IntegerField("PLZ");
+        postCodeField.setRequiredIndicatorVisible(true);
+        TextField cityField = new TextField("Stadt");
+        cityField.setRequiredIndicatorVisible(true);
+        VerticalLayout centerAddressLayout = new VerticalLayout(streetField,
+                houseNrField, postCodeField, cityField);
+        AccordionPanel centerAddressPanel = accordion.add("Adresse", centerAddressLayout);
+        centerAddressPanel.addThemeVariants(DetailsVariant.FILLED);
 
-                TimePicker startTimePicker = new TimePicker("Start");
-                startTimePicker.setRequiredIndicatorVisible(true);
-                TimePicker endTimePicker = new TimePicker("Ende");
-                endTimePicker.setRequiredIndicatorVisible(true);
-                VerticalLayout centerBusinessHoursLayout = new VerticalLayout(startTimePicker,
-                                endTimePicker);
-                AccordionPanel centerBusinessHoursPanel = accordion.add("Geschäftszeiten", centerBusinessHoursLayout);
-                centerBusinessHoursPanel.addThemeVariants(DetailsVariant.FILLED);
+        TimePicker startTimePicker = new TimePicker("Start");
+        startTimePicker.setRequiredIndicatorVisible(true);
+        TimePicker endTimePicker = new TimePicker("Ende");
+        endTimePicker.setRequiredIndicatorVisible(true);
+        VerticalLayout centerBusinessHoursLayout = new VerticalLayout(startTimePicker,
+                endTimePicker);
+        AccordionPanel centerBusinessHoursPanel = accordion.add("Geschäftszeiten", centerBusinessHoursLayout);
+        centerBusinessHoursPanel.addThemeVariants(DetailsVariant.FILLED);
 
-                NumberField bowlingAlleyPricePerHourField = new NumberField("Bahnpreis pro Stunde");
-                bowlingAlleyPricePerHourField.setRequiredIndicatorVisible(true);
-                NumberField bowlingShoePriceField = new NumberField("Schuhpreis pro Ausleihe");
-                bowlingShoePriceField.setRequiredIndicatorVisible(true);
-                VerticalLayout centerPriceLayout = new VerticalLayout(bowlingAlleyPricePerHourField,
-                                bowlingShoePriceField);
-                AccordionPanel centerPricePanel = accordion.add("Bahn und Schuhpreise", centerPriceLayout);
-                centerPricePanel.addThemeVariants(DetailsVariant.FILLED);
+        NumberField bowlingAlleyPricePerHourField = new NumberField("Bahnpreis pro Stunde");
+        bowlingAlleyPricePerHourField.setRequiredIndicatorVisible(true);
+        bowlingAlleyPricePerHourField.setSuffixComponent(new Span("EUR"));
+        NumberField bowlingShoePriceField = new NumberField("Schuhpreis pro Ausleihe");
+        bowlingShoePriceField.setRequiredIndicatorVisible(true);
+        bowlingShoePriceField.setSuffixComponent(new Span("EUR"));
+        VerticalLayout centerPriceLayout = new VerticalLayout(bowlingAlleyPricePerHourField,
+                bowlingShoePriceField);
+        AccordionPanel centerPricePanel = accordion.add("Bahn und Schuhpreise", centerPriceLayout);
+        centerPricePanel.addThemeVariants(DetailsVariant.FILLED);
 
-                TextField senderEmailField = new TextField("Sender E-Mail");
-                TextField receiverEmailField = new TextField("Empfänger E-Mail");
-                TextField passwordField = new TextField("E-Mail Passwort");
-                TextField smtpHostField = new TextField("SMTP Host");
-                TextField smtpPortField = new TextField("SMTP Port");
-                VerticalLayout centerEmailLayout = new VerticalLayout(senderEmailField, receiverEmailField,
-                                passwordField, smtpHostField, smtpPortField);
-                AccordionPanel centerEmailPanel = accordion.add("E-Mail Server Daten", centerEmailLayout);
-                centerEmailPanel.addThemeVariants(DetailsVariant.FILLED);
+        TextField senderEmailField = new TextField("Sender E-Mail");
+        TextField receiverEmailField = new TextField("Empfänger E-Mail (nur zu Testzwecken)");
+        PasswordField passwordField = new PasswordField("E-Mail Passwort");
+        TextField smtpHostField = new TextField("SMTP Host");
+        TextField smtpPortField = new TextField("SMTP Port");
+        VerticalLayout centerEmailLayout = new VerticalLayout(senderEmailField, receiverEmailField,
+                passwordField, smtpHostField, smtpPortField);
+        AccordionPanel centerEmailPanel = accordion.add("E-Mail Server Daten", centerEmailLayout);
+        centerEmailPanel.addThemeVariants(DetailsVariant.FILLED);
 
-                Button saveButton = new Button("Sichern");
-                saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-                saveButton.getStyle().set("margin-left", "10px").set("margin-top", "10px");
+        Button saveButton = new Button("Speichern");
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.getStyle().set("margin-left", "10px").set("margin-top", "10px");
 
-                add(accordion, saveButton);
+        add(accordion, saveButton);
 
-                saveButton.addClickListener(e -> {
-                        try {
-                                binder.writeBean(bowlingCenter);
-                                bowlingCenterRepository.save(bowlingCenter);
-                                Notifications.showInfo("gespeichert");
-                        } catch (ValidationException ex) {
-                                if (!ex.getValidationErrors().isEmpty()) {
-                                        Notifications.showError(ex.getValidationErrors().get(0).getErrorMessage());
-                                }
-                        }
-                });
+        saveButton.addClickListener(e -> {
+            try {
+                binder.writeBean(bowlingCenter);
+                bowlingCenterRepository.save(bowlingCenter);
+                Notifications.showInfo("gespeichert");
+            } catch (ValidationException ex) {
+                if (!ex.getValidationErrors().isEmpty()) {
+                    Notifications.showError(ex.getValidationErrors().get(0).getErrorMessage());
+                }
+            }
+        });
 
-                binder.withValidator(new BowlingCenterValidator());
-                binder.bind(displayNameField, BowlingCenter::getDisplayName, BowlingCenter::setDisplayName);
-                binder.bind(businessNameField, BowlingCenter::getBusinessName, BowlingCenter::setBusinessName);
-                binder.bind(streetField, BowlingCenter::getStreet, BowlingCenter::setStreet);
-                binder.bind(houseNrField, BowlingCenter::getHouseNr,
-                                (bc, i) -> bc.setHouseNr(Objects.requireNonNullElse(i, 0)));
-                binder.bind(postCodeField, BowlingCenter::getPostCode,
-                                (bc, i) -> bc.setPostCode(Objects.requireNonNullElse(i, 0)));
-                binder.bind(cityField, BowlingCenter::getCity, BowlingCenter::setCity);
-                binder.bind(startTimePicker, bc -> LocalTime.ofSecondOfDay(bc.getStartTime()),
-                                (bc, time) -> bc.setStartTime(time.toSecondOfDay()));
-                binder.bind(endTimePicker, bc -> LocalTime.ofSecondOfDay(bc.getEndTime()),
-                                (bc, time) -> bc.setEndTime(time.toSecondOfDay()));
-                binder.bind(bowlingAlleyPricePerHourField, BowlingCenter::getBowlingAlleyPricePerHour,
-                                BowlingCenter::setBowlingAlleyPricePerHour);
-                binder.bind(bowlingShoePriceField, BowlingCenter::getBowlingShoePrice,
-                                BowlingCenter::setBowlingShoePrice);
-                binder.bind(senderEmailField, BowlingCenter::getSenderEmail, BowlingCenter::setSenderEmail);
-                binder.bind(receiverEmailField, BowlingCenter::getReceiverEmail, BowlingCenter::setReceiverEmail);
-                binder.bind(passwordField, BowlingCenter::getPassword, BowlingCenter::setPassword);
-                binder.bind(smtpHostField, BowlingCenter::getSmtpHost, BowlingCenter::setSmtpHost);
-                binder.bind(smtpPortField, BowlingCenter::getSmtpPort, BowlingCenter::setSmtpPort);
+        binder.withValidator(new BowlingCenterValidator());
+        binder.bind(displayNameField, BowlingCenter::getDisplayName, BowlingCenter::setDisplayName);
+        binder.bind(businessNameField, BowlingCenter::getBusinessName, BowlingCenter::setBusinessName);
+        binder.bind(streetField, BowlingCenter::getStreet, BowlingCenter::setStreet);
+        binder.bind(houseNrField, BowlingCenter::getHouseNr,
+                (bc, i) -> bc.setHouseNr(Objects.requireNonNullElse(i, 0)));
+        binder.bind(postCodeField, BowlingCenter::getPostCode,
+                (bc, i) -> bc.setPostCode(Objects.requireNonNullElse(i, 0)));
+        binder.bind(cityField, BowlingCenter::getCity, BowlingCenter::setCity);
+        binder.bind(startTimePicker, bc -> LocalTime.ofSecondOfDay(bc.getStartTime()),
+                (bc, time) -> bc.setStartTime(time.toSecondOfDay()));
+        binder.bind(endTimePicker, bc -> LocalTime.ofSecondOfDay(bc.getEndTime()),
+                (bc, time) -> bc.setEndTime(time.toSecondOfDay()));
+        binder.bind(bowlingAlleyPricePerHourField, BowlingCenter::getBowlingAlleyPricePerHour,
+                BowlingCenter::setBowlingAlleyPricePerHour);
+        binder.bind(bowlingShoePriceField, BowlingCenter::getBowlingShoePrice,
+                BowlingCenter::setBowlingShoePrice);
+        binder.bind(senderEmailField, BowlingCenter::getSenderEmail, BowlingCenter::setSenderEmail);
+        binder.bind(receiverEmailField, BowlingCenter::getReceiverEmail, BowlingCenter::setReceiverEmail);
+        binder.bind(passwordField, BowlingCenter::getPassword, BowlingCenter::setPassword);
+        binder.bind(smtpHostField, BowlingCenter::getSmtpHost, BowlingCenter::setSmtpHost);
+        binder.bind(smtpPortField, BowlingCenter::getSmtpPort, BowlingCenter::setSmtpPort);
 
-                binder.readBean(bowlingCenter);
-        }
+        binder.readBean(bowlingCenter);
+    }
 }

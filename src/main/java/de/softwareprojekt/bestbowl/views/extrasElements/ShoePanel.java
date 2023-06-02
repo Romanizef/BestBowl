@@ -1,10 +1,5 @@
 package de.softwareprojekt.bestbowl.views.extrasElements;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
@@ -14,19 +9,23 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
-
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
-import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeRepository;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_SHOE;
 
 /**
  * @author Matija Kopschek
  * @author Ali aus Mali
  */
 public class ShoePanel extends VerticalLayout {
-    private VerticalLayout panelLayout;
     private FormLayout kachelLayout;
     private Grid<BowlingShoeBooking> shoeGrid;
 
@@ -57,7 +56,7 @@ public class ShoePanel extends VerticalLayout {
                 }
             }
         }
-        panelLayout = new VerticalLayout();
+        VerticalLayout panelLayout = new VerticalLayout();
         shoeAmountField = new IntegerField();
         HorizontalLayout amountLayout = new HorizontalLayout();
         Label amountLabel = new Label("Menge");
@@ -92,42 +91,13 @@ public class ShoePanel extends VerticalLayout {
         add(panelLayout, shoeGrid);
     }
 
-    public ShoePanel(BowlingShoeBooking bowlingShoeBooking, BowlingShoeBookingRepository shoeBookingRepository) {
-        List<BowlingShoeBooking> shoeBookingList = shoeBookingRepository.findAllByClientEquals(bowlingShoeBooking.getClient());
-
-        VerticalLayout panelLayout = new VerticalLayout();
-        Label sizeLabel = new Label("Schuhgröße: " + bowlingShoeBooking.getBowlingShoe().getSize());
-        HorizontalLayout sizeLayout = new HorizontalLayout();
-        sizeLabel.setMinWidth("250px");
-        sizeLabel.setMaxWidth("250px");
-        shoeSizeField = new IntegerField();
-        shoeSizeField.setMin(30);
-        shoeSizeField.setMax(50);
-        shoeSizeField.setValue(40);
-        shoeSizeField.setStepButtonsVisible(true);
-        sizeLayout.add(sizeLabel, shoeSizeField);
-
-        HorizontalLayout amountLayout = new HorizontalLayout();
-        Label amountLabel = new Label("Menge");
-        amountLabel.setMinWidth("250px");
-        amountLabel.setMaxWidth("250px");
-        IntegerField shoeAmountField = new IntegerField();
-        shoeAmountField.setValue(shoeBookingList.size());
-        shoeAmountField.setStepButtonsVisible(true);
-        shoeAmountField.setMin(0);
-        shoeAmountField.setMax(shoeBookingList.size());
-        amountLayout.add(amountLabel, shoeAmountField);
-
-
-        setWidthFull();
-        addCSS();
-        setAlignItems(Alignment.CENTER);
-        panelLayout.add(sizeLayout, amountLayout);
-        add(panelLayout);
-    }
-
     private void addCSS() {
-        getStyle().set("border", "2px solid #dde63e").set("background-color", "#dde63e10").set("padding", "10px").set("margin-bottom", "10px").set("border-radius", "20px");
+        getStyle()
+                .set("border", "2px solid " + PANEL_COLOR_SHOE)
+                .set("background-color", PANEL_COLOR_SHOE + "10")
+                .set("padding", "10px")
+                .set("margin-bottom", "10px")
+                .set("border-radius", "20px");
     }
 
     public void updateShoeSizeAmountMap() {

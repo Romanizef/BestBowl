@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 @Route(value = "foodManagement", layout = MainView.class)
@@ -38,7 +39,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 public class FoodManagementView extends VerticalLayout {
     private final transient FoodRepository foodRepository;
     private final Binder<Food> foodBinder = new Binder<>();
-    private final Button saveButton = new Button("Sichern");
+    private final Button saveButton = new Button("Speichern");
     private final Button cancelButton = new Button("Abbrechen");
     private Grid<Food> foodGrid;
     private FoodForm foodForm;
@@ -191,7 +192,7 @@ public class FoodManagementView extends VerticalLayout {
         Grid.Column<Food> nameColumn = foodGrid.addColumn("name").setHeader("Name");
         Grid.Column<Food> stockColumn = foodGrid.addColumn("stock").setHeader("Bestand");
         Grid.Column<Food> reorderPointColumn = foodGrid.addColumn("reorderPoint").setHeader("Meldebestand");
-        Grid.Column<Food> priceColumn = foodGrid.addColumn("price").setHeader("Preis");
+        Grid.Column<Food> priceColumn = foodGrid.addColumn(food -> formatDouble(food.getPrice()) + "€").setHeader("Preis");
         Grid.Column<Food> activeColumn = foodGrid.addColumn(food -> food.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
         foodGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
         foodGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
