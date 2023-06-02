@@ -27,6 +27,10 @@ public class Address implements Serializable {
     public Address() {
     }
 
+    public String getPostCodeString() {
+        return String.format("%05d", postCode);
+    }
+
     public int getId() {
         return id;
     }

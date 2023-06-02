@@ -23,6 +23,7 @@ import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.function.SerializableComparator;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -274,7 +275,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
         grid.removeAllColumns();
         Grid.Column<DrinkVariant> idColumn = grid.addColumn(DrinkVariant::getId).setHeader("ID");
         Grid.Column<DrinkVariant> nameColum = grid.addColumn(drinkVariant ->
-                drinkVariant.getDrink() == null ? "" : drinkVariant.getDrink().getName()).setHeader("Getränk");
+                drinkVariant.getDrink().getName()).setHeader("Getränk");
         Grid.Column<DrinkVariant> mlColumn = grid.addColumn(DrinkVariant::getMl).setHeader("Variante (ml)");
         Grid.Column<DrinkVariant> priceColumn =
                 grid.addColumn(drinkVariant -> formatDouble(drinkVariant.getPrice()) + "€").setHeader("Preis");
@@ -287,8 +288,9 @@ public class DrinkVariantManagementView extends VerticalLayout {
 
         List<DrinkVariant> drinkVariantList = drinkVariantRepository.findAll();
         GridListDataView<DrinkVariant> dataView = grid.setItems(drinkVariantList);
+        dataView.setSortOrder(drinkVariant -> drinkVariant.getDrink().getName() + drinkVariant.getMl(), SortDirection.ASCENDING);
 
-        DrinkVariantManagementView.DrinkVariantFilter drinkVariantFilter = new DrinkVariantManagementView.DrinkVariantFilter(dataView);
+        DrinkVariantFilter drinkVariantFilter = new DrinkVariantFilter(dataView);
         grid.getHeaderRows().clear();
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", drinkVariantFilter::setId));

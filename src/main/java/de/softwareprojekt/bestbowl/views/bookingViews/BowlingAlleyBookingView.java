@@ -22,6 +22,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingCenterRepository;
 import de.softwareprojekt.bestbowl.utils.Utils;
 import de.softwareprojekt.bestbowl.utils.email.MailSenderService;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
@@ -60,6 +61,7 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
     private final Button bookButton;
     private final Button continueToExtrasButton;
     private final transient MailSenderService mailSenderController = new MailSenderService();
+    private final BowlingCenter bowlingCenter;
     private DatePicker datePicker;
     private TimePicker timePicker;
     private ComboBox<Duration> durationCB;
@@ -74,6 +76,7 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
     @Autowired
     public BowlingAlleyBookingView(BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
                                    BowlingAlleyRepository bowlingAlleyRepository,
+                                   BowlingCenterRepository bowlingCenterRepository,
                                    AuthenticationContext authenticationContext) {
         this.bowlingAlleyBookingRepository = bowlingAlleyBookingRepository;
         this.bowlingAlleyRepository = bowlingAlleyRepository;
@@ -81,8 +84,8 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         setSizeFull();
         setAlignItems(Alignment.CENTER);
 
-        gridLowerBound = Utils.getCurrentDateTimeOfDayStart().atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L;
-        gridUpperBound = gridLowerBound + java.time.Duration.ofDays(1).toMillis();
+        bowlingCenter = bowlingCenterRepository.getBowlingCenter();
+        setBoundsToWholeDay();
 
         clientHeader = new H1();
         Component menuComponent = createMenuComponent();
@@ -96,6 +99,15 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         updateInitialComponents();
         updateGridItems();
         updateLabelAndButtons();
+    }
+
+    private void setBoundsToWholeDay() {
+        LocalDateTime startLDT = LocalDateTime.of(LocalDate.now(), LocalTime.ofSecondOfDay(bowlingCenter.getStartTime()));
+        if (LocalTime.now().isBefore(LocalTime.ofSecondOfDay(bowlingCenter.getStartTime()))) {
+            startLDT = startLDT.minus(java.time.Duration.ofDays(1));
+        }
+        gridLowerBound = startLDT.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L;
+        gridUpperBound = gridLowerBound + java.time.Duration.ofDays(1).toMillis();
     }
 
     private Component createMenuComponent() {
@@ -140,10 +152,7 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
             }
         });
         wholeDayButton.addClickListener(e -> {
-            gridLowerBound = Utils
-                    .setLocalDateTimeToDayStart(LocalDateTime.of(datePicker.getValue(), timePicker.getValue()))
-                    .atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L;
-            gridUpperBound = gridLowerBound + java.time.Duration.ofDays(1).toMillis();
+            setBoundsToWholeDay();
             updateGridItems();
         });
 
@@ -169,7 +178,6 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         timePicker.setStep(java.time.Duration.ofMinutes(30));
         timePicker.setValue(Utils.getCurrentDateTimeRounded().toLocalTime());
         if (!isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
-            BowlingCenter bowlingCenter = Repos.getBowlingCenterRepository().getBowlingCenter();
             timePicker.setMin(LocalTime.ofSecondOfDay(bowlingCenter.getStartTime()));
             timePicker.setMax(LocalTime.ofSecondOfDay(bowlingCenter.getEndTime()));
         }

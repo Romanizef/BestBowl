@@ -42,6 +42,10 @@ public class BowlingCenter implements Serializable {
     public BowlingCenter() {
     }
 
+    public String getPostCodeString() {
+        return String.format("%05d", postCode);
+    }
+
     public int getId() {
         return id;
     }

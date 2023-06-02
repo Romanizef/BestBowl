@@ -139,7 +139,7 @@ public class ClientManagementView extends VerticalLayout {
                 .setHeader("Straße");
         Grid.Column<Client> houseNrColumn = grid.addColumn(client -> client.getAddress().getHouseNr())
                 .setHeader("Hausnummer");
-        Grid.Column<Client> postCodeColumn = grid.addColumn(client -> client.getAddress().getPostCode())
+        Grid.Column<Client> postCodeColumn = grid.addColumn(client -> client.getAddress().getPostCodeString())
                 .setHeader("PLZ");
         Grid.Column<Client> cityColumn = grid.addColumn(client -> client.getAddress().getCity()).setHeader("Stadt");
         Grid.Column<Client> activeColumn = grid.addColumn(client -> client.isActive() ? "Aktiv" : "Inaktiv")
@@ -434,7 +434,7 @@ public class ClientManagementView extends VerticalLayout {
                     client.getAssociation() != null && matches(client.getAssociation().getName(), associationName);
             boolean matchesStreet = matches(client.getAddress().getStreet(), street);
             boolean matchesHouseNr = matches(String.valueOf(client.getAddress().getHouseNr()), houseNr);
-            boolean matchesPostCode = matches(String.valueOf(client.getAddress().getPostCode()), postCode);
+            boolean matchesPostCode = matches(client.getAddress().getPostCodeString(), postCode);
             boolean matchesCity = matches(client.getAddress().getCity(), city);
             boolean matchesActive = active == null || active == client.isActive();
             return matchesId && matchesFirstName && matchesLastName && matchesEmail && matchesComment
