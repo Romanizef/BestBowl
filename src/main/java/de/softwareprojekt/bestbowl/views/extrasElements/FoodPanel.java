@@ -11,6 +11,7 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.Food;
 import de.softwareprojekt.bestbowl.jpa.entities.FoodBooking;
+import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 
 /**
  * Class for the Food Panel in the ExtrasView.
@@ -48,13 +49,18 @@ public class FoodPanel extends HorizontalLayout {
             }
             if (value < foodAmountField.getMin() || value > foodAmountField.getMax()) {
                 foodAmountField.setValue(e.getOldValue());
+                Notifications.showError("Nicht genügend von der Speise: "+ food.getName());
                 return;
             }
 
             FoodBooking temp = new FoodBooking(food, bowlingAlleyBooking);
             FoodBooking foodBooking = foodBookingMap.getOrDefault(temp.getName(), temp);
             foodBooking.setAmount(value);
-            foodBookingMap.put(foodBooking.getName(), foodBooking);
+            if(foodBooking.getAmount() == 0){
+                foodBookingMap.remove(foodBooking.getName());
+            }else {
+                foodBookingMap.put(foodBooking.getName(), foodBooking);
+            }
         });
 
         addCSS();

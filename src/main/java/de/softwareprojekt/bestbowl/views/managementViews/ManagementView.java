@@ -1,17 +1,15 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 /**
@@ -39,6 +37,7 @@ public class ManagementView extends VerticalLayout {
         HorizontalLayout drinkRowButtonLayout = createDrinkRowButtonLayout();
         HorizontalLayout foodAndShoeRowButtonLayout = createFoodAndShoeRowButtonLayout();
         HorizontalLayout userAndCenterRowButtonLayout = createUserAndCenterRowButtonLayout();
+        //Todo Tabelle mit Namen und Bestand für Getränke und Speisen die unter dem Meldebestand gefallen sind, nur aktive
 
         add(alleyRowButtonLayout, clientAndOrgRowButtonLayout, userAndCenterRowButtonLayout, drinkRowButtonLayout, foodAndShoeRowButtonLayout);
     }

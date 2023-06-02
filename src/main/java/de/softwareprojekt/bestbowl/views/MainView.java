@@ -158,6 +158,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
                 userManager.setDarkModeStateForUser(getAuthenticatedUserNameOrDefault(), true);
             }
         });
+        button.getStyle().set("margin-left", "10px").set("margin-right", "10px");
         return button;
     }
 

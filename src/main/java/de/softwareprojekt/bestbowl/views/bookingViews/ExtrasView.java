@@ -175,12 +175,11 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
         VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
         layout.setAlignItems(Alignment.CENTER);
-
         List<Drink> drinkList = drinkRepository.findAll();
+        //todo sort nach Name, also String
         for (Drink drink : drinkList) {
             layout.add(new DrinkPanel(drink, currentBowlingAlleyBooking, drinkBookingMap));
         }
-
         drinkLayoutForAddItem = layout;
         return layout;
     }
@@ -194,8 +193,8 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
         VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
         layout.setAlignItems(Alignment.CENTER);
-
         List<Food> foodList = foodRepository.findAll();
+        //todo sort nach Name, also String
         for (Food food : foodList) {
             layout.add(new FoodPanel(food, currentBowlingAlleyBooking, foodBookingMap));
         }
@@ -210,12 +209,12 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
      * @return The alley buttons component.
      */
     private final Component createAlleyButtonsComponent() {
-        HorizontalLayout alleyLayout;
+        HorizontalLayout alleyLayout; // Todo layout ändern mit 30 buttons/bahnen testen, scrolllayout bildschirmbreite max breite oder %tual https://vaadin.com/docs/latest/components/scroller
         alleyLayout = new HorizontalLayout();
         alleyLayout.setPadding(true);
         alleyLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
 
-        List<BowlingAlley> bowlingAlleyList = bowlingAlleyRepository.findAll();
+        List<BowlingAlley> bowlingAlleyList = bowlingAlleyRepository.findAll(); //Todo activeistrue
         if (bowlingAlleyList.isEmpty()) {
             Notifications.showError("Es sind keine Bahnen im System vorhanden.\nBitte trage Bahnen ins System ein.");
         }
@@ -232,11 +231,16 @@ public class ExtrasView extends VerticalLayout implements HasUrlParameter<Intege
         // Todo exception handling wenn keine bahnen
 
         for (BowlingAlley bowlingAlley : bowlingAlleyList) {
-            Button alleyButton = new Button("Bahn " + bowlingAlley.getId());
+            Button alleyButton = new Button("Bahn " + bowlingAlley.getId());//Todo header mit kunde und Start- und Endzeit über den Buttons, wie bei Rechnung
             buttonMap.put(bowlingAlley.getId(), alleyButton);
             alleyButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             alleyButton.setEnabled(!freeBowlingAlleyHashSet.contains(bowlingAlley.getId()));
             alleyButton.addClickListener(buttonClickEvent -> {
+//                if(){
+//                    //Todo set disabled wenn rechnung fertig ist
+//                    //Todo update divs
+//                    return;
+//                }
                 changePreviousButtonStyle(currentBowlingAlleyId);
                 currentBowlingAlleyId = Integer.parseInt(alleyButton.getText().replaceAll("\\D+(\\d+)", "$1"));
                 changeCurrentButtonStyle(currentBowlingAlleyId);

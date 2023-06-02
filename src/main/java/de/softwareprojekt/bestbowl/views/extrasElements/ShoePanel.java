@@ -1,29 +1,27 @@
 package de.softwareprojekt.bestbowl.views.extrasElements;
 
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_SHOE;
-
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
-
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeRepository;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_SHOE;
+
 /**
  * Class for the Shoe Panels in the ExtrasView.
- * 
+ *
  * @author Matija Kopschek
  * @author Ali aus Mali
  */
@@ -36,7 +34,7 @@ public class ShoePanel extends VerticalLayout {
 
     /**
      * Constructor for the ShoePanel.
-     * 
+     *
      * @param bowlingShoeRepository
      * @param client
      * @see #addCSS()
@@ -135,39 +133,8 @@ public class ShoePanel extends VerticalLayout {
     }
 
     /**
-     * Creates a {@code FormLayout} with the shoe size and amount
-     * {@code IntegerFields}.
-     * 
-     * @return {@code FormLayout}
-     */
-    public FormLayout addPanelComponent() {
-        kachelLayout = new FormLayout();
-        kachelLayout.setResponsiveSteps(new ResponsiveStep("0", 2));
-
-        IntegerField shoeSizeField = new IntegerField();
-        shoeSizeField.setValue(35);
-        shoeSizeField.setStepButtonsVisible(true);
-        shoeSizeField.setMin(35);
-        shoeSizeField.setMax(45);
-        shoeSizeField.addValueChangeListener(e -> {
-
-        });
-        kachelLayout.addFormItem(shoeSizeField, "Größe: ");
-
-        IntegerField shoeAmountField = new IntegerField();
-        shoeAmountField.setValue(0);
-        shoeAmountField.setStepButtonsVisible(true);
-        shoeAmountField.setMin(0);
-        shoeAmountField.setMax(10);
-
-        kachelLayout.addFormItem(shoeAmountField, "Menge: ");
-
-        return kachelLayout;
-    }
-
-    /**
      * Creates a {@code Grid} with the {@code BowlingShoe}s of the client.
-     * 
+     *
      * @param client
      * @return {@code Grid<BowlingShoe>}
      */
@@ -186,7 +153,7 @@ public class ShoePanel extends VerticalLayout {
 
     /**
      * Getter for the {@code IntegerField} shoeSizeField.
-     * 
+     *
      * @return {@code IntegerField}
      */
     public IntegerField getShoeSizeField() {
@@ -194,17 +161,8 @@ public class ShoePanel extends VerticalLayout {
     }
 
     /**
-     * Setter for the {@code IntegerField} shoeSizeField.
-     * 
-     * @param shoeSizeField
-     */
-    public void setShoeSizeField(IntegerField shoeSizeField) {
-        this.shoeSizeField = shoeSizeField;
-    }
-
-    /**
      * Getter for the {@code IntegerField} shoeAmountField.
-     * 
+     *
      * @return {@code IntegerField}
      */
     public IntegerField getShoeAmountField() {
@@ -212,29 +170,11 @@ public class ShoePanel extends VerticalLayout {
     }
 
     /**
-     * Setter for the {@code IntegerField} shoeAmountField.
-     * 
-     * @param shoeAmountField
-     */
-    public void setShoeAmountField(IntegerField shoeAmountField) {
-        this.shoeAmountField = shoeAmountField;
-    }
-
-    /**
      * Getter for the {@code Map<Integer, Integer>} shoeSizeAmountMap.
-     * 
+     *
      * @return {@code Map<Integer, Integer>}
      */
     public Map<Integer, Integer> getShoeSizeAmountMap() {
         return shoeSizeAmountMap;
-    }
-
-    /**
-     * Setter for the {@code Map<Integer, Integer>} shoeSizeAmountMap.
-     * 
-     * @param shoeSizeAmountMap
-     */
-    public void setShoeSizeAmountMap(Map<Integer, Integer> shoeSizeAmountMap) {
-        this.shoeSizeAmountMap = shoeSizeAmountMap;
     }
 }

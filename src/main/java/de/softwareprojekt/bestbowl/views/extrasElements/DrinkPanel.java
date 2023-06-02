@@ -18,6 +18,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.Drink;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
+import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 
 /**
  * Class for the Drink Panel in the ExtrasView.
@@ -55,7 +56,7 @@ public class DrinkPanel extends HorizontalLayout {
 
         addCSS();
         setAlignItems(Alignment.CENTER);
-        setFlexGrow(0);
+        setWidthFull();
         add(label, variantLayout);
     }
 
@@ -83,6 +84,7 @@ public class DrinkPanel extends HorizontalLayout {
             }
             if (value < mlField.getMin() || value > mlField.getMax()) {
                 mlField.setValue(e.getOldValue());
+                Notifications.showError("Nicht genügend vom Getränk: " + drinkVariant.getDrink().getName());
                 return;
             }
 
@@ -90,7 +92,11 @@ public class DrinkPanel extends HorizontalLayout {
             DrinkBooking drinkBooking = drinkBookingMap.getOrDefault(temp.getName(), temp);
 
             drinkBooking.setAmount(value);
-            drinkBookingMap.put(drinkBooking.getName(), drinkBooking);
+            if(drinkBooking.getAmount() == 0){
+                drinkBookingMap.remove(drinkBooking.getName());
+            }else{
+                drinkBookingMap.put(drinkBooking.getName(), drinkBooking);
+            }
         });
         return mlField;
     }
