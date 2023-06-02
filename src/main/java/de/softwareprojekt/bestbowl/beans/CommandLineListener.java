@@ -90,8 +90,8 @@ public class CommandLineListener {
             client.setEmail(client.getFirstName() + "." + client.getLastName() + "@example.com");
             Address address = new Address();
             address.setStreet(faker.address().streetName());
-            address.setHouseNr(Integer.parseInt(faker.bothify("##")));
-            address.setPostCode(Integer.parseInt(faker.bothify("#####")));
+            address.setHouseNr(faker.number().numberBetween(1, 500));
+            address.setPostCode(faker.number().numberBetween(1001, 99999));
             address.setCity(faker.address().cityName());
             client.addAddress(address);
             clientList.add(client);

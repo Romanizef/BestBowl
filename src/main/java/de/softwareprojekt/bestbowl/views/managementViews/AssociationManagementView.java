@@ -13,6 +13,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
@@ -186,7 +187,7 @@ public class AssociationManagementView extends VerticalLayout {
         nameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         nameField.setRequired(true);
 
-        TextField discountField = new TextField("Rabatt");
+        NumberField discountField = new NumberField("Rabatt");
         discountField.setWidthFull();
         discountField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         discountField.setRequired(true);
@@ -202,8 +203,7 @@ public class AssociationManagementView extends VerticalLayout {
 
         binder.withValidator(new AssociationValidator());
         binder.bind(nameField, Association::getName, Association::setName);
-        binder.bind(discountField, a -> String.valueOf(a.getDiscount()),
-                (association, s) -> association.setDiscount(Double.parseDouble(s)));
+        binder.bind(discountField, Association::getDiscount, Association::setDiscount);
         binder.bind(activeCheckbox, Association::isActive, Association::setActive);
         return layout;
     }
@@ -375,7 +375,7 @@ public class AssociationManagementView extends VerticalLayout {
         public boolean test(Association association) {
             boolean matchesId = matches(String.valueOf(association.getId()), id);
             boolean matchesName = matches(association.getName(), name);
-            boolean matchesDiscount = matches(String.valueOf(association.getDiscount()), discount);
+            boolean matchesDiscount = matches(formatDouble(association.getDiscount()) + "%", discount);
             boolean matchesActive = active == null || active == association.isActive();
             return matchesId && matchesDiscount && matchesName && matchesActive;
         }

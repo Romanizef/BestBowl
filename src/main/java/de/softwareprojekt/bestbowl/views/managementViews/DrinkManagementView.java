@@ -229,8 +229,8 @@ public class DrinkManagementView extends VerticalLayout {
         drinkGrid.removeAllColumns();
         Grid.Column<Drink> idColumn = drinkGrid.addColumn(Drink::getId).setHeader("ID");
         Grid.Column<Drink> nameColumn = drinkGrid.addColumn("name").setHeader("Name");
-        Grid.Column<Drink> stockColumn = drinkGrid.addColumn("stockInMilliliters").setHeader("Bestand");
-        Grid.Column<Drink> reorderPointColumn = drinkGrid.addColumn("reorderPoint").setHeader("Meldebestand");
+        Grid.Column<Drink> stockColumn = drinkGrid.addColumn("stockInMilliliters").setHeader("Bestand (ml)");
+        Grid.Column<Drink> reorderPointColumn = drinkGrid.addColumn("reorderPoint").setHeader("Meldebestand (ml)");
         Grid.Column<Drink> activeColumn = drinkGrid.addColumn(drink -> drink.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
         drinkGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
         drinkGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
@@ -248,7 +248,7 @@ public class DrinkManagementView extends VerticalLayout {
         headerRow.getCell(reorderPointColumn)
                 .setComponent(createFilterHeaderInteger("Meldebestand", drinkFilter::setReorderPoint));
         headerRow.getCell(activeColumn)
-                .setComponent(createFilterHeaderBoolean("Aktive", "Inaktiv", drinkFilter::setActive));
+                .setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", drinkFilter::setActive));
         drinkGrid.addSelectionListener(e -> {
             if (e.isFromClient()) {
                 Optional<Drink> optionalDrink = e.getFirstSelectedItem();

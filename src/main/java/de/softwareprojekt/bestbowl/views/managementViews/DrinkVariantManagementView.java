@@ -264,7 +264,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
         Grid.Column<DrinkVariant> idColumn = grid.addColumn(DrinkVariant::getId).setHeader("ID");
         Grid.Column<DrinkVariant> nameColum = grid.addColumn(drinkVariant ->
                 drinkVariant.getDrink() == null ? "" : drinkVariant.getDrink().getName()).setHeader("Getränk");
-        Grid.Column<DrinkVariant> mlColumn = grid.addColumn(DrinkVariant::getMl).setHeader("Variante");
+        Grid.Column<DrinkVariant> mlColumn = grid.addColumn(DrinkVariant::getMl).setHeader("Variante (ml)");
         Grid.Column<DrinkVariant> priceColumn =
                 grid.addColumn(drinkVariant -> formatDouble(drinkVariant.getPrice()) + "€").setHeader("Preis");
         Grid.Column<DrinkVariant> activeColumn =
@@ -284,7 +284,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", drinkVariantFilter::setId));
         headerRow.getCell(nameColum).setComponent(createFilterHeaderString("Getränk", drinkVariantFilter::setName));
         headerRow.getCell(mlColumn).setComponent(createFilterHeaderInteger("Variante", drinkVariantFilter::setMl));
-        headerRow.getCell(priceColumn).setComponent(createFilterHeaderInteger("Preis", drinkVariantFilter::setPrice));
+        headerRow.getCell(priceColumn).setComponent(createFilterHeaderString("Preis", drinkVariantFilter::setPrice));
         headerRow.getCell(activeColumn)
                 .setComponent(createFilterHeaderBoolean("Aktive", "Inaktiv", drinkVariantFilter::setActive));
 
@@ -322,7 +322,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
             boolean matchesId = matches(String.valueOf(drinkVariant.getId()), id);
             boolean matchesDrink = matches((drinkVariant.getDrink().getName()), name);
             boolean matchesMilliliter = matches(String.valueOf(drinkVariant.getMl()), milliliter);
-            boolean matchesPrice = matches(String.valueOf(drinkVariant.getPrice()), price);
+            boolean matchesPrice = matches(formatDouble(drinkVariant.getPrice()) + "€", price);
             boolean matchesActive = active == null || active == drinkVariant.getDrink().isActive();
             return matchesId && matchesDrink && matchesMilliliter && matchesPrice && matchesActive;
         }
