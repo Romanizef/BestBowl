@@ -31,9 +31,18 @@ public class FoodPanel extends HorizontalLayout {
         foodAmountField.setMax(food.getStock());
 
         foodAmountField.addValueChangeListener(e -> {
+            Integer value = e.getValue();
+            if (value == null) {
+                value = 0;
+            }
+            if (value < foodAmountField.getMin() || value > foodAmountField.getMax()) {
+                foodAmountField.setValue(e.getOldValue());
+                return;
+            }
+
             FoodBooking temp = new FoodBooking(food, bowlingAlleyBooking);
             FoodBooking foodBooking = foodBookingMap.getOrDefault(temp.getName(), temp);
-            foodBooking.setAmount(e.getValue());
+            foodBooking.setAmount(value);
             foodBookingMap.put(foodBooking.getName(), foodBooking);
         });
 

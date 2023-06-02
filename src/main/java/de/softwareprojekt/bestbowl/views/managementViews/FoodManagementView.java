@@ -190,8 +190,8 @@ public class FoodManagementView extends VerticalLayout {
         foodGrid.removeAllColumns();
         Grid.Column<Food> idColumn = foodGrid.addColumn(Food::getId).setHeader("ID");
         Grid.Column<Food> nameColumn = foodGrid.addColumn("name").setHeader("Name");
-        Grid.Column<Food> stockColumn = foodGrid.addColumn("stock").setHeader("Bestand");
-        Grid.Column<Food> reorderPointColumn = foodGrid.addColumn("reorderPoint").setHeader("Meldebestand");
+        Grid.Column<Food> stockColumn = foodGrid.addColumn("stock").setHeader("Bestand (Stück)");
+        Grid.Column<Food> reorderPointColumn = foodGrid.addColumn("reorderPoint").setHeader("Meldebestand (Stück)");
         Grid.Column<Food> priceColumn = foodGrid.addColumn(food -> formatDouble(food.getPrice()) + "€").setHeader("Preis");
         Grid.Column<Food> activeColumn = foodGrid.addColumn(food -> food.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
         foodGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
@@ -252,7 +252,7 @@ public class FoodManagementView extends VerticalLayout {
             boolean matchesName = matches(food.getName(), name);
             boolean matchesStock = matches(String.valueOf(food.getStock()), stock);
             boolean matchesReorderPoint = matches(String.valueOf(food.getReorderPoint()), reorderPoint);
-            boolean matchesPrice = matches(String.valueOf(food.getPrice()), price);
+            boolean matchesPrice = matches(formatDouble(food.getPrice()) + "€", price);
             boolean matchesActive = active == null || active == food.isActive();
             return matchesId && matchesName && matchesStock && matchesReorderPoint && matchesPrice && matchesActive;
         }

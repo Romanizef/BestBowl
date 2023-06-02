@@ -56,10 +56,19 @@ public class DrinkPanel extends HorizontalLayout {
         mlField.setMax(drinkVariant.getDrink().getStockInMilliliters() / drinkVariant.getMl());
 
         mlField.addValueChangeListener(e -> {
+            Integer value = e.getValue();
+            if (value == null) {
+                value = 0;
+            }
+            if (value < mlField.getMin() || value > mlField.getMax()) {
+                mlField.setValue(e.getOldValue());
+                return;
+            }
+
             DrinkBooking temp = new DrinkBooking(drinkVariant, bowlingAlleyBooking);
             DrinkBooking drinkBooking = drinkBookingMap.getOrDefault(temp.getName(), temp);
 
-            drinkBooking.setAmount(e.getValue());
+            drinkBooking.setAmount(value);
             drinkBookingMap.put(drinkBooking.getName(), drinkBooking);
         });
         return mlField;

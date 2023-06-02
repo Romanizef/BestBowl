@@ -170,7 +170,7 @@ public class ShoePanel extends VerticalLayout {
     private Grid<BowlingShoe> createShoeGrid(Client client) {
         Grid<BowlingShoe> grid = new Grid<>(BowlingShoe.class, false);
         grid.addColumn(BowlingShoe::getId).setHeader("Schuh ID");
-        grid.addColumn(BowlingShoe::getSize).setHeader("Schuh Groesse");
+        grid.addColumn(BowlingShoe::getSize).setHeader("Schuhgröße");
         List<BowlingShoe> bowlingShoeList = bowlingShoeRepository.findAllByClientEqualsAndActiveIsTrue(client);
         bowlingShoeList.sort(Comparator.comparingInt(BowlingShoe::getSize));
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
