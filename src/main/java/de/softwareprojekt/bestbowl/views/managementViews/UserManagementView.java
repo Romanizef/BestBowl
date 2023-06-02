@@ -47,7 +47,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
  * @author Marten Voß
  */
 @Route(value = "userManagement", layout = MainView.class)
-@PageTitle("Nutzerverwaltung")
+@PageTitle("Benutzerverwaltung")
 @RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 public class UserManagementView extends VerticalLayout {
     private final transient UserRepository userRepository;
@@ -74,7 +74,7 @@ public class UserManagementView extends VerticalLayout {
     }
 
     private Button createNewUserButton() {
-        Button button = new Button("Neuen Nutzer hinzufügen");
+        Button button = new Button("Neuen Benutzer hinzufügen");
         button.setWidthFull();
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         button.addClickListener(e -> {
@@ -105,7 +105,7 @@ public class UserManagementView extends VerticalLayout {
         Grid.Column<User> emailColumn = grid.addColumn("email").setHeader("E-Mail");
         Grid.Column<User> questionColumn = grid.addColumn("securityQuestion").setHeader("Sicherheitsfrage");
         Grid.Column<User> answerColumn = grid.addColumn("securityQuestionAnswer").setHeader("Sicherheitsfragenantwort");
-        Grid.Column<User> roleColumn = grid.addColumn("role").setHeader("Nutzerrolle");
+        Grid.Column<User> roleColumn = grid.addColumn("role").setHeader("Benutzerrolle");
         Grid.Column<User> activeColumn = grid.addColumn(user -> user.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
@@ -174,7 +174,7 @@ public class UserManagementView extends VerticalLayout {
         securityQuestionAnswerField.setRequiredIndicatorVisible(true);
         securityQuestionAnswerField.setRequired(true);
 
-        ComboBox<String> roleCB = new ComboBox<>("Nutzerrolle");
+        ComboBox<String> roleCB = new ComboBox<>("Benutzerrolle");
         roleCB.setWidthFull();
         roleCB.setAllowCustomValue(false);
         roleCB.setItems(UserRole.getAllValues());
@@ -210,7 +210,7 @@ public class UserManagementView extends VerticalLayout {
             if (Utils.isStringNotEmpty(passwordField.getValue())) {
                 //saving with a password change
                 if (!isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
-                    Notifications.showInfo("Das Passwort eines Nutzers kann nur als Admin geändert werden");
+                    Notifications.showInfo("Das Passwort eines Benutzers kann nur als Admin geändert werden");
                     return;
                 }
                 if (writeBean()) {
@@ -283,13 +283,13 @@ public class UserManagementView extends VerticalLayout {
         if ((dbUser.isPresent() && dbUser.get().getRole().equals(UserRole.ADMIN)) || selectedUser.getRole().equals(UserRole.ADMIN)) {
             //admin users can only be updated by admins
             if (!isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
-                validationErrorLabel.setText("Nur Admins können Admin Nutzer verwalten");
+                validationErrorLabel.setText("Nur Admins können Admin Benutzer verwalten");
                 return false;
             }
             //there must be 1 active admin user in the system
             List<User> adminUserList = userRepository.findAllByRoleEquals(UserRole.ADMIN);
             if (adminUserList.size() == 1 && selectedUser.getId() == adminUserList.get(0).getId() && !selectedUser.isActive()) {
-                validationErrorLabel.setText("Es muss 1 aktiver Admin Nutzer im System existieren");
+                validationErrorLabel.setText("Es muss 1 aktiver Admin Benutzer im System existieren");
                 return false;
             }
         }
@@ -302,7 +302,7 @@ public class UserManagementView extends VerticalLayout {
             userEmailSet.remove(user.getEmail());
         });
         if (userNameSet.contains(selectedUser.getName())) {
-            validationErrorLabel.setText("Ein Nutzer mit diesem Namen existiert bereits");
+            validationErrorLabel.setText("Ein Benutzer mit diesem Namen existiert bereits");
             return false;
         }
         if (userEmailSet.contains(selectedUser.getEmail())) {
@@ -321,7 +321,7 @@ public class UserManagementView extends VerticalLayout {
         }
         userManager.updateUsersFromDb();
         resetEditLayout();
-        Notifications.showInfo("Nutzer gespeichert");
+        Notifications.showInfo("Benutzer gespeichert");
     }
 
     private void resetEditLayout() {

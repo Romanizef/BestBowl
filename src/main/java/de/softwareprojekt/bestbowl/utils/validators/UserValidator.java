@@ -29,7 +29,7 @@ public class UserValidator implements Validator<User> {
             return ValidationResult.error("Sicherheitsantwort muss min. 1 Zeichen lang sein");
         }
         if (!isStringNotEmpty(user.getRole())) {
-            return ValidationResult.error("Der Nutzer muss einer Rolle zugeordnet sein");
+            return ValidationResult.error("Der Benutzer muss einer Rolle zugeordnet sein");
         }
         return ValidationResult.ok();
     }
