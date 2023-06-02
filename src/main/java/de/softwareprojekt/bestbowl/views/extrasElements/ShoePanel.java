@@ -1,5 +1,12 @@
 package de.softwareprojekt.bestbowl.views.extrasElements;
 
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_SHOE;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
@@ -9,36 +16,32 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
+
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoe;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingShoeBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingShoeRepository;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_SHOE;
-
 /**
+ * Class for the Shoe Panels in the ExtrasView.
+ * 
  * @author Matija Kopschek
  * @author Ali aus Mali
  */
 public class ShoePanel extends VerticalLayout {
     private FormLayout kachelLayout;
-    private Grid<BowlingShoeBooking> shoeGrid;
-
     private IntegerField shoeSizeField;
     private IntegerField shoeAmountField;
-
-    private HorizontalLayout amountLayout;
-
-    private HorizontalLayout sizeLayout;
     private BowlingShoeRepository bowlingShoeRepository;
-
     private Map<Integer, Integer> shoeSizeAmountMap;
 
+    /**
+     * Constructor for the ShoePanel.
+     * 
+     * @param bowlingShoeRepository
+     * @param client
+     * @see #addCSS()
+     * @see #createShoeGrid(Client)
+     */
     public ShoePanel(BowlingShoeRepository bowlingShoeRepository, Client client) {
         this.bowlingShoeRepository = bowlingShoeRepository;
         List<BowlingShoe> shoeList = bowlingShoeRepository.findAllByClientIsNullAndActiveIsTrue();
@@ -91,6 +94,9 @@ public class ShoePanel extends VerticalLayout {
         add(panelLayout, shoeGrid);
     }
 
+    /**
+     * Adds CSS style to the ShoePanel.
+     */
     private void addCSS() {
         getStyle()
                 .set("border", "2px solid " + PANEL_COLOR_SHOE)
@@ -100,6 +106,9 @@ public class ShoePanel extends VerticalLayout {
                 .set("border-radius", "20px");
     }
 
+    /**
+     * Updates the amount of shoes of a certain size.
+     */
     public void updateShoeSizeAmountMap() {
         List<BowlingShoe> shoeList = bowlingShoeRepository.findAllByClientIsNullAndActiveIsTrue();
         int value;
@@ -118,10 +127,19 @@ public class ShoePanel extends VerticalLayout {
         }
     }
 
+    /**
+     * Resets the shoeAmountField to the value 0.
+     */
     public void resetIntergerfield() {
         shoeAmountField.setValue(0);
     }
 
+    /**
+     * Creates a {@code FormLayout} with the shoe size and amount
+     * {@code IntegerFields}.
+     * 
+     * @return {@code FormLayout}
+     */
     public FormLayout addPanelComponent() {
         kachelLayout = new FormLayout();
         kachelLayout.setResponsiveSteps(new ResponsiveStep("0", 2));
@@ -140,33 +158,19 @@ public class ShoePanel extends VerticalLayout {
         shoeAmountField.setValue(0);
         shoeAmountField.setStepButtonsVisible(true);
         shoeAmountField.setMin(0);
-        shoeAmountField.setMax(10); // TODO Lagerbestand muss aus der DB ausgelesen werden und als max gesetzt
+        shoeAmountField.setMax(10);
 
         kachelLayout.addFormItem(shoeAmountField, "Menge: ");
 
         return kachelLayout;
     }
 
-    private HorizontalLayout createShoeGridLayout() {
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.setSizeFull();
-        shoeGrid = createGrid();
-        layout.add(shoeGrid);
-        return layout;
-    }
-
-    private Grid<BowlingShoeBooking> createGrid() {
-        Grid<BowlingShoeBooking> grid = new Grid<>(BowlingShoeBooking.class);
-        grid.removeAllColumns();
-        Grid.Column<BowlingShoeBooking> idColumn = grid.addColumn("id").setHeader("ID");
-        Grid.Column<BowlingShoeBooking> sizeColumn = grid.addColumn("size").setHeader("ID");
-        grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
-        grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
-        grid.setWidth("75%");
-        grid.setHeight("100%");
-        return grid;
-    }
-
+    /**
+     * Creates a {@code Grid} with the {@code BowlingShoe}s of the client.
+     * 
+     * @param client
+     * @return {@code Grid<BowlingShoe>}
+     */
     private Grid<BowlingShoe> createShoeGrid(Client client) {
         Grid<BowlingShoe> grid = new Grid<>(BowlingShoe.class, false);
         grid.addColumn(BowlingShoe::getId).setHeader("Schuh ID");
@@ -180,66 +184,56 @@ public class ShoePanel extends VerticalLayout {
         return grid;
     }
 
-    public FormLayout getKachelLayout() {
-        return kachelLayout;
-    }
-
-    public void setKachelLayout(FormLayout kachelLayout) {
-        this.kachelLayout = kachelLayout;
-    }
-
-    public Grid<BowlingShoeBooking> getShoeGrid() {
-        return shoeGrid;
-    }
-
-    public void setShoeGrid(Grid<BowlingShoeBooking> shoeGrid) {
-        this.shoeGrid = shoeGrid;
-    }
-
+    /**
+     * Getter for the {@code IntegerField} shoeSizeField.
+     * 
+     * @return {@code IntegerField}
+     */
     public IntegerField getShoeSizeField() {
         return shoeSizeField;
     }
 
+    /**
+     * Setter for the {@code IntegerField} shoeSizeField.
+     * 
+     * @param shoeSizeField
+     */
     public void setShoeSizeField(IntegerField shoeSizeField) {
         this.shoeSizeField = shoeSizeField;
     }
 
+    /**
+     * Getter for the {@code IntegerField} shoeAmountField.
+     * 
+     * @return {@code IntegerField}
+     */
     public IntegerField getShoeAmountField() {
         return shoeAmountField;
     }
 
+    /**
+     * Setter for the {@code IntegerField} shoeAmountField.
+     * 
+     * @param shoeAmountField
+     */
     public void setShoeAmountField(IntegerField shoeAmountField) {
         this.shoeAmountField = shoeAmountField;
     }
 
-    public HorizontalLayout getAmountLayout() {
-        return amountLayout;
-    }
-
-    public void setAmountLayout(HorizontalLayout amountLayout) {
-        this.amountLayout = amountLayout;
-    }
-
-    public HorizontalLayout getSizeLayout() {
-        return sizeLayout;
-    }
-
-    public void setSizeLayout(HorizontalLayout sizeLayout) {
-        this.sizeLayout = sizeLayout;
-    }
-
-    public BowlingShoeRepository getBowlingShoeRepository() {
-        return bowlingShoeRepository;
-    }
-
-    public void setBowlingShoeRepository(BowlingShoeRepository bowlingShoeRepository) {
-        this.bowlingShoeRepository = bowlingShoeRepository;
-    }
-
+    /**
+     * Getter for the {@code Map<Integer, Integer>} shoeSizeAmountMap.
+     * 
+     * @return {@code Map<Integer, Integer>}
+     */
     public Map<Integer, Integer> getShoeSizeAmountMap() {
         return shoeSizeAmountMap;
     }
 
+    /**
+     * Setter for the {@code Map<Integer, Integer>} shoeSizeAmountMap.
+     * 
+     * @param shoeSizeAmountMap
+     */
     public void setShoeSizeAmountMap(Map<Integer, Integer> shoeSizeAmountMap) {
         this.shoeSizeAmountMap = shoeSizeAmountMap;
     }

@@ -1,23 +1,34 @@
 package de.softwareprojekt.bestbowl.views.extrasElements;
 
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_FOOD;
+
+import java.util.Map;
+
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
+
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.Food;
 import de.softwareprojekt.bestbowl.jpa.entities.FoodBooking;
 
-import java.util.Map;
-
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_FOOD;
-
 /**
+ * Class for the Food Panel in the ExtrasView.
+ * 
  * @author Matija Kopschek
  * @author Ali aus Mali
  */
 public class FoodPanel extends HorizontalLayout {
     private final IntegerField foodAmountField;
 
+    /**
+     * Constructor for the FoodPanel.
+     * 
+     * @param food
+     * @param bowlingAlleyBooking
+     * @param foodBookingMap
+     * @see #addCSS()
+     */
     public FoodPanel(Food food, BowlingAlleyBooking bowlingAlleyBooking, Map<String, FoodBooking> foodBookingMap) {
         Label label = new Label(food.getName());
         label.setMinWidth("250px");
@@ -43,6 +54,9 @@ public class FoodPanel extends HorizontalLayout {
         add(label, foodAmountField);
     }
 
+    /**
+     * Adds CSS style to the FoodPanel.
+     */
     private void addCSS() {
         getStyle()
                 .set("border", "2px solid " + PANEL_COLOR_FOOD)
@@ -53,6 +67,9 @@ public class FoodPanel extends HorizontalLayout {
                 .set("padding-right", "20px");
     }
 
+    /**
+     * Resets the FoodAmountField to the value 0.
+     */
     public void resetFoodAmountFieldValue() {
         this.foodAmountField.setValue(0);
     }

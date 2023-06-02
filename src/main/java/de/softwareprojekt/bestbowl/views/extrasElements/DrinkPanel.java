@@ -1,30 +1,42 @@
 package de.softwareprojekt.bestbowl.views.extrasElements;
 
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.IntegerField;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.Drink;
-import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_DRINK;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createResponsiveSteps;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_DRINK;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createResponsiveSteps;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
+
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.Drink;
+import de.softwareprojekt.bestbowl.jpa.entities.DrinkBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
 
 /**
+ * Class for the Drink Panel in the ExtrasView.
+ * 
  * @author Matija Kopschek
  * @author Ali aus Mali
  */
 public class DrinkPanel extends HorizontalLayout {
     private final FormLayout variantLayout;
 
+    /**
+     * Constructor for the Drink Panel.
+     * 
+     * @param drink
+     * @param bowlingAlleyBooking
+     * @param drinkBookingMap
+     * @see #addCSS()
+     * @see #createIntegerField(DrinkVariant, BowlingAlleyBooking, Map)
+     */
     public DrinkPanel(Drink drink, BowlingAlleyBooking bowlingAlleyBooking, Map<String, DrinkBooking> drinkBookingMap) {
         variantLayout = new FormLayout();
         variantLayout.setResponsiveSteps(createResponsiveSteps(200, 5));
@@ -47,7 +59,16 @@ public class DrinkPanel extends HorizontalLayout {
         add(label, variantLayout);
     }
 
-    public IntegerField createIntegerField(DrinkVariant drinkVariant, BowlingAlleyBooking bowlingAlleyBooking, Map<String, DrinkBooking> drinkBookingMap) {
+    /**
+     * Creates an IntegerField for the Drink Panel.
+     * 
+     * @param drinkVariant
+     * @param bowlingAlleyBooking
+     * @param drinkBookingMap
+     * @return {@code IntegerField}
+     */
+    public IntegerField createIntegerField(DrinkVariant drinkVariant, BowlingAlleyBooking bowlingAlleyBooking,
+            Map<String, DrinkBooking> drinkBookingMap) {
         IntegerField mlField = new IntegerField();
         mlField.setValue(0);
         mlField.setStepButtonsVisible(true);
@@ -65,6 +86,9 @@ public class DrinkPanel extends HorizontalLayout {
         return mlField;
     }
 
+    /**
+     * Resets the IntegerField of the Drink Panel to the value 0.
+     */
     public void resetIntegerField() {
         variantLayout.getChildren().forEach(component -> {
             if (component instanceof IntegerField integerField) {
@@ -73,6 +97,9 @@ public class DrinkPanel extends HorizontalLayout {
         });
     }
 
+    /**
+     * Adds CSS style to the Drink Panel.
+     */
     private void addCSS() {
         getStyle()
                 .set("border", "2px solid " + PANEL_COLOR_DRINK)
