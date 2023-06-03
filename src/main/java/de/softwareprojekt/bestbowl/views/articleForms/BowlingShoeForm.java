@@ -58,7 +58,7 @@ public class BowlingShoeForm extends FormLayout {
                 ZoneId.systemDefault()), (bowlingShoe, localDateTime) -> {
             bowlingShoe.setBoughtAt(localDateTime.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000);
         });
-        shoeBinder.bind(sizeField, BowlingShoe::getSize, BowlingShoe::setSize);
-        shoeBinder.bind(activeCheckbox, BowlingShoe::isActive, BowlingShoe::setActive);
+        shoeBinder.bind(sizeField, BowlingShoe::getSize, (arg0, arg1) -> arg0.setSize(arg1));
+        shoeBinder.bind(activeCheckbox, BowlingShoe::isActive, (arg0, arg1) -> arg0.setActive(arg1));
     }
 }

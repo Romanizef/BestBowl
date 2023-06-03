@@ -1,6 +1,8 @@
 package de.softwareprojekt.bestbowl.beans;
 
-import de.softwareprojekt.bestbowl.jpa.repositories.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepos.AddressRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepos.AssociationRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepos.ClientRepository;
@@ -16,8 +18,6 @@ import de.softwareprojekt.bestbowl.jpa.repositories.drinkRepos.DrinkVariantRepos
 import de.softwareprojekt.bestbowl.jpa.repositories.foodRepos.FoodBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.foodRepos.FoodRepository;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Marten Voß

@@ -1,5 +1,23 @@
 package de.softwareprojekt.bestbowl.views.bookingViews;
 
+import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
+import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
+import static de.softwareprojekt.bestbowl.utils.Utils.toHourOnlyString;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_ALLEY;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_DRINK;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_FOOD;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_SHOE;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.VAADIN_PRIMARY_BLUE;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -16,14 +34,17 @@ import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.component.tabs.TabVariant;
 import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.router.*;
-import de.softwareprojekt.bestbowl.jpa.entities.*;
+import com.vaadin.flow.router.BeforeEvent;
+import com.vaadin.flow.router.HasUrlParameter;
+import com.vaadin.flow.router.OptionalParameter;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
+
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoeEntities.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoeEntities.BowlingShoeBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.drinkEntities.DrinkBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.foodEntities.FoodBooking;
-import de.softwareprojekt.bestbowl.jpa.repositories.*;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlleyRepos.BowlingAlleyBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoeRepos.BowlingShoeBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoeRepos.BowlingShoeRepository;
@@ -34,12 +55,6 @@ import de.softwareprojekt.bestbowl.utils.email.MailSenderService;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.PermitAll;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.*;
-
-import static de.softwareprojekt.bestbowl.utils.Utils.*;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * Creates a view for all booked elements to be displayed in an invoice and paid

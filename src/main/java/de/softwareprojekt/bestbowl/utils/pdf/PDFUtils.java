@@ -1,13 +1,24 @@
 package de.softwareprojekt.bestbowl.utils.pdf;
 
-import de.softwareprojekt.bestbowl.beans.Repos;
-import de.softwareprojekt.bestbowl.jpa.entities.*;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoeEntities.BowlingShoeBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingcenterAnduserEntities.BowlingCenter;
-import de.softwareprojekt.bestbowl.jpa.entities.drinkEntities.DrinkBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.foodEntities.FoodBooking;
-import de.softwareprojekt.bestbowl.utils.Utils;
+import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
+import static java.awt.Color.LIGHT_GRAY;
+import static java.awt.Color.WHITE;
+import static java.lang.Double.parseDouble;
+import static org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA;
+import static org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD;
+import static org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD_OBLIQUE;
+import static org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_OBLIQUE;
+import static org.vandeseer.easytable.settings.HorizontalAlignment.CENTER;
+import static org.vandeseer.easytable.settings.HorizontalAlignment.LEFT;
+import static org.vandeseer.easytable.settings.HorizontalAlignment.RIGHT;
+import static org.vandeseer.easytable.settings.VerticalAlignment.TOP;
+
+import java.awt.Color;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -20,19 +31,13 @@ import org.vandeseer.easytable.structure.Table;
 import org.vandeseer.easytable.structure.Table.TableBuilder;
 import org.vandeseer.easytable.structure.cell.TextCell;
 
-import java.awt.*;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
-import static java.awt.Color.LIGHT_GRAY;
-import static java.awt.Color.WHITE;
-import static java.lang.Double.parseDouble;
-import static org.apache.pdfbox.pdmodel.font.PDType1Font.*;
-import static org.vandeseer.easytable.settings.HorizontalAlignment.*;
-import static org.vandeseer.easytable.settings.VerticalAlignment.TOP;
+import de.softwareprojekt.bestbowl.beans.Repos;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoeEntities.BowlingShoeBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingcenterAnduserEntities.BowlingCenter;
+import de.softwareprojekt.bestbowl.jpa.entities.drinkEntities.DrinkBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.foodEntities.FoodBooking;
+import de.softwareprojekt.bestbowl.utils.Utils;
 
 /**
  * Class for creating PDFs.

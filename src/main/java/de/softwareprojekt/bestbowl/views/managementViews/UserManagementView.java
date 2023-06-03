@@ -241,7 +241,7 @@ public class UserManagementView extends VerticalLayout {
         binder.bind(securityQuestionField, User::getSecurityQuestion, User::setSecurityQuestion);
         binder.bind(securityQuestionAnswerField, User::getSecurityQuestionAnswer, User::setSecurityQuestionAnswer);
         binder.bind(roleCB, User::getRole, User::setRole);
-        binder.bind(activeCheckbox, User::isActive, User::setActive);
+        binder.bind(activeCheckbox, User::isActive, (arg0, arg1) -> arg0.setActive(arg1));
         return layout;
     }
 

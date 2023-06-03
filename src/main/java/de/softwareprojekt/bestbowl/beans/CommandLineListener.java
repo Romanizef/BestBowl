@@ -1,8 +1,23 @@
 package de.softwareprojekt.bestbowl.beans;
 
+import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
+
+import java.security.SecureRandom;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.github.javafaker.Faker;
+
 import de.softwareprojekt.bestbowl.BestBowlApplication;
-import de.softwareprojekt.bestbowl.jpa.entities.*;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlley;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoeEntities.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.entities.clientEntities.Address;
@@ -14,20 +29,6 @@ import de.softwareprojekt.bestbowl.jpa.entities.foodEntities.Food;
 import de.softwareprojekt.bestbowl.utils.checkers.DuplicateChecker;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import jakarta.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.security.SecureRandom;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.stream.Collectors;
-
-import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
 
 /**
  * @author Marten Voß

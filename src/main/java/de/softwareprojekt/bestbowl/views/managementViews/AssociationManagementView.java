@@ -204,8 +204,8 @@ public class AssociationManagementView extends VerticalLayout {
 
         binder.withValidator(new AssociationValidator());
         binder.bind(nameField, Association::getName, Association::setName);
-        binder.bind(discountField, Association::getDiscount, Association::setDiscount);
-        binder.bind(activeCheckbox, Association::isActive, Association::setActive);
+        binder.bind(discountField, Association::getDiscount, (arg0, arg1) -> arg0.setDiscount(arg1));
+        binder.bind(activeCheckbox, Association::isActive, (arg0, arg1) -> arg0.setActive(arg1));
         return layout;
     }
 

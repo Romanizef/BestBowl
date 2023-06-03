@@ -132,9 +132,9 @@ public class BowlingCenterManagementView extends Div {
         binder.bind(endTimePicker, bc -> LocalTime.ofSecondOfDay(bc.getEndTime()),
                 (bc, time) -> bc.setEndTime(time.toSecondOfDay()));
         binder.bind(bowlingAlleyPricePerHourField, BowlingCenter::getBowlingAlleyPricePerHour,
-                BowlingCenter::setBowlingAlleyPricePerHour);
+                (arg0, arg1) -> arg0.setBowlingAlleyPricePerHour(arg1));
         binder.bind(bowlingShoePriceField, BowlingCenter::getBowlingShoePrice,
-                BowlingCenter::setBowlingShoePrice);
+                (arg0, arg1) -> arg0.setBowlingShoePrice(arg1));
         binder.bind(senderEmailField, BowlingCenter::getSenderEmail, BowlingCenter::setSenderEmail);
         binder.bind(receiverEmailField, BowlingCenter::getReceiverEmail, BowlingCenter::setReceiverEmail);
         binder.bind(passwordField, BowlingCenter::getPassword, BowlingCenter::setPassword);

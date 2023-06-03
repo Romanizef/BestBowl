@@ -1,5 +1,16 @@
 package de.softwareprojekt.bestbowl.views.bookingViews;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
@@ -14,8 +25,12 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
-import com.vaadin.flow.router.*;
-import de.softwareprojekt.bestbowl.jpa.entities.*;
+import com.vaadin.flow.router.BeforeEvent;
+import com.vaadin.flow.router.HasUrlParameter;
+import com.vaadin.flow.router.OptionalParameter;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
+
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlley;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoeEntities.BowlingShoe;
@@ -25,7 +40,6 @@ import de.softwareprojekt.bestbowl.jpa.entities.drinkEntities.DrinkBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.drinkEntities.DrinkVariant;
 import de.softwareprojekt.bestbowl.jpa.entities.foodEntities.Food;
 import de.softwareprojekt.bestbowl.jpa.entities.foodEntities.FoodBooking;
-import de.softwareprojekt.bestbowl.jpa.repositories.*;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlleyRepos.BowlingAlleyBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlleyRepos.BowlingAlleyRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoeRepos.BowlingShoeBookingRepository;
@@ -41,11 +55,6 @@ import de.softwareprojekt.bestbowl.views.articlePanels.DrinkPanel;
 import de.softwareprojekt.bestbowl.views.articlePanels.FoodPanel;
 import de.softwareprojekt.bestbowl.views.articlePanels.ShoePanel;
 import jakarta.annotation.security.PermitAll;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Creates a View for the extra bookings, like food, drinks and shoes.

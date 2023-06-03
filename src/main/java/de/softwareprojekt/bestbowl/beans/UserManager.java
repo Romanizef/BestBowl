@@ -1,24 +1,25 @@
 package de.softwareprojekt.bestbowl.beans;
 
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingcenterAnduserEntities.User;
-import de.softwareprojekt.bestbowl.jpa.repositories.bowlingcenterAnduserRepos.UserRepository;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingcenterAnduserEntities.User;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingcenterAnduserRepos.UserRepository;
 
 /**
  * @author Marten Voß
  */
 @Component
 public class UserManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserManager.class);
     private final List<String> currentUserNameList = new ArrayList<>();
     private final Map<String, Boolean> userDrawerStateMap = new HashMap<>();
     private final UserRepository userRepository;

@@ -304,7 +304,7 @@ public class ClientManagementView extends VerticalLayout {
                 ((client, i) -> client.getAddress().setPostCode(Objects.requireNonNullElse(i, 0))));
         binder.bind(cityField, client -> client.getAddress().getCity(),
                 ((client, s) -> client.getAddress().setCity(s)));
-        binder.bind(activeCheckbox, Client::isActive, Client::setActive);
+        binder.bind(activeCheckbox, Client::isActive, (arg0, arg1) -> arg0.setActive(arg1));
         return layout;
     }
 

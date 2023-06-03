@@ -169,9 +169,9 @@ public class DrinkVariantManagementView extends VerticalLayout {
                         drinkVariant.setDrink(drink);
                     }
                 }));
-        drinkVariantBinder.bind(priceField, DrinkVariant::getPrice, DrinkVariant::setPrice);
-        drinkVariantBinder.bind(variantField, DrinkVariant::getMl, DrinkVariant::setMl);
-        drinkVariantBinder.bind(activeCheckbox, DrinkVariant::isActive, DrinkVariant::setActive);
+        drinkVariantBinder.bind(priceField, DrinkVariant::getPrice, (arg0, arg1) -> arg0.setPrice(arg1));
+        drinkVariantBinder.bind(variantField, DrinkVariant::getMl, (arg0, arg1) -> arg0.setMl(arg1));
+        drinkVariantBinder.bind(activeCheckbox, DrinkVariant::isActive, (arg0, arg1) -> arg0.setActive(arg1));
         return drinkVariantlayout;
     }
 
