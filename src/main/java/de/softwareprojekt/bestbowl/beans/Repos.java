@@ -1,6 +1,20 @@
 package de.softwareprojekt.bestbowl.beans;
 
 import de.softwareprojekt.bestbowl.jpa.repositories.*;
+import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepos.AddressRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepos.AssociationRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepos.ClientRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlleyRepos.BowlingAlleyBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlleyRepos.BowlingAlleyRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoeRepos.BowlingShoeBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoeRepos.BowlingShoeRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingcenterAnduserRepos.BowlingCenterRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingcenterAnduserRepos.UserRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.drinkRepos.DrinkBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.drinkRepos.DrinkRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.drinkRepos.DrinkVariantRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.foodRepos.FoodBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.foodRepos.FoodRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -26,14 +26,15 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-import de.softwareprojekt.bestbowl.jpa.entities.Address;
-import de.softwareprojekt.bestbowl.jpa.entities.Association;
-import de.softwareprojekt.bestbowl.jpa.entities.Client;
-import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepository;
+
+import de.softwareprojekt.bestbowl.jpa.entities.clientEntities.Address;
+import de.softwareprojekt.bestbowl.jpa.entities.clientEntities.Association;
+import de.softwareprojekt.bestbowl.jpa.entities.clientEntities.Client;
+import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepos.ClientRepository;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
-import de.softwareprojekt.bestbowl.utils.validators.ClientValidator;
+import de.softwareprojekt.bestbowl.utils.validators.clientValidators.ClientValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
-import de.softwareprojekt.bestbowl.views.otherViews.StatisticsView;
+import de.softwareprojekt.bestbowl.views.dbAndstatisticsViews.StatisticsView;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -3,7 +3,8 @@ package de.softwareprojekt.bestbowl.utils.validators;
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.binder.ValueContext;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlley;
+
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlley;
 
 /**
  * @author Marten Voß

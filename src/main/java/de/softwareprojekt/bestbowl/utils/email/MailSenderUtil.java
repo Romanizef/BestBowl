@@ -4,7 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Properties;
 
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.utils.pdf.PDFUtils;
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;

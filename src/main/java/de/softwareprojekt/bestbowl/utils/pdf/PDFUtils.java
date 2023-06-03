@@ -2,6 +2,11 @@ package de.softwareprojekt.bestbowl.utils.pdf;
 
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.*;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoeEntities.BowlingShoeBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingcenterAnduserEntities.BowlingCenter;
+import de.softwareprojekt.bestbowl.jpa.entities.drinkEntities.DrinkBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.foodEntities.FoodBooking;
 import de.softwareprojekt.bestbowl.utils.Utils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;

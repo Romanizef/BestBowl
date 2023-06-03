@@ -19,9 +19,10 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlley;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
-import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyRepository;
+
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlley;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingcenterAnduserEntities.BowlingCenter;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlleyRepos.BowlingAlleyRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.utils.validators.BowlingAlleyValidator;

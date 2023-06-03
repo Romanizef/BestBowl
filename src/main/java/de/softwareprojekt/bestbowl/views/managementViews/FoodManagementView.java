@@ -17,12 +17,13 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.softwareprojekt.bestbowl.jpa.entities.Food;
-import de.softwareprojekt.bestbowl.jpa.repositories.FoodRepository;
+
+import de.softwareprojekt.bestbowl.jpa.entities.foodEntities.Food;
+import de.softwareprojekt.bestbowl.jpa.repositories.foodRepos.FoodRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
-import de.softwareprojekt.bestbowl.views.form.FoodForm;
+import de.softwareprojekt.bestbowl.views.articleForms.FoodForm;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 

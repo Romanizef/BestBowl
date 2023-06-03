@@ -1,7 +1,8 @@
 package de.softwareprojekt.bestbowl.beans;
 
-import de.softwareprojekt.bestbowl.jpa.entities.User;
-import de.softwareprojekt.bestbowl.jpa.repositories.UserRepository;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingcenterAnduserEntities.User;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingcenterAnduserRepos.UserRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

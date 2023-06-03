@@ -16,7 +16,8 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.SerializableComparator;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import de.softwareprojekt.bestbowl.beans.Repos;
-import de.softwareprojekt.bestbowl.jpa.entities.Association;
+import de.softwareprojekt.bestbowl.jpa.entities.clientEntities.Association;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

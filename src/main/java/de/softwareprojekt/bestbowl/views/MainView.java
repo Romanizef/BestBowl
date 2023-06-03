@@ -25,10 +25,11 @@ import de.softwareprojekt.bestbowl.BestBowlApplication;
 import de.softwareprojekt.bestbowl.beans.SecurityService;
 import de.softwareprojekt.bestbowl.beans.UserManager;
 import de.softwareprojekt.bestbowl.views.bookingViews.ClientSearchView;
-import de.softwareprojekt.bestbowl.views.bookingViews.ExtrasView;
+import de.softwareprojekt.bestbowl.views.bookingViews.ArticleBookingView;
 import de.softwareprojekt.bestbowl.views.bookingViews.PendingBookingView;
+import de.softwareprojekt.bestbowl.views.dbAndstatisticsViews.DatabaseRedirectView;
 import de.softwareprojekt.bestbowl.views.managementViews.ManagementView;
-import de.softwareprojekt.bestbowl.views.otherViews.DatabaseRedirectView;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -116,7 +117,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
     private Tab[] createMenuItems() {
         return new Tab[]{
                 createTab(ClientSearchView.class, "Kundensuche", VaadinIcon.USERS),
-                createTab(ExtrasView.class, "Extras bestellen", VaadinIcon.FORM),
+                createTab(ArticleBookingView.class, "Extras bestellen", VaadinIcon.FORM),
                 createTab(PendingBookingView.class, "Offene Buchungen", VaadinIcon.CREDIT_CARD),
                 createTab(ManagementView.class, "Verwaltungen", VaadinIcon.DESKTOP),
                 createTab(DatabaseRedirectView.class, "Datenbank", VaadinIcon.DATABASE)

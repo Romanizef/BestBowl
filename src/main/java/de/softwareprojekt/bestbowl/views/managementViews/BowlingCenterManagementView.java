@@ -17,8 +17,9 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
-import de.softwareprojekt.bestbowl.jpa.repositories.BowlingCenterRepository;
+
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingcenterAnduserEntities.BowlingCenter;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingcenterAnduserRepos.BowlingCenterRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.utils.validators.BowlingCenterValidator;

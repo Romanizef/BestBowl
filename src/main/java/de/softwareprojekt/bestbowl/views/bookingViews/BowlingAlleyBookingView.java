@@ -16,18 +16,18 @@ import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import de.softwareprojekt.bestbowl.beans.Repos;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlley;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
-import de.softwareprojekt.bestbowl.jpa.entities.Client;
-import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyBookingRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.BowlingAlleyRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.BowlingCenterRepository;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlley;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingcenterAnduserEntities.BowlingCenter;
+import de.softwareprojekt.bestbowl.jpa.entities.clientEntities.Client;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlleyRepos.BowlingAlleyBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlleyRepos.BowlingAlleyRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingcenterAnduserRepos.BowlingCenterRepository;
 import de.softwareprojekt.bestbowl.utils.Utils;
+import de.softwareprojekt.bestbowl.utils.checkers.AlleyBookingChecker;
 import de.softwareprojekt.bestbowl.utils.email.MailSenderService;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
-import de.softwareprojekt.bestbowl.utils.other.AlleyBookingChecker;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -264,7 +264,7 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         Button button = new Button("Weiter zum Extras buchen");
         button.setWidth("55%");
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        button.addClickListener(e -> UI.getCurrent().navigate(ExtrasView.class, latestBooking.getId()));
+        button.addClickListener(e -> UI.getCurrent().navigate(ArticleBookingView.class, latestBooking.getId()));
         return button;
     }
 

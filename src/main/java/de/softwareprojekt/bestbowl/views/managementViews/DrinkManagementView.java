@@ -18,13 +18,14 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.softwareprojekt.bestbowl.jpa.entities.Drink;
-import de.softwareprojekt.bestbowl.jpa.entities.DrinkVariant;
-import de.softwareprojekt.bestbowl.jpa.repositories.DrinkRepository;
+
+import de.softwareprojekt.bestbowl.jpa.entities.drinkEntities.Drink;
+import de.softwareprojekt.bestbowl.jpa.entities.drinkEntities.DrinkVariant;
+import de.softwareprojekt.bestbowl.jpa.repositories.drinkRepos.DrinkRepository;
 import de.softwareprojekt.bestbowl.utils.enums.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
-import de.softwareprojekt.bestbowl.views.form.DrinkForm;
+import de.softwareprojekt.bestbowl.views.articleForms.DrinkForm;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
