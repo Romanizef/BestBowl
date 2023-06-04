@@ -3,20 +3,20 @@ package de.softwareprojekt.bestbowl.beans;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepos.AddressRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepos.AssociationRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepos.ClientRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlleyRepos.BowlingAlleyBookingRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlleyRepos.BowlingAlleyRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoeRepos.BowlingShoeBookingRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoeRepos.BowlingShoeRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.bowlingcenterAnduserRepos.BowlingCenterRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.bowlingcenterAnduserRepos.UserRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.drinkRepos.DrinkBookingRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.drinkRepos.DrinkRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.drinkRepos.DrinkVariantRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.foodRepos.FoodBookingRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.foodRepos.FoodRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.client.AddressRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.client.AssociationRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.client.ClientRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlley.BowlingAlleyBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlley.BowlingAlleyRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoe.BowlingShoeBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoe.BowlingShoeRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingCenterRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.UserRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.drink.DrinkBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.drink.DrinkRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.drink.DrinkVariantRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.food.FoodBookingRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.food.FoodRepository;
 import jakarta.annotation.PostConstruct;
 
 /**

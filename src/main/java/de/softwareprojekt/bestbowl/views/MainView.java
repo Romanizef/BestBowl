@@ -1,12 +1,5 @@
 package de.softwareprojekt.bestbowl.views;
 
-import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
-
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -27,15 +20,19 @@ import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.Lumo;
-
 import de.softwareprojekt.bestbowl.BestBowlApplication;
 import de.softwareprojekt.bestbowl.beans.SecurityService;
 import de.softwareprojekt.bestbowl.beans.UserManager;
 import de.softwareprojekt.bestbowl.views.bookingViews.ArticleBookingView;
 import de.softwareprojekt.bestbowl.views.bookingViews.ClientSearchView;
 import de.softwareprojekt.bestbowl.views.bookingViews.PendingBookingView;
-import de.softwareprojekt.bestbowl.views.dbAndstatisticsViews.DatabaseRedirectView;
 import de.softwareprojekt.bestbowl.views.managementViews.ManagementView;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Optional;
+
+import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
 
 /**
  * Is the main template for all the other views and incorporates them as tabs
@@ -43,7 +40,7 @@ import de.softwareprojekt.bestbowl.views.managementViews.ManagementView;
  * @author Marten Voß
  * @author Matija Kopschek
  * @author Max Ziller
- * @author Ali aus Mali, chillt am Strand in Bali und drinkt ne ganze Bacardi
+ * @author Ali Cicek
  */
 public class MainView extends AppLayout implements AppShellConfigurator {
     private final transient SecurityService securityService;
@@ -70,15 +67,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         viewTitle.getStyle()
                 .set("font-size", "var(--lumo-font-size-l)")
                 .set("margin", "var(--lumo-space-m) var(--lumo-space-l)");
-
-        HorizontalLayout headerLayout = createHeaderContent();
-        headerLayout.add(new Button(VaadinIcon.POWER_OFF.create(), e -> startThread(BestBowlApplication::shutdown, "shutdown", true)));
-        headerLayout.add(createDarkModeToggle());
-        if (securityService.getAuthenticatedUser() != null) {
-            Button logoutButton = new Button("Logout", click -> securityService.logout());
-            headerLayout.add(logoutButton);
-        }
-        addToNavbar(headerLayout);
+        addToNavbar(createHeaderContent());
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
         setDrawerOpened(userManager.getDrawerStateForUser(getAuthenticatedUserNameOrDefault()));
@@ -140,6 +129,14 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         layout.add(drawerToggle);
         layout.add(viewTitle);
         layout.expand(viewTitle);
+        Button shutdownButton = new Button(VaadinIcon.POWER_OFF.create());
+        shutdownButton.addClickListener(e -> startThread(BestBowlApplication::shutdown, "shutdown", true));
+        layout.add(shutdownButton);
+        layout.add(createDarkModeToggle());
+        if (securityService.getAuthenticatedUser() != null) {
+            Button logoutButton = new Button("Logout", click -> securityService.logout());
+            layout.add(logoutButton);
+        }
         return layout;
     }
 

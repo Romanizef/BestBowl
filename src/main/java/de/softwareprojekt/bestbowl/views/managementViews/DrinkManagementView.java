@@ -19,10 +19,10 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import de.softwareprojekt.bestbowl.jpa.entities.drinkEntities.Drink;
-import de.softwareprojekt.bestbowl.jpa.entities.drinkEntities.DrinkVariant;
-import de.softwareprojekt.bestbowl.jpa.repositories.drinkRepos.DrinkRepository;
-import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.jpa.entities.drink.Drink;
+import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkVariant;
+import de.softwareprojekt.bestbowl.jpa.repositories.drink.DrinkRepository;
+import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.articleForms.DrinkForm;

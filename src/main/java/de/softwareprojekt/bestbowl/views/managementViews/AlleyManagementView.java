@@ -32,9 +32,9 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlley;
-import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlleyRepos.BowlingAlleyRepository;
-import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlley.BowlingAlleyRepository;
+import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.utils.validators.BowlingAlleyValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
@@ -147,7 +147,7 @@ public class AlleyManagementView extends VerticalLayout {
 
         binder.withValidator(new BowlingAlleyValidator());
         binder.bind(idField, BowlingAlley::getId, (alley, i) -> alley.setId(Objects.requireNonNullElse(i, 0)));
-        binder.bind(activeCheckbox, BowlingAlley::isActive, (arg0, arg1) -> arg0.setActive(arg1));
+        binder.bind(activeCheckbox, BowlingAlley::isActive, BowlingAlley::setActive);
         return layout;
     }
 

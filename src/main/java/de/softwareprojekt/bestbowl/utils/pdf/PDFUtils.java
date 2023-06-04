@@ -32,11 +32,11 @@ import org.vandeseer.easytable.structure.Table.TableBuilder;
 import org.vandeseer.easytable.structure.cell.TextCell;
 
 import de.softwareprojekt.bestbowl.beans.Repos;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoeEntities.BowlingShoeBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingcenterAnduserEntities.BowlingCenter;
-import de.softwareprojekt.bestbowl.jpa.entities.drinkEntities.DrinkBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.foodEntities.FoodBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoeBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
+import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.food.FoodBooking;
 import de.softwareprojekt.bestbowl.utils.Utils;
 
 /**

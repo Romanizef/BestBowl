@@ -1,10 +1,10 @@
 package de.softwareprojekt.bestbowl.beans;
 
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingcenterAnduserEntities.BowlingCenter;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingcenterAnduserEntities.User;
-import de.softwareprojekt.bestbowl.jpa.repositories.bowlingcenterAnduserRepos.BowlingCenterRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.bowlingcenterAnduserRepos.UserRepository;
-import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
+import de.softwareprojekt.bestbowl.jpa.entities.User;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingCenterRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.UserRepository;
+import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

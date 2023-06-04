@@ -24,10 +24,10 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import de.softwareprojekt.bestbowl.beans.UserManager;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingcenterAnduserEntities.User;
-import de.softwareprojekt.bestbowl.jpa.repositories.bowlingcenterAnduserRepos.UserRepository;
+import de.softwareprojekt.bestbowl.jpa.entities.User;
+import de.softwareprojekt.bestbowl.jpa.repositories.UserRepository;
 import de.softwareprojekt.bestbowl.utils.Utils;
-import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.utils.validators.UserValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
@@ -241,7 +241,7 @@ public class UserManagementView extends VerticalLayout {
         binder.bind(securityQuestionField, User::getSecurityQuestion, User::setSecurityQuestion);
         binder.bind(securityQuestionAnswerField, User::getSecurityQuestionAnswer, User::setSecurityQuestionAnswer);
         binder.bind(roleCB, User::getRole, User::setRole);
-        binder.bind(activeCheckbox, User::isActive, (arg0, arg1) -> arg0.setActive(arg1));
+        binder.bind(activeCheckbox, User::isActive, User::setActive);
         return layout;
     }
 

@@ -12,8 +12,8 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 
-import de.softwareprojekt.bestbowl.jpa.entities.foodEntities.Food;
-import de.softwareprojekt.bestbowl.utils.validators.articleValidators.FoodValidator;
+import de.softwareprojekt.bestbowl.jpa.entities.food.Food;
+import de.softwareprojekt.bestbowl.utils.validators.article.FoodValidator;
 
 /**
  * Creates the Form for the Food Entity.
@@ -62,9 +62,9 @@ public class FoodForm extends FormLayout {
 
         foodBinder.withValidator(new FoodValidator());
         foodBinder.bind(nameField, Food::getName, Food::setName);
-        foodBinder.bind(stockField, Food::getStock, (arg0, arg1) -> arg0.setStock(arg1));
-        foodBinder.bind(reorderPointField, Food::getReorderPoint, (arg0, arg1) -> arg0.setReorderPoint(arg1));
-        foodBinder.bind(priceField, Food::getPrice, (arg0, arg1) -> arg0.setPrice(arg1));
-        foodBinder.bind(activeCheckbox, Food::isActive, (arg0, arg1) -> arg0.setActive(arg1));
+        foodBinder.bind(stockField, Food::getStock, Food::setStock);
+        foodBinder.bind(reorderPointField, Food::getReorderPoint, Food::setReorderPoint);
+        foodBinder.bind(priceField, Food::getPrice, Food::setPrice);
+        foodBinder.bind(activeCheckbox, Food::isActive, Food::setActive);
     }
 }

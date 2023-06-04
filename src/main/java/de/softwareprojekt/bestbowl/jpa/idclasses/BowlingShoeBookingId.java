@@ -1,8 +1,8 @@
 package de.softwareprojekt.bestbowl.jpa.idclasses;
 
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlley;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoeEntities.BowlingShoe;
-import de.softwareprojekt.bestbowl.jpa.entities.clientEntities.Client;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
+import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 
 import java.io.Serializable;
 import java.util.Objects;

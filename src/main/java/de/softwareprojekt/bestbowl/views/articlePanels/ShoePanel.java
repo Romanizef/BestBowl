@@ -8,9 +8,9 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoeEntities.BowlingShoe;
-import de.softwareprojekt.bestbowl.jpa.entities.clientEntities.Client;
-import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoeRepos.BowlingShoeRepository;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
+import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoe.BowlingShoeRepository;
 
 import java.util.Comparator;
 import java.util.HashMap;

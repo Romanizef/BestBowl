@@ -28,12 +28,12 @@ import com.vaadin.flow.function.SerializableComparator;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.softwareprojekt.bestbowl.beans.Repos;
-import de.softwareprojekt.bestbowl.jpa.entities.drinkEntities.Drink;
-import de.softwareprojekt.bestbowl.jpa.entities.drinkEntities.DrinkVariant;
-import de.softwareprojekt.bestbowl.jpa.repositories.drinkRepos.DrinkVariantRepository;
-import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.jpa.entities.drink.Drink;
+import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkVariant;
+import de.softwareprojekt.bestbowl.jpa.repositories.drink.DrinkVariantRepository;
+import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
-import de.softwareprojekt.bestbowl.utils.validators.articleValidators.DrinkVariantValidator;
+import de.softwareprojekt.bestbowl.utils.validators.article.DrinkVariantValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -169,9 +169,9 @@ public class DrinkVariantManagementView extends VerticalLayout {
                         drinkVariant.setDrink(drink);
                     }
                 }));
-        drinkVariantBinder.bind(priceField, DrinkVariant::getPrice, (arg0, arg1) -> arg0.setPrice(arg1));
-        drinkVariantBinder.bind(variantField, DrinkVariant::getMl, (arg0, arg1) -> arg0.setMl(arg1));
-        drinkVariantBinder.bind(activeCheckbox, DrinkVariant::isActive, (arg0, arg1) -> arg0.setActive(arg1));
+        drinkVariantBinder.bind(priceField, DrinkVariant::getPrice, DrinkVariant::setPrice);
+        drinkVariantBinder.bind(variantField, DrinkVariant::getMl, DrinkVariant::setMl);
+        drinkVariantBinder.bind(activeCheckbox, DrinkVariant::isActive, DrinkVariant::setActive);
         return drinkVariantlayout;
     }
 

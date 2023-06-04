@@ -17,10 +17,9 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingcenterAnduserEntities.BowlingCenter;
-import de.softwareprojekt.bestbowl.jpa.repositories.bowlingcenterAnduserRepos.BowlingCenterRepository;
-import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingCenterRepository;
+import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.utils.validators.BowlingCenterValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
@@ -132,9 +131,8 @@ public class BowlingCenterManagementView extends Div {
         binder.bind(endTimePicker, bc -> LocalTime.ofSecondOfDay(bc.getEndTime()),
                 (bc, time) -> bc.setEndTime(time.toSecondOfDay()));
         binder.bind(bowlingAlleyPricePerHourField, BowlingCenter::getBowlingAlleyPricePerHour,
-                (arg0, arg1) -> arg0.setBowlingAlleyPricePerHour(arg1));
-        binder.bind(bowlingShoePriceField, BowlingCenter::getBowlingShoePrice,
-                (arg0, arg1) -> arg0.setBowlingShoePrice(arg1));
+                BowlingCenter::setBowlingAlleyPricePerHour);
+        binder.bind(bowlingShoePriceField, BowlingCenter::getBowlingShoePrice, BowlingCenter::setBowlingShoePrice);
         binder.bind(senderEmailField, BowlingCenter::getSenderEmail, BowlingCenter::setSenderEmail);
         binder.bind(receiverEmailField, BowlingCenter::getReceiverEmail, BowlingCenter::setReceiverEmail);
         binder.bind(passwordField, BowlingCenter::getPassword, BowlingCenter::setPassword);

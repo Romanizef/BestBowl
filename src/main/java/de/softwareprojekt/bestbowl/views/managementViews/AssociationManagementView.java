@@ -21,11 +21,11 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import de.softwareprojekt.bestbowl.jpa.entities.clientEntities.Association;
-import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepos.AssociationRepository;
-import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.jpa.entities.client.Association;
+import de.softwareprojekt.bestbowl.jpa.repositories.client.AssociationRepository;
+import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
-import de.softwareprojekt.bestbowl.utils.validators.clientValidators.AssociationValidator;
+import de.softwareprojekt.bestbowl.utils.validators.client.AssociationValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -204,8 +204,8 @@ public class AssociationManagementView extends VerticalLayout {
 
         binder.withValidator(new AssociationValidator());
         binder.bind(nameField, Association::getName, Association::setName);
-        binder.bind(discountField, Association::getDiscount, (arg0, arg1) -> arg0.setDiscount(arg1));
-        binder.bind(activeCheckbox, Association::isActive, (arg0, arg1) -> arg0.setActive(arg1));
+        binder.bind(discountField, Association::getDiscount, Association::setDiscount);
+        binder.bind(activeCheckbox, Association::isActive, Association::setActive);
         return layout;
     }
 

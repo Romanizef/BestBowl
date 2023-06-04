@@ -2,11 +2,11 @@ package de.softwareprojekt.bestbowl.utils.checkers;
 
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import de.softwareprojekt.bestbowl.beans.Repos;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlley;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingcenterAnduserEntities.BowlingCenter;
-import de.softwareprojekt.bestbowl.jpa.entities.clientEntities.Client;
-import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
+import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
+import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 
 import java.time.*;

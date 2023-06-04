@@ -8,9 +8,9 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.foodEntities.Food;
-import de.softwareprojekt.bestbowl.jpa.entities.foodEntities.FoodBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.food.Food;
+import de.softwareprojekt.bestbowl.jpa.entities.food.FoodBooking;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 
 /**

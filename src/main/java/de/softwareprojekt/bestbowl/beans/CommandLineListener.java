@@ -18,16 +18,16 @@ import org.springframework.stereotype.Component;
 import com.github.javafaker.Faker;
 
 import de.softwareprojekt.bestbowl.BestBowlApplication;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlley;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoeEntities.BowlingShoe;
-import de.softwareprojekt.bestbowl.jpa.entities.clientEntities.Address;
-import de.softwareprojekt.bestbowl.jpa.entities.clientEntities.Association;
-import de.softwareprojekt.bestbowl.jpa.entities.clientEntities.Client;
-import de.softwareprojekt.bestbowl.jpa.entities.drinkEntities.Drink;
-import de.softwareprojekt.bestbowl.jpa.entities.drinkEntities.DrinkVariant;
-import de.softwareprojekt.bestbowl.jpa.entities.foodEntities.Food;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
+import de.softwareprojekt.bestbowl.jpa.entities.client.Address;
+import de.softwareprojekt.bestbowl.jpa.entities.client.Association;
+import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
+import de.softwareprojekt.bestbowl.jpa.entities.drink.Drink;
+import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkVariant;
+import de.softwareprojekt.bestbowl.jpa.entities.food.Food;
 import de.softwareprojekt.bestbowl.utils.checkers.DuplicateChecker;
-import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import jakarta.annotation.PostConstruct;
 
 /**

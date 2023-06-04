@@ -4,7 +4,7 @@ import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.binder.ValueContext;
 
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlley;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
 
 /**
  * @author Marten Voß

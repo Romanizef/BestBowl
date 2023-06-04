@@ -17,10 +17,10 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoeEntities.BowlingShoe;
-import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoeRepos.BowlingShoeRepository;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
+import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoe.BowlingShoeRepository;
 import de.softwareprojekt.bestbowl.utils.Utils;
-import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.articleForms.BowlingShoeForm;

@@ -21,13 +21,13 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import de.softwareprojekt.bestbowl.jpa.entities.clientEntities.Address;
-import de.softwareprojekt.bestbowl.jpa.entities.clientEntities.Association;
-import de.softwareprojekt.bestbowl.jpa.entities.clientEntities.Client;
-import de.softwareprojekt.bestbowl.jpa.repositories.ClientRepos.ClientRepository;
-import de.softwareprojekt.bestbowl.utils.enums.UserRole;
+import de.softwareprojekt.bestbowl.jpa.entities.client.Address;
+import de.softwareprojekt.bestbowl.jpa.entities.client.Association;
+import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
+import de.softwareprojekt.bestbowl.jpa.repositories.client.ClientRepository;
+import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
-import de.softwareprojekt.bestbowl.utils.validators.clientValidators.ClientValidator;
+import de.softwareprojekt.bestbowl.utils.validators.client.ClientValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -304,7 +304,7 @@ public class ClientManagementView extends VerticalLayout {
                 ((client, i) -> client.getAddress().setPostCode(Objects.requireNonNullElse(i, 0))));
         binder.bind(cityField, client -> client.getAddress().getCity(),
                 ((client, s) -> client.getAddress().setCity(s)));
-        binder.bind(activeCheckbox, Client::isActive, (arg0, arg1) -> arg0.setActive(arg1));
+        binder.bind(activeCheckbox, Client::isActive, Client::setActive);
         return layout;
     }
 

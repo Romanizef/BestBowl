@@ -6,10 +6,10 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlleyEntities.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.drinkEntities.Drink;
-import de.softwareprojekt.bestbowl.jpa.entities.drinkEntities.DrinkBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.drinkEntities.DrinkVariant;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.drink.Drink;
+import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkVariant;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 
 import java.util.ArrayList;
