@@ -2,7 +2,12 @@ package de.softwareprojekt.bestbowl.views;
 
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.VAADIN_PRIMARY_BLUE;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -108,32 +113,54 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
     }
 
     /**
-     * Creates a {@code Select<String>} select that contains all years of bookings.
+     * Creates a {@code Select<String>} select that contains all years of al the
+     * bookings. A bookingyear can be selected so that the grid updates itself
+     * with the bookings of that year.
      *
      * @return {@code Select<String>}
      */
     private Component createYearDropDown() {
-        List<BowlingAlleyBooking> list = bowlingAlleyBookingRepository.findAll();
+        List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository
+                .findAll();
         List<String> yearList = new ArrayList<>();
         Select<String> select = new Select<>();
         select.setLabel("Sortieren nach Jahr");
         select.getStyle().set("margin-right", "80px");
 
-        for (BowlingAlleyBooking bowlingAlleyBooking : list) {
-            String stringTime = Utils.toDateString(bowlingAlleyBooking.getEndTime());
+        for (BowlingAlleyBooking bowlingAlleyBooking : bowlingAlleyBookingList) {
+            String stringTime = Utils.toDateString(bowlingAlleyBooking.getStartTime());
             String year = stringTime.substring(6, 10);
-            yearList.add(year);
+            if (!yearList.contains(year))
+                yearList.add(year);
         }
+
+        // Sort reversed alphabetically
+        Comparator<String> reverseComparator = Comparator.reverseOrder();
+        Collections.sort(yearList, reverseComparator);
 
         select.setItems(yearList);
         select.addValueChangeListener(e -> {
-            for (BowlingAlleyBooking bowlingAlleyBooking : list) {
-                String stringTime = Utils.toDateString(bowlingAlleyBooking.getEndTime());
+            for (BowlingAlleyBooking bowlingAlleyBooking : bowlingAlleyBookingList) {
+                long longTime = bowlingAlleyBooking.getStartTime();
+                String stringTime = Utils.toDateString(longTime);
                 String bookingYear = stringTime.substring(6, 10);
-                if (bookingYear.equals(select.getValue())) {
-                    updateGridYear(bowlingAlleyBooking.getEndTime());
-                }
 
+                // start and endtime of the chosen year
+                Calendar cal = Calendar.getInstance();
+                cal.set(Calendar.YEAR, Integer.parseInt(bookingYear));
+                cal.set(Calendar.DAY_OF_YEAR, 1); // 1 = first day of the year
+                Date start = cal.getTime();
+
+                cal.set(Calendar.YEAR, Integer.parseInt(bookingYear));
+                cal.set(Calendar.MONTH, 11); // 11 = december
+                cal.set(Calendar.DAY_OF_MONTH, 31); // 31 = last day of december
+                Date end = cal.getTime();
+
+                long lowerBound = start.getTime();
+                long upperBound = end.getTime();
+                if (bookingYear.equals(select.getValue().toString())) {
+                    updateGridYear(lowerBound, upperBound);
+                }
             }
         });
         return select;
@@ -220,12 +247,13 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
     /**
      * Updates all the grid items to the matching year.
      * 
-     * @param l
+     * @param lowerBound
+     * @param upperBound
      */
-    private void updateGridYear(long l) {
+    private void updateGridYear(long lowerBound, long upperBound) {
         bookingGrid.setItems(
                 bowlingAlleyBookingRepository
-                        .findAllByTimePeriodsOverlapping(l));
+                        .findAllByStartTimeBetween(lowerBound, upperBound));
     }
 
     /**

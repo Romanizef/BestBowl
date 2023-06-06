@@ -35,4 +35,11 @@ public interface BowlingAlleyBookingRepository extends JpaRepository<BowlingAlle
     List<BowlingAlleyBooking> findAllByClientEquals(Client client);
 
     List<BowlingAlleyBooking> findAllByEndTimeLessThanAndCompletedEquals(long endTime, boolean completed);
+
+    @Query("from BowlingAlleyBooking bab where" +
+    "(bab.startTime between :lowerBound and :upperBound " +
+    "or bab.endTime between :lowerBound and :upperBound " +
+    "or :lowerBound between bab.startTime and bab.endTime " +
+    ") order by bab.bowlingAlley.id")
+    List<BowlingAlleyBooking> findAllByStartTimeBetween(@Param("lowerBound") long lowerBound, @Param("upperBound") long upperBound);
 }
