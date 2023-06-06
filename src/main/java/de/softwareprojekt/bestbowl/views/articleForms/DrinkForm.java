@@ -9,9 +9,10 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
-
 import de.softwareprojekt.bestbowl.jpa.entities.drink.Drink;
 import de.softwareprojekt.bestbowl.utils.validators.article.DrinkValidator;
+
+import java.util.Objects;
 
 /**
  * Creates the Form for the Drink Entity
@@ -53,8 +54,11 @@ public class DrinkForm extends FormLayout {
 
         drinkBinder.withValidator(new DrinkValidator());
         drinkBinder.bind(nameField, Drink::getName, Drink::setName);
-        drinkBinder.bind(stockField, Drink::getStockInMilliliters, Drink::setStockInMilliliters);
-        drinkBinder.bind(reorderPointField, Drink::getReorderPoint, Drink::setReorderPoint);
-        drinkBinder.bind(activeCheckbox, Drink::isActive, Drink::setActive);
+        drinkBinder.bind(stockField, Drink::getStockInMilliliters,
+                (drink, stockInMilliliters) -> drink.setStockInMilliliters(Objects.requireNonNullElse(stockInMilliliters, 0)));
+        drinkBinder.bind(reorderPointField, Drink::getReorderPoint,
+                (drink, reorderPoint) -> drink.setReorderPoint(Objects.requireNonNullElse(reorderPoint, 0)));
+        drinkBinder.bind(activeCheckbox, Drink::isActive,
+                (drink, active) -> drink.setActive(Objects.requireNonNullElse(active, false)));
     }
 }

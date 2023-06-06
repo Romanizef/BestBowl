@@ -10,7 +10,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
-
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
 import de.softwareprojekt.bestbowl.utils.validators.article.BowlingShoeValidator;
 
@@ -18,6 +17,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Creates the Form for the Shoe Entity.
@@ -58,7 +58,9 @@ public class BowlingShoeForm extends FormLayout {
                 ZoneId.systemDefault()), (bowlingShoe, localDateTime) -> {
             bowlingShoe.setBoughtAt(localDateTime.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000);
         });
-        shoeBinder.bind(sizeField, BowlingShoe::getSize, BowlingShoe::setSize);
-        shoeBinder.bind(activeCheckbox, BowlingShoe::isActive, BowlingShoe::setActive);
+        shoeBinder.bind(sizeField, BowlingShoe::getSize,
+                (bowlingShoe, size) -> bowlingShoe.setSize(Objects.requireNonNullElse(size, 0)));
+        shoeBinder.bind(activeCheckbox, BowlingShoe::isActive,
+                (bowlingShoe, active) -> bowlingShoe.setActive(Objects.requireNonNullElse(active, false)));
     }
 }

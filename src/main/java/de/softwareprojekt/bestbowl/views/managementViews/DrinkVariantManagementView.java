@@ -38,10 +38,7 @@ import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
@@ -169,9 +166,12 @@ public class DrinkVariantManagementView extends VerticalLayout {
                         drinkVariant.setDrink(drink);
                     }
                 }));
-        drinkVariantBinder.bind(priceField, DrinkVariant::getPrice, DrinkVariant::setPrice);
-        drinkVariantBinder.bind(variantField, DrinkVariant::getMl, DrinkVariant::setMl);
-        drinkVariantBinder.bind(activeCheckbox, DrinkVariant::isActive, DrinkVariant::setActive);
+        drinkVariantBinder.bind(priceField, DrinkVariant::getPrice,
+                (drinkVariant, price) -> drinkVariant.setPrice(Objects.requireNonNullElse(price, 0.0)));
+        drinkVariantBinder.bind(variantField, DrinkVariant::getMl,
+                (drinkVariant, ml) -> drinkVariant.setMl(Objects.requireNonNullElse(ml, 0)));
+        drinkVariantBinder.bind(activeCheckbox, DrinkVariant::isActive,
+                (drinkVariant, active) -> drinkVariant.setActive(Objects.requireNonNullElse(active, false)));
         return drinkVariantlayout;
     }
 

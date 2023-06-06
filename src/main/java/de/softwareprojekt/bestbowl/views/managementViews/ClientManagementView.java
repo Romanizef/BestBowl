@@ -20,7 +20,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
 import de.softwareprojekt.bestbowl.jpa.entities.client.Address;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Association;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
@@ -304,7 +303,8 @@ public class ClientManagementView extends VerticalLayout {
                 ((client, i) -> client.getAddress().setPostCode(Objects.requireNonNullElse(i, 0))));
         binder.bind(cityField, client -> client.getAddress().getCity(),
                 ((client, s) -> client.getAddress().setCity(s)));
-        binder.bind(activeCheckbox, Client::isActive, Client::setActive);
+        binder.bind(activeCheckbox, Client::isActive,
+                (client, active) -> client.setActive(Objects.requireNonNullElse(active, false)));
         return layout;
     }
 

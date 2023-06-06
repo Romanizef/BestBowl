@@ -36,6 +36,7 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -241,7 +242,8 @@ public class UserManagementView extends VerticalLayout {
         binder.bind(securityQuestionField, User::getSecurityQuestion, User::setSecurityQuestion);
         binder.bind(securityQuestionAnswerField, User::getSecurityQuestionAnswer, User::setSecurityQuestionAnswer);
         binder.bind(roleCB, User::getRole, User::setRole);
-        binder.bind(activeCheckbox, User::isActive, User::setActive);
+        binder.bind(activeCheckbox, User::isActive,
+                (user, active) -> user.setActive(Objects.requireNonNullElse(active, false)));
         return layout;
     }
 

@@ -20,7 +20,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
 import de.softwareprojekt.bestbowl.jpa.entities.client.Association;
 import de.softwareprojekt.bestbowl.jpa.repositories.client.AssociationRepository;
 import de.softwareprojekt.bestbowl.utils.constants.UserRole;
@@ -204,8 +203,10 @@ public class AssociationManagementView extends VerticalLayout {
 
         binder.withValidator(new AssociationValidator());
         binder.bind(nameField, Association::getName, Association::setName);
-        binder.bind(discountField, Association::getDiscount, Association::setDiscount);
-        binder.bind(activeCheckbox, Association::isActive, Association::setActive);
+        binder.bind(discountField, Association::getDiscount,
+                (association, discount) -> association.setDiscount(Objects.requireNonNullElse(discount, 0.0)));
+        binder.bind(activeCheckbox, Association::isActive,
+                (association, active) -> association.setActive(Objects.requireNonNullElse(active, false)));
         return layout;
     }
 
