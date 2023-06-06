@@ -28,7 +28,6 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.OptionalParameter;
 import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
 
 import de.softwareprojekt.bestbowl.beans.Repos;
@@ -45,7 +44,6 @@ import de.softwareprojekt.bestbowl.utils.Utils;
 import de.softwareprojekt.bestbowl.utils.components.InvoiceDownloadButton;
 import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
-import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.bookingViews.ClientSearchView;
 import jakarta.annotation.security.RolesAllowed;
 
@@ -57,7 +55,6 @@ import jakarta.annotation.security.RolesAllowed;
 @Route(value = "statistics", layout = MainView.class)
 @PageTitle("Statistiken")
 @RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
-@PreserveOnRefresh
 public class StatisticsView extends VerticalLayout implements HasUrlParameter<Integer> {
     private final transient BowlingAlleyBookingRepository bowlingAlleyBookingRepository;
     private final transient DrinkBookingRepository drinkBookingRepository;
@@ -89,7 +86,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
         setSizeFull();
         bookingGrid = createGrid();
         Component footerComponent = createFooterComponent();
-        Component headerComponent = createHeaderComponents(bookingRepository);
+        Component headerComponent = createHeaderComponents();
         add(headerComponent, bookingGrid, footerComponent);
         updateGridItems();
     }
@@ -97,28 +94,26 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
     /**
      * Creates a {@code HorizontalLayout} headerLayout that contains the
      * clientHeader and year dropdownfilter.
-     * 
-     * @param bookingRepository
-     * @see #createYearDropDown(BowlingAlleyBookingRepository)
+     *
+     * @see #createYearDropDown()
      * @return {@code HorizontalLayout}
      */
-    private Component createHeaderComponents(BowlingAlleyBookingRepository bookingRepository) {
+    private Component createHeaderComponents() {
         HorizontalLayout headerLayout = new HorizontalLayout();
         headerLayout.setAlignItems(Alignment.CENTER);
         headerLayout.expand(clientHeader);
         headerLayout.setWidthFull();
-        headerLayout.add(clientHeader, createYearDropDown(bookingRepository));
+        headerLayout.add(clientHeader, createYearDropDown());
         return headerLayout;
     }
 
     /**
      * Creates a {@code Select<String>} select that contains all years of bookings.
-     * 
-     * @param bookingRepository
+     *
      * @return {@code Select<String>}
      */
-    private Component createYearDropDown(BowlingAlleyBookingRepository bookingRepository) {
-        List<BowlingAlleyBooking> list = bookingRepository.findAll();
+    private Component createYearDropDown() {
+        List<BowlingAlleyBooking> list = bowlingAlleyBookingRepository.findAll();
         List<String> yearList = new ArrayList<>();
         Select<String> select = new Select<>();
         select.setLabel("Sortieren nach Jahr");
@@ -145,7 +140,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
     }
 
     /**
-     * If no client ist selected a message apears. A {@code H1} shows the currently
+     * If no client is selected a message appears. A {@code H1} shows the currently
      * selected client
      */
     private void updateInitialComponents() {
@@ -168,7 +163,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
         VerticalLayout verticallayout = new VerticalLayout();
         verticallayout.setWidth("80%");
         verticallayout.setAlignItems(Alignment.CENTER);
-        verticallayout.add(createLastViewButton(verticallayout), createRefreshButton());
+        verticallayout.add(createLastViewButton(), createRefreshButton());
 
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.setWidthFull();
@@ -187,10 +182,9 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
     /**
      * Creates a {@code Button} that returns the user to the ClientSearchView
      *
-     * @param layout
      * @return {@code Button} lastViewButton
      */
-    private Button createLastViewButton(VerticalLayout layout) {
+    private Button createLastViewButton() {
         Button lastViewButton;
         lastViewButton = new Button("Zurück zu Kundensuche");
         lastViewButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -258,6 +252,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
         bookingGrid
                 .addColumn(new ComponentRenderer<>(booking -> {
                     HorizontalLayout horizontalLayout = new HorizontalLayout();
+                    horizontalLayout.setAlignItems(Alignment.CENTER);
                     horizontalLayout.add(new InvoiceDownloadButton(booking),
                             new Label(String.valueOf(booking.getId())));
                     return horizontalLayout;
@@ -276,7 +271,6 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
         bookingGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
         bookingGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         bookingGrid.setSizeFull();
-        // prepareFilterFields();
         return bookingGrid;
     }
 

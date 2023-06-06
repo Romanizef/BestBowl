@@ -114,7 +114,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
     }
 
     /**
-     * A new Header is created, with the drawer toggle and the title
+     * creates the header layout with the drawer toggle, title, shutdown button, darkmode button and logout button
      *
      * @return {@code layout}
      */
@@ -126,15 +126,16 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         DrawerToggle drawerToggle = new DrawerToggle();
         drawerToggle.addClickListener(e -> userManager.toggleDrawerStateForUser(getAuthenticatedUserNameOrDefault()));
-        layout.add(drawerToggle);
-        layout.add(viewTitle);
-        layout.expand(viewTitle);
         Button shutdownButton = new Button(VaadinIcon.POWER_OFF.create());
+        shutdownButton.getStyle().set("margin-right", "10px");
         shutdownButton.addClickListener(e -> startThread(BestBowlApplication::shutdown, "shutdown", true));
-        layout.add(shutdownButton);
-        layout.add(createDarkModeToggle());
+        Button darkModeButton = createDarkModeToggle();
+        darkModeButton.getStyle().set("margin-right", "10px");
+        layout.add(drawerToggle, viewTitle, shutdownButton, darkModeButton);
+        layout.expand(viewTitle);
         if (securityService.getAuthenticatedUser() != null) {
             Button logoutButton = new Button("Logout", click -> securityService.logout());
+            logoutButton.getStyle().set("margin-right", "10px");
             layout.add(logoutButton);
         }
         return layout;
@@ -156,7 +157,6 @@ public class MainView extends AppLayout implements AppShellConfigurator {
                 userManager.setDarkModeStateForUser(getAuthenticatedUserNameOrDefault(), true);
             }
         });
-        button.getStyle().set("margin-left", "10px").set("margin-right", "10px");
         return button;
     }
 
