@@ -83,6 +83,7 @@ public class CommandLineListener {
                     if (e.getMessage() != null) {
                         LOGGER.error(e.getMessage());
                     }
+                    scanner.close();
                     scanner = new Scanner(System.in);
                 }
             }
