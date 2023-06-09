@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -12,6 +13,7 @@ import java.io.Serializable;
  */
 @Entity
 public class Food implements Serializable {
+    @Serial
     private static final long serialVersionUID = 8272575838721537250L;
 
 
@@ -30,7 +32,7 @@ public class Food implements Serializable {
         active = true;
     }
 
-    public Food(Food other){
+    public Food(Food other) {
         this.id = other.id;
         this.name = other.name;
         this.price = other.price;
@@ -39,7 +41,7 @@ public class Food implements Serializable {
         this.active = other.active;
     }
 
-    public void copyValuesOf(Food other){
+    public void copyValuesOf(Food other) {
         this.id = other.id;
         this.name = other.name;
         this.price = other.price;

@@ -2,7 +2,6 @@ package de.softwareprojekt.bestbowl.views;
 
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.VAADIN_PRIMARY_BLUE;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -253,7 +252,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
     private void updateGridYear(long lowerBound, long upperBound) {
         bookingGrid.setItems(
                 bowlingAlleyBookingRepository
-                        .findAllByStartTimeBetween(lowerBound, upperBound));
+                        .findAllByStartTimeBetweenOrderByStartTime(lowerBound, upperBound));
     }
 
     /**

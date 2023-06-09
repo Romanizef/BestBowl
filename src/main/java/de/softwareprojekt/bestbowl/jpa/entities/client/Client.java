@@ -2,6 +2,7 @@ package de.softwareprojekt.bestbowl.jpa.entities.client;
 
 import jakarta.persistence.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -9,6 +10,7 @@ import java.io.Serializable;
  */
 @Entity
 public class Client implements Serializable {
+    @Serial
     private static final long serialVersionUID = 4443604125629860648L;
 
     @Id

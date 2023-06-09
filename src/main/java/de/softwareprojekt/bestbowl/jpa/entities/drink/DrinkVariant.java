@@ -5,10 +5,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
 public class DrinkVariant implements Serializable {
+    @Serial
     private static final long serialVersionUID = -4900276745273591624L;
 
     @Id

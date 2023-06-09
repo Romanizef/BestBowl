@@ -3,6 +3,7 @@ package de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -10,6 +11,7 @@ import java.io.Serializable;
  */
 @Entity
 public class BowlingAlley implements Serializable {
+    @Serial
     private static final long serialVersionUID = -5386396429886134586L;
 
     @Id

@@ -19,6 +19,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.isCurrentUserInRole;
  */
 public class AlleyBookingChecker {
     private Client client;
+    private LocalDate bookingDate;
     private long startTime;
     private long endTime;
     private BowlingAlley availableAlley;
@@ -28,6 +29,7 @@ public class AlleyBookingChecker {
     }
 
     public void setTimeInfo(LocalDate date, LocalTime time, int durationInMin) {
+        bookingDate = date;
         startTime = LocalDateTime.of(date, time).atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L;
         endTime = startTime + durationInMin * 60 * 1000L - 1; // -1ms to avoid overlap
     }
@@ -52,7 +54,7 @@ public class AlleyBookingChecker {
 
     private boolean isInBusinessHours() {
         BowlingCenter bowlingCenter = Repos.getBowlingCenterRepository().getBowlingCenter();
-        LocalDate nowLD = LocalDate.now();
+        LocalDate nowLD = bookingDate;
         LocalDateTime startTimeLDT = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime), ZoneId.systemDefault());
         LocalDateTime endTimeLDT = LocalDateTime.ofInstant(Instant.ofEpochMilli(endTime), ZoneId.systemDefault());
         return !startTimeLDT.isBefore(LocalDateTime.of(nowLD, LocalTime.ofSecondOfDay(bowlingCenter.getStartTime())))

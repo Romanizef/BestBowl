@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.ManyToOne;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -17,6 +18,7 @@ import java.io.Serializable;
 @Entity
 @IdClass(FoodBookingId.class)
 public class FoodBooking implements Serializable {
+    @Serial
     private static final long serialVersionUID = -8958760050661309105L;
 
     @Id
@@ -39,7 +41,7 @@ public class FoodBooking implements Serializable {
         active = true;
     }
 
-    public FoodBooking(Food food, BowlingAlleyBooking bowlingAlleyBooking){
+    public FoodBooking(Food food, BowlingAlleyBooking bowlingAlleyBooking) {
         client = bowlingAlleyBooking.getClient();
         bowlingAlley = bowlingAlleyBooking.getBowlingAlley();
         timeStamp = bowlingAlleyBooking.getStartTime();

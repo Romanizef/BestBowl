@@ -2,7 +2,6 @@ package de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlley;
 
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -36,10 +35,5 @@ public interface BowlingAlleyBookingRepository extends JpaRepository<BowlingAlle
 
     List<BowlingAlleyBooking> findAllByEndTimeLessThanAndCompletedEquals(long endTime, boolean completed);
 
-    @Query("from BowlingAlleyBooking bab where" +
-    "(bab.startTime between :lowerBound and :upperBound " +
-    "or bab.endTime between :lowerBound and :upperBound " +
-    "or :lowerBound between bab.startTime and bab.endTime " +
-    ") order by bab.bowlingAlley.id")
-    List<BowlingAlleyBooking> findAllByStartTimeBetween(@Param("lowerBound") long lowerBound, @Param("upperBound") long upperBound);
+    List<BowlingAlleyBooking> findAllByStartTimeBetweenOrderByStartTime(long lowerBound, long upperBound);
 }

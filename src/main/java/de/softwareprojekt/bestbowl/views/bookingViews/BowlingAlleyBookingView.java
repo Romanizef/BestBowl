@@ -16,17 +16,17 @@ import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import de.softwareprojekt.bestbowl.beans.Repos;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingCenterRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlley.BowlingAlleyBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlley.BowlingAlleyRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.BowlingCenterRepository;
 import de.softwareprojekt.bestbowl.utils.Utils;
 import de.softwareprojekt.bestbowl.utils.checkers.AlleyBookingChecker;
-import de.softwareprojekt.bestbowl.utils.email.MailSenderService;
 import de.softwareprojekt.bestbowl.utils.constants.UserRole;
+import de.softwareprojekt.bestbowl.utils.email.MailSenderService;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.PermitAll;
@@ -85,7 +85,6 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         setAlignItems(Alignment.CENTER);
 
         bowlingCenter = bowlingCenterRepository.getBowlingCenter();
-        setBoundsToWholeDay();
 
         clientHeader = new H1();
         Component menuComponent = createMenuComponent();
@@ -99,10 +98,11 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         updateInitialComponents();
         updateGridItems();
         updateLabelAndButtons();
+        setBoundsToWholeDay();
     }
 
     private void setBoundsToWholeDay() {
-        LocalDateTime startLDT = LocalDateTime.of(LocalDate.now(), LocalTime.ofSecondOfDay(bowlingCenter.getStartTime()));
+        LocalDateTime startLDT = LocalDateTime.of(datePicker.getValue(), LocalTime.ofSecondOfDay(bowlingCenter.getStartTime()));
         if (LocalTime.now().isBefore(LocalTime.ofSecondOfDay(bowlingCenter.getStartTime()))) {
             startLDT = startLDT.minus(java.time.Duration.ofDays(1));
         }

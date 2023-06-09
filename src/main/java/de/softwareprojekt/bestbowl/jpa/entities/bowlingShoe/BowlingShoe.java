@@ -1,19 +1,20 @@
 package de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe;
 
+import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 
+import java.io.Serial;
 import java.io.Serializable;
-
-import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 
 /**
  * @author Marten Voß
  */
 @Entity
 public class BowlingShoe implements Serializable {
+    @Serial
     private static final long serialVersionUID = 991398573020179381L;
 
     @Id
@@ -30,14 +31,14 @@ public class BowlingShoe implements Serializable {
         active = true;
     }
 
-    public BowlingShoe(BowlingShoe other){
+    public BowlingShoe(BowlingShoe other) {
         this.id = other.id;
         this.size = other.size;
         this.boughtAt = other.boughtAt;
         this.active = other.active;
     }
 
-    public void copyValueOf(BowlingShoe other){
+    public void copyValueOf(BowlingShoe other) {
         this.id = other.id;
         this.size = other.size;
         this.boughtAt = other.boughtAt;

@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.ManyToOne;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -16,6 +17,7 @@ import java.io.Serializable;
 @Entity
 @IdClass(BowlingShoeBookingId.class)
 public class BowlingShoeBooking implements Serializable {
+    @Serial
     private static final long serialVersionUID = 7908165986912369981L;
 
     @Id
@@ -35,7 +37,8 @@ public class BowlingShoeBooking implements Serializable {
     private boolean active;
 
     public BowlingShoeBooking() {
-        active = true; price = 10;
+        active = true;
+        price = 10;
     }
 
     public Client getClient() {
@@ -78,7 +81,9 @@ public class BowlingShoeBooking implements Serializable {
         this.active = active;
     }
 
-    public double getPrice() { return price;}
+    public double getPrice() {
+        return price;
+    }
 
     public void setPrice(double price) {
         this.price = price;

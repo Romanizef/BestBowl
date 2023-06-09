@@ -2,6 +2,7 @@ package de.softwareprojekt.bestbowl.jpa.entities.drink;
 
 import jakarta.persistence.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,6 +13,7 @@ import java.util.Set;
 @Entity
 public class Drink implements Serializable {
     public static final Drink NO_DRINK;
+    @Serial
     private static final long serialVersionUID = 679638727317395915L;
 
     static {
@@ -19,6 +21,7 @@ public class Drink implements Serializable {
         NO_DRINK.setId(-1);
         NO_DRINK.setName("-");
     }
+
     @Id
     @GeneratedValue
     private int id;
@@ -36,12 +39,7 @@ public class Drink implements Serializable {
         active = true;
     }
 
-    public void addDrinkVariant(DrinkVariant drinkVariant) {
-        drinkVariants.add(drinkVariant);
-        drinkVariant.setDrink(this);
-    }
-
-    public Drink(Drink other){
+    public Drink(Drink other) {
         this.id = other.id;
         this.name = other.name;
         this.stockInMilliliters = other.stockInMilliliters;
@@ -49,7 +47,12 @@ public class Drink implements Serializable {
         this.active = other.active;
     }
 
-    public void copyValuesOf(Drink other){
+    public void addDrinkVariant(DrinkVariant drinkVariant) {
+        drinkVariants.add(drinkVariant);
+        drinkVariant.setDrink(this);
+    }
+
+    public void copyValuesOf(Drink other) {
         this.id = other.id;
         this.name = other.name;
         this.stockInMilliliters = other.stockInMilliliters;

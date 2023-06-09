@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.ManyToOne;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -17,6 +18,7 @@ import java.io.Serializable;
 @Entity
 @IdClass(DrinkBookingId.class)
 public class DrinkBooking implements Serializable {
+    @Serial
     private static final long serialVersionUID = -2299627824997591271L;
 
     @Id

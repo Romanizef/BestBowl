@@ -1,19 +1,20 @@
 package de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley;
 
+import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 
+import java.io.Serial;
 import java.io.Serializable;
-
-import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 
 /**
  * @author Marten Voß
  */
 @Entity
 public class BowlingAlleyBooking implements Serializable {
+    @Serial
     private static final long serialVersionUID = -2451218547318750126L;
 
     @Id

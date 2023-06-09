@@ -2,6 +2,7 @@ package de.softwareprojekt.bestbowl.jpa.entities.client;
 
 import jakarta.persistence.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,6 +13,7 @@ import java.util.Set;
 @Entity
 public class Association implements Serializable {
     public static final Association NO_ASSOCIATION;
+    @Serial
     private static final long serialVersionUID = 3267080689333108719L;
 
     static {
