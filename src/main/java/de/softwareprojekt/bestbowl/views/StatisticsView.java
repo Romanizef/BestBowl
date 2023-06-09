@@ -252,7 +252,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
     private void updateGridYear(long lowerBound, long upperBound) {
         bookingGrid.setItems(
                 bowlingAlleyBookingRepository
-                        .findAllByStartTimeBetweenOrderByStartTime(lowerBound, upperBound));
+                        .findAllByStartTimeBetweenAndClientEqualsOrderByStartTime(lowerBound, upperBound, currentClient));
     }
 
     /**
@@ -318,7 +318,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
                 .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
                         bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
 
-        double total = bowlingAlleyBooking.getPrice();
+        double total = bowlingAlleyBooking.getPriceWithDiscount();
         for (DrinkBooking drinkBooking : drinkBookingList) {
             total += drinkBooking.getPrice() * drinkBooking.getAmount();
         }
@@ -345,7 +345,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
 
         double total = 0.0;
         for (BowlingAlleyBooking alleyBooking : bowlingAlleyBookingList) {
-            total += alleyBooking.getPrice();
+            total += alleyBooking.getPriceWithDiscount();
         }
         for (DrinkBooking drinkBooking : drinkBookingList) {
             total += drinkBooking.getPrice() * drinkBooking.getAmount();

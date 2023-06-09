@@ -38,7 +38,6 @@ public class BowlingShoeBooking implements Serializable {
 
     public BowlingShoeBooking() {
         active = true;
-        price = 10;
     }
 
     public Client getClient() {

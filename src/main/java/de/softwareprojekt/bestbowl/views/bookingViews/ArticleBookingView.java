@@ -31,6 +31,7 @@ import com.vaadin.flow.router.OptionalParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
@@ -40,6 +41,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkVariant;
 import de.softwareprojekt.bestbowl.jpa.entities.food.Food;
 import de.softwareprojekt.bestbowl.jpa.entities.food.FoodBooking;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingCenterRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlley.BowlingAlleyBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlley.BowlingAlleyRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoe.BowlingShoeBookingRepository;
@@ -86,6 +88,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     private VerticalLayout drinkLayoutForAddItem;
     private Button addItem;
     private Button goToBill;
+    private final BowlingCenter bowlingCenter; 
 
     /**
      * Creates a new instance of the ExtrasView.
@@ -108,7 +111,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
                       FoodBookingRepository foodBookingRepository,
                       DrinkBookingRepository drinkBookingRepository,
                       BowlingShoeRepository bowlingShoeRepository,
-                      BowlingShoeBookingRepository bowlingShoeBookingRepository) {
+                      BowlingShoeBookingRepository bowlingShoeBookingRepository,  BowlingCenterRepository bowlingCenterRepository) {
         this.bowlingAlleyRepository = bowlingAlleyRepository;
         this.drinkRepository = drinkRepository;
         this.foodRepository = foodRepository;
@@ -117,6 +120,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         this.foodBookingRepository = foodBookingRepository;
         this.drinkBookingRepository = drinkBookingRepository;
         this.bowlingShoeBookingRepository = bowlingShoeBookingRepository;
+        this.bowlingCenter = bowlingCenterRepository.getBowlingCenter();
         this.currentBowlingAlleyId = 1;
         buttonMap = new HashMap<>();
         setSizeFull();
@@ -360,6 +364,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
             bowlingShoeBooking.setClient(currentBowlingAlleyBooking.getClient());
             bowlingShoeBooking.setTimeStamp(currentBowlingAlleyBooking.getStartTime());
             bowlingShoeBooking.setBowlingShoe(bowlingShoeForBooking);
+            bowlingShoeBooking.setPrice(bowlingCenter.getBowlingShoePrice());
             bowlingShoeBookingRepository.save(bowlingShoeBooking);
         }
         shoePanel.updateShoeSizeAmountMap();

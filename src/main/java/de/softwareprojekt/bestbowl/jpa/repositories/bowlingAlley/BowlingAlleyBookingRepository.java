@@ -35,5 +35,5 @@ public interface BowlingAlleyBookingRepository extends JpaRepository<BowlingAlle
 
     List<BowlingAlleyBooking> findAllByEndTimeLessThanAndCompletedEquals(long endTime, boolean completed);
 
-    List<BowlingAlleyBooking> findAllByStartTimeBetweenOrderByStartTime(long lowerBound, long upperBound);
+    List<BowlingAlleyBooking> findAllByStartTimeBetweenAndClientEqualsOrderByStartTime(long lowerBound, long upperBound, Client client);
 }
