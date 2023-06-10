@@ -77,7 +77,8 @@ public class PDFUtils {
 
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 try (PDDocument document = new PDDocument();) {
-                        int totalPositions = drinkBookingList.size() + foodBookingList.size() + shoeBookingList.size();
+                        int totalPositions = drinkBookingList.size() + foodBookingList.size() + shoeBookingList.size()
+                                        + 1;
                         double discount = booking.getDiscount();
                         if (discount > 0)
                                 totalPositions++;
@@ -131,7 +132,7 @@ public class PDFUtils {
                 double disc = booking.getDiscount();
                 if (disc != 0) {
                         InvoiceLine discountInvoiceLine = new InvoiceLine(" ",
-                                        " Rabatt: " + formatDouble(disc) + "%", 1,
+                                        " Rabatt: " + formatDouble(disc) + " % ", 1,
                                         -1 * (booking.getPrice() - booking.getPriceWithDiscount()));
                         invoiceLineList.add(discountInvoiceLine);
                 }
@@ -194,7 +195,7 @@ public class PDFUtils {
                         // Kundendaten
                         contentStream.beginText();
                         contentStream.setLeading(14.5f);
-                        contentStream.setFont(PDType1Font.HELVETICA_BOLD, 8);
+                        contentStream.setFont(PDType1Font.HELVETICA_BOLD, 9);
                         contentStream.newLineAtOffset(TEXT_OFFSET + 20, pageHeight - 75);
                         contentStream.showText("Rechnungsempfänger");
                         contentStream.newLine();
@@ -225,8 +226,8 @@ public class PDFUtils {
                         // Tabelle
                         TableDrawer tableDrawer = TableDrawer.builder()
                                         .contentStream(contentStream)
-                                        .startX(50f)
-                                        .startY(page.getMediaBox().getUpperRightY() - 140f)
+                                        .startX(95f)
+                                        .startY(page.getMediaBox().getUpperRightY() - 165f)
                                         .table(createTable(subInvoiceLineList, invoiceLineList, pageNumber == pages))
                                         .build();
                         tableDrawer.draw();
@@ -273,6 +274,7 @@ public class PDFUtils {
          * @param subInvoiceLineList
          * @param invoiceLineList
          * @param lastPage
+         * @param pageNumber
          * @return {@code Table}
          * @see #createTableHeaderRow(TableBuilder)
          * @see #createTableDiscountRow(double, TableBuilder)
@@ -282,7 +284,7 @@ public class PDFUtils {
                         boolean lastPage) {
                 // TableBuilder
                 final TableBuilder tableBuilder = Table.builder()
-                                .addColumnsOfWidth(80, 260, 80, 80)
+                                .addColumnsOfWidth(40, 240, 55, 80)
                                 .fontSize(10)
                                 .font(HELVETICA)
                                 .borderColor(Color.WHITE);
@@ -293,21 +295,48 @@ public class PDFUtils {
                 for (int i = 0; i < subInvoiceLineList.size(); i++) {
                         InvoiceLine invoiceLine = subInvoiceLineList.get(i);
 
-                        tableBuilder.addRow(Row.builder()
-                                        .add(TextCell.builder().text(invoiceLine.posnr).borderWidth(1)
-                                                        .horizontalAlignment(RIGHT).build())
-                                        .add(TextCell.builder().text(invoiceLine.description).borderWidth(1)
-                                                        .horizontalAlignment(LEFT).build())
-                                        .add(TextCell.builder().text(String.valueOf(invoiceLine.amount)).borderWidth(1)
-                                                        .horizontalAlignment(RIGHT).build())
-                                        .add(TextCell.builder()
-                                                        .text(formatDouble((invoiceLine.price
-                                                                        * invoiceLine.amount)) + " €")
-                                                        .borderWidth(1).horizontalAlignment(RIGHT).build())
-                                        .backgroundColor(i % 2 == 0 ? BLUE_LIGHT_1 : BLUE_LIGHT_2)
-                                        .build());
+                        if (invoiceLine.description.contains("Rabatt")) {
+                                tableBuilder.addRow(Row.builder()
+                                                .add(TextCell.builder()
+                                                                .text(invoiceLine.description)
+                                                                .horizontalAlignment(RIGHT)
+                                                                .colSpan(2)
+                                                                .lineSpacing(1f)
+                                                                .fontSize(8)
+                                                                .borderWidthTop(1)
+                                                                .backgroundColor(i % 2 == 0 ? BLUE_LIGHT_1
+                                                                                : BLUE_LIGHT_2)
+                                                                .font(HELVETICA_BOLD_OBLIQUE)
+                                                                .borderWidth(1)
+                                                                .build())
+                                                .add(TextCell.builder().text(String.valueOf(invoiceLine.amount))
+                                                                .borderWidth(1)
+                                                                .horizontalAlignment(RIGHT).build())
+                                                .add(TextCell.builder()
+                                                                .text(formatDouble((invoiceLine.price
+                                                                                * invoiceLine.amount)) + " €")
+                                                                .borderWidth(1).horizontalAlignment(RIGHT).build())
+                                                .backgroundColor(i % 2 == 0 ? BLUE_LIGHT_1 : BLUE_LIGHT_2)
+                                                .build());
+                        } else {
+                                tableBuilder.addRow(Row.builder()
+                                                .add(TextCell.builder().text(invoiceLine.posnr).borderWidth(1)
+                                                                .horizontalAlignment(RIGHT).build())
+                                                .add(TextCell.builder().text(invoiceLine.description).borderWidth(1)
+                                                                .horizontalAlignment(LEFT).build())
+                                                .add(TextCell.builder().text(String.valueOf(invoiceLine.amount))
+                                                                .borderWidth(1)
+                                                                .horizontalAlignment(RIGHT).build())
+                                                .add(TextCell.builder()
+                                                                .text(formatDouble((invoiceLine.price
+                                                                                * invoiceLine.amount)) + " €")
+                                                                .borderWidth(1).horizontalAlignment(RIGHT).build())
+                                                .backgroundColor(i % 2 == 0 ? BLUE_LIGHT_1 : BLUE_LIGHT_2)
+                                                .build());
+                        }
                 }
-                createTableTotalRow(tableBuilder, subInvoiceLineList, "Zwischensumme");
+                if (lastPage == false)
+                        createTableTotalRow(tableBuilder, subInvoiceLineList, "Zwischensumme");
                 if (lastPage)
                         createTableTotalRow(tableBuilder, invoiceLineList, "Gesamtsumme");
                 return tableBuilder.build();
@@ -338,19 +367,19 @@ public class PDFUtils {
          *
          * @param tableBuilder
          * @param invoiceLineList
-         * @param sumDesc
+         * @param sumDescriptor
          */
         private static void createTableTotalRow(final TableBuilder tableBuilder,
-                        List<InvoiceLine> invoiceLineList, String sumDesc) {
+                        List<InvoiceLine> invoiceLineList, String sumDescriptor) {
                 double total = 0;
                 for (InvoiceLine invoiceLine : invoiceLineList) {
                         total += invoiceLine.price * invoiceLine.amount;
                 }
 
-                // Teilsummenzeile
+                // Summenzeile
                 tableBuilder.addRow(Row.builder()
                                 .add(TextCell.builder()
-                                                .text(sumDesc)
+                                                .text(sumDescriptor)
                                                 .horizontalAlignment(RIGHT)
                                                 .colSpan(3)
                                                 .lineSpacing(1f)
@@ -358,7 +387,7 @@ public class PDFUtils {
                                                 .textColor(WHITE)
                                                 .backgroundColor(BLUE_DARK)
                                                 .fontSize(7)
-                                                .font(HELVETICA_OBLIQUE)
+                                                .font(HELVETICA_BOLD_OBLIQUE)
                                                 .borderWidth(1)
                                                 .build())
                                 .add(TextCell.builder()
