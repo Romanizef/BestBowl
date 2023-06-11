@@ -11,7 +11,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkBooking;
 import de.softwareprojekt.bestbowl.jpa.idclasses.DrinkBookingId;
 
 /**
- * @author Marten Voß
+ * @author Ali
  */
 @Repository
 public interface DrinkBookingRepository extends JpaRepository<DrinkBooking, DrinkBookingId> {

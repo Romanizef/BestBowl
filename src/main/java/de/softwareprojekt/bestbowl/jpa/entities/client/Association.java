@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * @author Marten Voß
+ * @author Ali
  */
 @Entity
 public class Association implements Serializable {

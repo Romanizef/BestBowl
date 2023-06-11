@@ -11,7 +11,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.food.FoodBooking;
 import de.softwareprojekt.bestbowl.jpa.idclasses.FoodBookingId;
 
 /**
- * @author Marten Voß
+ * @author Ali
  */
 @Repository
 public interface FoodBookingRepository extends JpaRepository<FoodBooking, FoodBookingId> {

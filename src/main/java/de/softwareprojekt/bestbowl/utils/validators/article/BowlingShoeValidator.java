@@ -6,6 +6,9 @@ import com.vaadin.flow.data.binder.ValueContext;
 
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
 
+/**
+ * @author Max
+ */
 public class BowlingShoeValidator implements Validator<BowlingShoe> {
     @Override
     public ValidationResult apply(BowlingShoe bowlingShoe, ValueContext context) {

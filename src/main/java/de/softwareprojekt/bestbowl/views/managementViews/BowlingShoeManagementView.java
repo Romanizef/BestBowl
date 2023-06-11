@@ -33,6 +33,9 @@ import java.util.Optional;
 import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
+/**
+ * @author Max Ziller
+ */
 @Route(value = "shoeManagement", layout = MainView.class)
 @PageTitle("Schuhverwaltung")
 @RolesAllowed({UserRole.OWNER, UserRole.ADMIN})

@@ -8,6 +8,9 @@ import jakarta.persistence.ManyToOne;
 import java.io.Serial;
 import java.io.Serializable;
 
+/**
+ * @author Max
+ */
 @Entity
 public class DrinkVariant implements Serializable {
     @Serial

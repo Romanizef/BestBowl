@@ -9,7 +9,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.client.Association;
 import java.util.Set;
 
 /**
- * @author Marten Voß
+ * @author Ali
  */
 @Repository
 public interface AssociationRepository extends JpaRepository<Association, Integer> {

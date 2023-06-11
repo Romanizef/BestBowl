@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 
 /**
- * @author Marten Voß
+ * @author Ali
  */
 @Route("login")
 @PageTitle("Login")

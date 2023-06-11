@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author Marten Voß
+ * @author Ali
  */
 @Repository
 public interface DrinkRepository extends JpaRepository<Drink, Integer> {

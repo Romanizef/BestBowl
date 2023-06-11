@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * @author Marten Voß
+ * @author Max
  */
 @Repository
 public interface BowlingShoeRepository extends JpaRepository<BowlingShoe, Integer> {

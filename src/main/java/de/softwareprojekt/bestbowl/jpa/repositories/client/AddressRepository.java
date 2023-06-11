@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Address;
 
 /**
- * @author Marten Voß
+ * @author Max
  */
 @Repository
 public interface AddressRepository extends JpaRepository<Address, Integer> {

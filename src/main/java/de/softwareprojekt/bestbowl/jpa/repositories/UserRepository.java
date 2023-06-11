@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * @author Marten Voß
+ * @author Ali
  */
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {

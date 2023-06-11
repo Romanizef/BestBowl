@@ -20,7 +20,7 @@ import de.softwareprojekt.bestbowl.jpa.repositories.food.FoodRepository;
 import jakarta.annotation.PostConstruct;
 
 /**
- * @author Marten Voß
+ * @author Max
  */
 @Component
 public class Repos {

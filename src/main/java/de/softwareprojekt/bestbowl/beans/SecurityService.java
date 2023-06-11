@@ -9,7 +9,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.stereotype.Component;
 
 /**
- * @author Marten Voß
+ * @author Ali
  */
 @Component
 public class SecurityService {

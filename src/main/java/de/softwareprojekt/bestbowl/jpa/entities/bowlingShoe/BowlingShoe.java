@@ -10,7 +10,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * @author Marten Voß
+ * @author Ali
  */
 @Entity
 public class BowlingShoe implements Serializable {

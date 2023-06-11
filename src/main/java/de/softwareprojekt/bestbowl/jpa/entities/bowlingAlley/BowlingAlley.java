@@ -7,7 +7,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * @author Marten Voß
+ * @author Matija
  */
 @Entity
 public class BowlingAlley implements Serializable {

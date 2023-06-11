@@ -7,7 +7,7 @@ import com.vaadin.flow.data.binder.ValueContext;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
 
 /**
- * @author Marten Voß
+ * @author Matija
  */
 public class BowlingAlleyValidator implements Validator<BowlingAlley> {
     @Override

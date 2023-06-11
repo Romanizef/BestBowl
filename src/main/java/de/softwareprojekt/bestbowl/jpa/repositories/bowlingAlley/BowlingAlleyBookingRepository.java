@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * @author Marten Voß
+ * @author Matija
  * @author Ali Cicek
  */
 @Repository

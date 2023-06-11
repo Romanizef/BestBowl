@@ -37,8 +37,6 @@ import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
 /**
  * Is the main template for all the other views and incorporates them as tabs
  *
- * @author Marten Voß
- * @author Matija Kopschek
  * @author Max Ziller
  * @author Ali Cicek
  */

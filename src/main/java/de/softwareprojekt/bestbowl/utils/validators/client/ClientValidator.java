@@ -9,6 +9,9 @@ import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringValidEmail;
 
+/**
+ * @author Marten
+ */
 public class ClientValidator implements Validator<Client> {
     @Override
     public ValidationResult apply(Client client, ValueContext context) {

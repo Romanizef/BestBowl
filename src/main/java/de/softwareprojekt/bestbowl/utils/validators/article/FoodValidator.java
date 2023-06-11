@@ -8,6 +8,9 @@ import de.softwareprojekt.bestbowl.jpa.entities.food.Food;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
 
+/**
+ * @author Max
+ */
 public class FoodValidator implements Validator<Food> {
     @Override
     public ValidationResult apply(Food food, ValueContext context) {

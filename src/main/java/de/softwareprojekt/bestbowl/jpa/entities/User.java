@@ -9,7 +9,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * @author Marten Voß
+ * @author Ali
  */
 @Entity
 @Table(name = "users")

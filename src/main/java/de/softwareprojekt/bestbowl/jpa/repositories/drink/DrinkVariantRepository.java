@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Set;
 
 /**
- * @author Max Ziller
+ * @author Ali
  */
 @Repository
 public interface DrinkVariantRepository extends JpaRepository<DrinkVariant, Integer> {

@@ -8,6 +8,9 @@ import de.softwareprojekt.bestbowl.jpa.entities.drink.Drink;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
 
+/**
+ * @author Max
+ */
 public class DrinkValidator implements Validator<Drink> {
     @Override
     public ValidationResult apply(Drink drink, ValueContext context) {

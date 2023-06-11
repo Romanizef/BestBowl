@@ -34,6 +34,9 @@ import java.util.Set;
 import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
+/**
+ * @author Max Ziller
+ */
 @Route(value = "foodManagement", layout = MainView.class)
 @PageTitle("Speiesenverwaltung")
 @RolesAllowed({UserRole.OWNER, UserRole.ADMIN})

@@ -10,7 +10,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
 import java.util.List;
 
 /**
- * @author Marten Voß
+ * @author Matija
  */
 @Repository
 public interface BowlingAlleyRepository extends JpaRepository<BowlingAlley, Integer> {

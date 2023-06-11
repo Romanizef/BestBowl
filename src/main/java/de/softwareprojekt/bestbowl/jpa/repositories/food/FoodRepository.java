@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author Marten Voß
+ * @author Ali
  */
 @Repository
 public interface FoodRepository extends JpaRepository<Food, Integer> {

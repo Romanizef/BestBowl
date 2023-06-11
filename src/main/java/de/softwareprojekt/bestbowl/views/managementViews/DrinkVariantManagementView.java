@@ -43,6 +43,9 @@ import java.util.*;
 import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
+/**
+ * @author Max Ziller
+ */
 @Route(value = "drinkVariantManagement", layout = MainView.class)
 @PageTitle("Getränkevariantenverwaltung")
 @RolesAllowed({UserRole.OWNER, UserRole.ADMIN})

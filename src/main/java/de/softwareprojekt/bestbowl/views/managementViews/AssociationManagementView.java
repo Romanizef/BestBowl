@@ -43,7 +43,6 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
  * inactivated
  *
  * @author Matija Kopschek
- * @author Marten Voß
  */
 @Route(value = "associationManagement", layout = MainView.class)
 @PageTitle("Vereinsverwaltung")

@@ -6,6 +6,9 @@ import com.vaadin.flow.data.binder.ValueContext;
 
 import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkVariant;
 
+/**
+ * @author Max
+ */
 public class DrinkVariantValidator implements Validator<DrinkVariant> {
     @Override
     public ValidationResult apply(DrinkVariant drinkVariant, ValueContext context) {

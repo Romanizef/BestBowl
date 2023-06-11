@@ -11,7 +11,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 import de.softwareprojekt.bestbowl.jpa.idclasses.BowlingShoeBookingId;
 
 /**
- * @author Marten Voß
+ * @author Max
  */
 @Repository
 public interface BowlingShoeBookingRepository extends JpaRepository<BowlingShoeBooking, BowlingShoeBookingId> {

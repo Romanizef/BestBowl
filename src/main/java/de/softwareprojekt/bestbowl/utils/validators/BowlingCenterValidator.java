@@ -9,6 +9,9 @@ import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringValidEmail;
 
+/**
+ * @author Marten
+ */
 public class BowlingCenterValidator implements Validator<BowlingCenter> {
 
     @Override

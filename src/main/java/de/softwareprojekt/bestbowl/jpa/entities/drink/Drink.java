@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * @author Marten Voß
+ * @author Max
  */
 @Entity
 public class Drink implements Serializable {

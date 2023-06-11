@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 
 /**
- * @author Marten Voß
+ * @author Ali
  */
 @Repository
 public interface BowlingCenterRepository extends JpaRepository<BowlingCenter, Integer> {

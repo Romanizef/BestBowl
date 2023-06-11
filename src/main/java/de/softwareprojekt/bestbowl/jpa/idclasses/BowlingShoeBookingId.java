@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * @author Marten Voß
+ * @author Ali
  */
 public class BowlingShoeBookingId implements Serializable {
     private static final long serialVersionUID = 7549075836963205963L;
