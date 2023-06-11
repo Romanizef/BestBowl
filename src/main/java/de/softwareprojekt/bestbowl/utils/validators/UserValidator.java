@@ -12,6 +12,15 @@ import static de.softwareprojekt.bestbowl.utils.Utils.*;
  * @author Marten Voß
  */
 public class UserValidator implements Validator<User> {
+
+    /**
+     * The apply function is used to validate the user input.
+     * 
+     * @param user    Access the fields of the user object
+     * @param context Get the current locale
+     *
+     * @return A validationresult
+     */
     @Override
     public ValidationResult apply(User user, ValueContext context) {
         if (!isStringMinNChars(user.getName(), 3)) {

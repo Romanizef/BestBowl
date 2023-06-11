@@ -14,6 +14,15 @@ import static de.softwareprojekt.bestbowl.utils.Utils.isStringValidEmail;
  */
 public class BowlingCenterValidator implements Validator<BowlingCenter> {
 
+    /**
+     * The apply function is used to validate the input of a BowlingCenter object.
+     * It checks if all fields are valid and returns an error message if not.
+     * 
+     * @param bowlingCenter Access the values of the fields in the form
+     * @param context       Get the current value of the field
+     *
+     * @return A validationresult
+     */
     @Override
     public ValidationResult apply(BowlingCenter bowlingCenter, ValueContext context) {
         if (!isStringMinNChars(bowlingCenter.getDisplayName(), 2)) {
@@ -40,10 +49,12 @@ public class BowlingCenterValidator implements Validator<BowlingCenter> {
         if (bowlingCenter.getBowlingShoePrice() < 0) {
             return ValidationResult.error("Der Bowling Schuh Preis muss positiv sein");
         }
-        if (bowlingCenter.getSenderEmail() != null && bowlingCenter.getSenderEmail().length() > 0 && !isStringValidEmail(bowlingCenter.getSenderEmail())) {
+        if (bowlingCenter.getSenderEmail() != null && bowlingCenter.getSenderEmail().length() > 0
+                && !isStringValidEmail(bowlingCenter.getSenderEmail())) {
             return ValidationResult.error("Ungültige E-Mail");
         }
-        if (bowlingCenter.getReceiverEmail() != null && bowlingCenter.getReceiverEmail().length() > 0 && !isStringValidEmail(bowlingCenter.getReceiverEmail())) {
+        if (bowlingCenter.getReceiverEmail() != null && bowlingCenter.getReceiverEmail().length() > 0
+                && !isStringValidEmail(bowlingCenter.getReceiverEmail())) {
             return ValidationResult.error("Ungültige E-Mail");
         }
         return ValidationResult.ok();

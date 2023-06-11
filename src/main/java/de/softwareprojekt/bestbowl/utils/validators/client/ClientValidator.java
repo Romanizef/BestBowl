@@ -13,6 +13,17 @@ import static de.softwareprojekt.bestbowl.utils.Utils.isStringValidEmail;
  * @author Marten
  */
 public class ClientValidator implements Validator<Client> {
+
+    /**
+     * The apply function is used to validate the Client object.
+     * It checks if all fields are valid and returns a ValidationResult.ok() if they
+     * are, or an error message otherwise.
+     * 
+     * @param client  Access the fields of a client object
+     * @param context Get the current value of a field
+     *
+     * @return A validationresult
+     */
     @Override
     public ValidationResult apply(Client client, ValueContext context) {
         if (!isStringMinNChars(client.getFirstName(), 2)) {
