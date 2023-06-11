@@ -1,10 +1,9 @@
 package de.softwareprojekt.bestbowl.beans;
 
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
-import de.softwareprojekt.bestbowl.jpa.entities.User;
-import de.softwareprojekt.bestbowl.jpa.repositories.BowlingCenterRepository;
-import de.softwareprojekt.bestbowl.jpa.repositories.UserRepository;
-import de.softwareprojekt.bestbowl.utils.constants.UserRole;
+import java.time.Duration;
+import java.util.List;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +11,15 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
-import java.util.List;
-import java.util.Optional;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
+import de.softwareprojekt.bestbowl.jpa.entities.User;
+import de.softwareprojekt.bestbowl.jpa.repositories.BowlingCenterRepository;
+import de.softwareprojekt.bestbowl.jpa.repositories.UserRepository;
+import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 
 /**
+ * Class for initializing the application.
+ * 
  * @author Ali
  */
 @Component
@@ -27,24 +30,40 @@ public class Initializer {
     private final BowlingCenterRepository bowlingCenterRepository;
     private final UserRepository userRepository;
 
+    /**
+     * Constructor for the Initializer bean.
+     * 
+     * @param userManager
+     * @param bowlingCenterRepository
+     * @param userRepository
+     */
     @Autowired
     public Initializer(UserManager userManager, BowlingCenterRepository bowlingCenterRepository,
-                       UserRepository userRepository) {
+            UserRepository userRepository) {
         this.userManager = userManager;
         this.bowlingCenterRepository = bowlingCenterRepository;
         this.userRepository = userRepository;
     }
 
+    /**
+     * Initializes the class methods.
+     * 
+     * @see #createBowlingCenterIfNotPresent()
+     * @see #createAdminUserIfNotPresent()
+     */
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
         createBowlingCenterIfNotPresent();
-
         createAdminUserIfNotPresent();
-
-        //init the in-memory user manager
+        // init the in-memory user manager
         userManager.updateUsersFromDb();
     }
 
+    /**
+     * Creates the default bowling center if it does not exist yet.
+     * 
+     * @see #createDefaultBowlingCenter()
+     */
     private void createBowlingCenterIfNotPresent() {
         Optional<BowlingCenter> bowlingCenterOptional = bowlingCenterRepository.findById(1);
         if (bowlingCenterOptional.isEmpty()) {
@@ -53,6 +72,11 @@ public class Initializer {
         }
     }
 
+    /**
+     * Creates the default bowling center.
+     * 
+     * @return {@code BowlingCenter}
+     */
     private BowlingCenter createDefaultBowlingCenter() {
         BowlingCenter bowlingCenter = new BowlingCenter();
         bowlingCenter.setId(1);
@@ -73,6 +97,11 @@ public class Initializer {
         return bowlingCenter;
     }
 
+    /**
+     * Creates the default admin user if it does not exist yet.
+     * 
+     * @see #createDefaultAdminUser()
+     */
     private void createAdminUserIfNotPresent() {
         List<User> adminUserList = userRepository.findAllByRoleEquals(UserRole.ADMIN);
         if (adminUserList.isEmpty()) {
@@ -80,10 +109,16 @@ public class Initializer {
             Optional<User> userWithSameName = userRepository.findByName(adminUser.getName());
             userWithSameName.ifPresent(userRepository::delete);
             userRepository.save(adminUser);
-            LOGGER.info("Initialer Admin Nutzer: Benutzername: '" + adminUser.getName() + "', Passwort: '" + DEFAULT_ADMIN_PASSWORD + "'");
+            LOGGER.info("Initialer Admin Nutzer: Benutzername: '" + adminUser.getName() + "', Passwort: '"
+                    + DEFAULT_ADMIN_PASSWORD + "'");
         }
     }
 
+    /**
+     * Creates the default admin user.
+     * 
+     * @return {@code User}
+     */
     private User createDefaultAdminUser() {
         User user = new User();
         user.setName("admin");

@@ -23,7 +23,7 @@ import jakarta.mail.internet.MimeMultipart;
 import jakarta.mail.util.ByteArrayDataSource;
 
 /**
- * Creates an email
+ * The MailSenderUtil class is the modell for an E-Mail.
  * 
  * @author Matija Kopschek
  */
@@ -108,7 +108,8 @@ public class MailSenderUtil {
      *      BowlingAlleyBooking)
      * @see #loginCheck()
      */
-    public void sendAttachmentMail(String transmitterMail, String transmitterName, String receiverAddress, String subject,
+    public void sendAttachmentMail(String transmitterMail, String transmitterName, String receiverAddress,
+            String subject,
             String mailText, BowlingAlleyBooking booking)
             throws MessagingException, IllegalStateException, UnsupportedEncodingException {
 
@@ -157,8 +158,9 @@ public class MailSenderUtil {
     }
 
     /**
-     * Sets all the important information for the booking confirmation Email
-     * (transmitter, receiver, subject, message, attachment)
+     * The messageOnlyMailSettings function is used to set the basic settings for a
+     * mail.
+     * It sets the sender, receiver, subject and text of an email.
      * 
      * @param transmitterMail
      * @param transmitterName
@@ -252,7 +254,10 @@ public class MailSenderUtil {
     }
 
     /**
-     * Checking if your logged into your mailSession, login()-method executed
+     * The loginCheck function checks if the user is logged in.
+     * If not, it throws an IllegalStateException.
+     *
+     * @return A boolean value
      */
     private void loginCheck() {
         if (mailSession == null) {

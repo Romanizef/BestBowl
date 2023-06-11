@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Address;
 
 /**
+ * The AddressRepository is a Spring Data JPA repository for the
+ * {@link Address} entities.
+ * 
  * @author Max
  */
 @Repository

@@ -7,9 +7,23 @@ import com.vaadin.flow.data.binder.ValueContext;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
 
 /**
+ * The BowlingShoeValidatorclass validates the attributes of a BowlingShoe
+ * object.
+ * 
  * @author Max
  */
 public class BowlingShoeValidator implements Validator<BowlingShoe> {
+
+    /**
+     * The apply function is used to validate the input of a BowlingShoe object.
+     * It checks if the size of the shoe is between 20 and 70. If not, it returns an
+     * error message.
+     * 
+     * @param bowlingShoe
+     * @param context
+     * 
+     * @return Validationresult
+     */
     @Override
     public ValidationResult apply(BowlingShoe bowlingShoe, ValueContext context) {
         if (bowlingShoe.getSize() < 20 || bowlingShoe.getSize() > 70) {

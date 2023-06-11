@@ -11,12 +11,22 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class BestBowlApplication {
     private static ConfigurableApplicationContext context;
 
+    /**
+     * The main function of the BestBowlApplication class.
+     * 
+     * @param String[] args Pass arguments to the main method
+     *
+     * @return A springapplication
+     */
     public static void main(String[] args) {
         context = SpringApplication.run(BestBowlApplication.class, args);
     }
 
     /**
-     * Initiates an orderly shutdown of the application, db and the jvm
+     * The shutdown function is used to gracefully shutdown the application.
+     * It will wait for all threads to finish before shutting down.
+     * 
+     * @return The exit code of the springapplication
      */
     public static void shutdown() {
         int exitCode = SpringApplication.exit(context, () -> 0);

@@ -31,6 +31,8 @@ import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import jakarta.annotation.PostConstruct;
 
 /**
+ * Class that listens for commands in the command line.
+ * 
  * @author Marten Voß
  */
 @Component
@@ -38,11 +40,27 @@ public class CommandLineListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandLineListener.class);
     private UserManager userManager;
 
+    /**
+     * Initializes the listening method.
+     * 
+     * @see #startCommandLineThread()
+     */
     @PostConstruct
     public void init() {
         startCommandLineThread();
     }
 
+    /**
+     * Scans the command line for commands.
+     * 
+     * @see #generateBowlingAlleys()
+     * @see #generateRandomClients(int)
+     * @see #generateRandomAssociations(int)
+     * @see #connectRandomClientsAndAssociations(int)
+     * @see #generateRandomFoods(int)
+     * @see #generateRandomDrinks(int)
+     * @see #generateRandomShoes(int)
+     */
     private void startCommandLineThread() {
         startThread(() -> {
             Scanner scanner = new Scanner(System.in);
@@ -90,6 +108,11 @@ public class CommandLineListener {
         }, "Command Line", true);
     }
 
+    /**
+     * Generates a given amount of {@code Client}s with random data.
+     * 
+     * @param count
+     */
     private void generateRandomClients(int count) {
         List<Client> clientList = new ArrayList<>(count);
         Faker faker = new Faker();
@@ -109,6 +132,11 @@ public class CommandLineListener {
         Repos.getClientRepository().saveAll(clientList);
     }
 
+    /**
+     * Generates a given amount of {@code Association}s with random data.
+     * 
+     * @param count
+     */
     private void generateRandomAssociations(int count) {
         List<Association> existingAssociationList = Repos.getAssociationRepository().findAll();
         DuplicateChecker duplicateChecker = new DuplicateChecker(
@@ -127,6 +155,11 @@ public class CommandLineListener {
         Repos.getAssociationRepository().saveAll(associationList);
     }
 
+    /**
+     * Connects a given amount of {@code Client}s to a random {@code Association}.
+     * 
+     * @param count
+     */
     private void connectRandomClientsAndAssociations(int count) {
         List<Association> associationList = Repos.getAssociationRepository().findAll();
         List<Client> clientList = Repos.getClientRepository().findAll();
@@ -141,6 +174,11 @@ public class CommandLineListener {
         Repos.getAssociationRepository().saveAll(associationList);
     }
 
+    /**
+     * Generates a given amount of {@code Food}s with random data.
+     * 
+     * @param count
+     */
     private void generateRandomFoods(int count) {
         List<Food> existingFoodList = Repos.getFoodRepository().findAll();
         DuplicateChecker duplicateChecker = new DuplicateChecker(
@@ -161,6 +199,11 @@ public class CommandLineListener {
         Repos.getFoodRepository().saveAll(foodList);
     }
 
+    /**
+     * Generates a given amount of {@code Drink}s with random data.
+     * 
+     * @param count
+     */
     private void generateRandomDrinks(int count) {
         List<Drink> existingDrinkList = Repos.getDrinkRepository().findAll();
         DuplicateChecker duplicateChecker = new DuplicateChecker(
@@ -187,6 +230,11 @@ public class CommandLineListener {
         Repos.getDrinkRepository().saveAll(foodList);
     }
 
+    /**
+     * Generates a given amount of {@code BowlingShoe}s with random data.
+     * 
+     * @param count
+     */
     public void generateRandomShoes(int count) {
         List<BowlingShoe> bowlingShoeList = new ArrayList<>(count);
         Faker faker = new Faker();
@@ -200,6 +248,9 @@ public class CommandLineListener {
         Repos.getBowlingShoeRepository().saveAll(bowlingShoeList);
     }
 
+    /**
+     * Generates 10 {@code BowlingAlley}s with random data.
+     */
     public void generateBowlingAlleys() {
         List<BowlingAlley> bowlingAlleyList = new ArrayList<>(10);
         for (int i = 0; i < 10; i++) {
@@ -210,6 +261,11 @@ public class CommandLineListener {
         Repos.getBowlingAlleyRepository().saveAll(bowlingAlleyList);
     }
 
+    /**
+     * Setter for {@code UserManager}
+     * 
+     * @param userManager
+     */
     @Autowired
     public void setUserManager(UserManager userManager) {
         this.userManager = userManager;

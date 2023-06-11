@@ -12,13 +12,16 @@ import de.softwareprojekt.bestbowl.utils.pdf.PDFUtils;
 import java.io.ByteArrayInputStream;
 
 /**
+ * The InvoiceDownloadButton class creates a download button.
+ * 
  * @author Marten Voß
  */
 public class InvoiceDownloadButton extends Button {
     private byte[] pdfContent;
 
     /**
-     * Creates a button that wraps an Anchor which gets created only the first time the button is clicked.
+     * Creates a button that wraps an Anchor which gets created only the first time
+     * the button is clicked.
      * For all consecutive clicks the anchor and content is cached
      *
      * @param booking

@@ -13,6 +13,8 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 /**
+ * The Utils class contains all the utility methods used throughout the program.
+ * 
  * @author Marten Voß
  */
 public class Utils {
@@ -201,7 +203,7 @@ public class Utils {
 
     /**
      * @return a LocalDateTime of the current time with the minute rounded to the
-     * previous 1/4 hour
+     *         previous 1/4 hour
      */
     public static LocalDateTime getCurrentDateTimeRounded() {
         LocalDateTime localDateTime = LocalDateTime.now();

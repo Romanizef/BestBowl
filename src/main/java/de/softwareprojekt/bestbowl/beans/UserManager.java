@@ -16,6 +16,8 @@ import de.softwareprojekt.bestbowl.jpa.entities.User;
 import de.softwareprojekt.bestbowl.jpa.repositories.UserRepository;
 
 /**
+ * Class to manage the users and their permissions.
+ * 
  * @author Marten Voß
  */
 @Component
@@ -26,6 +28,11 @@ public class UserManager {
     private UserDetailsManager userDetailsManager;
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * Constructor for the UserManager.
+     * 
+     * @param userRepository
+     */
     @Autowired
     public UserManager(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -56,14 +63,17 @@ public class UserManager {
     }
 
     /**
-     * Creates a new User entity, encodes the password, saves it to the db and updates the UserDetailManager
+     * Creates a new User entity, encodes the password, saves it to the db and
+     * updates the {@code UserDetailManager}
      *
      * @param name     name of the user
      * @param password cleartext password of the user
      * @param email    e-mail of the user
      * @param userRole role of the user
+     * @see #updateUsersFromDb()
      */
-    public void addNewUser(String name, String password, String securityQuestion, String securityQuestionAnswer, String email, String userRole) {
+    public void addNewUser(String name, String password, String securityQuestion, String securityQuestionAnswer,
+            String email, String userRole) {
         User user = new User();
         user.setName(name);
         user.setEncodedPassword(passwordEncoder.encode(password));
@@ -101,19 +111,42 @@ public class UserManager {
         return passwordEncoder.encode(password);
     }
 
+    /**
+     * Getter for the current drawer state of the user
+     * 
+     * @param userName
+     * @return {@code boolean}
+     */
     public boolean getDrawerStateForUser(String userName) {
         return userDrawerStateMap.getOrDefault(userName, true);
     }
 
+    /**
+     * Toggles the current drawer state of the user
+     * 
+     * @param userName
+     */
     public void toggleDrawerStateForUser(String userName) {
         userDrawerStateMap.put(userName, !getDrawerStateForUser(userName));
     }
 
+    /**
+     * Getter for the current dark mode state of the user
+     * 
+     * @param userName
+     * @return {@code boolean}
+     */
     public boolean getDarkModeStateForUser(String userName) {
         Optional<User> user = userRepository.findByName(userName);
         return user.map(User::isDarkMode).orElse(false);
     }
 
+    /**
+     * Setter for the darkmode
+     * 
+     * @param userName
+     * @param darkMode
+     */
     public void setDarkModeStateForUser(String userName, boolean darkMode) {
         Optional<User> user = userRepository.findByName(userName);
         user.ifPresent(u -> {
@@ -122,11 +155,21 @@ public class UserManager {
         });
     }
 
+    /**
+     * Setter for the {@code UserDetailsManager}
+     * 
+     * @param userDetailsManager
+     */
     @Autowired
     public void setUserDetailsManager(UserDetailsManager userDetailsManager) {
         this.userDetailsManager = userDetailsManager;
     }
 
+    /**
+     * Setter for the {@code PasswordEncoder}
+     * 
+     * @param passwordEncoder
+     */
     @Autowired
     public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;

@@ -11,10 +11,20 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
 /**
+ * The Notifications class provides methods to display notifications in the
+ * application.
+ * 
  * @author Marten Voß
  * @author Matija Kopschek
  */
 public class Notifications {
+
+    /**
+     * The Notifications function is used to display a notification message on the
+     * screen.
+     * 
+     * @return An instance of the notifications class
+     */
     private Notifications() {
     }
 

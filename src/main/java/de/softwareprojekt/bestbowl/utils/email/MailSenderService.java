@@ -1,17 +1,16 @@
 package de.softwareprojekt.bestbowl.utils.email;
 
-import de.softwareprojekt.bestbowl.beans.Repos;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
-
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
 
+import de.softwareprojekt.bestbowl.beans.Repos;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
+
 /**
- * Controller class for sending emails.
+ * MailSenderService is a class that is used to send emails.
  *
  * @author Matija Kopschek
  */
-// @Service
 public class MailSenderService {
     private final MailSenderUtil sender = new MailSenderUtil();
     private BowlingCenter bowlingCenter;
@@ -128,9 +127,10 @@ public class MailSenderService {
     }
 
     /**
-     * reads the parameters from the db and checks them
-     *
-     * @return if the parameters are present
+     * The getConnectionParameters function is used to retrieve the connection
+     * parameters from the database.
+     * 
+     * @return A boolean value
      */
     private boolean getConnectionParameters() {
         bowlingCenter = Repos.getBowlingCenterRepository().getBowlingCenter();

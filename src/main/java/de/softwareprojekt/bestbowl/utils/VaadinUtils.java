@@ -1,5 +1,15 @@
 package de.softwareprojekt.bestbowl.utils;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasEnabled;
 import com.vaadin.flow.component.HasOrderedComponents;
@@ -15,20 +25,13 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.SerializableComparator;
 import com.vaadin.flow.spring.security.AuthenticationContext;
+
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Association;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-
 /**
+ * The VaadinUtils class contains utility methods for Vaadin components.
+ * 
  * @author Marten Voß
  */
 public class VaadinUtils {
@@ -38,6 +41,12 @@ public class VaadinUtils {
     public static final String PANEL_COLOR_SHOE = "#ffae1a";
     public static final String VAADIN_PRIMARY_BLUE = "#0065e9";
 
+    /**
+     * The VaadinUtils function is a collection of static methods that are used to
+     * simplify the creation and configuration of Vaadin components.
+     * 
+     * @return A vaadinutils object
+     */
     private VaadinUtils() {
     }
 
@@ -85,14 +94,16 @@ public class VaadinUtils {
 
     /**
      * Generates a ComboBox to be used as a filter in a Grid header
-     * Important: the filter needs to work with Boolean as a 3-state variable (null = no filter)
+     * Important: the filter needs to work with Boolean as a 3-state variable (null
+     * = no filter)
      *
      * @param filterChangeConsumer method reference that takes the changed value
      * @param displayValueTrue     text to be displayed for true
      * @param displayValueFalse    text to be displayed for false
      * @return component to be used as a filter
      */
-    public static Component createFilterHeaderBoolean(String displayValueTrue, String displayValueFalse, Consumer<Boolean> filterChangeConsumer) {
+    public static Component createFilterHeaderBoolean(String displayValueTrue, String displayValueFalse,
+            Consumer<Boolean> filterChangeConsumer) {
         ComboBox<String> comboBox = new ComboBox<>();
         comboBox.setAllowCustomValue(false);
         comboBox.setItems("*", displayValueTrue, displayValueFalse);
@@ -125,7 +136,8 @@ public class VaadinUtils {
         associationSet.add(Association.NO_ASSOCIATION);
         associationSet.addAll(associationList);
         ListDataProvider<Association> dataProvider = new ListDataProvider<>(associationSet);
-        dataProvider.setSortComparator((SerializableComparator<Association>) (o1, o2) -> o1.getName().compareTo(o2.getName()));
+        dataProvider.setSortComparator(
+                (SerializableComparator<Association>) (o1, o2) -> o1.getName().compareTo(o2.getName()));
 
         comboBox.setItems(dataProvider);
         comboBox.setValue(Association.NO_ASSOCIATION);
@@ -198,7 +210,8 @@ public class VaadinUtils {
      * @param cancelAnswer         text of the cancel button
      * @param onConfirm            code to be executed on confirmation
      */
-    public static void showConfirmationDialog(String confirmationQuestion, String confirmAnswer, String cancelAnswer, Runnable onConfirm) {
+    public static void showConfirmationDialog(String confirmationQuestion, String confirmAnswer, String cancelAnswer,
+            Runnable onConfirm) {
         ConfirmDialog dialog = new ConfirmDialog();
         dialog.setHeader("Bestätigen");
         dialog.setText(confirmationQuestion);

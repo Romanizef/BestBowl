@@ -5,11 +5,24 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 /**
+ * DuplicateChecker checks for duplicate values.
+ * 
  * @author Marten Voß
  */
 public class DuplicateChecker {
     private final Set<String> existingValues;
 
+    /**
+     * The DuplicateChecker function is used to check if a value already exists in
+     * the database.
+     * If it does, then it will return an Optional with the existing value.
+     * If not, then it will add the new value to the database and return an empty
+     * Optional.
+     * 
+     * @param existingValues Store the existing values in a set
+     *
+     * @return The existingvalues
+     */
     public DuplicateChecker(Set<String> existingValues) {
         this.existingValues = existingValues;
     }
