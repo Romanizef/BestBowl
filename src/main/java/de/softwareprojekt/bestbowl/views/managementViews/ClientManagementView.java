@@ -1,5 +1,21 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
+import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
+import static de.softwareprojekt.bestbowl.utils.Utils.matches;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.clearNumberFieldChildren;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createAssociationCB;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderBoolean;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderInteger;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderString;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -15,11 +31,16 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.*;
+import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.TextArea;
+import com.vaadin.flow.component.textfield.TextAreaVariant;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+
 import de.softwareprojekt.bestbowl.jpa.entities.client.Address;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Association;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
@@ -29,16 +50,6 @@ import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.utils.validators.client.ClientValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-
-import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
-import static de.softwareprojekt.bestbowl.utils.Utils.matches;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * Creates a View for the Client Management.
@@ -47,7 +58,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
  */
 @Route(value = "clientManagement", layout = MainView.class)
 @PageTitle("Kundenverwaltung")
-@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
+@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
 public class ClientManagementView extends VerticalLayout {
     private final transient ClientRepository clientRepository;
     private final Binder<Client> binder = new Binder<>();
@@ -443,56 +454,115 @@ public class ClientManagementView extends VerticalLayout {
                     && matchesPostCode && matchesCity && matchesActive;
         }
 
+        /**
+         * The setId function is used to set the id of a client.
+         * 
+         * @param String id Set the id of the object
+         */
         public void setId(String id) {
             this.id = id;
             dataView.refreshAll();
         }
 
+        /**
+         * The setFirstName function sets the first name of a client.
+         * 
+         * @param String firstName Set the firstname variable
+         */
         public void setFirstName(String firstName) {
             this.firstName = firstName;
             dataView.refreshAll();
         }
 
+        /**
+         * The setLastName function sets the last name of a client.
+         * 
+         * @param String lastName Set the last name of the person
+         */
         public void setLastName(String lastName) {
             this.lastName = lastName;
             dataView.refreshAll();
         }
 
+        /**
+         * The setEmail function sets the email of a client.
+         * 
+         * @param email
+         */
         public void setEmail(String email) {
             this.email = email;
             dataView.refreshAll();
         }
 
+        /**
+         * The setComment function sets the comment of a client.
+         * 
+         * @param String comment
+         */
         public void setComment(String comment) {
             this.comment = comment;
             dataView.refreshAll();
         }
 
+        /**
+         * The setAssociationName function sets the associationName variable to the
+         * value of its parameter.
+         * 
+         * @param associationName
+         */
         public void setAssociationName(String associationName) {
             this.associationName = associationName;
             dataView.refreshAll();
         }
 
+        /**
+         * The setStreet function sets the street of a client.
+         *
+         * @param street
+         */
         public void setStreet(String street) {
             this.street = street;
             dataView.refreshAll();
         }
 
+        /**
+         * The setHouseNr function sets the house number of a client.
+         * 
+         * @param String houseNr
+         */
         public void setHouseNr(String houseNr) {
             this.houseNr = houseNr;
             dataView.refreshAll();
         }
 
+        /**
+         * The setPostCode function sets the postCode variable to the value of its
+         * parameter.
+         * 
+         * @param postCod
+         */
         public void setPostCode(String postCode) {
             this.postCode = postCode;
             dataView.refreshAll();
         }
 
+        /**
+         * The setCity function sets the city of a client.
+         * 
+         * @param city
+         */
         public void setCity(String city) {
             this.city = city;
             dataView.refreshAll();
         }
 
+        /**
+         * The setActive function is used to set the active state of a client.
+         * 
+         * @param active
+         *
+         * @return A boolean value
+         */
         public void setActive(Boolean active) {
             this.active = active;
             dataView.refreshAll();

@@ -14,6 +14,12 @@ import jakarta.annotation.security.PermitAll;
 @PageTitle("Redirect")
 @PermitAll
 public class DatabaseRedirectView extends VerticalLayout {
+
+    /**
+     * The DatabaseRedirectView function redirects the user to the database page.
+     * 
+     * @return A databaseredirectview object
+     */
     public DatabaseRedirectView() {
         UI.getCurrent().getPage().setLocation("/db");
     }

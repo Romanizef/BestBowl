@@ -49,11 +49,22 @@ public class PendingBookingView extends VerticalLayout {
     private TextField searchField;
     private BowlingAlleyBooking selectedBooking;
 
+    /**
+     * The PendingBookingView function is a constructor for the PendingBookingView
+     * class.
+     * It creates a new instance of the PendingBookingView class and initializes its
+     * fields with values passed as parameters.
+     * 
+     * @param bowlingAlleyBookingRepository
+     * @param drinkBookingRepository
+     * @param foodBookingRepository
+     * @param shoeBookingRepository
+     */
     @Autowired
     public PendingBookingView(BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
-                              DrinkBookingRepository drinkBookingRepository,
-                              FoodBookingRepository foodBookingRepository,
-                              BowlingShoeBookingRepository shoeBookingRepository) {
+            DrinkBookingRepository drinkBookingRepository,
+            FoodBookingRepository foodBookingRepository,
+            BowlingShoeBookingRepository shoeBookingRepository) {
         this.bowlingAlleyBookingRepository = bowlingAlleyBookingRepository;
         this.drinkBookingRepository = drinkBookingRepository;
         this.foodBookingRepository = foodBookingRepository;
@@ -71,6 +82,14 @@ public class PendingBookingView extends VerticalLayout {
         updateComponents();
     }
 
+    /**
+     * The createSearchComponent function creates a search bar that allows the user
+     * to filter through the bookings.
+     * The function returns a Component object, which is then added to the main
+     * layout of this view.
+     * 
+     * @return A horizontallayout
+     */
     private Component createSearchComponent() {
         HorizontalLayout searchLayout = new HorizontalLayout();
         searchLayout.setWidth("70%");
@@ -86,6 +105,11 @@ public class PendingBookingView extends VerticalLayout {
         return searchLayout;
     }
 
+    /**
+     * The createGrid function creates a grid of bowling alley bookings.
+     * 
+     * @return A grid
+     */
     private Grid<BowlingAlleyBooking> createGrid() {
         Grid<BowlingAlleyBooking> grid = new Grid<>(BowlingAlleyBooking.class, false);
         grid.setSizeFull();
@@ -107,9 +131,24 @@ public class PendingBookingView extends VerticalLayout {
         return grid;
     }
 
+    /**
+     * The updateGridItems function is responsible for updating the items in the
+     * grid.
+     * It does this by first querying all bookings from the database that have an
+     * end time less than or equal to now, and are not completed yet.
+     * Then it checks if there is a search term entered into the search field, and
+     * if so splits it up into individual words (search terms).
+     * If there are any search terms present, then we iterate over each booking in
+     * our list of bookings retrieved from our query above. For each booking we
+     * check whether any of its properties contain one of our search terms (case
+     * insensitive), and remove them from a copy of the list of search terms if so.
+     * If there are no search terms left in the copy, then we remove the booking
+     * from the list of bookings.
+     */
     private void updateGridItems() {
         long currentTime = System.currentTimeMillis();
-        List<BowlingAlleyBooking> bookingList = bowlingAlleyBookingRepository.findAllByEndTimeLessThanAndCompletedEquals(currentTime, false);
+        List<BowlingAlleyBooking> bookingList = bowlingAlleyBookingRepository
+                .findAllByEndTimeLessThanAndCompletedEquals(currentTime, false);
         String searchFieldValue = searchField.getValue();
         String[] searchTerms;
         if (searchFieldValue != null) {
@@ -133,6 +172,12 @@ public class PendingBookingView extends VerticalLayout {
         clientGridListDataView.setSortOrder(BowlingAlleyBooking::getEndTime, SortDirection.ASCENDING);
     }
 
+    /**
+     * The createInvoiceButton function creates a button that navigates to the
+     * InvoiceView.
+     * 
+     * @return A button
+     */
     private Button createInvoiceButton() {
         Button button = new Button("Zu Rechnung abschließen");
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -141,10 +186,26 @@ public class PendingBookingView extends VerticalLayout {
         return button;
     }
 
+    /**
+     * The updateComponents function enables the invoiceButton if a booking is
+     * selected.
+     */
     private void updateComponents() {
         invoiceButton.setEnabled(selectedBooking != null);
     }
 
+    /**
+     * The calculateBookingTotal function calculates the total price of a booking.
+     * It does so by adding up the prices of all bookings that are associated with
+     * this booking,
+     * i.e., it adds up the price of all food and drink bookings as well as shoe
+     * rentals that were made at the same time for this bowling alley.
+     * 
+     * @param BowlingAlleyBooking bowlingAlleyBooking Get the client, bowling alley
+     *                            and start time of a booking
+     *
+     * @return A string
+     */
     private String calculateBookingTotal(BowlingAlleyBooking bowlingAlleyBooking) {
         List<DrinkBooking> drinkBookingList = drinkBookingRepository
                 .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),

@@ -23,7 +23,12 @@ public class FoodPanel extends HorizontalLayout {
     private final IntegerField foodAmountField;
 
     /**
-     * Constructor for the FoodPanel.
+     * The FoodPanel function is a constructor for the FoodPanel class.
+     * It creates a new FoodPanel object, which consists of two components:
+     * A label and an integer field. The label displays the name of the food item,
+     * while
+     * the integer field allows users to specify how many portions they want to
+     * order.
      * 
      * @param food
      * @param bowlingAlleyBooking
@@ -49,16 +54,16 @@ public class FoodPanel extends HorizontalLayout {
             }
             if (value < foodAmountField.getMin() || value > foodAmountField.getMax()) {
                 foodAmountField.setValue(e.getOldValue());
-                Notifications.showError("Nicht genügend von der Speise: "+ food.getName());
+                Notifications.showError("Nicht genügend von der Speise: " + food.getName());
                 return;
             }
 
             FoodBooking temp = new FoodBooking(food, bowlingAlleyBooking);
             FoodBooking foodBooking = foodBookingMap.getOrDefault(temp.getName(), temp);
             foodBooking.setAmount(value);
-            if(foodBooking.getAmount() == 0){
+            if (foodBooking.getAmount() == 0) {
                 foodBookingMap.remove(foodBooking.getName());
-            }else {
+            } else {
                 foodBookingMap.put(foodBooking.getName(), foodBooking);
             }
         });
@@ -70,7 +75,9 @@ public class FoodPanel extends HorizontalLayout {
     }
 
     /**
-     * Adds CSS style to the FoodPanel.
+     * The addCSS function adds CSS styling to the FoodPanel.
+     *
+     * @return A cssstyledeclaration object
      */
     private void addCSS() {
         getStyle()
@@ -83,7 +90,8 @@ public class FoodPanel extends HorizontalLayout {
     }
 
     /**
-     * Resets the FoodAmountField to the value 0.
+     * The resetFoodAmountFieldValue function resets the value of the
+     * foodAmountField to 0.
      */
     public void resetFoodAmountFieldValue() {
         this.foodAmountField.setValue(0);

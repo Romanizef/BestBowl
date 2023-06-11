@@ -88,7 +88,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     private VerticalLayout drinkLayoutForAddItem;
     private Button addItem;
     private Button goToBill;
-    private final BowlingCenter bowlingCenter; 
+    private final BowlingCenter bowlingCenter;
 
     /**
      * Creates a new instance of the ExtrasView.
@@ -105,13 +105,14 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
      */
     @Autowired
     public ArticleBookingView(DrinkRepository drinkRepository,
-                      FoodRepository foodRepository,
-                      BowlingAlleyRepository bowlingAlleyRepository,
-                      BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
-                      FoodBookingRepository foodBookingRepository,
-                      DrinkBookingRepository drinkBookingRepository,
-                      BowlingShoeRepository bowlingShoeRepository,
-                      BowlingShoeBookingRepository bowlingShoeBookingRepository,  BowlingCenterRepository bowlingCenterRepository) {
+            FoodRepository foodRepository,
+            BowlingAlleyRepository bowlingAlleyRepository,
+            BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
+            FoodBookingRepository foodBookingRepository,
+            DrinkBookingRepository drinkBookingRepository,
+            BowlingShoeRepository bowlingShoeRepository,
+            BowlingShoeBookingRepository bowlingShoeBookingRepository,
+            BowlingCenterRepository bowlingCenterRepository) {
         this.bowlingAlleyRepository = bowlingAlleyRepository;
         this.drinkRepository = drinkRepository;
         this.foodRepository = foodRepository;
@@ -134,9 +135,11 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     }
 
     /**
-     * Creates the article panel component.
-     *
-     * @return The article panel component.
+     * The createArticlePanelComponent function creates a TabSheet with three tabs,
+     * each containing a Div.
+     * The Divs are used to display the article panels for drinks, food and shoes.
+     * 
+     * @return The tabs component
      */
     private Component createArticlePanelComponent() {
         TabSheet tabs;
@@ -162,9 +165,10 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     }
 
     /**
-     * Creates the shoe panel component.
-     *
-     * @return The shoe panel component.
+     * The createShoePanel function creates a new ShoePanel object and assigns it to
+     * the shoePanel variable.
+     * 
+     * @return A shoePanel, which is a component
      */
     private Component createShoePanel() {
         shoePanel = new ShoePanel(bowlingShoeRepository, currentBowlingAlleyBooking.getClient());
@@ -172,9 +176,12 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     }
 
     /**
-     * Creates the drink panel component.
-     *
-     * @return The drink panel component.
+     * The createDrinkPanel function creates a VerticalLayout that contains
+     * DrinkPanels for each drink in the database.
+     * The function also sets the currentBowlingAlleyBooking and drinkBookingMap
+     * fields to their respective parameters.
+     * 
+     * @return A verticallayout
      */
     private Component createDrinkPanel() {
         VerticalLayout layout = new VerticalLayout();
@@ -199,9 +206,11 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     }
 
     /**
-     * Creates the food panel component.
+     * The createFoodPanel function creates a VerticalLayout that contains all the
+     * FoodPanels for each food item.
+     * The layout is then returned to be added to the TabSheet.
      *
-     * @return The food panel component.
+     * @return A verticallayout
      */
     private Component createFoodPanel() {
         VerticalLayout layout = new VerticalLayout();
@@ -217,17 +226,22 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     }
 
     /**
-     * Creates the alley buttons component.
-     *
-     * @return The alley buttons component.
+     * The createAlleyButtonsComponent function creates a HorizontalLayout
+     * containing buttons for each BowlingAlley in the database.
+     * The function also adds click listeners to each button, which change the
+     * currentBowlingAlleyId and currentBowlingAlleyBooking variables.
+     * 
+     * @return A component
      */
     private final Component createAlleyButtonsComponent() {
-        HorizontalLayout alleyLayout; // Todo layout ändern mit 30 buttons/bahnen testen, scrolllayout bildschirmbreite max breite oder %tual https://vaadin.com/docs/latest/components/scroller
+        HorizontalLayout alleyLayout; // Todo layout ändern mit 30 buttons/bahnen testen, scrolllayout
+                                      // bildschirmbreite max breite oder %tual
+                                      // https://vaadin.com/docs/latest/components/scroller
         alleyLayout = new HorizontalLayout();
         alleyLayout.setPadding(true);
         alleyLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
 
-        List<BowlingAlley> bowlingAlleyList = bowlingAlleyRepository.findAll(); //Todo activeistrue
+        List<BowlingAlley> bowlingAlleyList = bowlingAlleyRepository.findAll(); // Todo activeistrue
         if (bowlingAlleyList.isEmpty()) {
             Notifications.showError("Es sind keine Bahnen im System vorhanden.\nBitte trage Bahnen ins System ein.");
         }
@@ -244,21 +258,23 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         // Todo exception handling wenn keine bahnen
 
         for (BowlingAlley bowlingAlley : bowlingAlleyList) {
-            Button alleyButton = new Button("Bahn " + bowlingAlley.getId());//Todo header mit kunde und Start- und Endzeit über den Buttons, wie bei Rechnung
+            Button alleyButton = new Button("Bahn " + bowlingAlley.getId());// Todo header mit kunde und Start- und
+                                                                            // Endzeit über den Buttons, wie bei
+                                                                            // Rechnung
             buttonMap.put(bowlingAlley.getId(), alleyButton);
             alleyButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             alleyButton.setEnabled(!freeBowlingAlleyHashSet.contains(bowlingAlley.getId()));
             alleyButton.addClickListener(buttonClickEvent -> {
-//                if(){
-//                    //Todo set disabled wenn rechnung fertig ist
-//                    //Todo update divs
-//                    return;
-//                }
+                // if(){
+                // //Todo set disabled wenn rechnung fertig ist
+                // //Todo update divs
+                // return;
+                // }
                 changePreviousButtonStyle(currentBowlingAlleyId);
                 currentBowlingAlleyId = Integer.parseInt(alleyButton.getText().replaceAll("\\D+(\\d+)", "$1"));
                 changeCurrentButtonStyle(currentBowlingAlleyId);
                 currentBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(
-                                bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
+                        bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
                         .findFirst()
                         .orElse(null);
                 changeTabs();
@@ -344,7 +360,10 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     }
 
     /**
-     * Adds all new shoe bookings for the current bowling alley booking.
+     * The addAllNewShoeBookings function adds all new shoe bookings. It does this
+     * by first getting a list of all shoe bookings from the database, and then
+     * mapping them into a map. Then it iterates over each entry in the map and adds
+     * a new shoe booking.
      */
     private void addAllNewShoeBookings() {
         int stock = shoePanel.getShoeSizeAmountMap().get(shoePanel.getShoeSizeField().getValue())
@@ -372,7 +391,17 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     }
 
     /**
-     * Adds all new drink bookings for the current bowling alley booking.
+     * The addAllNewDrinkBookings function adds all new drink bookings to the
+     * database.
+     * It does this by first getting a list of all drink bookings from the database,
+     * and then mapping them into a map.
+     * Then it iterates over each entry in the local drinkBookingMap, which contains
+     * all of our current DrinkBooking objects.
+     * For each entry in that map, we get its corresponding Drink object from the
+     * database using its name as an identifier. We then subtract
+     * booking's amount times booking's ml (the amount of milliliters) from that
+     * Drink object's stockInMilliliters field to determine how much of that Drink
+     * is booked.
      */
     private void addAllNewDrinkBookings() {
         List<DrinkBooking> drinkBookingList = drinkBookingRepository
@@ -410,7 +439,32 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     }
 
     /**
-     * Adds all new food bookings for the current bowling alley booking.
+     * The addAllNewFoodBookings function adds all new food bookings to the
+     * database.
+     * It does this by first getting a list of all food bookings from the database
+     * that match the current bowling alley booking's client, bowling alley, and
+     * start time.
+     * Then it creates a map of those food bookings using their names as keys and
+     * themselves as values.
+     * Next it iterates over each entry in its own map (foodBookingMap) which
+     * contains FoodBooking objects with information about how many items were
+     * ordered for each type of food item. For each entry in this map:
+     * 1) The function gets the selectedFood object from the database using its
+     * name as an identifier.
+     * 2) The function subtracts the amount of the FoodBooking object from the
+     * selectedFood object's stock field.
+     * 3) If the selectedFood object's stock field is less than 0, the function
+     * shows an error message and returns.
+     * 4) If the selectedFood object's stock field is greater than 0, the
+     * function updates the selectedFood object's stock field and saves it to the
+     * database.
+     * 5) If the selectedFood object's stock field is 0, the function saves the
+     * FoodBooking object to the database.
+     * 6) If the selectedFood object's stock field is greater than 0, the function
+     * updates the FoodBooking object's amount field and saves it to the database.
+     * 7) If the selectedFood object's stock field is 0, the function saves the
+     * FoodBooking object to the database.
+     * 8) The function clears the local foodBookingMap.
      */
     private void addAllNewFoodBookings() {
         List<FoodBooking> foodBookingList = foodBookingRepository
@@ -444,6 +498,21 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         foodBookingMap.clear();
     }
 
+    /**
+     * The setParameter function is called by the framework when a new instance of
+     * this view is created.
+     * It receives an event and an optional parameter, which in our case will be the
+     * booking ID.
+     * If there's no parameter, we simply return from the function without doing
+     * anything else.
+     * Otherwise, we try to find a booking with that ID in our database and if it
+     * exists and is active (not expired),
+     * then we set it as our currentBowlingAlleyBooking variable so that other
+     * functions can access it later on.&lt;/code&gt;
+     *
+     * @param event   Get the current url
+     * @param Integer parameter Pass the parameter from the url to this function
+     */
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter Integer parameter) {
         if (parameter == null) {

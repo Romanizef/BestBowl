@@ -1,5 +1,12 @@
 package de.softwareprojekt.bestbowl.views.articlePanels;
 
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_SHOE;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -11,13 +18,6 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoe.BowlingShoeRepository;
-
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_SHOE;
 
 /**
  * Class for the Shoe Panels in the ExtrasView.
@@ -32,7 +32,8 @@ public class ShoePanel extends VerticalLayout {
     private Map<Integer, Integer> shoeSizeAmountMap;
 
     /**
-     * Constructor for the ShoePanel.
+     * The ShoePanel function creates a panel that allows the user to select shoes
+     * for their client.
      *
      * @param bowlingShoeRepository
      * @param client
@@ -92,7 +93,9 @@ public class ShoePanel extends VerticalLayout {
     }
 
     /**
-     * Adds CSS style to the ShoePanel.
+     * The addCSS function adds CSS styling to the panel.
+     * 
+     * @return A cssstyledeclaration
      */
     private void addCSS() {
         getStyle()
@@ -104,7 +107,11 @@ public class ShoePanel extends VerticalLayout {
     }
 
     /**
-     * Updates the amount of shoes of a certain size.
+     * The updateShoeSizeAmountMap function updates the shoeSizeAmountMap HashMap
+     * with the current amount of available shoes for each size.
+     * The function is called whenever a new client is added or removed from the
+     * database, so that it can be displayed in real time on the frontend.
+     *
      */
     public void updateShoeSizeAmountMap() {
         List<BowlingShoe> shoeList = bowlingShoeRepository.findAllByClientIsNullAndActiveIsTrue();
@@ -123,7 +130,7 @@ public class ShoePanel extends VerticalLayout {
     }
 
     /**
-     * Resets the shoeAmountField to the value 0.
+     * The resetIntegerField function resets the value of the shoeAmountField to 0.
      */
     public void resetIntegerField() {
         shoeAmountField.setValue(0);

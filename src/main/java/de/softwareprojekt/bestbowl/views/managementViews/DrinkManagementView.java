@@ -1,5 +1,16 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.clearNumberFieldChildren;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderBoolean;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderInteger;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderString;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -27,19 +38,13 @@ import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.articleForms.DrinkForm;
 import jakarta.annotation.security.RolesAllowed;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 /**
  * @author Max Ziller
  */
 @Route(value = "drinkManagement", layout = MainView.class)
 @PageTitle("Getränkeverwaltung")
-@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
+@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
 public class DrinkManagementView extends VerticalLayout {
     private final transient DrinkRepository drinkRepository;
     private final Binder<Drink> drinkBinder = new Binder<>();
@@ -52,6 +57,19 @@ public class DrinkManagementView extends VerticalLayout {
     private Label validationErrorLabel;
     private boolean editingNewDrink = false;
 
+    /**
+     * The DrinkManagementView function is responsible for creating the view that
+     * allows users to manage drinks.
+     * It creates a button that allows users to create new drinks, and it also
+     * creates a grid of all existing drinks.
+     * The grid contains buttons for editing and deleting each drink, as well as
+     * buttons for adding or removing variants from each drink.
+     *
+     * @param drinkRepository
+     * @see #createNewDrinkButton()
+     * @see #createDrinkGridFormLayout()
+     * @see #updateEditDrinkLayoutState()
+     */
     @Autowired
     public DrinkManagementView(DrinkRepository drinkRepository) {
         this.drinkRepository = drinkRepository;
@@ -62,6 +80,14 @@ public class DrinkManagementView extends VerticalLayout {
         updateEditDrinkLayoutState();
     }
 
+    /**
+     * The createNewDrinkButton function creates a new Button object with the text
+     * &quot;Neues Getränk hinzufügen&quot;.
+     * The button is used to create new drinks.
+     *
+     * @return A button
+     * @see #updateEditDrinkLayoutState()
+     */
     private Button createNewDrinkButton() {
         Button button = new Button("Neues Getränk hinzufügen");
         button.setWidthFull();
@@ -80,11 +106,26 @@ public class DrinkManagementView extends VerticalLayout {
         return button;
     }
 
+    /**
+     * The updateEditDrinkLayoutState function is used to update the state of the
+     * editDrinkLayout.
+     * It sets the validationErrorLabel text to an empty string and enables or
+     * disables all children of drinkForm depending on whether a drink has been
+     * selected.
+     */
     private void updateEditDrinkLayoutState() {
         validationErrorLabel.setText("");
         setChildrenEnabled(drinkForm.getChildren(), selectedDrink != null);
     }
 
+    /**
+     * The createDrinkGridFormLayout function creates a HorizontalLayout that
+     * contains the drinkGrid and the drinkForm.
+     * The layout is set to full size, so it will fill up all available space in its
+     * parent component.
+     * 
+     * @return A horizontallayout
+     */
     private HorizontalLayout createDrinkGridFormLayout() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setSizeFull();
@@ -93,6 +134,11 @@ public class DrinkManagementView extends VerticalLayout {
         return layout;
     }
 
+    /**
+     * The createDrinkFormLayout function creates a layout for the drink form.
+     * 
+     * @return A verticallayout
+     */
     private VerticalLayout createDrinkFormLayout() {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
@@ -102,6 +148,14 @@ public class DrinkManagementView extends VerticalLayout {
         return layout;
     }
 
+    /**
+     * The createValidationLabelLayout function creates a VerticalLayout that
+     * contains the validationErrorLabel.
+     * The validationErrorLabel is used to display error messages when the user
+     * tries to save an invalid DrinkForm.
+     * 
+     * @return A verticallayout
+     */
     private VerticalLayout createValidationLabelLayout() {
         VerticalLayout validationLabelLayout = new VerticalLayout();
         validationLabelLayout.setWidthFull();
@@ -116,6 +170,11 @@ public class DrinkManagementView extends VerticalLayout {
         return validationLabelLayout;
     }
 
+    /**
+     * The writeBean function is used to write the values of a form into an object.
+     * 
+     * @return True if the writing was successful, false otherwise
+     */
     private boolean writeBean() {
         try {
             drinkBinder.writeBean(selectedDrink);
@@ -128,6 +187,17 @@ public class DrinkManagementView extends VerticalLayout {
         return false;
     }
 
+    /**
+     * The createButton function creates a button that allows the user to save and
+     * open a drink variant.
+     * 
+     * @see #writeBean()
+     * @see #validateDrinkSave()
+     * @see #saveToDbAndUpdateDrink()
+     * 
+     * @return A vertical layout with two buttons, the savebutton and the
+     *         cancelbutton
+     */
     private Component createButton() {
         VerticalLayout buttonOrderLayout = new VerticalLayout();
         buttonOrderLayout.setWidthFull();
@@ -183,6 +253,15 @@ public class DrinkManagementView extends VerticalLayout {
         return buttonOrderLayout;
     }
 
+    /**
+     * The saveToDbAndUpdateDrink function saves the selected drink to the database
+     * and updates
+     * the grid. If a new drink is being edited, it will be added to the grid.
+     * Otherwise,
+     * it will refresh that item in the grid.
+     * 
+     * @see #resetEditLayout()
+     */
     private void saveToDbAndUpdateDrink() {
         drinkRepository.save(selectedDrink);
         if (editingNewDrink) {
@@ -194,6 +273,16 @@ public class DrinkManagementView extends VerticalLayout {
         Notifications.showInfo("Getränk gespeichert");
     }
 
+    /**
+     * The resetEditLayout function is used to reset the edit layout of the drink
+     * view.
+     * It deselects all drinks in the grid, sets selectedDrink to null, sets
+     * editingNewDrink to false and disables both save buttons.
+     * Then it creates a new Drink object with one DrinkVariant and reads this into
+     * the binder.
+     * Finally it updates the state of edit drink layout and clears all number
+     * fields in children of drinkForm (which are not visible).
+     */
     private void resetEditLayout() {
         drinkGrid.deselectAll();
         selectedDrink = null;
@@ -210,9 +299,19 @@ public class DrinkManagementView extends VerticalLayout {
         clearNumberFieldChildren(drinkForm.getChildren());
     }
 
+    /**
+     * The validateDrinkSave function checks if the selected drink is already in the
+     * database.
+     * If it is, then it removes that drink from the set of drinks and checks if
+     * there are any other drinks with that name.
+     * If there are no other drinks with that name, then we can save this new drink
+     * to our database.
+     * 
+     * @return A boolean
+     */
     private boolean validateDrinkSave() {
         Optional<Drink> dbDrink = drinkRepository.findById(selectedDrink.getId());
-        //name duplicate check
+        // name duplicate check
         Set<String> drinkNameSet = drinkRepository.findAllNames();
         dbDrink.ifPresent(drink -> {
             drinkNameSet.remove(drink.getName());
@@ -221,11 +320,20 @@ public class DrinkManagementView extends VerticalLayout {
             validationErrorLabel.setText("Ein Getränk mit diesem Namen existiert bereits");
             return false;
         }
-
         return true;
     }
 
-
+    /**
+     * The createDrinkGrid function creates a Grid of Drink objects.
+     * The grid is populated with all the drinks in the database, and each column
+     * can be filtered by its respective value.
+     * The grid also has a selection listener that enables/disables buttons
+     * depending on whether or not an item is selected.
+     * 
+     * @see #updateEditDrinkLayoutState()
+     * 
+     * @return A grid
+     */
     private Grid<Drink> createDrinkGrid() {
         Grid<Drink> drinkGrid = new Grid<>(Drink.class);
         drinkGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
@@ -234,7 +342,8 @@ public class DrinkManagementView extends VerticalLayout {
         Grid.Column<Drink> nameColumn = drinkGrid.addColumn("name").setHeader("Name");
         Grid.Column<Drink> stockColumn = drinkGrid.addColumn("stockInMilliliters").setHeader("Bestand (ml)");
         Grid.Column<Drink> reorderPointColumn = drinkGrid.addColumn("reorderPoint").setHeader("Meldebestand (ml)");
-        Grid.Column<Drink> activeColumn = drinkGrid.addColumn(drink -> drink.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
+        Grid.Column<Drink> activeColumn = drinkGrid.addColumn(drink -> drink.isActive() ? "Aktiv" : "Inaktiv")
+                .setHeader("Aktiv");
         drinkGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
         drinkGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         drinkGrid.setWidth("75%");
@@ -283,11 +392,26 @@ public class DrinkManagementView extends VerticalLayout {
         private String reorderPoint;
         private Boolean active;
 
+        /**
+         * The DrinkFilter function is used to filter the drinks in the grid.
+         * It filters by name, price and category.
+         * 
+         * @param dataView
+         */
         public DrinkFilter(GridListDataView<Drink> dataView) {
             this.dataView = dataView;
             this.dataView.addFilter(this::test);
         }
 
+        /**
+         * The test function is used to filter the grid.
+         * It checks if the given drink matches all of the filters.
+         * If it does, it returns true and will be displayed in the grid.
+         * 
+         * @param drink Pass the current drink object in the list to be tested against
+         *
+         * @return True if all the fields match
+         */
         public boolean test(Drink drink) {
             boolean matchesId = matches(String.valueOf(drink.getId()), id);
             boolean matchesName = matches(drink.getName(), name);
@@ -297,30 +421,70 @@ public class DrinkManagementView extends VerticalLayout {
             return matchesId && matchesName && matchesStock && matchesReorderPoint && matchesActive;
         }
 
+        /**
+         * The matches function checks if the searchTerm is null or empty. If it is,
+         * then we return true because
+         * that means there's no filter and everything should be shown. Otherwise, we
+         * check if the value contains
+         * the searchTerm (ignoring case). If it does, then we return true as well. This
+         * function will be used to
+         * determine whether a drink should be displayed in our grid or not based on
+         * what's typed into our filter field.
+         * 
+         * @param String value Compare the value of the searchterm parameter
+         * @param String searchTerm Search for the value of a specific column
+         *
+         * @return True if the searchterm is null or empty
+         */
         private boolean matches(String value, String searchTerm) {
             return searchTerm == null || searchTerm.isEmpty() || value.toLowerCase().contains(searchTerm.toLowerCase());
         }
 
+        /**
+         * The setId function is used to set the id of a drink.
+         * 
+         * @param id
+         */
         public void setId(String id) {
             this.id = id;
             dataView.refreshAll();
         }
 
+        /**
+         * The setName function sets the name of a drink.
+         * 
+         * @param name
+         */
         public void setName(String name) {
             this.name = name;
             dataView.refreshAll();
         }
 
+        /**
+         * The setStock function is used to set the stock of a drink.
+         * 
+         * @param stock
+         */
         public void setStock(String stock) {
             this.stock = stock;
             dataView.refreshAll();
         }
 
+        /**
+         * The setReorderPoint function sets the reorder point of a drink.
+         * 
+         * @param reorderPoint
+         */
         public void setReorderPoint(String reorderPoint) {
             this.reorderPoint = reorderPoint;
             dataView.refreshAll();
         }
 
+        /**
+         * The setActive function is used to set the active state of a drink.
+         * 
+         * @param active
+         */
         public void setActive(Boolean active) {
             this.active = active;
             dataView.refreshAll();

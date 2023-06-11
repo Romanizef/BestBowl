@@ -1,5 +1,10 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
+import java.time.LocalTime;
+import java.util.Objects;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.accordion.AccordionPanel;
 import com.vaadin.flow.component.button.Button;
@@ -17,6 +22,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingCenterRepository;
 import de.softwareprojekt.bestbowl.utils.constants.UserRole;
@@ -24,10 +30,6 @@ import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.utils.validators.BowlingCenterValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.time.LocalTime;
-import java.util.Objects;
 
 /**
  * @author Marten Voß
@@ -40,6 +42,12 @@ public class BowlingCenterManagementView extends Div {
         private final Binder<BowlingCenter> binder = new Binder<>();
         private final BowlingCenter bowlingCenter;
 
+        /**
+         * The BowlingCenterManagementView function is used to manage all the
+         * inmformation of the bowling center.
+         * 
+         * @param bowlingCenterRepository
+         */
         @Autowired
         public BowlingCenterManagementView(BowlingCenterRepository bowlingCenterRepository) {
                 bowlingCenter = bowlingCenterRepository.getBowlingCenter();

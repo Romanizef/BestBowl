@@ -40,9 +40,22 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     private User selectedUserForPasswordReset = null;
     private int passwordResetDialogStage = 1;
 
+    /**
+     * The LoginView function is responsible for the login view of the application.
+     * It contains a LoginForm, which allows users to log in with their username and
+     * password.
+     * If they forget their password, they can click on &quot;Passwort
+     * vergessen?&quot; and enter their email address to reset it.
+     *
+     * @param UserManager             userManager
+     * @param UserRepository          userRepository
+     * @param BowlingCenterRepository bowlingCenterRepository
+     *
+     * @return A loginform
+     */
     @Autowired
     public LoginView(UserManager userManager, UserRepository userRepository,
-                     BowlingCenterRepository bowlingCenterRepository) {
+            BowlingCenterRepository bowlingCenterRepository) {
         this.userManager = userManager;
         this.userRepository = userRepository;
         addClassName("login-view");
@@ -66,6 +79,15 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         add(new H1(bowlingCenterRepository.getBowlingCenter().getDisplayName()), loginForm);
     }
 
+    /**
+     * The beforeEnter function is called before the view is entered.
+     * It checks if there was an error during login and sets the error flag of the
+     * LoginForm accordingly.
+     * 
+     * @param beforeEnterEvent Get the query parameters
+     *
+     * @return A boolean value
+     */
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         if (beforeEnterEvent.getLocation()
@@ -76,6 +98,13 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         }
     }
 
+    
+    /**
+     * The createPasswordResetDialog function creates a dialog that allows the user to reset their password.
+     * The function is called when the user clicks on &quot;Passwort vergessen&quot; in the login form.
+     * 
+     * @return A dialog
+     */
     private Dialog createPasswordResetDialog() {
         Dialog dialog = new Dialog();
         dialog.setWidth("350px");
@@ -126,7 +155,8 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         };
         Runnable stageTwoAction = () -> {
             String answer = answerField.getValue();
-            if (Utils.isStringNotEmpty(answer) && answer.equals(selectedUserForPasswordReset.getSecurityQuestionAnswer())) {
+            if (Utils.isStringNotEmpty(answer)
+                    && answer.equals(selectedUserForPasswordReset.getSecurityQuestionAnswer())) {
                 passwordResetDialogStage = 3;
                 answerField.setValue("");
                 answerField.setVisible(false);

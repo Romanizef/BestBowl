@@ -1,5 +1,20 @@
 package de.softwareprojekt.bestbowl.views.bookingViews;
 
+import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
+import static de.softwareprojekt.bestbowl.utils.Utils.toHoursString;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.isCurrentUserInRole;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -13,8 +28,13 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.timepicker.TimePicker;
-import com.vaadin.flow.router.*;
+import com.vaadin.flow.router.BeforeEvent;
+import com.vaadin.flow.router.HasUrlParameter;
+import com.vaadin.flow.router.OptionalParameter;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.security.AuthenticationContext;
+
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
@@ -30,20 +50,6 @@ import de.softwareprojekt.bestbowl.utils.email.MailSenderService;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.PermitAll;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-
-import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
-import static de.softwareprojekt.bestbowl.utils.Utils.toHoursString;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.isCurrentUserInRole;
 
 /**
  * @author Marten Voß
@@ -73,11 +79,23 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
     private long gridLowerBound;
     private long gridUpperBound;
 
+    /**
+     * The BowlingAlleyBookingView function is the main function of this class.
+     * It creates a new BowlingAlleyBookingView object, which is used to display the
+     * booking view for bowling alleys.
+     * The user can select a date and time, as well as an alley number and book it
+     * if it's available.
+     * 
+     * @param bowlingAlleyBookingRepository Save the booking to the database
+     * @param bowlingAlleyRepository        Get the bowling alleys from the database
+     * @param bowlingCenterRepository       Get the bowling center
+     * @param authenticationContext         Get the current user
+     */
     @Autowired
     public BowlingAlleyBookingView(BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
-                                   BowlingAlleyRepository bowlingAlleyRepository,
-                                   BowlingCenterRepository bowlingCenterRepository,
-                                   AuthenticationContext authenticationContext) {
+            BowlingAlleyRepository bowlingAlleyRepository,
+            BowlingCenterRepository bowlingCenterRepository,
+            AuthenticationContext authenticationContext) {
         this.bowlingAlleyBookingRepository = bowlingAlleyBookingRepository;
         this.bowlingAlleyRepository = bowlingAlleyRepository;
         this.authenticationContext = authenticationContext;
@@ -91,7 +109,7 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         bookButton = createBookButton();
         bookingGrid = createBookingGrid();
         Component footerComponent = createFooterComponent();
-        continueToExtrasButton = createExtrasButton();
+        continueToExtrasButton = createArticleBookingViewButton();
 
         add(clientHeader, menuComponent, bookButton, bookingGrid, footerComponent, continueToExtrasButton);
 
@@ -101,8 +119,17 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         setBoundsToWholeDay();
     }
 
+    /**
+     * The setBoundsToWholeDay function sets the gridLowerBound and gridUpperBound
+     * variables to the start of a day
+     * (the current day if it is after the bowling center's opening time, or
+     * yesterday otherwise) and one day later.
+     * 
+     * @return The start time of the day, and the end time of that same day
+     */
     private void setBoundsToWholeDay() {
-        LocalDateTime startLDT = LocalDateTime.of(datePicker.getValue(), LocalTime.ofSecondOfDay(bowlingCenter.getStartTime()));
+        LocalDateTime startLDT = LocalDateTime.of(datePicker.getValue(),
+                LocalTime.ofSecondOfDay(bowlingCenter.getStartTime()));
         if (LocalTime.now().isBefore(LocalTime.ofSecondOfDay(bowlingCenter.getStartTime()))) {
             startLDT = startLDT.minus(java.time.Duration.ofDays(1));
         }
@@ -110,6 +137,19 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         gridUpperBound = gridLowerBound + java.time.Duration.ofDays(1).toMillis();
     }
 
+    /**
+     * The createMenuComponent function creates a HorizontalLayout that contains the
+     * following components:
+     * - A DatePicker for selecting the date of a booking.
+     * - A TimePicker for selecting the time of a booking.
+     * - A ComboBox to select how long you want to book an alley for (in hours).
+     * - The checkButton, which checks if there is an available bowling alley at
+     * your selected time and duration. If so, it will notify you with its number in
+     * Notifications.showInfo(). Otherwise it will tell you that no alleys are
+     * available at your selected time and duration in Notifications.showInfo(). It
+     *
+     * @return A layout
+     */
     private Component createMenuComponent() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setAlignItems(Alignment.BASELINE);
@@ -159,6 +199,21 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         return layout;
     }
 
+    /**
+     * The configureDatePicker function configures the datePicker to be used in the
+     * BookingView.
+     * It sets its locale to Germany, and sets its value to today's date. If the
+     * current user is not an admin, it also
+     * disables all dates before today's date (i.e., you can't book a bowling alley
+     * for yesterday). Finally, it adds a
+     * listener that checks if any of these rules are violated when changing the
+     * value of this DatePicker: if so, it resets
+     * this DatePicker back to its old value (i.e., you can't change your booking).
+     *
+     * @param datePicker Set the locale, value and min
+     *
+     * @return A datepicker
+     */
     private void configureDatePicker(DatePicker datePicker) {
         datePicker.setLocale(Locale.GERMANY);
         datePicker.setValue(Utils.getCurrentDateTimeRounded().toLocalDate());
@@ -173,6 +228,17 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         });
     }
 
+    /**
+     * The configureTimePicker function configures the timePicker to be used in the
+     * booking view.
+     * It sets the locale to Germany, sets a step of 30 minutes and rounds down/up
+     * to nearest half hour.
+     * If the user is not an admin, it also restricts him from selecting times
+     * outside of his bowling center's opening hours.
+     *
+     * @param timePicker Set the locale, step size and value of the time
+     *                   picker
+     */
     private void configureTimePicker(TimePicker timePicker) {
         timePicker.setLocale(Locale.GERMANY);
         timePicker.setStep(java.time.Duration.ofMinutes(30));
@@ -189,6 +255,12 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         });
     }
 
+    /**
+     * The createBookButton function creates a button that allows the user to book
+     * an alley.
+     * 
+     * @return A button
+     */
     private Button createBookButton() {
         Button button = new Button("Zeit buchen");
         button.setWidth("65%");
@@ -217,6 +289,14 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         return button;
     }
 
+    /**
+     * The createFooterComponent function creates a footer component for the booking
+     * view.
+     * The footer contains a label that displays the last booked bowling alley and a
+     * button to cancel this booking.
+     *
+     * @return A horizontallayout
+     */
     public Component createFooterComponent() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setAlignItems(Alignment.BASELINE);
@@ -242,6 +322,12 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         return layout;
     }
 
+    /**
+     * The createBookingGrid function creates a Grid of BowlingAlleyBooking objects.
+     * The grid is used to display the bookings in the booking view.
+     * 
+     * @return A grid
+     */
     private Grid<BowlingAlleyBooking> createBookingGrid() {
         Grid<BowlingAlleyBooking> grid = new Grid<>(BowlingAlleyBooking.class, false);
         grid.setSizeFull();
@@ -255,19 +341,42 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         return grid;
     }
 
+    /**
+     * The updateGridItems function updates the items in the bookingGrid.
+     * It does this by querying all bookings from the database that overlap with a
+     * given time period.
+     * The time period is defined by gridLowerBound and gridUpperBound, which are
+     * set to be one week before and after today's date respectively.
+     *
+     */
     private void updateGridItems() {
         bookingGrid.setItems(
                 bowlingAlleyBookingRepository.findAllByTimePeriodsOverlapping(gridLowerBound, gridUpperBound));
     }
 
-    private Button createExtrasButton() {
-        Button button = new Button("Weiter zum Extras buchen");
+    /**
+     * The createExtrasButton function creates a button that navigates to the
+     * ArticleBookingView.
+     * 
+     * @return A button
+     */
+    private Button createArticleBookingViewButton() {
+        Button button = new Button("Weiter zum Artikel buchen");
         button.setWidth("55%");
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         button.addClickListener(e -> UI.getCurrent().navigate(ArticleBookingView.class, latestBooking.getId()));
         return button;
     }
 
+    /**
+     * The generateDurationList function generates a list of durations that can be
+     * used to book bowling alleys.
+     * The duration is in hours and the minimum booking time is 30 minutes, so the
+     * function returns a list of all possible durations from 0.5h to 8h in steps of
+     * 0.5h
+     * 
+     * @return A list of duration objects
+     */
     private List<Duration> generateDurationList() {
         List<Duration> durationList = new ArrayList<>();
         for (int i = 1; i <= 16; i++) {
@@ -276,6 +385,16 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         return durationList;
     }
 
+    /**
+     * The updateInitialComponents function is used to update the initial components
+     * of the view.
+     * It sets the clientHeader text to &quot;Bahn buchen für: (kein Kunde
+     * ausgewählt)&quot; if no client has been selected,
+     * and it sets it to &quot;Bahn buchen für: [first name] [last name]&quot; if a
+     * client has been selected.
+     * It also enables or disables both checkButton and bookButton depending on
+     * whether or not a client has been selected.
+     */
     private void updateInitialComponents() {
         if (selectedClient == null) {
             clientHeader.setText("Bahn buchen für: (kein Kunde ausgewählt)");
@@ -289,6 +408,16 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         }
     }
 
+    /**
+     * The updateLabelAndButtons function updates the label and buttons on the page.
+     * If there is no latest booking, then it sets the text of
+     * lastBookedBowlingAlleyLabel to &quot;Neuste Buchung: -&quot;, disables
+     * continueToExtrasButton, and hides cancelBookingButton.
+     * Otherwise, it sets lastBookedBowlingAlleyLabel's text to a string containing
+     * information about latestBooking (the bowling alley number, start time in date
+     * format, and duration in hours), enables continueToExtrasButton, and shows
+     * cancelBookingButton.
+     */
     private void updateLabelAndButtons() {
         if (latestBooking == null) {
             lastBookedBowlingAlleyLabel.setText("Neuste Buchung: -");
@@ -303,11 +432,26 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         }
     }
 
+    /**
+     * The checkForBowlingAlleys function checks if there are any bowling alleys in
+     * the database.
+     * 
+     * @return True if there are bowling alleys in the database, false otherwise
+     */
     private boolean checkForBowlingAlleys() {
         List<BowlingAlley> bowlingAlleyList = bowlingAlleyRepository.findAll();
         return !bowlingAlleyList.isEmpty();
     }
 
+    /**
+     * The setParameter function is called by the framework when a new instance of
+     * this view is created.
+     * It sets the selectedClient to be used in this view.
+     * 
+     * @param event              Get the url parameters
+     * @param @OptionalParameter Integer parameter Pass the parameter from the url
+     *                           to this function
+     */
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter Integer parameter) {
         if (parameter == null) {
@@ -324,6 +468,12 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
     }
 
     private record Duration(double hours) {
+
+        /**
+         * The toString function is used to display the hours of a booking in the grid.
+         * 
+         * @return A string, which is the formatted hours
+         */
         @Override
         public String toString() {
             return Utils.formatDouble(hours) + " Std.";

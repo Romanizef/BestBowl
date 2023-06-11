@@ -1,5 +1,7 @@
 package de.softwareprojekt.bestbowl.views.articleForms;
 
+import java.util.Objects;
+
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Span;
@@ -9,10 +11,9 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
+
 import de.softwareprojekt.bestbowl.jpa.entities.drink.Drink;
 import de.softwareprojekt.bestbowl.utils.validators.article.DrinkValidator;
-
-import java.util.Objects;
 
 /**
  * Creates the Form for the Drink Entity

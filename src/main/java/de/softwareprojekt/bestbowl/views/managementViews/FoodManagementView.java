@@ -1,5 +1,17 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
+import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.clearNumberFieldChildren;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderBoolean;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderInteger;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderString;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -25,21 +37,13 @@ import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.articleForms.FoodForm;
 import jakarta.annotation.security.RolesAllowed;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * @author Max Ziller
  */
 @Route(value = "foodManagement", layout = MainView.class)
 @PageTitle("Speiesenverwaltung")
-@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
+@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
 public class FoodManagementView extends VerticalLayout {
     private final transient FoodRepository foodRepository;
     private final Binder<Food> foodBinder = new Binder<>();
@@ -51,6 +55,18 @@ public class FoodManagementView extends VerticalLayout {
     private Label validationErrorLabel;
     private boolean editingNewFood = false;
 
+    /**
+     * The FoodManagementView function is responsible for creating the
+     * FoodManagementView.
+     * It creates a newFoodButton, foodGridFormLayout and adds them to the view.
+     * The updateEditFoodLayoutState function is called at the end of this function.
+     * 
+     * @param foodRepository
+     * 
+     * @see #createNewFoodButton()
+     * @see #createFoodGridFormLayout()
+     * @see #updateEditFoodLayoutState()
+     */
     @Autowired
     public FoodManagementView(FoodRepository foodRepository) {
         this.foodRepository = foodRepository;
@@ -61,6 +77,15 @@ public class FoodManagementView extends VerticalLayout {
         updateEditFoodLayoutState();
     }
 
+    /**
+     * The createNewFoodButton function creates a new Button object with the text
+     * &quot;Neue Speise hinzufügen&quot; and adds it to the
+     * foodGrid.
+     * 
+     * @see #updateEditFoodLayoutState()
+     * 
+     * @return A button
+     */
     private Button createNewFoodButton() {
         Button button = new Button("Neue Speise hinzufügen");
         button.setWidthFull();
@@ -78,11 +103,27 @@ public class FoodManagementView extends VerticalLayout {
         return button;
     }
 
+    /**
+     * The updateEditFoodLayoutState function is used to update the state of the
+     * editFoodLayout.
+     * It sets the validationErrorLabel text to an empty string and enables or
+     * disables all children of foodForm depending on whether a Food object has been
+     * selected.
+     */
     private void updateEditFoodLayoutState() {
         validationErrorLabel.setText("");
         setChildrenEnabled(foodForm.getChildren(), selectedFood != null);
     }
 
+    /**
+     * The createFoodGridFormLayout function creates a HorizontalLayout that
+     * contains the foodGrid and the createFoodFormLayout.
+     * 
+     * @see #createFoodGrid()
+     * @see #createFoodFormLayout()
+     *
+     * @return A horizontallayout
+     */
     private HorizontalLayout createFoodGridFormLayout() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setSizeFull();
@@ -91,6 +132,16 @@ public class FoodManagementView extends VerticalLayout {
         return layout;
     }
 
+    /**
+     * The createFoodFormLayout function creates a VerticalLayout that contains the
+     * FoodForm,
+     * a Label for displaying validation errors and a Button to save the form.
+     * 
+     * @see #createValidationLabelLayout()
+     * @see #createButton()
+     *
+     * @return A verticallayout
+     */
     private VerticalLayout createFoodFormLayout() {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
@@ -100,6 +151,14 @@ public class FoodManagementView extends VerticalLayout {
         return layout;
     }
 
+    /**
+     * The createValidationLabelLayout function creates a VerticalLayout that
+     * contains the validationErrorLabel.
+     * The validationErrorLabel is used to display error messages when the user
+     * tries to add an article with invalid data.
+     * 
+     * @return A verticallayout
+     */
     private VerticalLayout createValidationLabelLayout() {
         VerticalLayout validationLabelLayout = new VerticalLayout();
         validationLabelLayout.setWidthFull();
@@ -114,6 +173,12 @@ public class FoodManagementView extends VerticalLayout {
         return validationLabelLayout;
     }
 
+    /**
+     * The writeBean function is used to write the values of a FoodForm into a Food
+     * object.
+     * 
+     * @return True if the FoodForm contains valid data, false otherwise.
+     */
     private boolean writeBean() {
         try {
             foodBinder.writeBean(selectedFood);
@@ -126,7 +191,21 @@ public class FoodManagementView extends VerticalLayout {
         return false;
     }
 
-
+    /**
+     * The createButton function creates a HorizontalLayout containing two buttons:
+     * saveButton and cancelButton. The saveButton is used to write the values of
+     * the FoodForm into
+     * selectedFood, validate them and then either update selectedFood in the
+     * database or reset it to its previous state.
+     * The cancel button resets all changes made by editing a food item.
+     * 
+     * @see #writeBean()
+     * @see #validateFoodSave()
+     * @see #saveToDbAndUpdateFood()
+     *
+     * 
+     * @return A horizontallayout
+     */
     private Component createButton() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setWidthFull();
@@ -152,6 +231,14 @@ public class FoodManagementView extends VerticalLayout {
         return buttonLayout;
     }
 
+    /**
+     * The saveToDbAndUpdateFood function saves the selectedFood to the database and
+     * updates it in the foodGrid.
+     * If a new Food is being edited, it will be added to the foodGrid. Otherwise,
+     * only its values are updated.
+     * After that, resetEditLayout() is called and a notification informing about
+     * successful saving of data is shown.
+     */
     private void saveToDbAndUpdateFood() {
         foodRepository.save(selectedFood);
         if (editingNewFood) {
@@ -163,6 +250,13 @@ public class FoodManagementView extends VerticalLayout {
         Notifications.showInfo("Speise gespeichert");
     }
 
+    /**
+     * The resetEditLayout function resets the edit layout to its default state.
+     * This means that all fields are cleared, the save and cancel buttons are
+     * disabled,
+     * and the selected food is set to null. The function also updates the edit
+     * layout's state.
+     */
     private void resetEditLayout() {
         foodGrid.deselectAll();
         selectedFood = null;
@@ -174,6 +268,16 @@ public class FoodManagementView extends VerticalLayout {
         clearNumberFieldChildren(foodForm.getChildren());
     }
 
+    /**
+     * The validateFoodSave function checks if the selectedFood is already in the
+     * database.
+     * If it is, then it removes that food from the set of all foods and checks if
+     * there are any other foods with that name.
+     * If there are no other foods with that name, then we can save this food to our
+     * database.
+     * 
+     * @return A boolean
+     */
     private boolean validateFoodSave() {
         Optional<Food> dbFood = foodRepository.findById(selectedFood.getId());
         Set<String> foodNameSet = foodRepository.findAllNames();
@@ -187,7 +291,18 @@ public class FoodManagementView extends VerticalLayout {
         return true;
     }
 
-
+    /**
+     * The createFoodGrid function creates a Grid of Food objects.
+     * The grid is populated with all the Food objects in the database.
+     * The grid has columns for ID, Name, Stock (amount), Reorder Point (amount),
+     * Price and Active status.
+     * Each column can be sorted by clicking on its header cell and can be filtered
+     * by entering text into its filter field.
+     * 
+     * @see #updateEditFoodLayoutState()
+     * 
+     * @return A grid
+     */
     private Grid<Food> createFoodGrid() {
         Grid<Food> foodGrid = new Grid<>(Food.class);
         foodGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
@@ -196,8 +311,10 @@ public class FoodManagementView extends VerticalLayout {
         Grid.Column<Food> nameColumn = foodGrid.addColumn("name").setHeader("Name");
         Grid.Column<Food> stockColumn = foodGrid.addColumn("stock").setHeader("Bestand (Stück)");
         Grid.Column<Food> reorderPointColumn = foodGrid.addColumn("reorderPoint").setHeader("Meldebestand (Stück)");
-        Grid.Column<Food> priceColumn = foodGrid.addColumn(food -> formatDouble(food.getPrice()) + "€").setHeader("Preis");
-        Grid.Column<Food> activeColumn = foodGrid.addColumn(food -> food.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
+        Grid.Column<Food> priceColumn = foodGrid.addColumn(food -> formatDouble(food.getPrice()) + "€")
+                .setHeader("Preis");
+        Grid.Column<Food> activeColumn = foodGrid.addColumn(food -> food.isActive() ? "Aktiv" : "Inaktiv")
+                .setHeader("Aktiv");
         foodGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
         foodGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         foodGrid.setWidth("75%");
@@ -211,7 +328,8 @@ public class FoodManagementView extends VerticalLayout {
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", foodFilter::setId));
         headerRow.getCell(nameColumn).setComponent(createFilterHeaderString("Name", foodFilter::setName));
         headerRow.getCell(stockColumn).setComponent(createFilterHeaderInteger("Bestand", foodFilter::setStock));
-        headerRow.getCell(reorderPointColumn).setComponent(createFilterHeaderInteger("Meldebestand", foodFilter::setReorderPoint));
+        headerRow.getCell(reorderPointColumn)
+                .setComponent(createFilterHeaderInteger("Meldebestand", foodFilter::setReorderPoint));
         headerRow.getCell(priceColumn).setComponent(createFilterHeaderString("Preis", foodFilter::setPrice));
         headerRow.getCell(activeColumn)
                 .setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", foodFilter::setActive));
@@ -246,11 +364,29 @@ public class FoodManagementView extends VerticalLayout {
         private String price;
         private Boolean active;
 
+        /**
+         * The FoodFilter function is used to filter the GridListDataView of Food
+         * objects.
+         * It takes a Food object as an argument and returns true if it matches the
+         * criteria, false otherwise.
+         * The criteria are defined by the user in a TextField and can be changed at any
+         * time.
+         * 
+         * @param dataView
+         */
         public FoodFilter(GridListDataView<Food> dataView) {
             this.dataView = dataView;
             this.dataView.addFilter(this::test);
         }
 
+        /**
+         * The test function checks if the given food matches all of the filter
+         * criteria.
+         * 
+         * @param food
+         *
+         * @return A boolean value
+         */
         public boolean test(Food food) {
             boolean matchesId = matches(String.valueOf(food.getId()), id);
             boolean matchesName = matches(food.getName(), name);
@@ -261,39 +397,83 @@ public class FoodManagementView extends VerticalLayout {
             return matchesId && matchesName && matchesStock && matchesReorderPoint && matchesPrice && matchesActive;
         }
 
+        /**
+         * The matches function checks if the searchTerm is null or empty. If it is,
+         * then we return true because
+         * that means there's no filter and everything should be shown. Otherwise, we
+         * check if the value contains
+         * the searchTerm (ignoring case). If it does, then we return true to show this
+         * item in our grid.
+         *
+         * 
+         * @param value      Store the value of the text field
+         * @param searchTerm Search for a specific value in the list
+         *
+         * @return True if the searchterm is null or empty, otherwise it returns whether
+         *         value contains the search term
+         */
         private boolean matches(String value, String searchTerm) {
             return searchTerm == null || searchTerm.isEmpty() || value.toLowerCase().contains(searchTerm.toLowerCase());
         }
 
+        /**
+         * The setId function is used to set the id of a food item.
+         * 
+         * @param id
+         */
         public void setId(String id) {
             this.id = id;
             dataView.refreshAll();
         }
 
+        /**
+         * The setName function sets the name of a food item.
+         * 
+         * @param name
+         */
         public void setName(String name) {
             this.name = name;
             dataView.refreshAll();
         }
 
+        /**
+         * The setStock function is used to update the stock of a food item.
+         * 
+         * @param stock
+         */
         public void setStock(String stock) {
             this.stock = stock;
             dataView.refreshAll();
         }
 
+        /**
+         * The setReorderPoint function is used to set the reorder point of a food item.
+         * 
+         * @param reorderPoint
+         */
         public void setReorderPoint(String reorderPoint) {
             this.reorderPoint = reorderPoint;
             dataView.refreshAll();
         }
 
+        /**
+         * The setPrice function sets the price of a food item.
+         * 
+         * @param price
+         */
         public void setPrice(String price) {
             this.price = price;
             dataView.refreshAll();
         }
 
+        /**
+         * The setActive function is used to set the active state of a food item.
+         * 
+         * @param active
+         */
         public void setActive(Boolean active) {
             this.active = active;
             dataView.refreshAll();
         }
     }
-
 }

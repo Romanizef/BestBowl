@@ -1,5 +1,17 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
+import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.clearNumberFieldChildren;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderBoolean;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderInteger;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderString;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -25,20 +37,13 @@ import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.articleForms.BowlingShoeForm;
 import jakarta.annotation.security.RolesAllowed;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-import java.util.Optional;
-
-import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * @author Max Ziller
  */
 @Route(value = "shoeManagement", layout = MainView.class)
 @PageTitle("Schuhverwaltung")
-@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
+@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
 public class BowlingShoeManagementView extends VerticalLayout {
     private final BowlingShoeRepository bowlingShoeRepository;
     private final Binder<BowlingShoe> bowlingShoeBinder = new Binder<>();
@@ -50,6 +55,16 @@ public class BowlingShoeManagementView extends VerticalLayout {
     private Label validationErrorLabel;
     private boolean editingNewBowlingShoe = false;
 
+    /**
+     * The BowlingShoeManagementView function is responsible for the creation of a
+     * view that allows the user to manage bowling shoes.
+     * The BowlingShoeManagementView function creates a newBowlingShoeButton, which
+     * allows the user to create new bowling shoes.
+     * The BowlingShoeManagementView function also creates a gridFormLayout, which
+     * contains both an editable grid and form for editing existing bowling shoes.
+     *
+     * @param bowlingShoeRepository
+     */
     @Autowired
     public BowlingShoeManagementView(BowlingShoeRepository bowlingShoeRepository) {
         this.bowlingShoeRepository = bowlingShoeRepository;
@@ -60,6 +75,20 @@ public class BowlingShoeManagementView extends VerticalLayout {
         updateEditBowlingShoeLayoutState();
     }
 
+    /**
+     * The createNewBowlingShoeButton function creates a new Button object with the
+     * text &quot;Neue Schuhe hinzufügen&quot; and sets its width to 100%.
+     * It then adds the LUMO_PRIMARY theme variant to it.
+     * When clicked, it deselects all items in the bowlingShoeGrid, creates a new
+     * BowlingShoe object called selectedShoe and reads this into bowlingShoeBinder.
+     * The saveButton is enabled while cancelButton is disabled.
+     * editingNewBowlingShoe is set to false and updateEditBowlingShoeLayoutState()
+     * as well as clearNumberFieldChildren(bowlingShoeForm.getChildren()) are
+     * called.
+     *
+     * @return A button
+     * @see #updateEditBowlingShoeLayoutState()
+     */
     private Button createNewBowlingShoeButton() {
         Button button = new Button("Neue Schuhe hinzufügen");
         button.setWidthFull();
@@ -77,11 +106,29 @@ public class BowlingShoeManagementView extends VerticalLayout {
         return button;
     }
 
+    /**
+     * The updateEditBowlingShoeLayoutState function is used to update the state of
+     * the edit bowling shoe layout.
+     * It sets the text of a validation error label and enables or disables all
+     * children in a form depending on whether
+     * there is currently a selected shoe.
+     *
+     */
     private void updateEditBowlingShoeLayoutState() {
         validationErrorLabel.setText("");
         setChildrenEnabled(bowlingShoeForm.getChildren(), selectedShoe != null);
     }
 
+    /**
+     * The createBowlingShoeGridFormLayout function creates a HorizontalLayout that
+     * contains the bowlingShoeGrid and the BowlingShoeForm.
+     * The bowlingShoeGrid is created by calling createBowlingShoeGrid().
+     * The BowlingShoeForm is created by calling createBowlingShoeFormLayout().
+     * 
+     * @return A horizontallayout
+     * @see #createBowlingShoeGrid()
+     * @see #createBowlingShoeFormLayout()
+     */
     private HorizontalLayout createBowlingShoeGridFormLayout() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setSizeFull();
@@ -90,6 +137,12 @@ public class BowlingShoeManagementView extends VerticalLayout {
         return layout;
     }
 
+    /**
+     * The createBowlingShoeFormLayout function creates a layout for the bowling
+     * shoe form.
+     * 
+     * @return A verticallayout
+     */
     private VerticalLayout createBowlingShoeFormLayout() {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
@@ -99,6 +152,14 @@ public class BowlingShoeManagementView extends VerticalLayout {
         return layout;
     }
 
+    /**
+     * The createValidationLabelLayout function creates a VerticalLayout that
+     * contains the validationErrorLabel.
+     * The validationErrorLabel is used to display error messages when the user
+     * tries to save an invalid BowlingShoeForm.
+     * 
+     * @return A verticallayout
+     */
     private VerticalLayout createValidationLabelLayout() {
         VerticalLayout validationLabelLayout = new VerticalLayout();
         validationLabelLayout.setWidthFull();
@@ -113,6 +174,11 @@ public class BowlingShoeManagementView extends VerticalLayout {
         return validationLabelLayout;
     }
 
+    /**
+     * The writeBean function is used to write the values of a form into an object.
+     *
+     * @return True if the bean was successfully written else false
+     */
     private boolean writeBean() {
         try {
             bowlingShoeBinder.writeBean(selectedShoe);
@@ -125,6 +191,20 @@ public class BowlingShoeManagementView extends VerticalLayout {
         return false;
     }
 
+    /**
+     * The createButton function creates a HorizontalLayout containing two buttons:
+     * saveButton and cancelButton. The saveButton is enabled when the user has made
+     * changes to the form,
+     * and disabled otherwise. When clicked, it saves the changes to the database if
+     * they are valid, or resets them otherwise.
+     * The cancel button is enabled when there are unsaved changes in the form, and
+     * disabled otherwise. When clicked it resets all unsaved changes in
+     * BowlingShoeForm (the editable fields). Both buttons have an icon next to
+     * their text label for better visual feedback of what they do.
+     *
+     * @return A horizontallayout
+     * @see #saveToDnAndUpdateBowlingShoe()
+     */
     public Component createButton() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setWidthFull();
@@ -149,6 +229,16 @@ public class BowlingShoeManagementView extends VerticalLayout {
         return buttonLayout;
     }
 
+    /**
+     * The saveToDnAndUpdateBowlingShoe function saves the selected shoe to the
+     * database and updates
+     * the grid. If a new shoe is being edited, it will be added to the grid.
+     * Otherwise, it will refresh
+     * that item in place. After saving/updating, resetEditLayout() is called and a
+     * notification is shown
+     * 
+     * @see #resetEditLayout()
+     */
     private void saveToDnAndUpdateBowlingShoe() {
         bowlingShoeRepository.save(selectedShoe);
         if (editingNewBowlingShoe) {
@@ -160,6 +250,16 @@ public class BowlingShoeManagementView extends VerticalLayout {
         Notifications.showInfo("Schuh gespeichert");
     }
 
+    /**
+     * The resetEditLayout function is used to reset the edit layout of the bowling
+     * shoe view.
+     * It deselects all items in the grid, sets selectedShoe to null, sets
+     * editingNewBowlingShoe to false and disables both saveButton and cancelButton.
+     * Finally it calls updateEditBowlingShoeLayoutState() which updates the state
+     * of all components in this function's scope (e.g. enables/disables them).
+     * 
+     * @see #updateEditBowlingShoeLayoutState()
+     */
     private void resetEditLayout() {
         bowlingShoeGrid.deselectAll();
         selectedShoe = null;
@@ -171,15 +271,23 @@ public class BowlingShoeManagementView extends VerticalLayout {
         clearNumberFieldChildren(bowlingShoeForm.getChildren());
     }
 
-
+    /**
+     * The createBowlingShoeGrid function creates a Grid of BowlingShoes.
+     * It also adds the ability to filter by ID, boughtAt, size and active.
+     * The function returns the created grid.
+     * 
+     * @return A grid&lt;bowlingshoe&gt; object
+     */
     private Grid<BowlingShoe> createBowlingShoeGrid() {
         Grid<BowlingShoe> shoeGrid = new Grid<>(BowlingShoe.class);
         shoeGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
         shoeGrid.removeAllColumns();
         Grid.Column<BowlingShoe> idColumn = shoeGrid.addColumn(BowlingShoe::getId).setHeader("ID");
-        Grid.Column<BowlingShoe> boughtAtColumn = shoeGrid.addColumn(s -> toDateString(s.getBoughtAt()), "dd mm yyyy").setHeader("Kaufdatum");
+        Grid.Column<BowlingShoe> boughtAtColumn = shoeGrid.addColumn(s -> toDateString(s.getBoughtAt()), "dd mm yyyy")
+                .setHeader("Kaufdatum");
         Grid.Column<BowlingShoe> sizeColumn = shoeGrid.addColumn("size").setHeader("Größe");
-        Grid.Column<BowlingShoe> activeColumn = shoeGrid.addColumn(s -> s.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
+        Grid.Column<BowlingShoe> activeColumn = shoeGrid.addColumn(s -> s.isActive() ? "Aktiv" : "Inaktiv")
+                .setHeader("Aktiv");
         shoeGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
         shoeGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         shoeGrid.setWidth("75%");
@@ -188,7 +296,8 @@ public class BowlingShoeManagementView extends VerticalLayout {
         List<BowlingShoe> shoeList = bowlingShoeRepository.findAll();
         GridListDataView<BowlingShoe> dataView = shoeGrid.setItems(shoeList);
 
-        BowlingShoeManagementView.BowlingShoeFilter shoeFilter = new BowlingShoeManagementView.BowlingShoeFilter(dataView);
+        BowlingShoeManagementView.BowlingShoeFilter shoeFilter = new BowlingShoeManagementView.BowlingShoeFilter(
+                dataView);
         shoeGrid.getHeaderRows().clear();
         HeaderRow headerRow = shoeGrid.appendHeaderRow();
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", shoeFilter::setId));
@@ -224,11 +333,29 @@ public class BowlingShoeManagementView extends VerticalLayout {
         private String size;
         private Boolean active;
 
+        /**
+         * The BowlingShoeFilter function is a filter function that filters the dataView
+         * by the given parameters.
+         * 
+         * @param dataView
+         *
+         * @return A boolean value
+         */
         public BowlingShoeFilter(GridListDataView<BowlingShoe> dataView) {
             this.dataView = dataView;
             this.dataView.addFilter(this::test);
         }
 
+        /**
+         * The test function is used to filter the grid.
+         * It checks if the shoe matches all of the given filters.
+         * If a filter is null, it will be ignored and always return true for that
+         * filter.
+         *
+         * @param shoe
+         *
+         * @return True if the shoe matches all of the criteria
+         */
         public boolean test(BowlingShoe shoe) {
             boolean matchesId = matches(String.valueOf(shoe.getId()), id);
             boolean matchesBoughtAt = matches(Utils.toDateString(shoe.getBoughtAt()), boughtAt);
@@ -237,25 +364,60 @@ public class BowlingShoeManagementView extends VerticalLayout {
             return matchesId && matchesBoughtAt && matchesSize && matchesActive;
         }
 
+        /**
+         * The matches function is used to filter the grid by a search term.
+         * It returns true if the value contains the searchTerm, or if no searchTerm has
+         * been entered yet.
+         * 
+         * @param value      Check if the searchterm is null or empty
+         * @param searchTerm Search for a specific term in the list
+         *
+         * @return True if the searchterm is null or empty, or if the value contains the
+         *         searchterm
+         */
         private boolean matches(String value, String searchTerm) {
             return searchTerm == null || searchTerm.isEmpty() || value.toLowerCase().contains(searchTerm.toLowerCase());
         }
 
+        /**
+         * The setId function is used to set the id of a bowling shoe.
+         * 
+         * @param id
+         */
         public void setId(String id) {
             this.id = id;
             dataView.refreshAll();
         }
 
+        /**
+         * The setBoughtAt function sets the boughtAt variable to the value of its
+         * parameter.
+         * It then refreshes all data in the dataView object.
+         *
+         * @param boughtAt Set the value of the boughtat variable
+         */
         public void setBoughtAt(String boughtAt) {
             this.boughtAt = boughtAt;
             dataView.refreshAll();
         }
 
+        /**
+         * The setSize function is used to filter the grid by size.
+         * 
+         * @param size
+         */
         public void setSize(String size) {
             this.size = size;
             dataView.refreshAll();
         }
 
+        /**
+         * The setActive function is used to set the active state of a bowling shoe.
+         * 
+         * @param Boolean active Set the active variable to true or false
+         *
+         * @return A boolean
+         */
         public void setActive(Boolean active) {
             this.active = active;
             dataView.refreshAll();

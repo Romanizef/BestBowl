@@ -1,5 +1,19 @@
 package de.softwareprojekt.bestbowl.views.bookingViews;
 
+import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.clearNumberFieldChildren;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createAssociationCB;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -36,13 +50,6 @@ import de.softwareprojekt.bestbowl.utils.validators.client.ClientValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.StatisticsView;
 import jakarta.annotation.security.PermitAll;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.*;
-
-import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.clearNumberFieldChildren;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createAssociationCB;
 
 /**
  * Creates a View in which the user can search for a Client.
