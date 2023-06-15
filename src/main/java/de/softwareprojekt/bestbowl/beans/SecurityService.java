@@ -1,17 +1,17 @@
 package de.softwareprojekt.bestbowl.beans;
 
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.server.VaadinServletRequest;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Component;
 
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.server.VaadinServletRequest;
-
 /**
  * Class for managing security.
- * 
+ *
  * @author Ali
  */
 @Component
@@ -20,7 +20,7 @@ public class SecurityService {
 
     /**
      * Getter for authenticated users details
-     * 
+     *
      * @return current users {@code UserDetails} or {@code null}
      */
     public UserDetails getAuthenticatedUser() {
@@ -31,6 +31,28 @@ public class SecurityService {
         }
         // Anonymous or no authentication.
         return null;
+    }
+
+    /**
+     * Checks if the current user is one of the given roles
+     *
+     * @param roles roles to be checked
+     * @return if the user has one of the given roles
+     */
+    public boolean isCurrentUserInRole(String... roles) {
+        UserDetails userDetails = getAuthenticatedUser();
+        if (userDetails == null) {
+            return false;
+        }
+        for (GrantedAuthority grantedAuthority : userDetails.getAuthorities()) {
+            String userAuthority = grantedAuthority.getAuthority().toLowerCase();
+            for (String role : roles) {
+                if (userAuthority.contains(role.toLowerCase())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

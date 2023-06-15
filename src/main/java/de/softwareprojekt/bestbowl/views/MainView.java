@@ -21,8 +21,10 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.Lumo;
 import de.softwareprojekt.bestbowl.BestBowlApplication;
+import de.softwareprojekt.bestbowl.beans.ReorderService;
 import de.softwareprojekt.bestbowl.beans.SecurityService;
 import de.softwareprojekt.bestbowl.beans.UserManager;
+import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import de.softwareprojekt.bestbowl.views.bookingViews.ArticleBookingView;
 import de.softwareprojekt.bestbowl.views.bookingViews.ClientSearchView;
 import de.softwareprojekt.bestbowl.views.bookingViews.PendingBookingView;
@@ -43,8 +45,10 @@ import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
 public class MainView extends AppLayout implements AppShellConfigurator {
     private final transient SecurityService securityService;
     private final transient UserManager userManager;
+    private final transient ReorderService reorderService;
     private final Tabs menu;
     private final H1 viewTitle;
+    private boolean reorderEventFired = false;
 
     /**
      * Constructor for the main view. Creates a new title for the View, Horizontal Layout for the header,
@@ -52,14 +56,18 @@ public class MainView extends AppLayout implements AppShellConfigurator {
      *
      * @param securityService
      * @param userManager
+     * @param reorderService
      * @see #createHeaderContent()
      * @see #createMenu()
      * @see #createMenuItems()
      * @see #createDrawerContent(Tabs)
      */
-    public MainView(@Autowired SecurityService securityService, @Autowired UserManager userManager) {
+    public MainView(@Autowired SecurityService securityService,
+                    @Autowired UserManager userManager,
+                    @Autowired ReorderService reorderService) {
         this.securityService = securityService;
         this.userManager = userManager;
+        this.reorderService = reorderService;
         setPrimarySection(Section.DRAWER);
         viewTitle = new H1();
         viewTitle.getStyle()
@@ -122,21 +130,38 @@ public class MainView extends AppLayout implements AppShellConfigurator {
         layout.setWidthFull();
         layout.setSpacing(false);
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
+
         DrawerToggle drawerToggle = new DrawerToggle();
         drawerToggle.addClickListener(e -> userManager.toggleDrawerStateForUser(getAuthenticatedUserNameOrDefault()));
+        //use the focus listener and focus as a page loaded event
+        drawerToggle.addFocusListener(e -> onPageLoaded());
+        drawerToggle.focus();
+        layout.add(drawerToggle, viewTitle);
+        layout.expand(viewTitle);
+
         Button shutdownButton = new Button(VaadinIcon.POWER_OFF.create());
         shutdownButton.getStyle().set("margin-right", "10px");
         shutdownButton.addClickListener(e -> startThread(BestBowlApplication::shutdown, "shutdown", true));
         Button darkModeButton = createDarkModeToggle();
         darkModeButton.getStyle().set("margin-right", "10px");
-        layout.add(drawerToggle, viewTitle, shutdownButton, darkModeButton);
-        layout.expand(viewTitle);
+        layout.add(shutdownButton, darkModeButton);
+
         if (securityService.getAuthenticatedUser() != null) {
             Button logoutButton = new Button("Logout", click -> securityService.logout());
             logoutButton.getStyle().set("margin-right", "10px");
             layout.add(logoutButton);
         }
+
         return layout;
+    }
+
+    private void onPageLoaded() {
+        if (!reorderEventFired) {
+            reorderEventFired = true;
+            if (securityService.isCurrentUserInRole(UserRole.ADMIN, UserRole.OWNER)) {
+                reorderService.checkForReorderThreshold();
+            }
+        }
     }
 
     private Button createDarkModeToggle() {

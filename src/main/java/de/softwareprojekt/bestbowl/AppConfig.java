@@ -1,9 +1,8 @@
 package de.softwareprojekt.bestbowl;
 
-import java.io.File;
-
-import javax.sql.DataSource;
-
+import com.vaadin.flow.spring.security.VaadinWebSecurity;
+import de.softwareprojekt.bestbowl.utils.Utils;
+import de.softwareprojekt.bestbowl.views.LoginView;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,10 +16,8 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import com.vaadin.flow.spring.security.VaadinWebSecurity;
-
-import de.softwareprojekt.bestbowl.utils.Utils;
-import de.softwareprojekt.bestbowl.views.LoginView;
+import javax.sql.DataSource;
+import java.io.File;
 
 /**
  * @author Ali
@@ -70,8 +67,8 @@ public class AppConfig extends VaadinWebSecurity {
     /**
      * The configure function is used to configure the security of the application.
      * It allows for a custom login view, and also defines which paths are
-     * publically accessible.
-     * 
+     * publicly accessible.
+     *
      * @param HttpSecurity http Configure the security of the web application
      */
     @Override
@@ -85,7 +82,7 @@ public class AppConfig extends VaadinWebSecurity {
      * The webSecurityCustomizerA function is a WebSecurityCustomizer that ignores
      * all requests to the /db/** path.
      * This allows us to access the H2 database console without having to log in.
-     * 
+     *
      * @return A websecuritycustomizer
      */
     @Bean
@@ -100,7 +97,7 @@ public class AppConfig extends VaadinWebSecurity {
      * In this case, we are using an in-memory implementation of the
      * UserDetailsManager interface, which means that all user account information
      * will be stored in memory and not persisted anywhere else (e.g., on disk).
-     * 
+     *
      * @return An instance of userdetailsmanager
      */
     @Bean
@@ -112,7 +109,7 @@ public class AppConfig extends VaadinWebSecurity {
      * The passwordEncoder function is used to encode the password of a user.
      * The encoding algorithm is delegated to the PasswordEncoderFactories class,
      * which uses BCrypt by default.
-     * 
+     *
      * @return A passwordencoder object
      */
     @Bean

@@ -1,34 +1,44 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import de.softwareprojekt.bestbowl.beans.ReorderService;
 import de.softwareprojekt.bestbowl.utils.constants.UserRole;
+import de.softwareprojekt.bestbowl.utils.records.ReorderEntry;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 /**
  * @author Ali
  */
 @Route(value = "verwaltungen", layout = MainView.class)
 @PageTitle("Verwaltungen")
-@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
+@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
 public class ManagementView extends VerticalLayout {
-
     private static final String VERWALTUNG = "verwaltung";
-    private final String width;
-    private final String height;
+    private static final String WIDTH = "300px";
+    private static final String HEIGHT = "55px";
+    private final transient ReorderService reorderService;
 
     /**
      * The ManagementView function is the main view for the management of all data
      * in the database.
      * It contains buttons to navigate to other views, which allow you to manage
      * specific parts of your data.
-     * 
+     *
      * @see #createAlleyRowButtonLayout()
      * @see #createClientAndOrgRowButtonLayout()
      * @see #createDrinkRowButtonLayout()
@@ -36,23 +46,21 @@ public class ManagementView extends VerticalLayout {
      * @see #createUserAndCenterRowButtonLayout()
      */
     @Autowired
-    public ManagementView() {
-        width = "300px";
-        height = "55px";
+    public ManagementView(ReorderService reorderService) {
+        this.reorderService = reorderService;
         setSizeFull();
         setAlignItems(Alignment.CENTER);
-        addCSS();
 
         HorizontalLayout alleyRowButtonLayout = createAlleyRowButtonLayout();
         HorizontalLayout clientAndOrgRowButtonLayout = createClientAndOrgRowButtonLayout();
+        HorizontalLayout userAndCenterRowButtonLayout = createUserAndCenterRowButtonLayout();
         HorizontalLayout drinkRowButtonLayout = createDrinkRowButtonLayout();
         HorizontalLayout foodAndShoeRowButtonLayout = createFoodAndShoeRowButtonLayout();
-        HorizontalLayout userAndCenterRowButtonLayout = createUserAndCenterRowButtonLayout();
-        // Todo Tabelle mit Namen und Bestand für Getränke und Speisen die unter dem
-        // Meldebestand gefallen sind, nur aktive
+
+        VerticalLayout reorderLayout = createReorderLayout();
 
         add(alleyRowButtonLayout, clientAndOrgRowButtonLayout, userAndCenterRowButtonLayout, drinkRowButtonLayout,
-                foodAndShoeRowButtonLayout);
+                foodAndShoeRowButtonLayout, reorderLayout);
     }
 
     /**
@@ -60,25 +68,16 @@ public class ManagementView extends VerticalLayout {
      * two buttons.
      * The first button navigates to the AlleyBookingView, while the second button
      * navigates to the AlleyManagementView.
-     * 
+     *
      * @return A horizontallayout
      */
     private HorizontalLayout createAlleyRowButtonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
-        /*
-         * Button alleyBookingViewButton = new Button("Bahn Buchungs" + VERWALTUNG);
-         * alleyBookingViewButton.addClickListener(buttonClickEvent ->
-         * UI.getCurrent().navigate(AlleyBookingView.class));
-         */
         Button alleyManagementViewButton = new Button("Bahn" + VERWALTUNG);
         alleyManagementViewButton
                 .addClickListener(buttonClickEvent -> UI.getCurrent().navigate(AlleyManagementView.class));
-        /*
-         * alleyBookingViewButton.setWidth(width);
-         * alleyBookingViewButton.setHeight(height);
-         */
-        alleyManagementViewButton.setWidth(width);
-        alleyManagementViewButton.setHeight(height);
+        alleyManagementViewButton.setWidth(WIDTH);
+        alleyManagementViewButton.setHeight(HEIGHT);
         buttonLayout.add(alleyManagementViewButton);
         return buttonLayout;
     }
@@ -88,7 +87,7 @@ public class ManagementView extends VerticalLayout {
      * containing two buttons.
      * The first button navigates to the ClientManagementView, while the second one
      * navigates to the AssociationManagementView.
-     * 
+     *
      * @return A horizontallayout
      */
     private HorizontalLayout createClientAndOrgRowButtonLayout() {
@@ -99,10 +98,10 @@ public class ManagementView extends VerticalLayout {
         Button associationManagmentViewButton = new Button("Vereins" + VERWALTUNG);
         associationManagmentViewButton
                 .addClickListener(buttonClickEvent -> UI.getCurrent().navigate(AssociationManagementView.class));
-        clientManagementViewButton.setWidth(width);
-        clientManagementViewButton.setHeight(height);
-        associationManagmentViewButton.setWidth(width);
-        associationManagmentViewButton.setHeight(height);
+        clientManagementViewButton.setWidth(WIDTH);
+        clientManagementViewButton.setHeight(HEIGHT);
+        associationManagmentViewButton.setWidth(WIDTH);
+        associationManagmentViewButton.setHeight(HEIGHT);
         buttonLayout.add(clientManagementViewButton, associationManagmentViewButton);
         return buttonLayout;
     }
@@ -112,7 +111,7 @@ public class ManagementView extends VerticalLayout {
      * two buttons.
      * The first button navigates to the DrinkManagementView, while the second one
      * navigates to the DrinkVariantManagementView.
-     * 
+     *
      * @return A horizontallayout
      */
     private HorizontalLayout createDrinkRowButtonLayout() {
@@ -122,10 +121,10 @@ public class ManagementView extends VerticalLayout {
         Button drinkVariantViewButton = new Button("Getränkevarianten" + VERWALTUNG);
         drinkVariantViewButton
                 .addClickListener(buttonClickEvent -> UI.getCurrent().navigate(DrinkVariantManagementView.class));
-        drinkViewButton.setWidth(width);
-        drinkViewButton.setHeight(height);
-        drinkVariantViewButton.setWidth(width);
-        drinkVariantViewButton.setHeight(height);
+        drinkViewButton.setWidth(WIDTH);
+        drinkViewButton.setHeight(HEIGHT);
+        drinkVariantViewButton.setWidth(WIDTH);
+        drinkVariantViewButton.setHeight(HEIGHT);
         buttonLayout.add(drinkViewButton, drinkVariantViewButton);
         return buttonLayout;
     }
@@ -134,7 +133,7 @@ public class ManagementView extends VerticalLayout {
      * The createFoodAndShoeRowButtonLayout function creates a HorizontalLayout
      * containing two buttons, one for the FoodManagementView and one for the
      * BowlingShoeManagementView.
-     * 
+     *
      * @return A horizontallayout
      */
     private HorizontalLayout createFoodAndShoeRowButtonLayout() {
@@ -144,10 +143,10 @@ public class ManagementView extends VerticalLayout {
         Button bowlingShoeViewButton = new Button("Schuh" + VERWALTUNG);
         bowlingShoeViewButton
                 .addClickListener(buttonClickEvent -> UI.getCurrent().navigate(BowlingShoeManagementView.class));
-        foodViewButton.setWidth(width);
-        foodViewButton.setHeight(height);
-        bowlingShoeViewButton.setWidth(width);
-        bowlingShoeViewButton.setHeight(height);
+        foodViewButton.setWidth(WIDTH);
+        foodViewButton.setHeight(HEIGHT);
+        bowlingShoeViewButton.setWidth(WIDTH);
+        bowlingShoeViewButton.setHeight(HEIGHT);
         buttonLayout.add(foodViewButton, bowlingShoeViewButton);
         return buttonLayout;
     }
@@ -157,7 +156,7 @@ public class ManagementView extends VerticalLayout {
      * containing two buttons.
      * The first button navigates to the UserManagementView, while the second one
      * navigates to the BowlingCenterManagementView.
-     * 
+     *
      * @return A horizontallayout
      */
     private HorizontalLayout createUserAndCenterRowButtonLayout() {
@@ -165,20 +164,37 @@ public class ManagementView extends VerticalLayout {
         Button userManagementViewButton = new Button("Benutzer" + VERWALTUNG);
         userManagementViewButton
                 .addClickListener(buttonClickEvent -> UI.getCurrent().navigate(UserManagementView.class));
-        Button bowlingCenterButton = new Button("Bowlingcenter Verwaltung");
+        Button bowlingCenterButton = new Button("Bowlingcenter" + VERWALTUNG);
         bowlingCenterButton.addClickListener(e -> UI.getCurrent().navigate(BowlingCenterManagementView.class));
         buttonLayout.add(userManagementViewButton, bowlingCenterButton);
-        userManagementViewButton.setWidth(width);
-        userManagementViewButton.setHeight(height);
-        bowlingCenterButton.setWidth(width);
-        bowlingCenterButton.setHeight(height);
+        userManagementViewButton.setWidth(WIDTH);
+        userManagementViewButton.setHeight(HEIGHT);
+        bowlingCenterButton.setWidth(WIDTH);
+        bowlingCenterButton.setHeight(HEIGHT);
         return buttonLayout;
     }
 
-    /**
-     * The addCSS function adds a CSS border to the component.
-     */
-    private void addCSS() {
-        // getStyle().set("border", "2px solid blue");
+    private VerticalLayout createReorderLayout() {
+        VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.setSizeFull();
+        verticalLayout.setAlignItems(Alignment.CENTER);
+        verticalLayout.add(new H2("Meldebestand Warnungen"));
+        List<ReorderEntry> reorderEntryList = reorderService.getReorderEntryList();
+        if (reorderEntryList.isEmpty()) {
+            verticalLayout.add(new Text("aktuell keine Warnung"));
+        } else {
+            Grid<ReorderEntry> grid = new Grid<>(ReorderEntry.class, false);
+            grid.setSizeFull();
+            grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+            grid.addColumn(ReorderEntry::articleType).setHeader("Artikeltyp").setSortable(true);
+            grid.addColumn(ReorderEntry::name).setHeader("Name").setSortable(true);
+            grid.addColumn(ReorderEntry::stock).setHeader("Bestand");
+            grid.addColumn(ReorderEntry::reorderPoint).setHeader("Meldebestand");
+            grid.getColumns().forEach(c -> c.setResizable(true));
+            GridListDataView<ReorderEntry> dataView = grid.setItems(reorderEntryList);
+            dataView.setSortOrder(reorderEntry -> reorderEntry.articleType() + reorderEntry.name(), SortDirection.ASCENDING);
+            verticalLayout.add(grid);
+        }
+        return verticalLayout;
     }
 }

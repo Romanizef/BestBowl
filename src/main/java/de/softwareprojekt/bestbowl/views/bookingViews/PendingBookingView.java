@@ -4,6 +4,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
@@ -11,12 +12,12 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoeBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkBooking;
@@ -25,6 +26,7 @@ import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlley.BowlingAlleyBoo
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoe.BowlingShoeBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.drink.DrinkBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.food.FoodBookingRepository;
+import de.softwareprojekt.bestbowl.utils.VaadinUtils;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +46,12 @@ public class PendingBookingView extends VerticalLayout {
     private final transient DrinkBookingRepository drinkBookingRepository;
     private final transient FoodBookingRepository foodBookingRepository;
     private final transient BowlingShoeBookingRepository shoeBookingRepository;
+    private final ComboBox<Mode> modeCB;
     private final Grid<BowlingAlleyBooking> bookingGrid;
-    private final Button invoiceButton;
+    private IntegerField bowlingAlleyField;
     private TextField searchField;
+    private Button cancelButton;
+    private Button completeButton;
     private BowlingAlleyBooking selectedBooking;
 
     /**
@@ -54,7 +59,7 @@ public class PendingBookingView extends VerticalLayout {
      * class.
      * It creates a new instance of the PendingBookingView class and initializes its
      * fields with values passed as parameters.
-     * 
+     *
      * @param bowlingAlleyBookingRepository
      * @param drinkBookingRepository
      * @param foodBookingRepository
@@ -62,9 +67,9 @@ public class PendingBookingView extends VerticalLayout {
      */
     @Autowired
     public PendingBookingView(BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
-            DrinkBookingRepository drinkBookingRepository,
-            FoodBookingRepository foodBookingRepository,
-            BowlingShoeBookingRepository shoeBookingRepository) {
+                              DrinkBookingRepository drinkBookingRepository,
+                              FoodBookingRepository foodBookingRepository,
+                              BowlingShoeBookingRepository shoeBookingRepository) {
         this.bowlingAlleyBookingRepository = bowlingAlleyBookingRepository;
         this.drinkBookingRepository = drinkBookingRepository;
         this.foodBookingRepository = foodBookingRepository;
@@ -73,13 +78,25 @@ public class PendingBookingView extends VerticalLayout {
         setAlignItems(Alignment.CENTER);
 
         H1 header = new H1("Offene Buchungen");
+        modeCB = createModeCB();
         Component searchComponent = createSearchComponent();
         bookingGrid = createGrid();
-        invoiceButton = createInvoiceButton();
-        add(header, searchComponent, bookingGrid, invoiceButton);
+        Component footerComponent = createFooterComponent();
+        add(header, modeCB, searchComponent, bookingGrid, footerComponent);
 
         updateGridItems();
         updateComponents();
+    }
+
+    private ComboBox<Mode> createModeCB() {
+        ComboBox<Mode> comboBox = new ComboBox<>();
+        comboBox.setWidth("300px");
+        comboBox.setAllowCustomValue(false);
+        comboBox.setItems(Mode.values());
+        comboBox.setValue(Mode.OVERDUE);
+        comboBox.setItemLabelGenerator(Mode::getName);
+        comboBox.addValueChangeListener(e -> updateGridItems());
+        return comboBox;
     }
 
     /**
@@ -87,27 +104,31 @@ public class PendingBookingView extends VerticalLayout {
      * to filter through the bookings.
      * The function returns a Component object, which is then added to the main
      * layout of this view.
-     * 
+     *
      * @return A horizontallayout
      */
     private Component createSearchComponent() {
         HorizontalLayout searchLayout = new HorizontalLayout();
         searchLayout.setWidth("70%");
+        bowlingAlleyField = new IntegerField();
+        bowlingAlleyField.setPlaceholder("Suche nach Bahn ...");
+        bowlingAlleyField.setValueChangeMode(ValueChangeMode.EAGER);
+        bowlingAlleyField.addValueChangeListener(e -> updateGridItems());
         searchField = new TextField();
-        searchField.setPlaceholder("Suche nach Bahn, Name oder Zeit ...");
+        searchField.setPlaceholder("Suche nach Name oder Zeit ...");
         searchField.setValueChangeMode(ValueChangeMode.EAGER);
         searchField.addValueChangeListener(e -> updateGridItems());
         Button searchButton = new Button();
         searchButton.setIcon(VaadinIcon.SEARCH.create());
         searchButton.addClickListener(e -> updateGridItems());
         searchLayout.expand(searchField);
-        searchLayout.add(searchField, searchButton);
+        searchLayout.add(bowlingAlleyField, searchField, searchButton);
         return searchLayout;
     }
 
     /**
      * The createGrid function creates a grid of bowling alley bookings.
-     * 
+     *
      * @return A grid
      */
     private Grid<BowlingAlleyBooking> createGrid() {
@@ -132,23 +153,14 @@ public class PendingBookingView extends VerticalLayout {
     }
 
     /**
-     * The updateGridItems function is responsible for updating the items in the
-     * grid.
-     * It does this by first querying all bookings from the database that have an
-     * end time less than or equal to now, and are not completed yet.
-     * Then it checks if there is a search term entered into the search field, and
-     * if so splits it up into individual words (search terms).
-     * If there are any search terms present, then we iterate over each booking in
-     * our list of bookings retrieved from our query above. For each booking we
-     * check whether any of its properties contain one of our search terms (case
-     * insensitive), and remove them from a copy of the list of search terms if so.
-     * If there are no search terms left in the copy, then we remove the booking
-     * from the list of bookings.
+     * The updateGridItems method is responsible for updating the items in the grid.
      */
     private void updateGridItems() {
-        long currentTime = System.currentTimeMillis();
-        List<BowlingAlleyBooking> bookingList = bowlingAlleyBookingRepository
-                .findAllByEndTimeLessThanAndCompletedEquals(currentTime, false);
+        List<BowlingAlleyBooking> bookingList = getBookingsForCurrentMode();
+        Integer alley = bowlingAlleyField.getValue();
+        if (alley != null) {
+            bookingList.removeIf(booking -> booking.getBowlingAlley().getId() != alley);
+        }
         String searchFieldValue = searchField.getValue();
         String[] searchTerms;
         if (searchFieldValue != null) {
@@ -157,7 +169,6 @@ public class PendingBookingView extends VerticalLayout {
             while (bookingIterator.hasNext()) {
                 BowlingAlleyBooking booking = bookingIterator.next();
                 List<String> searchTermsCopy = new ArrayList<>(Arrays.stream(searchTerms).toList());
-                matchAndRemoveIfContains(String.valueOf(booking.getBowlingAlley().getId()), searchTermsCopy);
                 matchAndRemoveIfContains(booking.getClient().getFirstName(), searchTermsCopy);
                 matchAndRemoveIfContains(booking.getClient().getLastName(), searchTermsCopy);
                 matchAndRemoveIfContains(toDateString(booking.getStartTime()), searchTermsCopy);
@@ -172,18 +183,42 @@ public class PendingBookingView extends VerticalLayout {
         clientGridListDataView.setSortOrder(BowlingAlleyBooking::getEndTime, SortDirection.ASCENDING);
     }
 
-    /**
-     * The createInvoiceButton function creates a button that navigates to the
-     * InvoiceView.
-     * 
-     * @return A button
-     */
-    private Button createInvoiceButton() {
-        Button button = new Button("Zu Rechnung abschließen");
-        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        button.setWidth("55%");
-        button.addClickListener(e -> UI.getCurrent().navigate(InvoiceView.class, selectedBooking.getId()));
-        return button;
+    private List<BowlingAlleyBooking> getBookingsForCurrentMode() {
+        List<BowlingAlleyBooking> bookingList;
+        long currentTime = System.currentTimeMillis();
+        Mode mode = modeCB.getValue();
+        if (mode == Mode.UPCOMING) {
+            bookingList = bowlingAlleyBookingRepository.findAllUpcomingBookings(currentTime);
+        } else if (mode == Mode.CURRENT) {
+            bookingList = bowlingAlleyBookingRepository.findAllCurrentBookings(currentTime);
+        } else {
+            bookingList = bowlingAlleyBookingRepository.findAllOverdueBookings(currentTime);
+        }
+        return bookingList;
+    }
+
+    private Component createFooterComponent() {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setWidthFull();
+        layout.setAlignItems(Alignment.CENTER);
+
+        cancelButton = new Button("Buchung stornieren");
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        cancelButton.addClickListener(e -> {
+            VaadinUtils.showConfirmationDialog("Wollen Sie die Buchung wirklich stornieren?", "Ja", "Nein", () -> {
+                selectedBooking.setActive(false);
+                bowlingAlleyBookingRepository.save(selectedBooking);
+                updateGridItems();
+            });
+        });
+
+        completeButton = new Button("Zu Rechnung abschließen");
+        completeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        completeButton.addClickListener(e -> UI.getCurrent().navigate(InvoiceView.class, selectedBooking.getId()));
+
+        layout.add(cancelButton, completeButton);
+        layout.expand(cancelButton, completeButton);
+        return layout;
     }
 
     /**
@@ -191,7 +226,8 @@ public class PendingBookingView extends VerticalLayout {
      * selected.
      */
     private void updateComponents() {
-        invoiceButton.setEnabled(selectedBooking != null);
+        completeButton.setEnabled(selectedBooking != null);
+        cancelButton.setEnabled(selectedBooking != null);
     }
 
     /**
@@ -200,10 +236,9 @@ public class PendingBookingView extends VerticalLayout {
      * this booking,
      * i.e., it adds up the price of all food and drink bookings as well as shoe
      * rentals that were made at the same time for this bowling alley.
-     * 
+     *
      * @param BowlingAlleyBooking bowlingAlleyBooking Get the client, bowling alley
      *                            and start time of a booking
-     *
      * @return A string
      */
     private String calculateBookingTotal(BowlingAlleyBooking bowlingAlleyBooking) {
@@ -217,7 +252,7 @@ public class PendingBookingView extends VerticalLayout {
                 .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
                         bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
 
-        double total = bowlingAlleyBooking.getPrice();
+        double total = bowlingAlleyBooking.getPriceWithDiscount();
         for (DrinkBooking drinkBooking : drinkBookingList) {
             total += drinkBooking.getPrice() * drinkBooking.getAmount();
         }
@@ -228,5 +263,21 @@ public class PendingBookingView extends VerticalLayout {
             total += shoeBooking.getPrice();
         }
         return String.format(Locale.GERMANY, "%.2f", total) + "€";
+    }
+
+    private enum Mode {
+        UPCOMING("Anstehend"),
+        CURRENT("Aktuell"),
+        OVERDUE("Fällig");
+
+        private final String name;
+
+        Mode(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 }

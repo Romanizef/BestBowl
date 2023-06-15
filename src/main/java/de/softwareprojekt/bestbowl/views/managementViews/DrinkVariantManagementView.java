@@ -180,8 +180,8 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * @return A formlayout
      */
     private FormLayout drinkVariantForm() {
-        FormLayout drinkVariantlayout = new FormLayout();
-        drinkVariantlayout.setWidth("25%");
+        FormLayout drinkVariantLayout = new FormLayout();
+        drinkVariantLayout.setWidth("25%");
 
         drinkCB = createDrinkCB();
 
@@ -229,7 +229,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
         buttonLayout.add(cancelButton, saveButton);
         buttonLayout.setFlexGrow(1, cancelButton, saveButton);
 
-        drinkVariantlayout.add(drinkCB, variantField, priceField, checkboxLayout, createValidationLabelLayout(),
+        drinkVariantLayout.add(drinkCB, variantField, priceField, checkboxLayout, createValidationLabelLayout(),
                 buttonLayout);
 
         drinkVariantBinder.withValidator(new DrinkVariantValidator());
@@ -248,7 +248,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
                 (drinkVariant, ml) -> drinkVariant.setMl(Objects.requireNonNullElse(ml, 0)));
         drinkVariantBinder.bind(activeCheckbox, DrinkVariant::isActive,
                 (drinkVariant, active) -> drinkVariant.setActive(Objects.requireNonNullElse(active, false)));
-        return drinkVariantlayout;
+        return drinkVariantLayout;
     }
 
     /**
