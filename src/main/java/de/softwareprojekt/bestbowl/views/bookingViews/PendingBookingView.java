@@ -51,7 +51,9 @@ public class PendingBookingView extends VerticalLayout {
     private IntegerField bowlingAlleyField;
     private TextField searchField;
     private Button cancelButton;
+    private Button extrasButton;
     private Button completeButton;
+    private List<BowlingAlleyBooking> bookingCache;
     private BowlingAlleyBooking selectedBooking;
 
     /**
@@ -84,6 +86,7 @@ public class PendingBookingView extends VerticalLayout {
         Component footerComponent = createFooterComponent();
         add(header, modeCB, searchComponent, bookingGrid, footerComponent);
 
+        updateBookingCache(modeCB.getValue());
         updateGridItems();
         updateComponents();
     }
@@ -95,7 +98,11 @@ public class PendingBookingView extends VerticalLayout {
         comboBox.setItems(Mode.values());
         comboBox.setValue(Mode.OVERDUE);
         comboBox.setItemLabelGenerator(Mode::getName);
-        comboBox.addValueChangeListener(e -> updateGridItems());
+        comboBox.addValueChangeListener(e -> {
+            updateBookingCache(e.getValue());
+            updateGridItems();
+            completeButton.setVisible(e.getValue() != Mode.UPCOMING);
+        });
         return comboBox;
     }
 
@@ -156,7 +163,7 @@ public class PendingBookingView extends VerticalLayout {
      * The updateGridItems method is responsible for updating the items in the grid.
      */
     private void updateGridItems() {
-        List<BowlingAlleyBooking> bookingList = getBookingsForCurrentMode();
+        List<BowlingAlleyBooking> bookingList = new ArrayList<>(bookingCache);
         Integer alley = bowlingAlleyField.getValue();
         if (alley != null) {
             bookingList.removeIf(booking -> booking.getBowlingAlley().getId() != alley);
@@ -180,21 +187,22 @@ public class PendingBookingView extends VerticalLayout {
             }
         }
         GridListDataView<BowlingAlleyBooking> clientGridListDataView = bookingGrid.setItems(bookingList);
-        clientGridListDataView.setSortOrder(BowlingAlleyBooking::getEndTime, SortDirection.ASCENDING);
+        if (modeCB.getValue() == Mode.OVERDUE) {
+            clientGridListDataView.setSortOrder(BowlingAlleyBooking::getEndTime, SortDirection.ASCENDING);
+        } else {
+            clientGridListDataView.setSortOrder(BowlingAlleyBooking::getStartTime, SortDirection.ASCENDING);
+        }
     }
 
-    private List<BowlingAlleyBooking> getBookingsForCurrentMode() {
-        List<BowlingAlleyBooking> bookingList;
+    private void updateBookingCache(Mode mode) {
         long currentTime = System.currentTimeMillis();
-        Mode mode = modeCB.getValue();
         if (mode == Mode.UPCOMING) {
-            bookingList = bowlingAlleyBookingRepository.findAllUpcomingBookings(currentTime);
+            bookingCache = bowlingAlleyBookingRepository.findAllUpcomingBookings(currentTime);
         } else if (mode == Mode.CURRENT) {
-            bookingList = bowlingAlleyBookingRepository.findAllCurrentBookings(currentTime);
+            bookingCache = bowlingAlleyBookingRepository.findAllCurrentBookings(currentTime);
         } else {
-            bookingList = bowlingAlleyBookingRepository.findAllOverdueBookings(currentTime);
+            bookingCache = bowlingAlleyBookingRepository.findAllOverdueBookings(currentTime);
         }
-        return bookingList;
     }
 
     private Component createFooterComponent() {
@@ -212,12 +220,16 @@ public class PendingBookingView extends VerticalLayout {
             });
         });
 
+        extrasButton = new Button("Zu Extras buchen");
+        extrasButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        extrasButton.addClickListener(e -> UI.getCurrent().navigate(ArticleBookingView.class, selectedBooking.getId()));
+
         completeButton = new Button("Zu Rechnung abschließen");
         completeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         completeButton.addClickListener(e -> UI.getCurrent().navigate(InvoiceView.class, selectedBooking.getId()));
 
-        layout.add(cancelButton, completeButton);
-        layout.expand(cancelButton, completeButton);
+        layout.add(cancelButton, extrasButton, completeButton);
+        layout.expand(cancelButton, extrasButton, completeButton);
         return layout;
     }
 
@@ -226,8 +238,9 @@ public class PendingBookingView extends VerticalLayout {
      * selected.
      */
     private void updateComponents() {
-        completeButton.setEnabled(selectedBooking != null);
         cancelButton.setEnabled(selectedBooking != null);
+        extrasButton.setEnabled(selectedBooking != null);
+        completeButton.setEnabled(selectedBooking != null);
     }
 
     /**

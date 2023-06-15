@@ -1,19 +1,5 @@
 package de.softwareprojekt.bestbowl.views.bookingViews;
 
-import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.clearNumberFieldChildren;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createAssociationCB;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -40,7 +26,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-
+import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Address;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Association;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
@@ -50,6 +36,13 @@ import de.softwareprojekt.bestbowl.utils.validators.client.ClientValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.StatisticsView;
 import jakarta.annotation.security.PermitAll;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.*;
+
+import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.clearNumberFieldChildren;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createAssociationCB;
 
 /**
  * Creates a View in which the user can search for a Client.
@@ -73,6 +66,7 @@ public class ClientSearchView extends VerticalLayout {
     private Button nextStepButton;
     private Client selectedClient = null;
     private Client newClient = null;
+    private List<Client> clientCache;
 
     /**
      * Constructor for the ClientSearchView. Creates a new ClientSearchView with
@@ -99,6 +93,8 @@ public class ClientSearchView extends VerticalLayout {
         clientGrid = createGrid();
         Component footerComponent = createFooterComponent();
         add(headerComponent, searchComponent, newClientComponent, clientGrid, footerComponent);
+
+        updateClientCache();
         updateGridItems();
         updateFooterComponents();
         resetDialog();
@@ -296,11 +292,14 @@ public class ClientSearchView extends VerticalLayout {
         searchField.setPlaceholder("Suche nach Kundennummer, Name, E-Mail oder Verein ...");
         searchField.setValueChangeMode(ValueChangeMode.EAGER);
         searchField.addValueChangeListener(e -> updateGridItems());
-        Button searchButton = new Button();
-        searchButton.setIcon(VaadinIcon.SEARCH.create());
-        searchButton.addClickListener(e -> updateGridItems());
+        Button refreshCacheButton = new Button();
+        refreshCacheButton.setIcon(LumoIcon.RELOAD.create());
+        refreshCacheButton.addClickListener(e -> {
+            updateClientCache();
+            updateGridItems();
+        });
         searchLayout.expand(searchField);
-        searchLayout.add(searchField, searchButton);
+        searchLayout.add(searchField, refreshCacheButton);
         return searchLayout;
     }
 
@@ -354,7 +353,7 @@ public class ClientSearchView extends VerticalLayout {
      * a specific client.
      */
     private void updateGridItems() {
-        List<Client> clientList = clientRepository.findAllByActiveEqualsOrderByLastName(true);
+        List<Client> clientList = new ArrayList<>(clientCache);
         String searchFieldValue = searchField.getValue();
         String[] searchTerms;
         if (searchFieldValue != null) {
@@ -377,6 +376,10 @@ public class ClientSearchView extends VerticalLayout {
         }
         GridListDataView<Client> clientGridListDataView = clientGrid.setItems(clientList);
         clientGridListDataView.setSortOrder(Client::getLastName, SortDirection.ASCENDING);
+    }
+
+    private void updateClientCache() {
+        clientCache = clientRepository.findAllByActiveEquals(true);
     }
 
     /**

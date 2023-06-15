@@ -19,13 +19,13 @@ import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 public interface ClientRepository extends JpaRepository<Client, Integer> {
 
     /**
-     * The findAllByActiveEqualsOrderByLastName method returns a list of all clients
+     * The findAllByActiveEquals method returns a list of all clients
      * by given boolean value active.
      * 
      * @param active
      * @return List of Clients
      */
-    List<Client> findAllByActiveEqualsOrderByLastName(boolean active);
+    List<Client> findAllByActiveEquals(boolean active);
 
     /**
      * The findAllByActiveEqualsOrderByLastName method returns a list of all client

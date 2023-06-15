@@ -4,12 +4,12 @@ import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.softwareprojekt.bestbowl.jpa.entities.drink.Drink;
 import de.softwareprojekt.bestbowl.jpa.entities.food.Food;
 import de.softwareprojekt.bestbowl.jpa.repositories.drink.DrinkRepository;
@@ -74,9 +74,9 @@ public class ReorderService {
             notification.setDuration(0);
         }
         notification.setPosition(Notification.Position.BOTTOM_STRETCH);
-        notification.addThemeVariants(NotificationVariant.LUMO_CONTRAST);
+        notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
         Div statusText = new Div(new Text(text));
-        Button closeButton = new Button(new Icon("lumo", "cross"));
+        Button closeButton = new Button(LumoIcon.CROSS.create());
         closeButton.getElement().getStyle().set("margin-left", "var(--lumo-space-xl)");
         closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
         closeButton.addClickListener(event -> notification.close());
