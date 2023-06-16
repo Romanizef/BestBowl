@@ -213,6 +213,7 @@ public class PendingBookingView extends VerticalLayout {
         cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
         cancelButton.addClickListener(e -> {
             VaadinUtils.showConfirmationDialog("Wollen Sie die Buchung wirklich stornieren?", "Ja", "Nein", () -> {
+                bookingCache.remove(selectedBooking);
                 selectedBooking.setActive(false);
                 bowlingAlleyBookingRepository.save(selectedBooking);
                 updateGridItems();
