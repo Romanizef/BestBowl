@@ -47,15 +47,13 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
      * If they forget their password, they can click on &quot;Passwort
      * vergessen?&quot; and enter their email address to reset it.
      *
-     * @param UserManager             userManager
-     * @param UserRepository          userRepository
-     * @param BowlingCenterRepository bowlingCenterRepository
-     *
-     * @return A loginform
+     * @param userManager
+     * @param userRepository
+     * @param bowlingCenterRepository
      */
     @Autowired
     public LoginView(UserManager userManager, UserRepository userRepository,
-            BowlingCenterRepository bowlingCenterRepository) {
+                     BowlingCenterRepository bowlingCenterRepository) {
         this.userManager = userManager;
         this.userRepository = userRepository;
         addClassName("login-view");
@@ -83,10 +81,8 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
      * The beforeEnter function is called before the view is entered.
      * It checks if there was an error during login and sets the error flag of the
      * LoginForm accordingly.
-     * 
-     * @param beforeEnterEvent Get the query parameters
      *
-     * @return A boolean value
+     * @param beforeEnterEvent Get the query parameters
      */
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
@@ -98,11 +94,11 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         }
     }
 
-    
+
     /**
      * The createPasswordResetDialog function creates a dialog that allows the user to reset their password.
      * The function is called when the user clicks on &quot;Passwort vergessen&quot; in the login form.
-     * 
+     *
      * @return A dialog
      */
     private Dialog createPasswordResetDialog() {

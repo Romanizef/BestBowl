@@ -269,9 +269,7 @@ public class FoodManagementView extends VerticalLayout {
     private boolean validateFoodSave() {
         Optional<Food> dbFood = foodRepository.findById(selectedFood.getId());
         Set<String> foodNameSet = foodRepository.findAllNames();
-        dbFood.ifPresent(food -> {
-            foodNameSet.remove(food.getName());
-        });
+        dbFood.ifPresent(food -> foodNameSet.remove(food.getName()));
         if (foodNameSet.contains(selectedFood.getName())) {
             validationErrorLabel.setText("Eine Speise mit diesem Namen existiert bereits");
             return false;
@@ -291,27 +289,27 @@ public class FoodManagementView extends VerticalLayout {
      * @see #updateEditFoodLayoutState()
      */
     private Grid<Food> createFoodGrid() {
-        Grid<Food> foodGrid = new Grid<>(Food.class);
-        foodGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
-        foodGrid.removeAllColumns();
-        Grid.Column<Food> idColumn = foodGrid.addColumn(Food::getId).setHeader("ID");
-        Grid.Column<Food> nameColumn = foodGrid.addColumn("name").setHeader("Name");
-        Grid.Column<Food> stockColumn = foodGrid.addColumn("stock").setHeader("Bestand (Stück)");
-        Grid.Column<Food> reorderPointColumn = foodGrid.addColumn("reorderPoint").setHeader("Meldebestand (Stück)");
-        Grid.Column<Food> priceColumn = foodGrid.addColumn(food -> formatDouble(food.getPrice()) + "€")
+        Grid<Food> grid = new Grid<>(Food.class);
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        grid.removeAllColumns();
+        Grid.Column<Food> idColumn = grid.addColumn(Food::getId).setHeader("ID");
+        Grid.Column<Food> nameColumn = grid.addColumn("name").setHeader("Name");
+        Grid.Column<Food> stockColumn = grid.addColumn("stock").setHeader("Bestand (Stück)");
+        Grid.Column<Food> reorderPointColumn = grid.addColumn("reorderPoint").setHeader("Meldebestand (Stück)");
+        Grid.Column<Food> priceColumn = grid.addColumn(food -> formatDouble(food.getPrice()) + "€")
                 .setHeader("Preis");
-        Grid.Column<Food> activeColumn = foodGrid.addColumn(food -> food.isActive() ? "Aktiv" : "Inaktiv")
+        Grid.Column<Food> activeColumn = grid.addColumn(food -> food.isActive() ? "Aktiv" : "Inaktiv")
                 .setHeader("Aktiv");
-        foodGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
-        foodGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
-        foodGrid.setWidth("75%");
-        foodGrid.setHeight("100%");
+        grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
+        grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+        grid.setWidth("75%");
+        grid.setHeight("100%");
         List<Food> foodList = foodRepository.findAll();
-        GridListDataView<Food> dataView = foodGrid.setItems(foodList);
+        GridListDataView<Food> dataView = grid.setItems(foodList);
 
         FoodManagementView.FoodFilter foodFilter = new FoodManagementView.FoodFilter(dataView);
-        foodGrid.getHeaderRows().clear();
-        HeaderRow headerRow = foodGrid.appendHeaderRow();
+        grid.getHeaderRows().clear();
+        HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", foodFilter::setId));
         headerRow.getCell(nameColumn).setComponent(createFilterHeaderString("Name", foodFilter::setName));
         headerRow.getCell(stockColumn).setComponent(createFilterHeaderInteger("Bestand", foodFilter::setStock));
@@ -321,7 +319,7 @@ public class FoodManagementView extends VerticalLayout {
         headerRow.getCell(activeColumn)
                 .setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", foodFilter::setActive));
 
-        foodGrid.addSelectionListener(e -> {
+        grid.addSelectionListener(e -> {
             if (e.isFromClient()) {
                 Optional<Food> optionalFood = e.getFirstSelectedItem();
                 saveButton.setEnabled(true);
@@ -339,7 +337,7 @@ public class FoodManagementView extends VerticalLayout {
             }
             updateEditFoodLayoutState();
         });
-        return foodGrid;
+        return grid;
     }
 
     private static class FoodFilter {
@@ -367,7 +365,7 @@ public class FoodManagementView extends VerticalLayout {
         }
 
         /**
-         * The test function checks if the given food matches all of the filter
+         * The test function checks if the given food matches all the filter
          * criteria.
          *
          * @param food

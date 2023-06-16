@@ -1,19 +1,22 @@
 package de.softwareprojekt.bestbowl.jpa.idclasses;
 
-import java.io.Serializable;
-import java.util.Objects;
-
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * DinkBookingId is the composite key for the {@code DrinkBooking}
  * entity.
- * 
+ *
  * @author Ali
  */
 public class DrinkBookingId implements Serializable {
+    @Serial
     private static final long serialVersionUID = 5181429790230031383L;
+
     private Client client;
     private BowlingAlley bowlingAlley;
     private long timeStamp;
@@ -23,15 +26,13 @@ public class DrinkBookingId implements Serializable {
      * The DrinkBookingId function is a composite primary key class for the
      * DrinkBooking entity.
      * It consists of two attributes: client and bowlingAlley.
-     * 
-     * @return The drinkbookingid
      */
     public DrinkBookingId() {
     }
 
     /**
      * The getClient function returns the client object.
-     * 
+     *
      * @return The client object
      */
     public Client getClient() {
@@ -40,8 +41,8 @@ public class DrinkBookingId implements Serializable {
 
     /**
      * The setClient function sets the client variable to the given Client object.
-     * 
-     * @param Client client Set the client object in the class
+     *
+     * @param client Set the client object in the class
      */
     public void setClient(Client client) {
         this.client = client;
@@ -49,7 +50,7 @@ public class DrinkBookingId implements Serializable {
 
     /**
      * The getBowlingAlley function returns the bowlingAlley object.
-     * 
+     *
      * @return The bowlingalley object
      */
     public BowlingAlley getBowlingAlley() {
@@ -59,8 +60,8 @@ public class DrinkBookingId implements Serializable {
     /**
      * The setBowlingAlley function sets the bowlingAlley variable to the value of
      * its parameter.
-     * 
-     * @param BowlingAlley bowlingAlley Set the bowlingalley variable
+     *
+     * @param bowlingAlley Set the bowlingalley variable
      */
     public void setBowlingAlley(BowlingAlley bowlingAlley) {
         this.bowlingAlley = bowlingAlley;
@@ -68,7 +69,7 @@ public class DrinkBookingId implements Serializable {
 
     /**
      * The getTimeStamp function returns the timeStamp variable.
-     * 
+     *
      * @return The timestamp variable, which is a long
      */
     public long getTimeStamp() {
@@ -78,8 +79,8 @@ public class DrinkBookingId implements Serializable {
     /**
      * The setTimeStamp function sets the timeStamp variable to the value of its
      * parameter.
-     * 
-     * @param long timeStamp Set the timestamp variable
+     *
+     * @param timeStamp Set the timestamp variable
      */
     public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
@@ -87,7 +88,7 @@ public class DrinkBookingId implements Serializable {
 
     /**
      * The getName function returns the name of a bowling alley.
-     * 
+     *
      * @return The name of the person
      */
     public String getName() {
@@ -96,8 +97,8 @@ public class DrinkBookingId implements Serializable {
 
     /**
      * The setName function sets the name of a bowling alley.
-     * 
-     * @param String name Set the name of the object
+     *
+     * @param name Set the name of the object
      */
     public void setName(String name) {
         this.name = name;
@@ -106,9 +107,8 @@ public class DrinkBookingId implements Serializable {
     /**
      * The equals function is used to compare two objects of the same class.
      * It returns true if all fields are equal, false otherwise.
-     * 
-     * @param Object o Compare the object to another object
      *
+     * @param o Compare the object to another object
      * @return True if the two objects are equal
      */
     @Override

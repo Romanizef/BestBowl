@@ -1,16 +1,16 @@
 package de.softwareprojekt.bestbowl.jpa.entities;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * User is a JPA entity class that represents a user in the database.
- * 
+ *
  * @author Ali
  */
 @Entity
@@ -34,8 +34,6 @@ public class User implements Serializable {
      * The User function is a constructor for the User class.
      * It sets the active variable to true, which means that
      * when a new user is created, they are automatically set to active.
-     * 
-     * @return The active variable
      */
     public User() {
         active = true;
@@ -44,10 +42,8 @@ public class User implements Serializable {
     /**
      * The User function is a constructor that takes in an object of type User and
      * copies the values from that object into this one.
-     * 
-     * @param User other Copy the properties of another user object into this one
      *
-     * @return A user object with the same fields as other
+     * @param other Copy the properties of another user object into this one
      */
     public User(User other) {
         this.id = other.id;
@@ -66,10 +62,8 @@ public class User implements Serializable {
      * object into this one.
      * This is useful for when you want to copy a user's information, but not their
      * ID or other unique identifiers.
-     * 
-     * @param User other Copy the values of the other user into this user
      *
-     * @return A user object
+     * @param other Copy the values of the other user into this user
      */
     public void copyValuesOf(User other) {
         this.id = other.id;
@@ -85,7 +79,7 @@ public class User implements Serializable {
 
     /**
      * The getId function returns the id of the user.
-     * 
+     *
      * @return The value of the id variable
      */
     public int getId() {
@@ -94,8 +88,8 @@ public class User implements Serializable {
 
     /**
      * The setId function sets the id of the user.
-     * 
-     * @param int id Set the id of the object
+     *
+     * @param id Set the id of the object
      */
     public void setId(int id) {
         this.id = id;
@@ -103,7 +97,7 @@ public class User implements Serializable {
 
     /**
      * The getName function returns the name of the user.
-     * 
+     *
      * @return The name of the user
      */
     public String getName() {
@@ -112,8 +106,8 @@ public class User implements Serializable {
 
     /**
      * The setName function sets the name of the user.
-     * 
-     * @param String name Set the name of the user
+     *
+     * @param name Set the name of the user
      */
     public void setName(String name) {
         this.name = name;
@@ -121,7 +115,7 @@ public class User implements Serializable {
 
     /**
      * The getEmail function returns the email of a user.
-     * 
+     *
      * @return The email of the user
      */
     public String getEmail() {
@@ -130,8 +124,8 @@ public class User implements Serializable {
 
     /**
      * The setEmail function sets the email of a user.
-     * 
-     * @param String email Set the email of the user
+     *
+     * @param email Set the email of the user
      */
     public void setEmail(String email) {
         this.email = email;
@@ -139,7 +133,7 @@ public class User implements Serializable {
 
     /**
      * The getEncodedPassword function returns the encoded password.
-     * 
+     *
      * @return The encoded password
      */
     public String getEncodedPassword() {
@@ -149,8 +143,8 @@ public class User implements Serializable {
     /**
      * The setEncodedPassword function sets the encodedPassword field to the value
      * of its parameter.
-     * 
-     * @param String encodedPassword Set the encodedpassword variable
+     *
+     * @param encodedPassword Set the encodedpassword variable
      */
     public void setEncodedPassword(String encodedPassword) {
         this.encodedPassword = encodedPassword;
@@ -158,7 +152,7 @@ public class User implements Serializable {
 
     /**
      * The getSecurityQuestion function returns the security question of a user.
-     * 
+     *
      * @return A string called securityquestion
      */
     public String getSecurityQuestion() {
@@ -167,8 +161,8 @@ public class User implements Serializable {
 
     /**
      * The setSecurityQuestion function sets the security question for a user.
-     * 
-     * @param String securityQuestion Set the security question
+     *
+     * @param securityQuestion Set the security question
      */
     public void setSecurityQuestion(String securityQuestion) {
         this.securityQuestion = securityQuestion;
@@ -176,7 +170,7 @@ public class User implements Serializable {
 
     /**
      * The getSecurityQuestionAnswer function returns the security question answer.
-     * 
+     *
      * @return The securityquestionanswer
      */
     public String getSecurityQuestionAnswer() {
@@ -186,8 +180,8 @@ public class User implements Serializable {
     /**
      * The setSecurityQuestionAnswer function sets the security question answer for
      * a user.
-     * 
-     * @param String securityQuestionAnswer Set the security question answer
+     *
+     * @param securityQuestionAnswer Set the security question answer
      */
     public void setSecurityQuestionAnswer(String securityQuestionAnswer) {
         this.securityQuestionAnswer = securityQuestionAnswer;
@@ -195,7 +189,7 @@ public class User implements Serializable {
 
     /**
      * The getRole function returns the role of a user.
-     * 
+     *
      * @return The role of the employee
      */
     public String getRole() {
@@ -204,8 +198,8 @@ public class User implements Serializable {
 
     /**
      * The setRole function sets the role of a user.
-     * 
-     * @param String role Set the role of the user
+     *
+     * @param role Set the role of the user
      */
     public void setRole(String role) {
         this.role = role;
@@ -217,17 +211,17 @@ public class User implements Serializable {
 
     /**
      * The setDarkMode function sets the darkMode variable to true or false.
-     * 
-     * @param boolean darkMode Determine whether the dark mode is enabled or not
+     *
+     * @param darkMode Determine whether the dark mode is enabled or not
      */
     public void setDarkMode(boolean darkMode) {
         this.darkMode = darkMode;
     }
 
     /**
-     * The isActive function returns a boolean value indicating whether or not the
+     * The isActive function returns a boolean value indicating if the
      * user is active.
-     * 
+     *
      * @return A boolean value
      */
     public boolean isActive() {
@@ -236,8 +230,8 @@ public class User implements Serializable {
 
     /**
      * The setActive function sets the active variable to true or false.
-     * 
-     * @param boolean active Set the value of the active variable
+     *
+     * @param active Set the value of the active variable
      */
     public void setActive(boolean active) {
         this.active = active;

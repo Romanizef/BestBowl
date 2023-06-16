@@ -116,7 +116,7 @@ public class AssociationManagementView extends VerticalLayout {
 
     /**
      * Creates a grid based on all the fields of the association class
-     * and adds an filter for all rows.
+     * and adds a filter for all rows.
      * {@code If} one of the gridlines is selected the editing Layout is refreshed
      * with all the data out of the currently selected line.
      * {@code Else} the editing Layout is reset to default.
@@ -210,7 +210,7 @@ public class AssociationManagementView extends VerticalLayout {
     }
 
     /**
-     * Ceates a new {@code HorizontalLayout} for the {@code cancelButton} and
+     * Creates a new {@code HorizontalLayout} for the {@code cancelButton} and
      * {@code saveButton}
      *
      * @return {@code buttonLayout}
@@ -293,7 +293,7 @@ public class AssociationManagementView extends VerticalLayout {
      * selectedAssociation to null, and sets editingNewAssociation to false.
      * Then it creates a new Association client object and reads its bean into
      * binder.
-     * Finally it calls {@code updateEditLayoutState()} and
+     * Finally, it calls {@code updateEditLayoutState()} and
      * {@code clearNumberFieldChildren(editLayout.getChildren())}
      *
      * @see #updateEditLayoutState()
@@ -388,7 +388,7 @@ public class AssociationManagementView extends VerticalLayout {
         }
 
         /**
-         * Cheking if grid filter row names match association-class fields
+         * Checking if grid filter row names match association-class fields
          *
          * @param association
          * @return {@code matchesId} {@code matchesName} {@code matchesDiscount}

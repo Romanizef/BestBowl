@@ -5,7 +5,6 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.server.StreamResource;
-
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.utils.pdf.PDFUtils;
 
@@ -13,7 +12,7 @@ import java.io.ByteArrayInputStream;
 
 /**
  * The InvoiceDownloadButton class creates a download button.
- * 
+ *
  * @author Marten Voß
  */
 public class InvoiceDownloadButton extends Button {

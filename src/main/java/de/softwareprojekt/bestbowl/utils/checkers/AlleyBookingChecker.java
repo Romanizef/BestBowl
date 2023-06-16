@@ -27,7 +27,7 @@ public class AlleyBookingChecker {
     /**
      * The setClient function sets the client variable to the given Client object.
      *
-     * @param Client client Set the client field
+     * @param client Set the client field
      */
     public void setClient(Client client) {
         this.client = client;
@@ -43,10 +43,9 @@ public class AlleyBookingChecker {
      * The endtime is calculated by adding {@code durationInMin*60*1000L- 1ms} (to
      * avoid overlap) to starttime
      *
-     * @param LocalDate date Set the bookingdate variable
-     * @param LocalTime time Set the starttime variable
-     * @param int       durationInMin Set the duration of the booking
-     * @return A boolean value
+     * @param date          Set the bookingdate variable
+     * @param time          Set the starttime variable
+     * @param durationInMin Set the duration of the booking
      */
     public void setTimeInfo(LocalDate date, LocalTime time, int durationInMin) {
         bookingDate = date;

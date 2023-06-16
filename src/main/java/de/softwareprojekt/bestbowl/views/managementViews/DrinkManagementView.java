@@ -273,7 +273,7 @@ public class DrinkManagementView extends VerticalLayout {
      * editingNewDrink to false and disables both save buttons.
      * Then it creates a new Drink object with one DrinkVariant and reads this into
      * the binder.
-     * Finally it updates the state of edit drink layout and clears all number
+     * Finally, it updates the state of edit drink layout and clears all number
      * fields in children of drinkForm (which are not visible).
      */
     private void resetEditLayout() {
@@ -321,31 +321,31 @@ public class DrinkManagementView extends VerticalLayout {
      * The grid is populated with all the drinks in the database, and each column
      * can be filtered by its respective value.
      * The grid also has a selection listener that enables/disables buttons
-     * depending on whether or not an item is selected.
+     * depending on whether an item is selected.
      *
      * @return A grid
      * @see #updateEditDrinkLayoutState()
      */
     private Grid<Drink> createDrinkGrid() {
-        Grid<Drink> drinkGrid = new Grid<>(Drink.class);
-        drinkGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
-        drinkGrid.removeAllColumns();
-        Grid.Column<Drink> idColumn = drinkGrid.addColumn(Drink::getId).setHeader("ID");
-        Grid.Column<Drink> nameColumn = drinkGrid.addColumn("name").setHeader("Name");
-        Grid.Column<Drink> stockColumn = drinkGrid.addColumn("stockInMilliliters").setHeader("Bestand (ml)");
-        Grid.Column<Drink> reorderPointColumn = drinkGrid.addColumn("reorderPoint").setHeader("Meldebestand (ml)");
-        Grid.Column<Drink> activeColumn = drinkGrid.addColumn(drink -> drink.isActive() ? "Aktiv" : "Inaktiv")
+        Grid<Drink> grid = new Grid<>(Drink.class);
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        grid.removeAllColumns();
+        Grid.Column<Drink> idColumn = grid.addColumn(Drink::getId).setHeader("ID");
+        Grid.Column<Drink> nameColumn = grid.addColumn("name").setHeader("Name");
+        Grid.Column<Drink> stockColumn = grid.addColumn("stockInMilliliters").setHeader("Bestand (ml)");
+        Grid.Column<Drink> reorderPointColumn = grid.addColumn("reorderPoint").setHeader("Meldebestand (ml)");
+        Grid.Column<Drink> activeColumn = grid.addColumn(drink -> drink.isActive() ? "Aktiv" : "Inaktiv")
                 .setHeader("Aktiv");
-        drinkGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
-        drinkGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
-        drinkGrid.setWidth("75%");
-        drinkGrid.setHeight("100%");
+        grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
+        grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+        grid.setWidth("75%");
+        grid.setHeight("100%");
         List<Drink> drinkList = drinkRepository.findAll();
-        GridListDataView<Drink> dataView = drinkGrid.setItems(drinkList);
+        GridListDataView<Drink> dataView = grid.setItems(drinkList);
 
         DrinkManagementView.DrinkFilter drinkFilter = new DrinkManagementView.DrinkFilter(dataView);
-        drinkGrid.getHeaderRows().clear();
-        HeaderRow headerRow = drinkGrid.appendHeaderRow();
+        grid.getHeaderRows().clear();
+        HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", drinkFilter::setId));
         headerRow.getCell(nameColumn).setComponent(createFilterHeaderString("Name", drinkFilter::setName));
         headerRow.getCell(stockColumn).setComponent(createFilterHeaderInteger("Bestand", drinkFilter::setStock));
@@ -353,7 +353,7 @@ public class DrinkManagementView extends VerticalLayout {
                 .setComponent(createFilterHeaderInteger("Meldebestand", drinkFilter::setReorderPoint));
         headerRow.getCell(activeColumn)
                 .setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", drinkFilter::setActive));
-        drinkGrid.addSelectionListener(e -> {
+        grid.addSelectionListener(e -> {
             if (e.isFromClient()) {
                 Optional<Drink> optionalDrink = e.getFirstSelectedItem();
                 saveButton.setEnabled(true);
@@ -373,7 +373,7 @@ public class DrinkManagementView extends VerticalLayout {
             }
             updateEditDrinkLayoutState();
         });
-        return drinkGrid;
+        return grid;
     }
 
     private static class DrinkFilter {
@@ -397,7 +397,7 @@ public class DrinkManagementView extends VerticalLayout {
 
         /**
          * The test function is used to filter the grid.
-         * It checks if the given drink matches all of the filters.
+         * It checks if the given drink matches all the filters.
          * If it does, it returns true and will be displayed in the grid.
          *
          * @param drink Pass the current drink object in the list to be tested against
@@ -422,7 +422,7 @@ public class DrinkManagementView extends VerticalLayout {
          * determine whether a drink should be displayed in our grid or not based on
          * what's typed into our filter field.
          *
-         * @param value Compare the value of the searchterm parameter
+         * @param value      Compare the value of the searchterm parameter
          * @param searchTerm Search for the value of a specific column
          * @return True if the searchterm is null or empty or is contained
          */

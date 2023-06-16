@@ -1,19 +1,13 @@
 package de.softwareprojekt.bestbowl.jpa.entities.client;
 
+import jakarta.persistence.*;
+
 import java.io.Serial;
 import java.io.Serializable;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.PrimaryKeyJoinColumn;
-
 /**
  * Client is a JPA entity that represents a client.
- * 
+ *
  * @author Ali
  */
 @Entity
@@ -51,8 +45,8 @@ public class Client implements Serializable {
 
     /**
      * The addAddress function adds an address to the client.
-     * 
-     * @param Address address Set the address of the client
+     *
+     * @param address Set the address of the client
      */
     public void addAddress(Address address) {
         this.address = address;
@@ -61,7 +55,7 @@ public class Client implements Serializable {
 
     /**
      * The getFullName function returns the first name and last name of a person.
-     * 
+     *
      * @return A string with the first name and last name of the person
      */
     public String getFullName() {
@@ -70,7 +64,7 @@ public class Client implements Serializable {
 
     /**
      * The getId function returns the id of the object.
-     * 
+     *
      * @return The id of the object
      */
     public int getId() {
@@ -80,8 +74,8 @@ public class Client implements Serializable {
     /**
      * The setId function sets the id of a given object to the value passed in as an
      * argument.
-     * 
-     * @param int id
+     *
+     * @param id
      */
     public void setId(int id) {
         this.id = id;
@@ -89,7 +83,7 @@ public class Client implements Serializable {
 
     /**
      * The getFirstName function returns the first name of a person.
-     * 
+     *
      * @return The first name
      */
     public String getFirstName() {
@@ -98,8 +92,8 @@ public class Client implements Serializable {
 
     /**
      * The setFirstName function sets the first name of a client.
-     * 
-     * @param String firstName Set the firstname variable
+     *
+     * @param firstName Set the firstname variable
      */
     public void setFirstName(String firstName) {
         this.firstName = firstName;
@@ -107,7 +101,7 @@ public class Client implements Serializable {
 
     /**
      * The getLastName function returns the last name of a client.
-     * 
+     *
      * @return The last name
      */
     public String getLastName() {
@@ -116,8 +110,8 @@ public class Client implements Serializable {
 
     /**
      * The setLastName function sets the last name of a client.
-     * 
-     * @param String lastName Set the lastname field
+     *
+     * @param lastName Set the lastname field
      */
     public void setLastName(String lastName) {
         this.lastName = lastName;
@@ -125,7 +119,7 @@ public class Client implements Serializable {
 
     /**
      * The getEmail function returns the email of a client.
-     * 
+     *
      * @return The email of the user
      */
     public String getEmail() {
@@ -134,8 +128,8 @@ public class Client implements Serializable {
 
     /**
      * The setEmail function sets the email of a client.
-     * 
-     * @param String email Set the email field to the value of email
+     *
+     * @param email Set the email field to the value of email
      */
     public void setEmail(String email) {
         this.email = email;
@@ -143,7 +137,7 @@ public class Client implements Serializable {
 
     /**
      * The getAddress function returns the address of a client.
-     * 
+     *
      * @return The address object
      */
     public Address getAddress() {
@@ -152,8 +146,8 @@ public class Client implements Serializable {
 
     /**
      * The setAddress function sets the address of a client.
-     * 
-     * @param Address address Set the address of the customer
+     *
+     * @param address Set the address of the customer
      */
     public void setAddress(Address address) {
         this.address = address;
@@ -161,7 +155,7 @@ public class Client implements Serializable {
 
     /**
      * The getAssociation function returns the association object.
-     * 
+     *
      * @return {@code Association}
      */
     public Association getAssociation() {
@@ -171,8 +165,8 @@ public class Client implements Serializable {
     /**
      * The setAssociation function sets the association of a given object to an
      * Association.
-     * 
-     * @param Association association Set the association field in the class
+     *
+     * @param association Set the association field in the class
      */
     public void setAssociation(Association association) {
         this.association = association;
@@ -180,7 +174,7 @@ public class Client implements Serializable {
 
     /**
      * The getComment function returns the comment.
-     * 
+     *
      * @return The comment
      */
     public String getComment() {
@@ -189,17 +183,17 @@ public class Client implements Serializable {
 
     /**
      * The setComment function sets the comment field for the client.
-     * 
-     * @param String comment Set the comment for a particular review
+     *
+     * @param comment Set the comment for a particular review
      */
     public void setComment(String comment) {
         this.comment = comment;
     }
 
     /**
-     * The isActive function returns a boolean value indicating whether or not the
+     * The isActive function returns a boolean value indicating if the
      * Client is active.
-     * 
+     *
      * @return A boolean value of true or false
      */
     public boolean isActive() {
@@ -208,8 +202,8 @@ public class Client implements Serializable {
 
     /**
      * The setActive function sets the active variable to true or false.
-     * 
-     * @param boolean active Set the value of the active variable
+     *
+     * @param active Set the value of the active variable
      */
     public void setActive(boolean active) {
         this.active = active;

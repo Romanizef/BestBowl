@@ -1,12 +1,5 @@
 package de.softwareprojekt.bestbowl.views.articlePanels;
 
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_SHOE;
-
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -14,10 +7,16 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
-
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoe.BowlingShoeRepository;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_SHOE;
 
 /**
  * Class for the Shoe Panels in the ExtrasView.
@@ -49,12 +48,10 @@ public class ShoePanel extends VerticalLayout {
             shoeSizeAmountMap.put(i, 0);
         }
         for (BowlingShoe shoe : shoeList) {
-            if (shoe.isActive()) {
-                if (shoeSizeAmountMap.containsKey(shoe.getSize())) {
-                    value = shoeSizeAmountMap.get(shoe.getSize());
-                    value++;
-                    shoeSizeAmountMap.put(shoe.getSize(), value);
-                }
+            if (shoe.isActive() && (shoeSizeAmountMap.containsKey(shoe.getSize()))) {
+                value = shoeSizeAmountMap.get(shoe.getSize());
+                value++;
+                shoeSizeAmountMap.put(shoe.getSize(), value);
             }
         }
         VerticalLayout panelLayout = new VerticalLayout();
@@ -70,9 +67,8 @@ public class ShoePanel extends VerticalLayout {
         shoeSizeField.setMin(30);
         shoeSizeField.setMax(50);
         shoeSizeField.setValue(40);
-        shoeSizeField.addValueChangeListener(integerFieldIntegerComponentValueChangeEvent -> {
-            shoeAmountField.setMax(shoeSizeAmountMap.get(shoeSizeField.getValue()));
-        });
+        shoeSizeField.addValueChangeListener(integerFieldIntegerComponentValueChangeEvent ->
+                shoeAmountField.setMax(shoeSizeAmountMap.get(shoeSizeField.getValue())));
         shoeSizeField.setStepButtonsVisible(true);
         sizeLayout.add(sizeLabel, shoeSizeField);
 
@@ -94,8 +90,6 @@ public class ShoePanel extends VerticalLayout {
 
     /**
      * The addCSS function adds CSS styling to the panel.
-     * 
-     * @return A cssstyledeclaration
      */
     private void addCSS() {
         getStyle()
@@ -111,7 +105,6 @@ public class ShoePanel extends VerticalLayout {
      * with the current amount of available shoes for each size.
      * The function is called whenever a new client is added or removed from the
      * database, so that it can be displayed in real time on the frontend.
-     *
      */
     public void updateShoeSizeAmountMap() {
         List<BowlingShoe> shoeList = bowlingShoeRepository.findAllByClientIsNullAndActiveIsTrue();

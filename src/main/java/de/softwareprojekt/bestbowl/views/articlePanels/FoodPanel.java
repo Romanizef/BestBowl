@@ -1,21 +1,20 @@
 package de.softwareprojekt.bestbowl.views.articlePanels;
 
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_FOOD;
-
-import java.util.Map;
-
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
-
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.food.Food;
 import de.softwareprojekt.bestbowl.jpa.entities.food.FoodBooking;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 
+import java.util.Map;
+
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_FOOD;
+
 /**
  * Class for the Food Panel in the ExtrasView.
- * 
+ *
  * @author Matija Kopschek
  * @author Ali aus Mali
  */
@@ -29,7 +28,7 @@ public class FoodPanel extends HorizontalLayout {
      * while
      * the integer field allows users to specify how many portions they want to
      * order.
-     * 
+     *
      * @param food
      * @param bowlingAlleyBooking
      * @param foodBookingMap
@@ -76,8 +75,6 @@ public class FoodPanel extends HorizontalLayout {
 
     /**
      * The addCSS function adds CSS styling to the FoodPanel.
-     *
-     * @return A cssstyledeclaration object
      */
     private void addCSS() {
         getStyle()

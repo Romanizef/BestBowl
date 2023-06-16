@@ -69,7 +69,7 @@ public class AppConfig extends VaadinWebSecurity {
      * It allows for a custom login view, and also defines which paths are
      * publicly accessible.
      *
-     * @param HttpSecurity http Configure the security of the web application
+     * @param http Configure the security of the web application
      */
     @Override
     public void configure(HttpSecurity http) throws Exception {

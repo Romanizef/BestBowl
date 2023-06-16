@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 /**
  * The Utils class contains all the utility methods used throughout the program.
- * 
+ *
  * @author Marten Voß
  */
 public class Utils {
@@ -203,26 +203,11 @@ public class Utils {
 
     /**
      * @return a LocalDateTime of the current time with the minute rounded to the
-     *         previous 1/4 hour
+     * previous 1/4 hour
      */
     public static LocalDateTime getCurrentDateTimeRounded() {
         LocalDateTime localDateTime = LocalDateTime.now();
         int newMinute = localDateTime.getMinute() - (localDateTime.getMinute() % 15);
         return localDateTime.withMinute(newMinute).withSecond(0).withNano(0);
-    }
-
-    /**
-     * @return a LocalDateTime of the current date with hour set to 5
-     */
-    public static LocalDateTime getCurrentDateTimeOfDayStart() {
-        return setLocalDateTimeToDayStart(LocalDateTime.now());
-    }
-
-    /**
-     * @param localDateTime LocalDateTime to be changed
-     * @return the LocalDateTime with nano, second, minute set to 0 and hour to 5
-     */
-    public static LocalDateTime setLocalDateTimeToDayStart(LocalDateTime localDateTime) {
-        return localDateTime.withNano(0).withSecond(0).withMinute(0).withHour(5);
     }
 }

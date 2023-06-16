@@ -1,24 +1,23 @@
 package de.softwareprojekt.bestbowl.views.articlePanels;
 
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_DRINK;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createResponsiveSteps;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.drink.Drink;
+import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkVariant;
+import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.IntegerField;
-
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.drink.Drink;
-import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkVariant;
-import de.softwareprojekt.bestbowl.utils.messages.Notifications;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_DRINK;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createResponsiveSteps;
 
 /**
  * Class for the Drink Panel in the ExtrasView.
@@ -38,7 +37,6 @@ public class DrinkPanel extends HorizontalLayout {
      * @param drink
      * @param bowlingAlleyBooking
      * @param drinkBookingMap
-     * 
      * @see #addCSS()
      * @see #createIntegerField(DrinkVariant, BowlingAlleyBooking, Map)
      */
@@ -78,7 +76,7 @@ public class DrinkPanel extends HorizontalLayout {
      * @return {@code IntegerField}
      */
     public IntegerField createIntegerField(DrinkVariant drinkVariant, BowlingAlleyBooking bowlingAlleyBooking,
-            Map<String, DrinkBooking> drinkBookingMap) {
+                                           Map<String, DrinkBooking> drinkBookingMap) {
         IntegerField mlField = new IntegerField();
         mlField.setValue(0);
         mlField.setStepButtonsVisible(true);
@@ -126,8 +124,6 @@ public class DrinkPanel extends HorizontalLayout {
      * The addCSS function adds CSS styling to the DrinkPanel.
      * The border is set to 2px solid #00bcd4, the border-radius is set to 30px,
      * the background-color is set to #00bcd410 and padding is 10px on all sides.
-     * 
-     * @return A cssstyledeclaration object
      */
     private void addCSS() {
         getStyle()

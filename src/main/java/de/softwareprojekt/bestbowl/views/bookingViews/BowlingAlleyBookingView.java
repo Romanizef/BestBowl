@@ -117,8 +117,6 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
      * variables to the start of a day
      * (the current day if it is after the bowling center's opening time, or
      * yesterday otherwise) and one day later.
-     *
-     * @return The start time of the day, and the end time of that same day
      */
     private void setBoundsToWholeDay() {
         LocalDateTime startLDT = LocalDateTime.of(datePicker.getValue(),
@@ -138,7 +136,7 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
      * - A ComboBox to select how long you want to book an alley for (in hours).
      * - The checkButton, which checks if there is an available bowling alley at
      * your selected time and duration. If so, it will notify you with its number in
-     * Notifications.showInfo(). Otherwise it will tell you that no alleys are
+     * Notifications.showInfo(). Otherwise, it will tell you that no alleys are
      * available at your selected time and duration in Notifications.showInfo(). It
      *
      * @return A layout
@@ -204,7 +202,6 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
      * this DatePicker back to its old value (i.e., you can't change your booking).
      *
      * @param datePicker Set the locale, value and min
-     * @return A datepicker
      */
     private void configureDatePicker(DatePicker datePicker) {
         datePicker.setLocale(Locale.GERMANY);
@@ -226,7 +223,7 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
      * It sets the locale to Germany, sets a step of 30 minutes and rounds down/up
      * to nearest half hour.
      * If the user is not an admin, it also restricts him from selecting times
-     * outside of his bowling center's opening hours.
+     * outside of this bowling center's opening hours.
      *
      * @param timePicker Set the locale, step size and value of the time
      *                   picker
@@ -439,9 +436,8 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
      * this view is created.
      * It sets the selectedClient to be used in this view.
      *
-     * @param event              Get the url parameters
-     * @param @OptionalParameter Integer parameter Pass the parameter from the url
-     *                           to this function
+     * @param event     Get the url parameters
+     * @param parameter Pass the parameter from the url to this function
      */
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter Integer parameter) {

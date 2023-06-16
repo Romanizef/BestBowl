@@ -13,20 +13,16 @@ public class BestBowlApplication {
 
     /**
      * The main function of the BestBowlApplication class.
-     * 
-     * @param String[] args Pass arguments to the main method
      *
-     * @return A springapplication
+     * @param args Pass arguments to the main method
      */
     public static void main(String[] args) {
         context = SpringApplication.run(BestBowlApplication.class, args);
     }
 
     /**
-     * The shutdown function is used to gracefully shutdown the application.
+     * The shutdown function is used to gracefully shut down the application.
      * It will wait for all threads to finish before shutting down.
-     * 
-     * @return The exit code of the springapplication
      */
     public static void shutdown() {
         int exitCode = SpringApplication.exit(context, () -> 0);

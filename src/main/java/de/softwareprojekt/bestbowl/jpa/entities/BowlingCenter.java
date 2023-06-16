@@ -1,14 +1,14 @@
 package de.softwareprojekt.bestbowl.jpa.entities;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * BowlingCenter is a JPA entity representing a bowling center.
- * 
+ *
  * @author Marten Voß
  */
 @Entity
@@ -49,7 +49,7 @@ public class BowlingCenter implements Serializable {
      * postCode field.
      * The format is 5 digits, with leading zeros if necessary.
      *
-     * @return A string with the postcode formatted as a 5 digit number
+     * @return A string with the postcode formatted as a 5-digit number
      */
     public String getPostCodeString() {
         return String.format("%05d", postCode);
@@ -57,7 +57,7 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The getId function returns the id of the bowling center.
-     * 
+     *
      * @return The id of the student
      */
     public int getId() {
@@ -66,8 +66,8 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The setId function sets the id of the bowling center.
-     * 
-     * @param int id Set the id of the object
+     *
+     * @param id Set the id of the object
      */
     public void setId(int id) {
         this.id = id;
@@ -75,7 +75,7 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The getDisplayName function returns the displayName of the bowling center.
-     * 
+     *
      * @return The displayname of the bowling center
      */
     public String getDisplayName() {
@@ -85,8 +85,8 @@ public class BowlingCenter implements Serializable {
     /**
      * The setDisplayName function sets the displayName variable to the value of its
      * parameter.
-     * 
-     * @param String displayName Set the displayname variable
+     *
+     * @param displayName Set the displayname variable
      */
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
@@ -94,7 +94,7 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The getBusinessName function returns the business name of the bowling center.
-     * 
+     *
      * @return The businessname variable
      */
     public String getBusinessName() {
@@ -104,8 +104,8 @@ public class BowlingCenter implements Serializable {
     /**
      * The setBusinessName function sets the businessName variable to the value of
      * its parameter.
-     * 
-     * @param String businessName Set the businessname field
+     *
+     * @param businessName Set the businessname field
      */
     public void setBusinessName(String businessName) {
         this.businessName = businessName;
@@ -113,7 +113,7 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The getStreet function returns the street of the bowling center.
-     * 
+     *
      * @return The value of the street variable
      */
     public String getStreet() {
@@ -122,10 +122,8 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The setStreet function sets the street of the bowling center.
-     * 
-     * @param String street Set the value of the street variable
      *
-     * @return The street name
+     * @param street Set the value of the street variable
      */
     public void setStreet(String street) {
         this.street = street;
@@ -133,7 +131,7 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The getHouseNr function returns the house number of the bowling center
-     * 
+     *
      * @return The housenr variable
      */
     public int getHouseNr() {
@@ -142,8 +140,8 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The setHouseNr function sets the house number of the bowling center.
-     * 
-     * @param int houseNr Set the housenr variable
+     *
+     * @param houseNr Set the housenr variable
      */
     public void setHouseNr(int houseNr) {
         this.houseNr = houseNr;
@@ -151,7 +149,7 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The getPostCode function returns the post code of the bowling center.
-     * 
+     *
      * @return The postcode variable
      */
     public int getPostCode() {
@@ -161,8 +159,8 @@ public class BowlingCenter implements Serializable {
     /**
      * The setPostCode function sets the postCode variable to the value of its
      * parameter.
-     * 
-     * @param int postCode Set the postcode of the bowling center
+     *
+     * @param postCode Set the postcode of the bowling center
      */
     public void setPostCode(int postCode) {
         this.postCode = postCode;
@@ -170,7 +168,7 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The getCity function returns the city of the bowling center.
-     * 
+     *
      * @return The city variable
      */
     public String getCity() {
@@ -179,8 +177,8 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The setCity function sets the city of the bowling center.
-     * 
-     * @param String city Set the city of the bowling center
+     *
+     * @param city Set the city of the bowling center
      */
     public void setCity(String city) {
         this.city = city;
@@ -188,7 +186,7 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The getStartTime function returns the startTime variable.
-     * 
+     *
      * @return The start time of the business hours
      */
     public long getStartTime() {
@@ -198,8 +196,8 @@ public class BowlingCenter implements Serializable {
     /**
      * The setStartTime function sets the startTime variable to the value of its
      * parameter.
-     * 
-     * @param long startTime Set the starttime variable
+     *
+     * @param startTime Set the starttime variable
      */
     public void setStartTime(long startTime) {
         this.startTime = startTime;
@@ -207,7 +205,7 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The getEndTime function returns the endTime variable.
-     * 
+     *
      * @return The end time of the business hours
      */
     public long getEndTime() {
@@ -217,10 +215,8 @@ public class BowlingCenter implements Serializable {
     /**
      * The setEndTime function sets the endTime variable to the value of its
      * parameter.
-     * 
-     * @param long endTime Set the endtime variable
-     * 
-     * @return The endtime variable
+     *
+     * @param endTime Set the endtime variable
      */
     public void setEndTime(long endTime) {
         this.endTime = endTime;
@@ -229,7 +225,7 @@ public class BowlingCenter implements Serializable {
     /**
      * The getBowlingAlleyPricePerHour function returns the price per hour of a
      * bowling alley.
-     * 
+     *
      * @return The value of the bowlingalleypriceperhour variable
      */
     public double getBowlingAlleyPricePerHour() {
@@ -239,9 +235,9 @@ public class BowlingCenter implements Serializable {
     /**
      * The setBowlingAlleyPricePerHour function sets the price per hour of a bowling
      * alley.
-     * 
-     * @param double bowlingAlleyPricePerHour Set the price per hour of a bowling
-     *               alley
+     *
+     * @param bowlingAlleyPricePerHour Set the price per hour of a bowling
+     *                                 alley
      */
     public void setBowlingAlleyPricePerHour(double bowlingAlleyPricePerHour) {
         this.bowlingAlleyPricePerHour = bowlingAlleyPricePerHour;
@@ -249,7 +245,7 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The getBowlingShoePrice function returns the price of a bowling shoe.
-     * 
+     *
      * @return The value of the bowlingshoeprice variable
      */
     public double getBowlingShoePrice() {
@@ -258,8 +254,8 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The setBowlingShoePrice function sets the price of a bowling shoe.
-     * 
-     * @param double bowlingShoePrice Set the price of the bowling shoes
+     *
+     * @param bowlingShoePrice Set the price of the bowling shoes
      */
     public void setBowlingShoePrice(double bowlingShoePrice) {
         this.bowlingShoePrice = bowlingShoePrice;
@@ -267,7 +263,7 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The getSenderEmail function returns the sender's email address.
-     * 
+     *
      * @return The email address of the sender
      */
     public String getSenderEmail() {
@@ -277,8 +273,8 @@ public class BowlingCenter implements Serializable {
     /**
      * The setSenderEmail function sets the senderEmail field to the email
      * parameter.
-     * 
-     * @param String email Set the senderemail field
+     *
+     * @param email Set the senderemail field
      */
     public void setSenderEmail(String email) {
         this.senderEmail = email;
@@ -286,7 +282,7 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The getReceiverEmail function returns the receiverEmail variable.
-     * 
+     *
      * @return The receiveremail variable
      */
     public String getReceiverEmail() {
@@ -296,8 +292,8 @@ public class BowlingCenter implements Serializable {
     /**
      * The setReceiverEmail function sets the receiverEmail field to the email
      * parameter.
-     * 
-     * @param String email Set the receiveremail variable
+     *
+     * @param email Set the receiveremail variable
      */
     public void setReceiverEmail(String email) {
         this.receiverEmail = email;
@@ -305,7 +301,7 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The getPassword function returns the password of the sender's email address.
-     * 
+     *
      * @return The password field
      */
     public String getPassword() {
@@ -314,8 +310,8 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The setPassword function sets the password of the sender's email address.
-     * 
-     * @param String password Set the password of the sender's email address
+     *
+     * @param password Set the password of the sender's email address
      */
     public void setPassword(String password) {
         this.password = password;
@@ -323,7 +319,7 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The getSmtpHost function returns the smtpHost variable.
-     * 
+     *
      * @return The smtphost variable
      */
     public String getSmtpHost() {
@@ -333,8 +329,8 @@ public class BowlingCenter implements Serializable {
     /**
      * The setSmtpHost function sets the smtpHost variable to the value of its
      * parameter.
-     * 
-     * @param String smtpHost Set the smtphost variable
+     *
+     * @param smtpHost Set the smtphost variable
      */
     public void setSmtpHost(String smtpHost) {
         this.smtpHost = smtpHost;
@@ -342,7 +338,7 @@ public class BowlingCenter implements Serializable {
 
     /**
      * The getSmtpPort function returns the smtpPort variable.
-     * 
+     *
      * @return The smtpport variable
      */
     public String getSmtpPort() {
@@ -352,8 +348,8 @@ public class BowlingCenter implements Serializable {
     /**
      * The setSmtpPort function sets the smtpPort variable to the value of its
      * parameter.
-     * 
-     * @param String smtpPort Set the smtpport variable
+     *
+     * @param smtpPort Set the smtpport variable
      */
     public void setSmtpPort(String smtpPort) {
         this.smtpPort = smtpPort;

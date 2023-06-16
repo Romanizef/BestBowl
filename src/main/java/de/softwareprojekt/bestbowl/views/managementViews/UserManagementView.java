@@ -471,7 +471,7 @@ public class UserManagementView extends VerticalLayout {
 
         /**
          * The test function is used to filter the users in the grid.
-         * It checks if a user matches all of the given filters.
+         * It checks if a user matches all the given filters.
          * If no filter is set, it will return true for every user.
          *
          * @param user Compare the user object with the search criteria

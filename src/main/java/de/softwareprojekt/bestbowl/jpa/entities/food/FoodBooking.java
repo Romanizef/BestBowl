@@ -1,8 +1,5 @@
 package de.softwareprojekt.bestbowl.jpa.entities.food;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
@@ -12,9 +9,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.ManyToOne;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * FoodBooking is a JPA entity class that represents a booking of food.
- * 
+ *
  * @author Max
  */
 @Entity
@@ -39,8 +39,6 @@ public class FoodBooking implements Serializable {
     /**
      * The FoodBooking function is used to book food for a client at a bowling
      * alley.
-     * 
-     * @return A boolean value, true or false
      */
     public FoodBooking() {
         active = true;
@@ -48,12 +46,9 @@ public class FoodBooking implements Serializable {
 
     /**
      * The FoodBooking function is used to create a new FoodBooking object.
-     * 
-     * @param Food                food Get the name and price of the food
-     * @param BowlingAlleyBooking bowlingAlleyBooking Get the client, bowlingalley
-     *                            and starttime from
      *
-     * @return A foodbooking object, which is a subclass of booking
+     * @param food                Get the name and price of the food
+     * @param bowlingAlleyBooking Get the client, bowlingalley and starttime from
      */
     public FoodBooking(Food food, BowlingAlleyBooking bowlingAlleyBooking) {
         client = bowlingAlleyBooking.getClient();
@@ -67,7 +62,7 @@ public class FoodBooking implements Serializable {
     /**
      * The getClient function returns the client object associated with this
      * FoodBooking.
-     * 
+     *
      * @return The client object
      */
     public Client getClient() {
@@ -76,8 +71,8 @@ public class FoodBooking implements Serializable {
 
     /**
      * The setClient function sets the client of a FoodBooking.
-     * 
-     * @param Client client Set the client of this class
+     *
+     * @param client Set the client of this class
      */
     public void setClient(Client client) {
         this.client = client;
@@ -85,7 +80,7 @@ public class FoodBooking implements Serializable {
 
     /**
      * The getBowlingAlley function returns the bowlingAlley variable.
-     * 
+     *
      * @return The bowlingalley object
      */
     public BowlingAlley getBowlingAlley() {
@@ -95,8 +90,8 @@ public class FoodBooking implements Serializable {
     /**
      * The setBowlingAlley function sets the bowlingAlley variable to the value of
      * its parameter.
-     * 
-     * @param BowlingAlley bowlingAlley Set the bowlingalley variable in the class
+     *
+     * @param bowlingAlley Set the bowlingalley variable in the class
      */
     public void setBowlingAlley(BowlingAlley bowlingAlley) {
         this.bowlingAlley = bowlingAlley;
@@ -104,7 +99,7 @@ public class FoodBooking implements Serializable {
 
     /**
      * The getTimeStamp function returns the timeStamp variable.
-     * 
+     *
      * @return The timestamp variable
      */
     public long getTimeStamp() {
@@ -114,8 +109,8 @@ public class FoodBooking implements Serializable {
     /**
      * The setTimeStamp function sets the timeStamp variable to the value of its
      * parameter.
-     * 
-     * @param long timeStamp Set the timestamp field of the class
+     *
+     * @param timeStamp Set the timestamp field of the class
      */
     public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
@@ -123,7 +118,7 @@ public class FoodBooking implements Serializable {
 
     /**
      * The getName function returns the name of the food item.
-     * 
+     *
      * @return The name of the object
      */
     public String getName() {
@@ -132,9 +127,8 @@ public class FoodBooking implements Serializable {
 
     /**
      * The setName function sets the name of a FoodBooking object.
-     * 
-     * @param String name Set the name of the object
      *
+     * @param name Set the name of the object
      * @return Nothing, so it is a void function
      */
     public void setName(String name) {
@@ -143,7 +137,7 @@ public class FoodBooking implements Serializable {
 
     /**
      * The getAmount function returns the amount of food ordered.
-     * 
+     *
      * @return The amount of the transaction
      */
     public int getAmount() {
@@ -152,8 +146,8 @@ public class FoodBooking implements Serializable {
 
     /**
      * The setAmount function sets the amount of food to be ordered.
-     * 
-     * @param int amount Set the amount of money in the account
+     *
+     * @param amount Set the amount of money in the account
      */
     public void setAmount(int amount) {
         this.amount = amount;
@@ -161,7 +155,7 @@ public class FoodBooking implements Serializable {
 
     /**
      * The getPrice function returns the price of a food item.
-     * 
+     *
      * @return The price of the item
      */
     public double getPrice() {
@@ -170,8 +164,8 @@ public class FoodBooking implements Serializable {
 
     /**
      * The setPrice function sets the price of a food item.
-     * 
-     * @param double price Set the price of the item
+     *
+     * @param price Set the price of the item
      */
     public void setPrice(double price) {
         this.price = price;
@@ -180,7 +174,7 @@ public class FoodBooking implements Serializable {
     /**
      * The isActive function returns a boolean value indicating whether the
      * FoodBooking is active or not.
-     * 
+     *
      * @return A boolean value
      */
     public boolean isActive() {
@@ -189,29 +183,10 @@ public class FoodBooking implements Serializable {
 
     /**
      * The setActive function sets the active variable to true or false.
-     * 
-     * @param boolean active Set the value of the active variable
+     *
+     * @param active Set the value of the active variable
      */
     public void setActive(boolean active) {
         this.active = active;
-    }
-
-    /**
-     * The toString function is used to print out the contents of a FoodBooking
-     * object.
-     * 
-     * @return A string
-     */
-    @Override
-    public String toString() {
-        return "FoodBooking{" +
-                "client=" + client +
-                ", bowlingAlley=" + bowlingAlley +
-                ", timeStamp=" + timeStamp +
-                ", name='" + name + '\'' +
-                ", amount=" + amount +
-                ", price=" + price +
-                ", active=" + active +
-                '}';
     }
 }

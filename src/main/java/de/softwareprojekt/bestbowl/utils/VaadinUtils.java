@@ -38,8 +38,6 @@ public class VaadinUtils {
     /**
      * The VaadinUtils function is a collection of static methods that are used to
      * simplify the creation and configuration of Vaadin components.
-     *
-     * @return A vaadinutils object
      */
     private VaadinUtils() {
     }

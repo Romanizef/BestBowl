@@ -39,7 +39,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 @PageTitle("Schuhverwaltung")
 @RolesAllowed({UserRole.OWNER})
 public class BowlingShoeManagementView extends VerticalLayout {
-    private final BowlingShoeRepository bowlingShoeRepository;
+    private final transient BowlingShoeRepository bowlingShoeRepository;
     private final Binder<BowlingShoe> bowlingShoeBinder = new Binder<>();
     private final Button saveButton = new Button("Sichern");
     private final Button cancelButton = new Button("Abbrechen");
@@ -248,7 +248,7 @@ public class BowlingShoeManagementView extends VerticalLayout {
      * shoe view.
      * It deselects all items in the grid, sets selectedShoe to null, sets
      * editingNewBowlingShoe to false and disables both saveButton and cancelButton.
-     * Finally it calls updateEditBowlingShoeLayoutState() which updates the state
+     * Finally, it calls updateEditBowlingShoeLayoutState() which updates the state
      * of all components in this function's scope (e.g. enables/disables them).
      *
      * @see #updateEditBowlingShoeLayoutState()
@@ -331,7 +331,6 @@ public class BowlingShoeManagementView extends VerticalLayout {
          * by the given parameters.
          *
          * @param dataView
-         * @return A boolean value
          */
         public BowlingShoeFilter(GridListDataView<BowlingShoe> dataView) {
             this.dataView = dataView;
@@ -340,12 +339,12 @@ public class BowlingShoeManagementView extends VerticalLayout {
 
         /**
          * The test function is used to filter the grid.
-         * It checks if the shoe matches all of the given filters.
+         * It checks if the shoe matches all the given filters.
          * If a filter is null, it will be ignored and always return true for that
          * filter.
          *
          * @param shoe
-         * @return True if the shoe matches all of the criteria
+         * @return True if the shoe matches all the criteria
          */
         public boolean test(BowlingShoe shoe) {
             boolean matchesId = matches(String.valueOf(shoe.getId()), id);
@@ -405,7 +404,6 @@ public class BowlingShoeManagementView extends VerticalLayout {
          * The setActive function is used to set the active state of a bowling shoe.
          *
          * @param active Set the active variable to true or false
-         * @return A boolean
          */
         public void setActive(Boolean active) {
             this.active = active;

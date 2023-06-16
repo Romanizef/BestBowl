@@ -130,8 +130,8 @@ public class ClientSearchView extends VerticalLayout {
         TextField emailField = new TextField("E-Mail");
         emailField.setWidthFull();
         emailField.setRequiredIndicatorVisible(true);
-        TextArea commentArea = new TextArea("Kommentar");
-        commentArea.setWidthFull();
+        TextArea dialogCommentArea = new TextArea("Kommentar");
+        dialogCommentArea.setWidthFull();
         HorizontalLayout streetLayout = new HorizontalLayout();
         streetLayout.setWidthFull();
         TextField streetField = new TextField("Straße");
@@ -152,7 +152,7 @@ public class ClientSearchView extends VerticalLayout {
         cityLayout.setFlexGrow(1, cityField);
         Select<Association> associationSelect = createAssociationSelect("Verein");
         associationSelect.setWidthFull();
-        layout.add(firstNameField, lastNameField, emailField, commentArea, streetLayout, cityLayout, associationSelect,
+        layout.add(firstNameField, lastNameField, emailField, dialogCommentArea, streetLayout, cityLayout, associationSelect,
                 createValidationLabelLayout());
         dialog.add(layout);
 
@@ -201,7 +201,7 @@ public class ClientSearchView extends VerticalLayout {
         binder.bind(firstNameField, Client::getFirstName, Client::setFirstName);
         binder.bind(lastNameField, Client::getLastName, Client::setLastName);
         binder.bind(emailField, Client::getEmail, Client::setEmail);
-        binder.bind(commentArea, Client::getComment, Client::setComment);
+        binder.bind(dialogCommentArea, Client::getComment, Client::setComment);
         binder.bind(streetField, client -> client.getAddress().getStreet(),
                 ((client, s) -> client.getAddress().setStreet(s)));
         binder.bind(houseNrField, client -> client.getAddress().getHouseNr(),

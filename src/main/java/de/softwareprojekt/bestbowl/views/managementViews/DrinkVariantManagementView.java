@@ -66,7 +66,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * The DrinkVariantManagementView function creates a new button, which allows
      * the user to create a new drink variant.
      * The DrinkVariantManagementView function also creates a grid form layout,
-     * which displays all of the existing drink variants and their properties in an
+     * which displays all the existing drink variants and their properties in an
      * organized manner.
      *
      * @param drinkVariantRepository
@@ -337,7 +337,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * null, and sets editingNewDrinkVariant to false.
      * Then it creates a new Drink object with one Drink Variant and reads that into
      * the binder.
-     * Finally it updates the state of Edit Drinks Layout and clears all number
+     * Finally, it updates the state of Edit Drinks Layout and clears all number
      * fields in drink variant form children.
      *
      * @see #updateEditDrinkVariantLayoutState()
@@ -358,7 +358,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
     /**
      * The validateDrinkVariantSave function checks if the selected drink variant is
      * valid.
-     * It does so by checking if a drink has been selected, and whether or not there
+     * It does so by checking if a drink has been selected, and whether there
      * are any duplicate variants in the database.
      * If either of these conditions are met, it returns false; otherwise it returns
      * true.
@@ -374,9 +374,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
         Optional<DrinkVariant> dbDrinkVariant = drinkVariantRepository.findById(selectedDrinkVariant.getId());
 
         Set<Integer> drinkVariantMlSet = drinkVariantRepository.findAllMlForDrink(selectedDrinkVariant.getDrink());
-        dbDrinkVariant.ifPresent(drinkVariant -> {
-            drinkVariantMlSet.remove(drinkVariant.getMl());
-        });
+        dbDrinkVariant.ifPresent(drinkVariant -> drinkVariantMlSet.remove(drinkVariant.getMl()));
         if (drinkVariantMlSet.contains(selectedDrinkVariant.getMl())) {
             validationErrorLabel.setText("Ein Getränkevariante mit dieser größe existiert bereits");
             return false;
@@ -462,7 +460,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
 
         /**
          * The test function is used to filter the grid.
-         * It checks if the given drinkVariant matches all of the filters.
+         * It checks if the given drinkVariant matches all the filters.
          *
          * @param drinkVariant
          * @return The result of the matches function

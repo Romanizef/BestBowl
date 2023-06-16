@@ -42,7 +42,7 @@ public class BowlingCenterManagementView extends Div {
 
     /**
      * The BowlingCenterManagementView function is used to manage all the
-     * inmformation of the bowling center.
+     * information of the bowling center.
      *
      * @param bowlingCenterRepository
      */
@@ -142,10 +142,9 @@ public class BowlingCenterManagementView extends Div {
         binder.bind(endTimePicker, bc -> LocalTime.ofSecondOfDay(bc.getEndTime()),
                 (bc, time) -> bc.setEndTime(time.toSecondOfDay()));
         binder.bind(bowlingAlleyPricePerHourField, BowlingCenter::getBowlingAlleyPricePerHour,
-                (BowlingCenter, price) -> bowlingCenter
-                        .setBowlingAlleyPricePerHour(Objects.requireNonNullElse(price, 0.0)));
-        binder.bind(bowlingShoePriceField, BowlingCenter::getBowlingShoePrice, (BowlingCenter,
-                                                                                price) -> bowlingCenter.setBowlingShoePrice(Objects.requireNonNullElse(price, 0.0)));
+                (bc, price) -> bc.setBowlingAlleyPricePerHour(Objects.requireNonNullElse(price, 0.0)));
+        binder.bind(bowlingShoePriceField, BowlingCenter::getBowlingShoePrice,
+                (bc, price) -> bc.setBowlingShoePrice(Objects.requireNonNullElse(price, 0.0)));
         binder.bind(senderEmailField, BowlingCenter::getSenderEmail, BowlingCenter::setSenderEmail);
         binder.bind(receiverEmailField, BowlingCenter::getReceiverEmail, BowlingCenter::setReceiverEmail);
         binder.bind(passwordField, BowlingCenter::getPassword, BowlingCenter::setPassword);

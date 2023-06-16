@@ -1,20 +1,15 @@
 package de.softwareprojekt.bestbowl.jpa.entities.drink;
 
+import jakarta.persistence.*;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-
 /**
  * Drink is a JPA entity representing a drink in the database.
- * 
+ *
  * @author Max
  */
 @Entity
@@ -44,7 +39,7 @@ public class Drink implements Serializable {
      * class.
      * It initializes the drinkVariants field to be a new HashSet, and sets active
      * to true.
-     * 
+     *
      * @return A new drink object
      */
     public Drink() {
@@ -54,10 +49,8 @@ public class Drink implements Serializable {
 
     /**
      * The Drink function is a constructor that creates an object of type Drink.
-     * 
      *
-     * @param Drink other Copy the values of another drink object into this one
-     *
+     * @param other Copy the values of another drink object into this one
      * @return A new drink with the same properties as the other drink
      */
     public Drink(Drink other) {
@@ -70,8 +63,8 @@ public class Drink implements Serializable {
 
     /**
      * The addDrinkVariant function adds a DrinkVariant to the drinkVariants Set.
-     * 
-     * @param DrinkVariant drinkVariant Add a drink variant to the list of drink
+     *
+     * @param drinkVariant Add a drink variant to the list of drink
      *                     variants
      */
     public void addDrinkVariant(DrinkVariant drinkVariant) {
@@ -82,8 +75,8 @@ public class Drink implements Serializable {
     /**
      * The copyValuesOf function copies the values of all fields from another
      * instance of Drink into this one.
-     * 
-     * @param Drink other
+     *
+     * @param other
      */
     public void copyValuesOf(Drink other) {
         this.id = other.id;
@@ -95,7 +88,7 @@ public class Drink implements Serializable {
 
     /**
      * The getId function returns the id of the drink.
-     * 
+     *
      * @return The id of the drink
      */
     public int getId() {
@@ -105,8 +98,8 @@ public class Drink implements Serializable {
     /**
      * The setId function sets the id of a drink to the value passed in as an
      * argument.
-     * 
-     * @param int id
+     *
+     * @param id
      */
     public void setId(int id) {
         this.id = id;
@@ -114,7 +107,7 @@ public class Drink implements Serializable {
 
     /**
      * The getName function returns the name of a drink.
-     * 
+     *
      * @return The name of the drink
      */
     public String getName() {
@@ -123,8 +116,8 @@ public class Drink implements Serializable {
 
     /**
      * The setName function sets the name of a drink.
-     * 
-     * @param String name
+     *
+     * @param name
      */
     public void setName(String name) {
         this.name = name;
@@ -132,7 +125,7 @@ public class Drink implements Serializable {
 
     /**
      * The getDrinkVariants function returns a set of drink variants.
-     * 
+     *
      * @return A set of drinkvariant objects
      */
     public Set<DrinkVariant> getDrinkVariants() {
@@ -141,9 +134,8 @@ public class Drink implements Serializable {
 
     /**
      * The setDrinkVariants function is used to set the drinkVariants variable.
-     * 
-     * @param Set&lt;DrinkVariant&gt; drinkVariants
      *
+     * @param drinkVariants
      * @return A set of drinkvariant objects
      */
     public void setDrinkVariants(Set<DrinkVariant> drinkVariants) {
@@ -152,7 +144,7 @@ public class Drink implements Serializable {
 
     /**
      * The getStockInMilliliters function returns the stockInMilliliters variable.
-     * 
+     *
      * @return The stockinmilliliters variable
      */
     public int getStockInMilliliters() {
@@ -162,8 +154,8 @@ public class Drink implements Serializable {
     /**
      * The setStockInMilliliters function sets the stockInMilliliters variable to
      * the value of its parameter.
-     * 
-     * @param int stockInMilliliters
+     *
+     * @param stockInMilliliters
      */
     public void setStockInMilliliters(int stockInMilliliters) {
         this.stockInMilliliters = stockInMilliliters;
@@ -171,7 +163,7 @@ public class Drink implements Serializable {
 
     /**
      * The getReorderPoint function returns the reorderPoint variable.
-     * 
+     *
      * @return The reorderpoint variable
      */
     public int getReorderPoint() {
@@ -181,17 +173,17 @@ public class Drink implements Serializable {
     /**
      * The setReorderPoint function sets the reorderPoint variable to the value of
      * its parameter.
-     * 
-     * @param int reorderPoint
+     *
+     * @param reorderPoint
      */
     public void setReorderPoint(int reorderPoint) {
         this.reorderPoint = reorderPoint;
     }
 
     /**
-     * The isActive function returns a boolean value indicating whether or not the
+     * The isActive function returns a boolean value indicating if the
      * drink is active.
-     * 
+     *
      * @return A boolean value
      */
     public boolean isActive() {
@@ -201,8 +193,8 @@ public class Drink implements Serializable {
     /**
      * The setActive function sets the active variable to true or false. Determining
      * if the drink is active or not.
-     * 
-     * @param boolean active
+     *
+     * @param active
      */
     public void setActive(boolean active) {
         this.active = active;

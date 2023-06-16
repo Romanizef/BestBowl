@@ -546,7 +546,6 @@ public class ClientManagementView extends VerticalLayout {
          * The setActive function is used to set the active state of a client.
          *
          * @param active
-         * @return A boolean value
          */
         public void setActive(Boolean active) {
             this.active = active;

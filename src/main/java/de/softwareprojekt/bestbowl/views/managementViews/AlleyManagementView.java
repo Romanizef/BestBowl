@@ -42,8 +42,8 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 @PageTitle("Bahnverwaltung")
 @RolesAllowed({UserRole.OWNER})
 public class AlleyManagementView extends VerticalLayout {
+    private final transient BowlingAlleyRepository bowlingAlleyRepository;
     private final Binder<BowlingAlley> binder = new Binder<>();
-    private final BowlingAlleyRepository bowlingAlleyRepository;
     private Grid<BowlingAlley> bowlingAlleyGrid;
     private FormLayout editLayout;
     private BowlingAlley selectedBowlingAlley = null;
@@ -60,7 +60,6 @@ public class AlleyManagementView extends VerticalLayout {
      * their changes.
      *
      * @param bowlingAlleyRepository bowlingAlleyRepository Access the database
-     * @return A horizontallayout
      * @see #updateEditLayoutState()
      * @see #createNewBowlingAlleyButton()
      * @see #createGridLayout()
@@ -255,8 +254,6 @@ public class AlleyManagementView extends VerticalLayout {
     /**
      * The resetEditLayout function resets the editLayout to its default state.
      * This means that all fields are cleared and the layout is disabled.
-     *
-     * @return A bowlingalley object
      */
     private void resetEditLayout() {
         bowlingAlleyGrid.deselectAll();
@@ -314,7 +311,6 @@ public class AlleyManagementView extends VerticalLayout {
      * If a new bowling alley is being created, it adds it to the grid.
      * Otherwise, it refreshes the item in question and resets all edit fields.
      *
-     * @return Void
      * @see #resetEditLayout()
      */
     private void saveToDb() {
@@ -339,7 +335,6 @@ public class AlleyManagementView extends VerticalLayout {
          * It filters by name, address and number of lanes.
          *
          * @param dataView
-         * @return A boolean
          */
         public BowlingAlleyFilter(GridListDataView<BowlingAlley> dataView) {
             this.dataView = dataView;
@@ -348,7 +343,7 @@ public class AlleyManagementView extends VerticalLayout {
 
         /**
          * The test function is used to filter the bowlingAlleys in the grid.
-         * It checks if a given BowlingAlley matches all of the given search criteria.
+         * It checks if a given BowlingAlley matches all the given search criteria.
          *
          * @param bowlingAlley
          * @return A boolean value
@@ -373,7 +368,6 @@ public class AlleyManagementView extends VerticalLayout {
          * The setActive function is used to set the active status of a bowling alley.
          *
          * @param active
-         * @return A boolean
          */
         public void setActive(Boolean active) {
             this.active = active;

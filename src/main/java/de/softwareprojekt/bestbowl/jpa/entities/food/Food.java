@@ -1,16 +1,16 @@
 package de.softwareprojekt.bestbowl.jpa.entities.food;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * Food is a JPA entity representing a food item.
- * 
+ *
  * @author Max
  */
 @Entity
@@ -30,8 +30,6 @@ public class Food implements Serializable {
      * The Food function is a constructor for the Food class.
      * It sets the active variable to true, which means that it is available in the
      * menu.
-     * 
-     * @return A boolean value of true
      */
     public Food() {
         active = true;
@@ -40,10 +38,8 @@ public class Food implements Serializable {
     /**
      * The Food function is a constructor that takes in an object of type Food and
      * copies its values into the new object.
-     * 
-     * @param Food other Copy the values of another food object into this one
      *
-     * @return A new food object with the same values as the other one
+     * @param other Copy the values of another food object into this one
      */
     public Food(Food other) {
         this.id = other.id;
@@ -58,9 +54,9 @@ public class Food implements Serializable {
      * The copyValuesOf function copies the values of all fields from another
      * instance of this class.
      * This is useful for when you want to copy an object's state without having to
-     * worry about whether or not it has been persisted yet.
-     * 
-     * @param Food other Pass the object that you want to copy
+     * worry about if it has been persisted yet.
+     *
+     * @param other Pass the object that you want to copy
      */
     public void copyValuesOf(Food other) {
         this.id = other.id;
@@ -73,7 +69,7 @@ public class Food implements Serializable {
 
     /**
      * The getId function returns the id of the food item.
-     * 
+     *
      * @return The id of the object
      */
     public int getId() {
@@ -82,8 +78,8 @@ public class Food implements Serializable {
 
     /**
      * The setId function sets the id of a food item.
-     * 
-     * @param int id Set the id of the object
+     *
+     * @param id Set the id of the object
      */
     public void setId(int id) {
         this.id = id;
@@ -91,7 +87,7 @@ public class Food implements Serializable {
 
     /**
      * The getName function returns the name of the food item.
-     * 
+     *
      * @return The name of the food item
      */
     public String getName() {
@@ -100,8 +96,8 @@ public class Food implements Serializable {
 
     /**
      * The setName function sets the name of a food item.
-     * 
-     * @param String name Set the name of the food item
+     *
+     * @param name Set the name of the food item
      */
     public void setName(String name) {
         this.name = name;
@@ -109,7 +105,7 @@ public class Food implements Serializable {
 
     /**
      * The getStock function returns the stock of a food item.
-     * 
+     *
      * @return The stock variable
      */
     public int getStock() {
@@ -118,8 +114,8 @@ public class Food implements Serializable {
 
     /**
      * The setStock function sets the stock of a food item.
-     * 
-     * @param int stock Set the stock of a food item
+     *
+     * @param stock Set the stock of a food item
      */
     public void setStock(int stock) {
         this.stock = stock;
@@ -127,7 +123,7 @@ public class Food implements Serializable {
 
     /**
      * The getReorderPoint function returns the reorder point of a food item.
-     * 
+     *
      * @return The reorderpoint variable
      */
     public int getReorderPoint() {
@@ -136,8 +132,8 @@ public class Food implements Serializable {
 
     /**
      * The setReorderPoint function sets the reorder point for a food item.
-     * 
-     * @param int reorderPoint Set the reorderpoint variable
+     *
+     * @param reorderPoint Set the reorderpoint variable
      */
     public void setReorderPoint(int reorderPoint) {
         this.reorderPoint = reorderPoint;
@@ -145,7 +141,7 @@ public class Food implements Serializable {
 
     /**
      * The getPrice function returns the price of a product.
-     * 
+     *
      * @return The price of the item
      */
     public double getPrice() {
@@ -154,17 +150,17 @@ public class Food implements Serializable {
 
     /**
      * The setPrice function sets the price of a product.
-     * 
-     * @param double price Set the price of the item
+     *
+     * @param price Set the price of the item
      */
     public void setPrice(double price) {
         this.price = price;
     }
 
     /**
-     * The isActive function returns a boolean value indicating whether or not the
+     * The isActive function returns a boolean value indicating if the
      * food item is active.
-     * 
+     *
      * @return A boolean value
      */
     public boolean isActive() {
@@ -173,8 +169,8 @@ public class Food implements Serializable {
 
     /**
      * The setActive function sets the active variable to true or false.
-     * 
-     * @param boolean active Set the value of the active field
+     *
+     * @param active Set the value of the active field
      */
     public void setActive(boolean active) {
         this.active = active;

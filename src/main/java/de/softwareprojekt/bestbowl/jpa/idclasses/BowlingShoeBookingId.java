@@ -1,20 +1,23 @@
 package de.softwareprojekt.bestbowl.jpa.idclasses;
 
-import java.io.Serializable;
-import java.util.Objects;
-
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Objects;
+
 /**
  * BowlingShoeBookingId is the composite key for the {@code BowlingShoeBooking}
  * entity.
- * 
+ *
  * @author Ali
  */
 public class BowlingShoeBookingId implements Serializable {
+    @Serial
     private static final long serialVersionUID = 7549075836963205963L;
+
     private Client client;
     private BowlingAlley bowlingAlley;
     private long timeStamp;
@@ -25,15 +28,13 @@ public class BowlingShoeBookingId implements Serializable {
      * BowlingShoeBooking entity.
      * It consists of two attributes: client and bowlingAlley, which are both
      * foreign keys to their respective entities.
-     *
-     * @return The id of the booking
      */
     public BowlingShoeBookingId() {
     }
 
     /**
      * The getClient function returns the client object.
-     * 
+     *
      * @return A client object
      */
     public Client getClient() {
@@ -42,8 +43,8 @@ public class BowlingShoeBookingId implements Serializable {
 
     /**
      * The setClient function sets the client variable to the given Client object.
-     * 
-     * @param Client client Set the client object to the one passed in
+     *
+     * @param client Set the client object to the one passed in
      */
     public void setClient(Client client) {
         this.client = client;
@@ -51,7 +52,7 @@ public class BowlingShoeBookingId implements Serializable {
 
     /**
      * The getBowlingAlley function returns the bowlingAlley variable.
-     * 
+     *
      * @return The bowlingalley object
      */
     public BowlingAlley getBowlingAlley() {
@@ -61,8 +62,8 @@ public class BowlingShoeBookingId implements Serializable {
     /**
      * The setBowlingAlley function sets the bowlingAlley variable to the value of
      * its parameter.
-     * 
-     * @param BowlingAlley bowlingAlley Set the bowlingalley field
+     *
+     * @param bowlingAlley Set the bowlingalley field
      */
     public void setBowlingAlley(BowlingAlley bowlingAlley) {
         this.bowlingAlley = bowlingAlley;
@@ -70,7 +71,7 @@ public class BowlingShoeBookingId implements Serializable {
 
     /**
      * The getTimeStamp function returns the timeStamp variable.
-     * 
+     *
      * @return The timestamp variable
      */
     public long getTimeStamp() {
@@ -80,8 +81,8 @@ public class BowlingShoeBookingId implements Serializable {
     /**
      * The setTimeStamp function sets the timeStamp variable to the value of its
      * parameter.
-     * 
-     * @param long timeStamp Set the timestamp variable
+     *
+     * @param timeStamp Set the timestamp variable
      */
     public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
@@ -89,7 +90,7 @@ public class BowlingShoeBookingId implements Serializable {
 
     /**
      * The getBowlingShoe function returns the bowlingShoe object.
-     * 
+     *
      * @return The bowlingshoe object
      */
     public BowlingShoe getBowlingShoe() {
@@ -99,8 +100,8 @@ public class BowlingShoeBookingId implements Serializable {
     /**
      * The setBowlingShoe function sets the bowlingShoe variable to the value of its
      * parameter.
-     * 
-     * @param BowlingShoe bowlingShoe Set the bowlingshoe field to the value of the
+     *
+     * @param bowlingShoe Set the bowlingshoe field to the value of the
      *                    parameter
      */
     public void setBowlingShoe(BowlingShoe bowlingShoe) {
@@ -110,9 +111,8 @@ public class BowlingShoeBookingId implements Serializable {
     /**
      * The equals function is used to compare two objects of the same type.
      * It returns true if all fields are equal, false otherwise.
-     * 
-     * @param Object o Compare the current object with another object
      *
+     * @param o Compare the current object with another object
      * @return A boolean, so you can't return a hashcode from it
      */
     @Override
@@ -135,7 +135,7 @@ public class BowlingShoeBookingId implements Serializable {
      * If two objects are equal according to the equals(Object) method, then calling
      * the hashCode method on each of the two objects must produce the same integer
      * result (unless an exception is thrown).
-     * 
+     *
      * @return The hashcode of the objects
      */
     @Override
