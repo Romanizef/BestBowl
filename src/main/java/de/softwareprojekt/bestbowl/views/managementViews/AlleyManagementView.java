@@ -1,17 +1,5 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
-import static de.softwareprojekt.bestbowl.utils.Utils.matches;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.clearNumberFieldChildren;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderBoolean;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderInteger;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -31,7 +19,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlley.BowlingAlleyRepository;
 import de.softwareprojekt.bestbowl.utils.constants.UserRole;
@@ -39,13 +26,21 @@ import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.utils.validators.BowlingAlleyValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+import static de.softwareprojekt.bestbowl.utils.Utils.matches;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * @author Matija
  */
 @Route(value = "alleyManagement", layout = MainView.class)
 @PageTitle("Bahnverwaltung")
-@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
+@RolesAllowed({UserRole.OWNER})
 public class AlleyManagementView extends VerticalLayout {
     private final Binder<BowlingAlley> binder = new Binder<>();
     private final BowlingAlleyRepository bowlingAlleyRepository;
@@ -63,9 +58,8 @@ public class AlleyManagementView extends VerticalLayout {
      * The grid layout contains an editable text field for each attribute of a
      * BowlingAlley object, as well as buttons allowing users to save or delete
      * their changes.
-     * 
-     * @param BowlingAlleyRepository bowlingAlleyRepository Access the database
      *
+     * @param bowlingAlleyRepository bowlingAlleyRepository Access the database
      * @return A horizontallayout
      * @see #updateEditLayoutState()
      * @see #createNewBowlingAlleyButton()
@@ -88,7 +82,7 @@ public class AlleyManagementView extends VerticalLayout {
      * bowlingAlleyGrid, creates a new BowlingAlley object and binds it to binder.
      * The editingNewBowlingAlley boolean is set to true and updateEditLayoutState()
      * is called.
-     * 
+     *
      * @return A button
      */
     private Button createNewBowlingAlleyButton() {
@@ -110,7 +104,7 @@ public class AlleyManagementView extends VerticalLayout {
      * populated with the bowlingAlleyGrid and editLayout.
      * The bowlingAlleyGrid is created by calling the createGrid function, while the
      * editLayout is created by calling the createEditLayout function.
-     * 
+     *
      * @return A horizontallayout
      */
     private HorizontalLayout createGridLayout() {
@@ -127,7 +121,7 @@ public class AlleyManagementView extends VerticalLayout {
      * ID, Active. The grid is populated by all BowlingAlleys in the database.
      * A filter header row is added to each column, allowing for filtering of data
      * in that column.
-     * 
+     *
      * @return A grid
      */
     private Grid<BowlingAlley> createGrid() {
@@ -173,7 +167,7 @@ public class AlleyManagementView extends VerticalLayout {
      * selected BowlingAlley.
      * The layout contains an IntegerField for the ID, a Checkbox for whether or not
      * it's active and two buttons: one to save changes and one to cancel them.
-     * 
+     *
      * @return A formlayout
      */
     private FormLayout createEditLayout() {
@@ -204,7 +198,7 @@ public class AlleyManagementView extends VerticalLayout {
     /**
      * The buttonLayoutConfig function creates a HorizontalLayout, which contains
      * two buttons: saveButton and cancelButton.
-     * 
+     *
      * @return The buttonlayout
      */
     private HorizontalLayout buttonLayoutConfig() {
@@ -219,9 +213,8 @@ public class AlleyManagementView extends VerticalLayout {
 
     /**
      * The saveButtonConfig function configures the saveButton.
-     * 
-     * @param saveButton
      *
+     * @param saveButton
      */
     private Button saveButtonConfig(Button saveButton) {
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -237,9 +230,8 @@ public class AlleyManagementView extends VerticalLayout {
     /**
      * The cancelButtonConfig function configures the cancelButton. It sets the icon
      * and add a click listener.
-     * 
-     * @param cancelButton
      *
+     * @param cancelButton
      * @return A button
      */
     private Button cancelButtonConfig(Button cancelButton) {
@@ -254,7 +246,6 @@ public class AlleyManagementView extends VerticalLayout {
      * It sets the validationErrorLabel text to an empty string and enables or
      * disables all children of editLayout depending on whether a bowling alley has
      * been selected.
-     *
      */
     private void updateEditLayoutState() {
         validationErrorLabel.setText("");
@@ -264,7 +255,7 @@ public class AlleyManagementView extends VerticalLayout {
     /**
      * The resetEditLayout function resets the editLayout to its default state.
      * This means that all fields are cleared and the layout is disabled.
-     * 
+     *
      * @return A bowlingalley object
      */
     private void resetEditLayout() {
@@ -283,7 +274,7 @@ public class AlleyManagementView extends VerticalLayout {
      * contains the validationErrorLabel.
      * The validationErrorLabel is used to display error messages when the user
      * tries to save an invalid BowlingAlley.
-     * 
+     *
      * @return A verticallayout
      */
     private VerticalLayout createValidationLabelLayout() {
@@ -303,7 +294,7 @@ public class AlleyManagementView extends VerticalLayout {
     /**
      * The writeBean function is used to write the values of a bean into the binder.
      * The function returns true if it was successful, false otherwise.
-     * 
+     *
      * @return True if the bean is successfully written else false
      */
     private boolean writeBean() {
@@ -322,7 +313,7 @@ public class AlleyManagementView extends VerticalLayout {
      * The saveToDb function saves the selectedBowlingAlley to the database.
      * If a new bowling alley is being created, it adds it to the grid.
      * Otherwise, it refreshes the item in question and resets all edit fields.
-     * 
+     *
      * @return Void
      * @see #resetEditLayout()
      */
@@ -346,9 +337,8 @@ public class AlleyManagementView extends VerticalLayout {
          * The BowlingAlleyFilter function is used to filter the bowling alleys in the
          * grid.
          * It filters by name, address and number of lanes.
-         * 
-         * @param dataView
          *
+         * @param dataView
          * @return A boolean
          */
         public BowlingAlleyFilter(GridListDataView<BowlingAlley> dataView) {
@@ -361,7 +351,6 @@ public class AlleyManagementView extends VerticalLayout {
          * It checks if a given BowlingAlley matches all of the given search criteria.
          *
          * @param bowlingAlley
-         *
          * @return A boolean value
          */
         public boolean test(BowlingAlley bowlingAlley) {
@@ -372,7 +361,7 @@ public class AlleyManagementView extends VerticalLayout {
 
         /**
          * The setId function is used to set the id of a bowling alley.
-         * 
+         *
          * @param id
          */
         public void setId(String id) {
@@ -382,9 +371,8 @@ public class AlleyManagementView extends VerticalLayout {
 
         /**
          * The setActive function is used to set the active status of a bowling alley.
-         * 
-         * @param active
          *
+         * @param active
          * @return A boolean
          */
         public void setActive(Boolean active) {

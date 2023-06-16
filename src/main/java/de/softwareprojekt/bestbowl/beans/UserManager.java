@@ -1,23 +1,19 @@
 package de.softwareprojekt.bestbowl.beans;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
+import de.softwareprojekt.bestbowl.jpa.entities.User;
+import de.softwareprojekt.bestbowl.jpa.repositories.UserRepository;
+import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Component;
 
-import de.softwareprojekt.bestbowl.jpa.entities.User;
-import de.softwareprojekt.bestbowl.jpa.repositories.UserRepository;
+import java.util.*;
 
 /**
  * Class to manage the users and their permissions.
- * 
+ *
  * @author Marten Voß
  */
 @Component
@@ -30,7 +26,7 @@ public class UserManager {
 
     /**
      * Constructor for the UserManager.
-     * 
+     *
      * @param userRepository
      */
     @Autowired
@@ -53,13 +49,30 @@ public class UserManager {
                 UserDetails userDetails = org.springframework.security.core.userdetails.User
                         .withUsername(user.getName())
                         .password(user.getEncodedPassword())
-                        .roles(user.getRole())
+                        .roles(getSubRoles(user.getRole()))
                         .build();
                 currentUserNameList.add(user.getName());
                 userDetailsManager.createUser(userDetails);
                 userDrawerStateMap.putIfAbsent(user.getName(), true);
             }
         }
+    }
+
+    private String[] getSubRoles(String role) {
+        List<String> roles = new ArrayList<>();
+        switch (role) {
+            case UserRole.ADMIN -> {
+                roles.add(UserRole.ADMIN);
+                roles.add(UserRole.OWNER);
+                roles.add(UserRole.EMPLOYEE);
+            }
+            case UserRole.OWNER -> {
+                roles.add(UserRole.OWNER);
+                roles.add(UserRole.EMPLOYEE);
+            }
+            case UserRole.EMPLOYEE -> roles.add(UserRole.EMPLOYEE);
+        }
+        return roles.toArray(new String[0]);
     }
 
     /**
@@ -73,7 +86,7 @@ public class UserManager {
      * @see #updateUsersFromDb()
      */
     public void addNewUser(String name, String password, String securityQuestion, String securityQuestionAnswer,
-            String email, String userRole) {
+                           String email, String userRole) {
         User user = new User();
         user.setName(name);
         user.setEncodedPassword(passwordEncoder.encode(password));
@@ -113,7 +126,7 @@ public class UserManager {
 
     /**
      * Getter for the current drawer state of the user
-     * 
+     *
      * @param userName
      * @return {@code boolean}
      */
@@ -123,7 +136,7 @@ public class UserManager {
 
     /**
      * Toggles the current drawer state of the user
-     * 
+     *
      * @param userName
      */
     public void toggleDrawerStateForUser(String userName) {
@@ -132,7 +145,7 @@ public class UserManager {
 
     /**
      * Getter for the current dark mode state of the user
-     * 
+     *
      * @param userName
      * @return {@code boolean}
      */
@@ -143,7 +156,7 @@ public class UserManager {
 
     /**
      * Setter for the darkmode
-     * 
+     *
      * @param userName
      * @param darkMode
      */
@@ -157,7 +170,7 @@ public class UserManager {
 
     /**
      * Setter for the {@code UserDetailsManager}
-     * 
+     *
      * @param userDetailsManager
      */
     @Autowired
@@ -167,7 +180,7 @@ public class UserManager {
 
     /**
      * Setter for the {@code PasswordEncoder}
-     * 
+     *
      * @param passwordEncoder
      */
     @Autowired

@@ -32,6 +32,8 @@ import de.softwareprojekt.bestbowl.views.managementViews.ManagementView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
@@ -110,13 +112,17 @@ public class MainView extends AppLayout implements AppShellConfigurator {
      * @return {@code Tab[]}
      */
     private Tab[] createMenuItems() {
-        return new Tab[]{
-                createTab(ClientSearchView.class, "Kundensuche", VaadinIcon.USERS),
-                createTab(ArticleBookingView.class, "Extras bestellen", VaadinIcon.FORM),
-                createTab(PendingBookingView.class, "Offene Buchungen", VaadinIcon.CREDIT_CARD),
-                createTab(ManagementView.class, "Verwaltungen", VaadinIcon.DESKTOP),
-                createTab(DatabaseRedirectView.class, "Datenbank", VaadinIcon.DATABASE)
-        };
+        List<Tab> tabList = new ArrayList<>();
+        tabList.add(createTab(ClientSearchView.class, "Kundensuche", VaadinIcon.USERS));
+        tabList.add(createTab(ArticleBookingView.class, "Extras bestellen", VaadinIcon.FORM));
+        tabList.add(createTab(PendingBookingView.class, "Offene Buchungen", VaadinIcon.CREDIT_CARD));
+        if (securityService.isCurrentUserInRole(UserRole.OWNER)) {
+            tabList.add(createTab(ManagementView.class, "Verwaltungen", VaadinIcon.DESKTOP));
+        }
+        if (securityService.isCurrentUserInRole(UserRole.ADMIN)) {
+            tabList.add(createTab(DatabaseRedirectView.class, "Datenbank", VaadinIcon.DATABASE));
+        }
+        return tabList.toArray(new Tab[0]);
     }
 
     /**
@@ -158,7 +164,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
     private void onPageLoaded() {
         if (!reorderEventFired) {
             reorderEventFired = true;
-            if (securityService.isCurrentUserInRole(UserRole.ADMIN, UserRole.OWNER)) {
+            if (securityService.isCurrentUserInRole(UserRole.OWNER)) {
                 reorderService.checkForReorderThreshold();
             }
         }

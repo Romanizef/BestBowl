@@ -73,7 +73,7 @@ public interface BowlingAlleyBookingRepository extends JpaRepository<BowlingAlle
     List<BowlingAlleyBooking> findAllOverdueBookings(@Param("currentTime") long currentTime);
 
     /**
-     * The findAllByClientEqualsAndStartTimeBetweenAndCompletedEquals method returns
+     * The findAllByClientEqualsAndStartTimeBetween method returns
      * all {@link BowlingAlleyBooking}s where the startTime is between the given
      * lowerBound and upperBound and the client equals the given client.
      *
@@ -82,6 +82,6 @@ public interface BowlingAlleyBookingRepository extends JpaRepository<BowlingAlle
      * @param client
      * @return List of {@link BowlingAlleyBooking}s
      */
-    List<BowlingAlleyBooking> findAllByStartTimeBetweenAndClientEqualsOrderByStartTime(long lowerBound,
-                                                                                       long upperBound, Client client);
+    List<BowlingAlleyBooking> findAllByStartTimeBetweenAndClientEquals(long lowerBound,
+                                                                       long upperBound, Client client);
 }

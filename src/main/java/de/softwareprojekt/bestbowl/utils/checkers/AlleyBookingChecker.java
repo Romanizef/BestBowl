@@ -1,18 +1,7 @@
 package de.softwareprojekt.bestbowl.utils.checkers;
 
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.isCurrentUserInRole;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.util.List;
-
-import com.vaadin.flow.spring.security.AuthenticationContext;
-
 import de.softwareprojekt.bestbowl.beans.Repos;
+import de.softwareprojekt.bestbowl.beans.SecurityService;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
@@ -20,9 +9,12 @@ import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 
+import java.time.*;
+import java.util.List;
+
 /**
  * AlleyBookingChecker is used to check if a booking is valid.
- * 
+ *
  * @author Marten Voß
  */
 public class AlleyBookingChecker {
@@ -34,7 +26,7 @@ public class AlleyBookingChecker {
 
     /**
      * The setClient function sets the client variable to the given Client object.
-     * 
+     *
      * @param Client client Set the client field
      */
     public void setClient(Client client) {
@@ -50,11 +42,10 @@ public class AlleyBookingChecker {
      * {@code ZoneId.systemDefault().toEpochSecond()*1000L;}
      * The endtime is calculated by adding {@code durationInMin*60*1000L- 1ms} (to
      * avoid overlap) to starttime
-     * 
+     *
      * @param LocalDate date Set the bookingdate variable
      * @param LocalTime time Set the starttime variable
      * @param int       durationInMin Set the duration of the booking
-     *
      * @return A boolean value
      */
     public void setTimeInfo(LocalDate date, LocalTime time, int durationInMin) {
@@ -66,15 +57,13 @@ public class AlleyBookingChecker {
     /**
      * The checkTime function checks if the booking time is in the past or not.
      * If it is, then an error message will be shown to the user.
-     * 
-     * @param AuthenticationContext authenticationContext Check if the current user
-     *                              is an admin
      *
+     * @param securityService
      * @return A boolean
      */
-    public boolean checkTime(AuthenticationContext authenticationContext) {
+    public boolean checkTime(SecurityService securityService) {
         // admin can book at any time (mainly for testing)
-        if (isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
+        if (securityService.isCurrentUserInRole(UserRole.ADMIN)) {
             return true;
         }
 
@@ -93,7 +82,7 @@ public class AlleyBookingChecker {
     /**
      * The isInBusinessHours function checks if the booking is within the business
      * hours of a bowling center.
-     * 
+     *
      * @return A boolean value
      */
     private boolean isInBusinessHours() {
@@ -112,7 +101,7 @@ public class AlleyBookingChecker {
      * will be returned.
      * If not, false will be returned and no bowling alley will be saved in the
      * availableAlley variable.
-     * 
+     *
      * @return True if there is a free alley, and false otherwise
      */
     public boolean checkAvailability() {
@@ -130,7 +119,7 @@ public class AlleyBookingChecker {
     /**
      * The getAvailableAlleyId function returns the id of the availableAlley object.
      * If no such object exists, it returns 0.
-     * 
+     *
      * @return The id of the availablealley
      */
     public int getAvailableAlleyId() {
@@ -139,7 +128,7 @@ public class AlleyBookingChecker {
 
     /**
      * The book function is used to book a bowling alley.
-     * 
+     *
      * @return A bowling alley booking object
      */
     public BowlingAlleyBooking book() {
@@ -168,7 +157,7 @@ public class AlleyBookingChecker {
 
     /**
      * The getStartTime function returns the startTime variable.
-     * 
+     *
      * @return The starttime
      */
     public long getStartTime() {
@@ -177,7 +166,7 @@ public class AlleyBookingChecker {
 
     /**
      * The getEndTime function returns the endTime variable.
-     * 
+     *
      * @return The endtime variable
      */
     public long getEndTime() {

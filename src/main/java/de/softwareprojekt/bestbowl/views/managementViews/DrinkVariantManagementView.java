@@ -1,20 +1,5 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
-import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.clearNumberFieldChildren;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderBoolean;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderInteger;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderString;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -42,7 +27,6 @@ import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.function.SerializableComparator;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.drink.Drink;
 import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkVariant;
@@ -52,13 +36,19 @@ import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.utils.validators.article.DrinkVariantValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.*;
+
+import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * @author Max Ziller
  */
 @Route(value = "drinkVariantManagement", layout = MainView.class)
 @PageTitle("Getränkevariantenverwaltung")
-@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
+@RolesAllowed({UserRole.OWNER})
 public class DrinkVariantManagementView extends VerticalLayout {
     private final transient DrinkVariantRepository drinkVariantRepository;
     private final Binder<DrinkVariant> drinkVariantBinder = new Binder<>();
@@ -78,12 +68,11 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * The DrinkVariantManagementView function also creates a grid form layout,
      * which displays all of the existing drink variants and their properties in an
      * organized manner.
-     * 
+     *
+     * @param drinkVariantRepository
      * @see #createNewDrinkVariantButton()
      * @see #createGridFormLayout()
      * @see #updateEditDrinkVariantLayoutState()
-     * 
-     * @param drinkVariantRepository
      */
     @Autowired
     public DrinkVariantManagementView(DrinkVariantRepository drinkVariantRepository) {
@@ -99,7 +88,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * to the DrinkVariant object passed in as a parameter.
      * It also updates the state of the EditDrinkVariantLayout and reads in data
      * from drinkVariantBinder.
-     * 
+     *
      * @param selectedDrinkVariant
      */
     public void setSelectedDrinkVariant(DrinkVariant selectedDrinkVariant) {
@@ -116,7 +105,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * DrinkVariant object and assigns it to selectedDrinkVariant.
      * The drinkCB ComboBox is set to NO_DRINK (which is an enum constant of type
      * Drink).
-     * 
+     *
      * @return A button
      */
     private Button createNewDrinkVariantButton() {
@@ -150,11 +139,10 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * The createGridFormLayout function creates a HorizontalLayout, which contains
      * the drinkVariantGrid and the drinkVariantForm.
      * The layout is set to full size.
-     * 
+     *
+     * @return A horizontallayout
      * @see #createDrinkVariantGrid()
      * @see #drinkVariantForm()
-     * 
-     * @return A horizontallayout
      */
     private HorizontalLayout createGridFormLayout() {
         HorizontalLayout layout = new HorizontalLayout();
@@ -172,12 +160,11 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * entering the variant in ml and
      * a NumberField for entering the price of this variant. It also contains two
      * buttons: one to save changes and one to cancel them.
-     * 
+     *
+     * @return A formlayout
      * @see #writeBean()
      * @see #validateDrinkVariantSave()
      * @see #saveToDbAndUpdateDrinkVariant()
-     * 
-     * @return A formlayout
      */
     private FormLayout drinkVariantForm() {
         FormLayout drinkVariantLayout = new FormLayout();
@@ -255,7 +242,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * The createDrinkCB function creates a ComboBox for the Drink entity.
      * It is used in the createDrinkVariantForm function to add a drink to a new
      * DrinkVariant.
-     * 
+     *
      * @return A combobox
      */
     private ComboBox<Drink> createDrinkCB() {
@@ -285,7 +272,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * contains the validationErrorLabel.
      * The validationErrorLabel is used to display error messages when the user
      * tries to save an invalid DrinkVariant.
-     * 
+     *
      * @return A verticallayout
      */
     private VerticalLayout createValidationLabelLayout() {
@@ -305,9 +292,9 @@ public class DrinkVariantManagementView extends VerticalLayout {
     /**
      * The writeBean function is used to write the values of a DrinkVariant object
      * into the form fields.
-     * 
+     *
      * @return True if the DrinkVariant was successfully written to the form fields,
-     *         false otherwise
+     * false otherwise
      */
     private boolean writeBean() {
         try {
@@ -330,7 +317,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * in the grid view. Finally,
      * this function resets all fields of editLayout and shows a notification that
      * informs about successful saving.
-     * 
+     *
      * @see #resetEditLayout()
      */
     private void saveToDbAndUpdateDrinkVariant() {
@@ -352,7 +339,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * the binder.
      * Finally it updates the state of Edit Drinks Layout and clears all number
      * fields in drink variant form children.
-     * 
+     *
      * @see #updateEditDrinkVariantLayoutState()
      */
     private void resetEditLayout() {
@@ -375,7 +362,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * are any duplicate variants in the database.
      * If either of these conditions are met, it returns false; otherwise it returns
      * true.
-     * 
+     *
      * @return True if the selecteddrinkvariant
      */
     private boolean validateDrinkVariantSave() {
@@ -401,10 +388,9 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * The createDrinkVariantGrid function creates a grid that displays all
      * DrinkVariants in the database.
      * The grid is filterable and sortable by each column.
-     * 
-     * @see #updateEditDrinkVariantLayoutState()
-     * 
+     *
      * @return A grid
+     * @see #updateEditDrinkVariantLayoutState()
      */
     private Grid<DrinkVariant> createDrinkVariantGrid() {
         Grid<DrinkVariant> grid = new Grid<>(DrinkVariant.class);
@@ -466,7 +452,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
         /**
          * The DrinkVariantFilter function is a filter function that filters the
          * DrinkVariant grid by name, price and amount.
-         * 
+         *
          * @param dataView
          */
         public DrinkVariantFilter(GridListDataView<DrinkVariant> dataView) {
@@ -477,7 +463,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
         /**
          * The test function is used to filter the grid.
          * It checks if the given drinkVariant matches all of the filters.
-         * 
+         *
          * @param drinkVariant
          * @return The result of the matches function
          */
@@ -493,10 +479,9 @@ public class DrinkVariantManagementView extends VerticalLayout {
         /**
          * The matches function is used to filter the data in the grid.
          * It checks if a given value matches a search term.
-         * 
+         *
          * @param value      Check if the search term is null or empty
          * @param searchTerm Compare the value of the searchterm to a string value
-         *
          * @return True if the searchterm is null or empty,
          */
         private boolean matches(String value, String searchTerm) {
@@ -505,7 +490,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
 
         /**
          * The setId function sets the id of a drink variant.
-         * 
+         *
          * @param id
          */
         public void setId(String id) {
@@ -515,7 +500,6 @@ public class DrinkVariantManagementView extends VerticalLayout {
 
         /**
          * The setName function sets the name of a drink variant.
-         * 
          *
          * @param name
          */
@@ -526,7 +510,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
 
         /**
          * The setMl function sets the milliliter variable to the given String.
-         * 
+         *
          * @param milliliter
          */
         public void setMl(String milliliter) {
@@ -536,7 +520,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
 
         /**
          * The setPrice function sets the price of a drink variant.
-         * 
+         *
          * @param price
          */
         public void setPrice(String price) {
@@ -546,7 +530,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
 
         /**
          * The setActive function is used to set the active state of a drink variant.
-         * 
+         *
          * @param active
          */
         public void setActive(Boolean active) {

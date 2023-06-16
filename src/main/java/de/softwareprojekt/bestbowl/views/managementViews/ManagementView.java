@@ -26,7 +26,7 @@ import java.util.List;
  */
 @Route(value = "verwaltungen", layout = MainView.class)
 @PageTitle("Verwaltungen")
-@RolesAllowed({UserRole.OWNER, UserRole.ADMIN})
+@RolesAllowed({UserRole.OWNER})
 public class ManagementView extends VerticalLayout {
     private static final String VERWALTUNG = "verwaltung";
     private static final String WIDTH = "300px";

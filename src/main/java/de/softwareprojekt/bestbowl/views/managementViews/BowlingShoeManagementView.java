@@ -1,17 +1,5 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
-import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.clearNumberFieldChildren;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderBoolean;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderInteger;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderString;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
-
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -28,7 +16,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoe.BowlingShoeRepository;
 import de.softwareprojekt.bestbowl.utils.Utils;
@@ -37,13 +24,20 @@ import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.articleForms.BowlingShoeForm;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.Optional;
+
+import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * @author Max Ziller
  */
 @Route(value = "shoeManagement", layout = MainView.class)
 @PageTitle("Schuhverwaltung")
-@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
+@RolesAllowed({UserRole.OWNER})
 public class BowlingShoeManagementView extends VerticalLayout {
     private final BowlingShoeRepository bowlingShoeRepository;
     private final Binder<BowlingShoe> bowlingShoeBinder = new Binder<>();
@@ -112,7 +106,6 @@ public class BowlingShoeManagementView extends VerticalLayout {
      * It sets the text of a validation error label and enables or disables all
      * children in a form depending on whether
      * there is currently a selected shoe.
-     *
      */
     private void updateEditBowlingShoeLayoutState() {
         validationErrorLabel.setText("");
@@ -124,7 +117,7 @@ public class BowlingShoeManagementView extends VerticalLayout {
      * contains the bowlingShoeGrid and the BowlingShoeForm.
      * The bowlingShoeGrid is created by calling createBowlingShoeGrid().
      * The BowlingShoeForm is created by calling createBowlingShoeFormLayout().
-     * 
+     *
      * @return A horizontallayout
      * @see #createBowlingShoeGrid()
      * @see #createBowlingShoeFormLayout()
@@ -140,7 +133,7 @@ public class BowlingShoeManagementView extends VerticalLayout {
     /**
      * The createBowlingShoeFormLayout function creates a layout for the bowling
      * shoe form.
-     * 
+     *
      * @return A verticallayout
      */
     private VerticalLayout createBowlingShoeFormLayout() {
@@ -157,7 +150,7 @@ public class BowlingShoeManagementView extends VerticalLayout {
      * contains the validationErrorLabel.
      * The validationErrorLabel is used to display error messages when the user
      * tries to save an invalid BowlingShoeForm.
-     * 
+     *
      * @return A verticallayout
      */
     private VerticalLayout createValidationLabelLayout() {
@@ -236,7 +229,7 @@ public class BowlingShoeManagementView extends VerticalLayout {
      * Otherwise, it will refresh
      * that item in place. After saving/updating, resetEditLayout() is called and a
      * notification is shown
-     * 
+     *
      * @see #resetEditLayout()
      */
     private void saveToDnAndUpdateBowlingShoe() {
@@ -257,7 +250,7 @@ public class BowlingShoeManagementView extends VerticalLayout {
      * editingNewBowlingShoe to false and disables both saveButton and cancelButton.
      * Finally it calls updateEditBowlingShoeLayoutState() which updates the state
      * of all components in this function's scope (e.g. enables/disables them).
-     * 
+     *
      * @see #updateEditBowlingShoeLayoutState()
      */
     private void resetEditLayout() {
@@ -275,7 +268,7 @@ public class BowlingShoeManagementView extends VerticalLayout {
      * The createBowlingShoeGrid function creates a Grid of BowlingShoes.
      * It also adds the ability to filter by ID, boughtAt, size and active.
      * The function returns the created grid.
-     * 
+     *
      * @return A grid&lt;bowlingshoe&gt; object
      */
     private Grid<BowlingShoe> createBowlingShoeGrid() {
@@ -336,9 +329,8 @@ public class BowlingShoeManagementView extends VerticalLayout {
         /**
          * The BowlingShoeFilter function is a filter function that filters the dataView
          * by the given parameters.
-         * 
-         * @param dataView
          *
+         * @param dataView
          * @return A boolean value
          */
         public BowlingShoeFilter(GridListDataView<BowlingShoe> dataView) {
@@ -353,7 +345,6 @@ public class BowlingShoeManagementView extends VerticalLayout {
          * filter.
          *
          * @param shoe
-         *
          * @return True if the shoe matches all of the criteria
          */
         public boolean test(BowlingShoe shoe) {
@@ -368,12 +359,11 @@ public class BowlingShoeManagementView extends VerticalLayout {
          * The matches function is used to filter the grid by a search term.
          * It returns true if the value contains the searchTerm, or if no searchTerm has
          * been entered yet.
-         * 
+         *
          * @param value      Check if the searchterm is null or empty
          * @param searchTerm Search for a specific term in the list
-         *
          * @return True if the searchterm is null or empty, or if the value contains the
-         *         searchterm
+         * searchterm
          */
         private boolean matches(String value, String searchTerm) {
             return searchTerm == null || searchTerm.isEmpty() || value.toLowerCase().contains(searchTerm.toLowerCase());
@@ -381,7 +371,7 @@ public class BowlingShoeManagementView extends VerticalLayout {
 
         /**
          * The setId function is used to set the id of a bowling shoe.
-         * 
+         *
          * @param id
          */
         public void setId(String id) {
@@ -403,7 +393,7 @@ public class BowlingShoeManagementView extends VerticalLayout {
 
         /**
          * The setSize function is used to filter the grid by size.
-         * 
+         *
          * @param size
          */
         public void setSize(String size) {
@@ -413,9 +403,8 @@ public class BowlingShoeManagementView extends VerticalLayout {
 
         /**
          * The setActive function is used to set the active state of a bowling shoe.
-         * 
-         * @param Boolean active Set the active variable to true or false
          *
+         * @param active Set the active variable to true or false
          * @return A boolean
          */
         public void setActive(Boolean active) {

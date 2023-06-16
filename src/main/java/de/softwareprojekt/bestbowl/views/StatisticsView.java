@@ -1,24 +1,12 @@
 package de.softwareprojekt.bestbowl.views;
 
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.VAADIN_PRIMARY_BLUE;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Label;
@@ -27,13 +15,9 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.router.BeforeEvent;
-import com.vaadin.flow.router.HasUrlParameter;
-import com.vaadin.flow.router.OptionalParameter;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-
+import com.vaadin.flow.router.*;
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoeBooking;
@@ -50,6 +34,12 @@ import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.bookingViews.ClientSearchView;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.*;
+
+import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.VAADIN_PRIMARY_BLUE;
 
 /**
  * Creates a view for all bookings to be displayed and downloaded
@@ -58,8 +48,9 @@ import jakarta.annotation.security.RolesAllowed;
  */
 @Route(value = "statistics", layout = MainView.class)
 @PageTitle("Statistiken")
-@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
+@RolesAllowed({UserRole.OWNER})
 public class StatisticsView extends VerticalLayout implements HasUrlParameter<Integer> {
+    private static final String ALL = "Alle";
     private final transient BowlingAlleyBookingRepository bowlingAlleyBookingRepository;
     private final transient DrinkBookingRepository drinkBookingRepository;
     private final transient FoodBookingRepository foodBookingRepository;
@@ -70,7 +61,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
     private Client currentClient;
 
     /**
-     * Constructor for the StatsticView class. Creates all the components
+     * Constructor for the StatisticsView class. Creates all the components
      *
      * @param bookingRepository
      * @param drinkBookingRepository
@@ -79,8 +70,8 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
      */
     @Autowired
     public StatisticsView(BowlingAlleyBookingRepository bookingRepository,
-            DrinkBookingRepository drinkBookingRepository, FoodBookingRepository foodBookingRepository,
-            BowlingShoeBookingRepository shoeBookingRepository) {
+                          DrinkBookingRepository drinkBookingRepository, FoodBookingRepository foodBookingRepository,
+                          BowlingShoeBookingRepository shoeBookingRepository) {
         this.bowlingAlleyBookingRepository = bookingRepository;
         this.drinkBookingRepository = drinkBookingRepository;
         this.foodBookingRepository = foodBookingRepository;
@@ -99,8 +90,8 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
      * Creates a {@code HorizontalLayout} headerLayout that contains the
      * clientHeader and year dropdownfilter.
      *
-     * @see #createYearDropDown()
      * @return {@code HorizontalLayout}
+     * @see #createYearDropDown()
      */
     private Component createHeaderComponents() {
         HorizontalLayout headerLayout = new HorizontalLayout();
@@ -119,13 +110,13 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
      * @return {@code Select<String>}
      */
     private Component createYearDropDown() {
-        List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository
-                .findAll();
+        List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository.findAll();
         List<String> yearList = new ArrayList<>();
         Select<String> select = new Select<>();
         select.setLabel("Sortieren nach Jahr");
         select.getStyle().set("margin-right", "80px");
 
+        yearList.add(ALL);
         for (BowlingAlleyBooking bowlingAlleyBooking : bowlingAlleyBookingList) {
             String stringTime = Utils.toDateString(bowlingAlleyBooking.getStartTime());
             String year = stringTime.substring(6, 10);
@@ -135,15 +126,15 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
 
         // Sort reversed alphabetically
         Comparator<String> reverseComparator = Comparator.reverseOrder();
-        Collections.sort(yearList, reverseComparator);
+        yearList.sort(reverseComparator);
 
         select.setItems(yearList);
+        select.setValue(ALL);
         select.addValueChangeListener(e -> {
-            for (BowlingAlleyBooking bowlingAlleyBooking : bowlingAlleyBookingList) {
-                long longTime = bowlingAlleyBooking.getStartTime();
-                String stringTime = Utils.toDateString(longTime);
-                String bookingYear = stringTime.substring(6, 10);
-
+            String bookingYear = e.getValue();
+            if (bookingYear.equals(ALL)) {
+                updateGridItems();
+            } else {
                 // start and endtime of the chosen year
                 Calendar cal = Calendar.getInstance();
                 cal.set(Calendar.YEAR, Integer.parseInt(bookingYear));
@@ -157,9 +148,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
 
                 long lowerBound = start.getTime();
                 long upperBound = end.getTime();
-                if (bookingYear.equals(select.getValue().toString())) {
-                    updateGridYear(lowerBound, upperBound);
-                }
+                updateGridItems(lowerBound, upperBound);
             }
         });
         return select;
@@ -189,7 +178,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
         VerticalLayout verticallayout = new VerticalLayout();
         verticallayout.setWidth("80%");
         verticallayout.setAlignItems(Alignment.CENTER);
-        verticallayout.add(createLastViewButton(), createRefreshButton());
+        verticallayout.add(createLastViewButton());
 
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.setWidthFull();
@@ -221,49 +210,30 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
     }
 
     /**
-     * Creates a refresh button that updates the grid if a client is selected. Else
-     * the user is returned to the ClientSearchView
-     *
-     * @param layout
-     * @return
-     */
-    private Button createRefreshButton() {
-        Button refreshButton;
-        refreshButton = new Button("Aktualisieren");
-        refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        refreshButton.setIcon(new Icon(VaadinIcon.REFRESH));
-        refreshButton.setWidth("50%");
-        refreshButton.addClickListener(e -> {
-            if (this.currentClient != null) {
-                updateGridItems();
-            } else {
-                UI.getCurrent().navigate(ClientSearchView.class);
-            }
-        });
-        return refreshButton;
-    }
-
-    /**
      * Updates all the grid items to the matching year.
-     * 
+     *
      * @param lowerBound
      * @param upperBound
      */
-    private void updateGridYear(long lowerBound, long upperBound) {
-        bookingGrid.setItems(
-                bowlingAlleyBookingRepository
-                        .findAllByStartTimeBetweenAndClientEqualsOrderByStartTime(lowerBound, upperBound, currentClient));
+    private void updateGridItems(long lowerBound, long upperBound) {
+        List<BowlingAlleyBooking> bookingList = bowlingAlleyBookingRepository
+                .findAllByStartTimeBetweenAndClientEquals(lowerBound, upperBound, currentClient);
+        updateGridItems(bookingList);
+        sumHeader.setText("Jahressumme: " + formatDouble(calculateTotal(bookingList)) + "€");
     }
 
     /**
      * Updates all the grid items to the latest state
      */
     private void updateGridItems() {
-        bookingGrid.setItems(
-                bowlingAlleyBookingRepository
-                        .findAllByClientEquals(currentClient));
+        List<BowlingAlleyBooking> bookingList = bowlingAlleyBookingRepository.findAllByClientEquals(currentClient);
+        updateGridItems(bookingList);
+        sumHeader.setText("Gesamtsumme: " + formatDouble(calculateTotal(bookingList)) + "€");
+    }
 
-        sumHeader.setText("Summe:\n" + calculateTotal());
+    private void updateGridItems(List<BowlingAlleyBooking> bookingList) {
+        GridListDataView<BowlingAlleyBooking> dataView = bookingGrid.setItems(bookingList);
+        dataView.setSortOrder(BowlingAlleyBooking::getStartTime, SortDirection.ASCENDING);
     }
 
     /**
@@ -286,16 +256,16 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
                 })).setHeader("Rechnungsnummer");
         bookingGrid
                 .addColumn(booking -> booking.getClient() == null ? "" : booking.getClient().getId())
-                .setHeader("Kundennummer").setSortable(true);
+                .setHeader("Kundennummer");
         bookingGrid
                 .addColumn(booking -> booking.getClient() == null ? "" : booking.getClient().getLastName())
-                .setHeader("Kundennachname").setSortable(true);
+                .setHeader("Kundennachname");
         bookingGrid
                 .addColumn(booking -> Utils.toDateString(booking.getStartTime())).setHeader("Datum");
-        bookingGrid.addColumn(this::calculateBookingTotal)
+        bookingGrid.addColumn(booking -> formatDouble(calculateBookingTotal(booking)) + "€")
                 .setHeader("Summe");
 
-        bookingGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
+        bookingGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
         bookingGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         bookingGrid.setSizeFull();
         return bookingGrid;
@@ -307,7 +277,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
      * @param bowlingAlleyBooking
      * @return {@code double} total
      */
-    private String calculateBookingTotal(BowlingAlleyBooking bowlingAlleyBooking) {
+    private double calculateBookingTotal(BowlingAlleyBooking bowlingAlleyBooking) {
         List<DrinkBooking> drinkBookingList = drinkBookingRepository
                 .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
                         bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
@@ -328,7 +298,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
         for (BowlingShoeBooking shoeBooking : shoeBookingList) {
             total += shoeBooking.getPrice();
         }
-        return String.format(Locale.GERMANY, "%.2f", total) + "€";
+        return total;
     }
 
     /**
@@ -336,27 +306,12 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
      *
      * @return {@code double} total
      */
-    private String calculateTotal() {
-        List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository
-                .findAllByClientEquals(currentClient);
-        List<DrinkBooking> drinkBookingList = drinkBookingRepository.findAllByClientEquals(currentClient);
-        List<FoodBooking> foodBookingList = foodBookingRepository.findAllByClientEquals(currentClient);
-        List<BowlingShoeBooking> shoeBookingList = shoeBookingRepository.findAllByClientEquals(currentClient);
-
+    private double calculateTotal(List<BowlingAlleyBooking> bookingList) {
         double total = 0.0;
-        for (BowlingAlleyBooking alleyBooking : bowlingAlleyBookingList) {
-            total += alleyBooking.getPriceWithDiscount();
+        for (BowlingAlleyBooking booking : bookingList) {
+            total += calculateBookingTotal(booking);
         }
-        for (DrinkBooking drinkBooking : drinkBookingList) {
-            total += drinkBooking.getPrice() * drinkBooking.getAmount();
-        }
-        for (FoodBooking foodBooking : foodBookingList) {
-            total += foodBooking.getPrice() * foodBooking.getAmount();
-        }
-        for (BowlingShoeBooking shoeBooking : shoeBookingList) {
-            total += shoeBooking.getPrice();
-        }
-        return String.format(Locale.GERMANY, "%.2f", total) + "€";
+        return total;
     }
 
     @Override

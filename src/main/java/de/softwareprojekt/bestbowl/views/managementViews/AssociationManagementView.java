@@ -1,20 +1,5 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
-import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
-import static de.softwareprojekt.bestbowl.utils.Utils.matches;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.clearNumberFieldChildren;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderBoolean;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderInteger;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderString;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -35,7 +20,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
 import de.softwareprojekt.bestbowl.jpa.entities.client.Association;
 import de.softwareprojekt.bestbowl.jpa.repositories.client.AssociationRepository;
 import de.softwareprojekt.bestbowl.utils.constants.UserRole;
@@ -43,6 +27,16 @@ import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.utils.validators.client.AssociationValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
+import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
+import static de.softwareprojekt.bestbowl.utils.Utils.matches;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * Creates a view for all the associations to be created, managed and
@@ -52,7 +46,7 @@ import jakarta.annotation.security.RolesAllowed;
  */
 @Route(value = "associationManagement", layout = MainView.class)
 @PageTitle("Vereinsverwaltung")
-@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
+@RolesAllowed({UserRole.OWNER})
 public class AssociationManagementView extends VerticalLayout {
     private final transient AssociationRepository associationRepository;
     private final Binder<Association> binder = new Binder<>();
@@ -287,7 +281,6 @@ public class AssociationManagementView extends VerticalLayout {
      * The function sets the text of validationErrorLabel to an empty string and
      * enables or disables all children in editLayout depending on whether a
      * selectedAssociation exists.
-     * 
      */
     private void updateEditLayoutState() {
         validationErrorLabel.setText("");
@@ -302,7 +295,7 @@ public class AssociationManagementView extends VerticalLayout {
      * binder.
      * Finally it calls {@code updateEditLayoutState()} and
      * {@code clearNumberFieldChildren(editLayout.getChildren())}
-     * 
+     *
      * @see #updateEditLayoutState()
      */
     private void resetEditLayout() {
@@ -322,7 +315,7 @@ public class AssociationManagementView extends VerticalLayout {
      * contains the validationErrorLabel.
      * The validationErrorLabel is used to display error messages when the user
      * tries to save an invalid Association.
-     * 
+     *
      * @return A vertical layout
      */
     private VerticalLayout createValidationLabelLayout() {
@@ -343,7 +336,7 @@ public class AssociationManagementView extends VerticalLayout {
      * The writeBean function is used to write the values of the form fields into a
      * bean.
      * The function returns true if all fields are valid and false otherwise.
-     * 
+     *
      * @return True if the bean was successfully written else false
      */
     private boolean writeBean() {
@@ -363,7 +356,7 @@ public class AssociationManagementView extends VerticalLayout {
      * If editingNewAssociation is true, it adds a new item to associationGrid's
      * listDataView.
      * Otherwise, it refreshes the item in associationGrid's listDataView.
-     * 
+     *
      * @see #resetEditLayout()
      */
     private void saveToDb() {
@@ -399,7 +392,7 @@ public class AssociationManagementView extends VerticalLayout {
          *
          * @param association
          * @return {@code matchesId} {@code matchesName} {@code matchesDiscount}
-         *         {@code matchesActive}
+         * {@code matchesActive}
          */
         public boolean test(Association association) {
             boolean matchesId = matches(String.valueOf(association.getId()), id);

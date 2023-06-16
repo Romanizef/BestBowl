@@ -1,17 +1,5 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.clearNumberFieldChildren;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderBoolean;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderInteger;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderString;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -29,7 +17,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
 import de.softwareprojekt.bestbowl.jpa.entities.drink.Drink;
 import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkVariant;
 import de.softwareprojekt.bestbowl.jpa.repositories.drink.DrinkRepository;
@@ -38,13 +25,20 @@ import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.articleForms.DrinkForm;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * @author Max Ziller
  */
 @Route(value = "drinkManagement", layout = MainView.class)
 @PageTitle("Getränkeverwaltung")
-@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
+@RolesAllowed({UserRole.OWNER})
 public class DrinkManagementView extends VerticalLayout {
     private final transient DrinkRepository drinkRepository;
     private final Binder<Drink> drinkBinder = new Binder<>();
@@ -123,7 +117,7 @@ public class DrinkManagementView extends VerticalLayout {
      * contains the drinkGrid and the drinkForm.
      * The layout is set to full size, so it will fill up all available space in its
      * parent component.
-     * 
+     *
      * @return A horizontallayout
      */
     private HorizontalLayout createDrinkGridFormLayout() {
@@ -136,7 +130,7 @@ public class DrinkManagementView extends VerticalLayout {
 
     /**
      * The createDrinkFormLayout function creates a layout for the drink form.
-     * 
+     *
      * @return A verticallayout
      */
     private VerticalLayout createDrinkFormLayout() {
@@ -153,7 +147,7 @@ public class DrinkManagementView extends VerticalLayout {
      * contains the validationErrorLabel.
      * The validationErrorLabel is used to display error messages when the user
      * tries to save an invalid DrinkForm.
-     * 
+     *
      * @return A verticallayout
      */
     private VerticalLayout createValidationLabelLayout() {
@@ -172,7 +166,7 @@ public class DrinkManagementView extends VerticalLayout {
 
     /**
      * The writeBean function is used to write the values of a form into an object.
-     * 
+     *
      * @return True if the writing was successful, false otherwise
      */
     private boolean writeBean() {
@@ -190,13 +184,12 @@ public class DrinkManagementView extends VerticalLayout {
     /**
      * The createButton function creates a button that allows the user to save and
      * open a drink variant.
-     * 
+     *
+     * @return A vertical layout with two buttons, the savebutton and the
+     * cancelbutton
      * @see #writeBean()
      * @see #validateDrinkSave()
      * @see #saveToDbAndUpdateDrink()
-     * 
-     * @return A vertical layout with two buttons, the savebutton and the
-     *         cancelbutton
      */
     private Component createButton() {
         VerticalLayout buttonOrderLayout = new VerticalLayout();
@@ -259,7 +252,7 @@ public class DrinkManagementView extends VerticalLayout {
      * the grid. If a new drink is being edited, it will be added to the grid.
      * Otherwise,
      * it will refresh that item in the grid.
-     * 
+     *
      * @see #resetEditLayout()
      */
     private void saveToDbAndUpdateDrink() {
@@ -306,7 +299,7 @@ public class DrinkManagementView extends VerticalLayout {
      * there are any other drinks with that name.
      * If there are no other drinks with that name, then we can save this new drink
      * to our database.
-     * 
+     *
      * @return A boolean
      */
     private boolean validateDrinkSave() {
@@ -329,10 +322,9 @@ public class DrinkManagementView extends VerticalLayout {
      * can be filtered by its respective value.
      * The grid also has a selection listener that enables/disables buttons
      * depending on whether or not an item is selected.
-     * 
-     * @see #updateEditDrinkLayoutState()
-     * 
+     *
      * @return A grid
+     * @see #updateEditDrinkLayoutState()
      */
     private Grid<Drink> createDrinkGrid() {
         Grid<Drink> drinkGrid = new Grid<>(Drink.class);
@@ -395,7 +387,7 @@ public class DrinkManagementView extends VerticalLayout {
         /**
          * The DrinkFilter function is used to filter the drinks in the grid.
          * It filters by name, price and category.
-         * 
+         *
          * @param dataView
          */
         public DrinkFilter(GridListDataView<Drink> dataView) {
@@ -407,9 +399,8 @@ public class DrinkManagementView extends VerticalLayout {
          * The test function is used to filter the grid.
          * It checks if the given drink matches all of the filters.
          * If it does, it returns true and will be displayed in the grid.
-         * 
-         * @param drink Pass the current drink object in the list to be tested against
          *
+         * @param drink Pass the current drink object in the list to be tested against
          * @return True if all the fields match
          */
         public boolean test(Drink drink) {
@@ -430,11 +421,10 @@ public class DrinkManagementView extends VerticalLayout {
          * function will be used to
          * determine whether a drink should be displayed in our grid or not based on
          * what's typed into our filter field.
-         * 
-         * @param String value Compare the value of the searchterm parameter
-         * @param String searchTerm Search for the value of a specific column
          *
-         * @return True if the searchterm is null or empty
+         * @param value Compare the value of the searchterm parameter
+         * @param searchTerm Search for the value of a specific column
+         * @return True if the searchterm is null or empty or is contained
          */
         private boolean matches(String value, String searchTerm) {
             return searchTerm == null || searchTerm.isEmpty() || value.toLowerCase().contains(searchTerm.toLowerCase());
@@ -442,7 +432,7 @@ public class DrinkManagementView extends VerticalLayout {
 
         /**
          * The setId function is used to set the id of a drink.
-         * 
+         *
          * @param id
          */
         public void setId(String id) {
@@ -452,7 +442,7 @@ public class DrinkManagementView extends VerticalLayout {
 
         /**
          * The setName function sets the name of a drink.
-         * 
+         *
          * @param name
          */
         public void setName(String name) {
@@ -462,7 +452,7 @@ public class DrinkManagementView extends VerticalLayout {
 
         /**
          * The setStock function is used to set the stock of a drink.
-         * 
+         *
          * @param stock
          */
         public void setStock(String stock) {
@@ -472,7 +462,7 @@ public class DrinkManagementView extends VerticalLayout {
 
         /**
          * The setReorderPoint function sets the reorder point of a drink.
-         * 
+         *
          * @param reorderPoint
          */
         public void setReorderPoint(String reorderPoint) {
@@ -482,7 +472,7 @@ public class DrinkManagementView extends VerticalLayout {
 
         /**
          * The setActive function is used to set the active state of a drink.
-         * 
+         *
          * @param active
          */
         public void setActive(Boolean active) {

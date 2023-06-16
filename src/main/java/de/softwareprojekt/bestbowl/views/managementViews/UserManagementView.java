@@ -1,20 +1,5 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
-import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
-import static de.softwareprojekt.bestbowl.utils.Utils.matches;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderBoolean;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderInteger;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderString;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.isCurrentUserInRole;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -38,7 +23,7 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.security.AuthenticationContext;
-
+import de.softwareprojekt.bestbowl.beans.SecurityService;
 import de.softwareprojekt.bestbowl.beans.UserManager;
 import de.softwareprojekt.bestbowl.jpa.entities.User;
 import de.softwareprojekt.bestbowl.jpa.repositories.UserRepository;
@@ -49,16 +34,26 @@ import de.softwareprojekt.bestbowl.utils.validators.UserValidator;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
+import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
+import static de.softwareprojekt.bestbowl.utils.Utils.matches;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * @author Marten Voß
  */
 @Route(value = "userManagement", layout = MainView.class)
 @PageTitle("Benutzerverwaltung")
-@RolesAllowed({ UserRole.OWNER, UserRole.ADMIN })
+@RolesAllowed({UserRole.OWNER})
 public class UserManagementView extends VerticalLayout {
     private final transient UserRepository userRepository;
-    private final transient AuthenticationContext authenticationContext;
+    private final transient SecurityService securityService;
     private final Binder<User> binder = new Binder<>();
     private Grid<User> userGrid;
     private FormLayout editLayout;
@@ -74,14 +69,14 @@ public class UserManagementView extends VerticalLayout {
      * management view.
      * It creates a new user button, a grid layout and adds them to the view.
      * The updateEditLayoutState function is called to update the edit layout state.
-     * 
+     *
      * @param userRepository
-     * @param authenticationContex
+     * @param securityService
      */
     @Autowired
-    public UserManagementView(UserRepository userRepository, AuthenticationContext authenticationContext) {
+    public UserManagementView(UserRepository userRepository, SecurityService securityService) {
         this.userRepository = userRepository;
-        this.authenticationContext = authenticationContext;
+        this.securityService = securityService;
         setSizeFull();
         Button newUserButton = createNewUserButton();
         HorizontalLayout gridLayout = createGridLayout();
@@ -97,10 +92,9 @@ public class UserManagementView extends VerticalLayout {
      * selectedUser
      * which is then bound by binder.readBean(selectedUser) and sets editingNewUser
      * to true so that updateEditLayoutState() can be called on it.
-     * 
-     * @see #updateEditLayoutState()
-     * 
+     *
      * @return A button
+     * @see #updateEditLayoutState()
      */
     private Button createNewUserButton() {
         Button button = new Button("Neuen Benutzer hinzufügen");
@@ -121,11 +115,10 @@ public class UserManagementView extends VerticalLayout {
      * populated with the userGrid and editLayout.
      * The userGrid is created by calling the createGrid function, while the
      * editLayout is created by calling the createEditLayout function.
-     * 
+     *
+     * @return A horizontallayout
      * @see #createGrid()
      * @see #createEditLayout()
-     * 
-     * @return A horizontallayout
      */
     private HorizontalLayout createGridLayout() {
         HorizontalLayout layout = new HorizontalLayout();
@@ -144,11 +137,10 @@ public class UserManagementView extends VerticalLayout {
      * The function also adds a selection listener to the grid which updates the
      * edit layout with information about the selected user when one is chosen from
      * within it.
-     * 
-     * @see #updateEditLayoutState()
-     * @see #resetEditLayout()
      *
      * @return A grid, which is added to a vertical layout
+     * @see #updateEditLayoutState()
+     * @see #resetEditLayout()
      */
     private Grid<User> createGrid() {
         Grid<User> grid = new Grid<>(User.class);
@@ -206,13 +198,12 @@ public class UserManagementView extends VerticalLayout {
      * encodedPassword field.
      * The save button saves changes made in this layout to the database and updates
      * them in UserManager.
-     * 
+     *
+     * @return A formlayout
      * @see #writeBean()
      * @see #validateUserSave()
      * @see #resetEditLayout()
      * @see #saveToDbAndUpdateUserManager()
-     *
-     * @return A formlayout
      */
     private FormLayout createEditLayout() {
         FormLayout layout = new FormLayout();
@@ -282,7 +273,7 @@ public class UserManagementView extends VerticalLayout {
             User uneditedUser = new User(selectedUser);
             if (Utils.isStringNotEmpty(passwordField.getValue())) {
                 // saving with a password change
-                if (!isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
+                if (!securityService.isCurrentUserInRole(UserRole.ADMIN)) {
                     Notifications.showInfo("Das Passwort eines Benutzers kann nur als Admin geändert werden");
                     return;
                 }
@@ -324,7 +315,7 @@ public class UserManagementView extends VerticalLayout {
      * contains the validationErrorLabel.
      * The validationErrorLabel is used to display error messages when the user
      * tries to create an account with invalid input.
-     * 
+     *
      * @return A verticallayout
      */
     private VerticalLayout createValidationLabelLayout() {
@@ -345,7 +336,7 @@ public class UserManagementView extends VerticalLayout {
      * The writeBean function is used to write the values of a bean into the fields.
      * This function is called when a user clicks on &quot;Save&quot; in order to
      * save his changes.
-     * 
+     *
      * @return True if the user is valid, and false otherwise
      */
     private boolean writeBean() {
@@ -365,7 +356,7 @@ public class UserManagementView extends VerticalLayout {
      * it.
      * It checks for duplicate names and emails, as well as if there is at least one
      * active admin in the system.
-     * 
+     *
      * @return True if the user is valid, and false otherwise
      */
     private boolean validateUserSave() {
@@ -380,7 +371,7 @@ public class UserManagementView extends VerticalLayout {
         if ((dbUser.isPresent() && dbUser.get().getRole().equals(UserRole.ADMIN))
                 || selectedUser.getRole().equals(UserRole.ADMIN)) {
             // admin users can only be updated by admins
-            if (!isCurrentUserInRole(authenticationContext, UserRole.ADMIN)) {
+            if (!securityService.isCurrentUserInRole(UserRole.ADMIN)) {
                 validationErrorLabel.setText("Nur Admins können Admin Benutzer verwalten");
                 return false;
             }
@@ -435,7 +426,7 @@ public class UserManagementView extends VerticalLayout {
     /**
      * The resetEditLayout function resets the edit layout to its default state.
      * This means that all fields are cleared and the user grid is deselected.
-     * 
+     *
      * @see #updateEditLayoutState()
      */
     private void resetEditLayout() {
@@ -472,9 +463,8 @@ public class UserManagementView extends VerticalLayout {
         /**
          * The UserFilter function is used to filter the GridListDataView of Users.
          * It filters by username, firstname, lastname and role.
-         * 
+         *
          * @param dataView
-         * 
          */
         public UserFilter(GridListDataView<User> dataView) {
             this.dataView = dataView;
@@ -485,9 +475,8 @@ public class UserManagementView extends VerticalLayout {
          * The test function is used to filter the users in the grid.
          * It checks if a user matches all of the given filters.
          * If no filter is set, it will return true for every user.
-         * 
-         * @param user Compare the user object with the search criteria
          *
+         * @param user Compare the user object with the search criteria
          * @return True if all the fields match
          */
         public boolean test(User user) {
@@ -504,7 +493,7 @@ public class UserManagementView extends VerticalLayout {
 
         /**
          * The setId function sets the id of a user.
-         * 
+         *
          * @param id
          */
         public void setId(String id) {
@@ -514,7 +503,7 @@ public class UserManagementView extends VerticalLayout {
 
         /**
          * The setName function sets the name of a user.
-         * 
+         *
          * @param name
          */
         public void setName(String name) {
@@ -524,7 +513,7 @@ public class UserManagementView extends VerticalLayout {
 
         /**
          * The setEmail function sets the email of a user.
-         * 
+         *
          * @param email
          */
         public void setEmail(String email) {
@@ -534,7 +523,7 @@ public class UserManagementView extends VerticalLayout {
 
         /**
          * The setSecurityQuestion function sets the security question of a user.
-         * 
+         *
          * @param securityQuestion
          */
         public void setSecurityQuestion(String securityQuestion) {
@@ -545,7 +534,7 @@ public class UserManagementView extends VerticalLayout {
         /**
          * The setSecurityQuestionAnswer function sets the securityQuestionAnswer
          * variable to the value of its parameter.
-         * 
+         *
          * @param securityQuestionAnswer
          */
         public void setSecurityQuestionAnswer(String securityQuestionAnswer) {
@@ -555,7 +544,7 @@ public class UserManagementView extends VerticalLayout {
 
         /**
          * The setRole function is used to set the role of a user.
-         * 
+         *
          * @param role
          */
         public void setRole(String role) {
@@ -565,7 +554,7 @@ public class UserManagementView extends VerticalLayout {
 
         /**
          * The setActive function is used to set the active status of a user.
-         * 
+         *
          * @param active
          */
         public void setActive(Boolean active) {

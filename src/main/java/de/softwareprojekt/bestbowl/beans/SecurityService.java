@@ -34,22 +34,20 @@ public class SecurityService {
     }
 
     /**
-     * Checks if the current user is one of the given roles
+     * Checks if the current user is in the given role
      *
-     * @param roles roles to be checked
-     * @return if the user has one of the given roles
+     * @param role role to be checked
+     * @return if the user has the role
      */
-    public boolean isCurrentUserInRole(String... roles) {
+    public boolean isCurrentUserInRole(String role) {
         UserDetails userDetails = getAuthenticatedUser();
         if (userDetails == null) {
             return false;
         }
         for (GrantedAuthority grantedAuthority : userDetails.getAuthorities()) {
             String userAuthority = grantedAuthority.getAuthority().toLowerCase();
-            for (String role : roles) {
-                if (userAuthority.contains(role.toLowerCase())) {
-                    return true;
-                }
+            if (userAuthority.contains(role.toLowerCase())) {
+                return true;
             }
         }
         return false;
