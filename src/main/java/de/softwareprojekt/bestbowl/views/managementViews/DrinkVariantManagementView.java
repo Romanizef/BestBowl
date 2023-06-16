@@ -3,8 +3,6 @@ package de.softwareprojekt.bestbowl.views.managementViews;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.combobox.ComboBoxVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -17,6 +15,8 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.select.SelectVariant;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
@@ -55,7 +55,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
     private final Binder<Drink> drinkBinder = new Binder<>();
     private Grid<DrinkVariant> drinkVariantGrid;
     private FormLayout drinkVariantForm;
-    private ComboBox<Drink> drinkCB;
+    private Select<Drink> drinkSelect;
     private DrinkVariant selectedDrinkVariant = null;
     private Label validationErrorLabel;
     private boolean editingNewDrinkVariant = false;
@@ -103,7 +103,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * It adds the LUMO_PRIMARY theme variant to it.
      * When clicked, it deselects all items in drinkVariantGrid, creates a new
      * DrinkVariant object and assigns it to selectedDrinkVariant.
-     * The drinkCB ComboBox is set to NO_DRINK (which is an enum constant of type
+     * The drinkSelect is set to NO_DRINK (which is an enum constant of type
      * Drink).
      *
      * @return A button
@@ -117,7 +117,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
             selectedDrinkVariant = new DrinkVariant();
             drinkVariantBinder.readBean(selectedDrinkVariant);
             editingNewDrinkVariant = true;
-            drinkCB.setValue(Drink.NO_DRINK);
+            drinkSelect.setValue(Drink.NO_DRINK);
             updateEditDrinkVariantLayoutState();
             clearNumberFieldChildren(drinkVariantForm.getChildren());
         });
@@ -170,7 +170,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
         FormLayout drinkVariantLayout = new FormLayout();
         drinkVariantLayout.setWidth("25%");
 
-        drinkCB = createDrinkCB();
+        drinkSelect = createDrinkSelect();
 
         NumberField priceField = new NumberField("Preis");
         IntegerField variantField = new IntegerField("Variante");
@@ -216,11 +216,11 @@ public class DrinkVariantManagementView extends VerticalLayout {
         buttonLayout.add(cancelButton, saveButton);
         buttonLayout.setFlexGrow(1, cancelButton, saveButton);
 
-        drinkVariantLayout.add(drinkCB, variantField, priceField, checkboxLayout, createValidationLabelLayout(),
+        drinkVariantLayout.add(drinkSelect, variantField, priceField, checkboxLayout, createValidationLabelLayout(),
                 buttonLayout);
 
         drinkVariantBinder.withValidator(new DrinkVariantValidator());
-        drinkVariantBinder.bind(drinkCB,
+        drinkVariantBinder.bind(drinkSelect,
                 drinkVariant -> drinkVariant.getDrink() == null ? Drink.NO_DRINK : drinkVariant.getDrink(),
                 ((drinkVariant, drink) -> {
                     if (drink.equals(Drink.NO_DRINK)) {
@@ -239,14 +239,15 @@ public class DrinkVariantManagementView extends VerticalLayout {
     }
 
     /**
-     * The createDrinkCB function creates a ComboBox for the Drink entity.
+     * The createDrinkSelect function creates a Select for the Drink entity.
      * It is used in the createDrinkVariantForm function to add a drink to a new
      * DrinkVariant.
      *
      * @return A combobox
      */
-    private ComboBox<Drink> createDrinkCB() {
-        ComboBox<Drink> drinkCB = new ComboBox<>("Getränk");
+    private Select<Drink> createDrinkSelect() {
+        Select<Drink> select = new Select<>();
+        select.setLabel("Getränk");
 
         List<Drink> drinkList = Repos.getDrinkRepository().findAll();
         Set<Drink> drinkSet = new HashSet<>(drinkList.size() + 1);
@@ -256,15 +257,14 @@ public class DrinkVariantManagementView extends VerticalLayout {
         dataProvider
                 .setSortComparator((SerializableComparator<Drink>) (o1, o2) -> o1.getName().compareTo(o2.getName()));
 
-        drinkCB.setWidthFull();
-        drinkCB.setItems(dataProvider);
-        drinkCB.setValue(Drink.NO_DRINK);
-        drinkCB.setItemLabelGenerator(Drink::getName);
-        drinkCB.setAllowCustomValue(false);
-        drinkCB.setRequiredIndicatorVisible(true);
-        drinkCB.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
+        select.setWidthFull();
+        select.setItems(dataProvider);
+        select.setValue(Drink.NO_DRINK);
+        select.setItemLabelGenerator(Drink::getName);
+        select.setRequiredIndicatorVisible(true);
+        select.addThemeVariants(SelectVariant.LUMO_SMALL);
 
-        return drinkCB;
+        return select;
     }
 
     /**

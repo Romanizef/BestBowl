@@ -4,7 +4,6 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -12,6 +11,7 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.router.*;
 import de.softwareprojekt.bestbowl.beans.Repos;
@@ -63,7 +63,7 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
     private final BowlingCenter bowlingCenter;
     private DatePicker datePicker;
     private TimePicker timePicker;
-    private ComboBox<Duration> durationCB;
+    private Select<Duration> durationSelect;
     private Button checkButton;
     private Label lastBookedBowlingAlleyLabel;
     private Button cancelBookingButton;
@@ -153,18 +153,18 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         timePicker = new TimePicker("Uhrzeit");
         configureTimePicker(timePicker);
 
-        durationCB = new ComboBox<>("Dauer");
-        durationCB.setAllowCustomValue(false);
+        durationSelect = new Select<>();
+        durationSelect.setLabel("Dauer");
         List<Duration> durationList = generateDurationList();
-        durationCB.setItems(durationList);
-        durationCB.setValue(durationList.get(1));
+        durationSelect.setItems(durationList);
+        durationSelect.setValue(durationList.get(1));
 
         checkButton = new Button("Zeit prüfen");
         checkButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         Button wholeDayButton = new Button("Zeige ganzen Tag");
 
-        layout.add(datePicker, timePicker, durationCB, checkButton, wholeDayButton);
+        layout.add(datePicker, timePicker, durationSelect, checkButton, wholeDayButton);
 
         checkButton.addClickListener(e -> {
             if (!checkForBowlingAlleys()) {
@@ -172,7 +172,7 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
                 return;
             }
             alleyBookingChecker.setTimeInfo(datePicker.getValue(), timePicker.getValue(),
-                    (int) (durationCB.getValue().hours() * 60));
+                    (int) (durationSelect.getValue().hours() * 60));
             if (alleyBookingChecker.checkTime(securityService)) {
                 gridLowerBound = alleyBookingChecker.getStartTime();
                 gridUpperBound = alleyBookingChecker.getEndTime();
@@ -264,7 +264,7 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
                 return;
             }
             alleyBookingChecker.setTimeInfo(datePicker.getValue(), timePicker.getValue(),
-                    (int) (durationCB.getValue().hours() * 60));
+                    (int) (durationSelect.getValue().hours() * 60));
             if (alleyBookingChecker.checkTime(securityService)) {
                 gridLowerBound = alleyBookingChecker.getStartTime();
                 gridUpperBound = alleyBookingChecker.getEndTime();

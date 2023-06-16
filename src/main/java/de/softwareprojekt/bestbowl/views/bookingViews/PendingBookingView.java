@@ -4,7 +4,6 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
@@ -12,6 +11,7 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.SortDirection;
@@ -46,7 +46,7 @@ public class PendingBookingView extends VerticalLayout {
     private final transient DrinkBookingRepository drinkBookingRepository;
     private final transient FoodBookingRepository foodBookingRepository;
     private final transient BowlingShoeBookingRepository shoeBookingRepository;
-    private final ComboBox<Mode> modeCB;
+    private final Select<Mode> modeSelect;
     private final Grid<BowlingAlleyBooking> bookingGrid;
     private IntegerField bowlingAlleyField;
     private TextField searchField;
@@ -80,21 +80,20 @@ public class PendingBookingView extends VerticalLayout {
         setAlignItems(Alignment.CENTER);
 
         H1 header = new H1("Offene Buchungen");
-        modeCB = createModeCB();
+        modeSelect = createModeSelect();
         Component searchComponent = createSearchComponent();
         bookingGrid = createGrid();
         Component footerComponent = createFooterComponent();
-        add(header, modeCB, searchComponent, bookingGrid, footerComponent);
+        add(header, modeSelect, searchComponent, bookingGrid, footerComponent);
 
-        updateBookingCache(modeCB.getValue());
+        updateBookingCache(modeSelect.getValue());
         updateGridItems();
         updateComponents();
     }
 
-    private ComboBox<Mode> createModeCB() {
-        ComboBox<Mode> comboBox = new ComboBox<>();
+    private Select<Mode> createModeSelect() {
+        Select<Mode> comboBox = new Select<>();
         comboBox.setWidth("300px");
-        comboBox.setAllowCustomValue(false);
         comboBox.setItems(Mode.values());
         comboBox.setValue(Mode.OVERDUE);
         comboBox.setItemLabelGenerator(Mode::getName);
@@ -187,7 +186,7 @@ public class PendingBookingView extends VerticalLayout {
             }
         }
         GridListDataView<BowlingAlleyBooking> clientGridListDataView = bookingGrid.setItems(bookingList);
-        if (modeCB.getValue() == Mode.OVERDUE) {
+        if (modeSelect.getValue() == Mode.OVERDUE) {
             clientGridListDataView.setSortOrder(BowlingAlleyBooking::getEndTime, SortDirection.ASCENDING);
         } else {
             clientGridListDataView.setSortOrder(BowlingAlleyBooking::getStartTime, SortDirection.ASCENDING);
@@ -250,8 +249,7 @@ public class PendingBookingView extends VerticalLayout {
      * i.e., it adds up the price of all food and drink bookings as well as shoe
      * rentals that were made at the same time for this bowling alley.
      *
-     * @param BowlingAlleyBooking bowlingAlleyBooking Get the client, bowling alley
-     *                            and start time of a booking
+     * @param bowlingAlleyBooking Get the client, bowling alley and start time of a booking
      * @return A string
      */
     private String calculateBookingTotal(BowlingAlleyBooking bowlingAlleyBooking) {

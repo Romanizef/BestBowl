@@ -1,22 +1,12 @@
 package de.softwareprojekt.bestbowl.utils;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasEnabled;
 import com.vaadin.flow.component.HasOrderedComponents;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.combobox.ComboBoxVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.select.SelectVariant;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -24,14 +14,18 @@ import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.SerializableComparator;
-import com.vaadin.flow.spring.security.AuthenticationContext;
-
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Association;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+
 /**
  * The VaadinUtils class contains utility methods for Vaadin components.
- * 
+ *
  * @author Marten Voß
  */
 public class VaadinUtils {
@@ -44,7 +38,7 @@ public class VaadinUtils {
     /**
      * The VaadinUtils function is a collection of static methods that are used to
      * simplify the creation and configuration of Vaadin components.
-     * 
+     *
      * @return A vaadinutils object
      */
     private VaadinUtils() {
@@ -103,13 +97,12 @@ public class VaadinUtils {
      * @return component to be used as a filter
      */
     public static Component createFilterHeaderBoolean(String displayValueTrue, String displayValueFalse,
-            Consumer<Boolean> filterChangeConsumer) {
-        ComboBox<String> comboBox = new ComboBox<>();
-        comboBox.setAllowCustomValue(false);
+                                                      Consumer<Boolean> filterChangeConsumer) {
+        Select<String> comboBox = new Select<>();
         comboBox.setItems("*", displayValueTrue, displayValueFalse);
         comboBox.setValue("*");
         comboBox.setWidthFull();
-        comboBox.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
+        comboBox.addThemeVariants(SelectVariant.LUMO_SMALL);
         comboBox.addValueChangeListener(e -> {
             if (comboBox.getValue().equals(displayValueTrue)) {
                 filterChangeConsumer.accept(Boolean.TRUE);
@@ -123,13 +116,14 @@ public class VaadinUtils {
     }
 
     /**
-     * Creates a ComboBox with all associations in the dropdown
+     * Creates a Select with all associations in the dropdown
      *
-     * @param label Name of the ComboBox
-     * @return ComboBox
+     * @param label Name of the select
+     * @return select
      */
-    public static ComboBox<Association> createAssociationCB(String label) {
-        ComboBox<Association> comboBox = new ComboBox<>(label);
+    public static Select<Association> createAssociationSelect(String label) {
+        Select<Association> select = new Select<>();
+        select.setLabel(label);
 
         List<Association> associationList = Repos.getAssociationRepository().findAll();
         Set<Association> associationSet = new HashSet<>(associationList.size() + 1);
@@ -139,12 +133,11 @@ public class VaadinUtils {
         dataProvider.setSortComparator(
                 (SerializableComparator<Association>) (o1, o2) -> o1.getName().compareTo(o2.getName()));
 
-        comboBox.setItems(dataProvider);
-        comboBox.setValue(Association.NO_ASSOCIATION);
-        comboBox.setAllowCustomValue(false);
-        comboBox.setItemLabelGenerator(Association::getName);
+        select.setItems(dataProvider);
+        select.setValue(Association.NO_ASSOCIATION);
+        select.setItemLabelGenerator(Association::getName);
 
-        return comboBox;
+        return select;
     }
 
     /**
@@ -165,10 +158,9 @@ public class VaadinUtils {
     }
 
     /**
-     * Recursively set the value for all IntegerField child components
+     * Recursively clear the value for all number field type child components
      *
      * @param children stream of all child elements
-     * @param value    new value for all IntegerFields
      */
     public static void clearNumberFieldChildren(Stream<Component> children) {
         children.forEach(component -> {
@@ -187,31 +179,13 @@ public class VaadinUtils {
     }
 
     /**
-     * @param authenticationContext current authentication context
-     * @param role                  role to be checked
-     * @return if the current user has that role
-     */
-    public static boolean isCurrentUserInRole(AuthenticationContext authenticationContext, String role) {
-        Optional<UserDetails> user = authenticationContext.getAuthenticatedUser(UserDetails.class);
-        if (user.isPresent()) {
-            UserDetails userDetails = user.get();
-            for (GrantedAuthority authority : userDetails.getAuthorities()) {
-                if (authority.getAuthority().toLowerCase().contains(role.toLowerCase())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
      * @param confirmationQuestion text of the dialog
      * @param confirmAnswer        text of the confirm button
      * @param cancelAnswer         text of the cancel button
      * @param onConfirm            code to be executed on confirmation
      */
     public static void showConfirmationDialog(String confirmationQuestion, String confirmAnswer, String cancelAnswer,
-            Runnable onConfirm) {
+                                              Runnable onConfirm) {
         ConfirmDialog dialog = new ConfirmDialog();
         dialog.setHeader("Bestätigen");
         dialog.setText(confirmationQuestion);

@@ -3,8 +3,6 @@ package de.softwareprojekt.bestbowl.views.managementViews;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.combobox.ComboBoxVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -15,6 +13,8 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.select.SelectVariant;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
@@ -22,7 +22,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.spring.security.AuthenticationContext;
 import de.softwareprojekt.bestbowl.beans.SecurityService;
 import de.softwareprojekt.bestbowl.beans.UserManager;
 import de.softwareprojekt.bestbowl.jpa.entities.User;
@@ -238,13 +237,12 @@ public class UserManagementView extends VerticalLayout {
         securityQuestionAnswerField.setRequiredIndicatorVisible(true);
         securityQuestionAnswerField.setRequired(true);
 
-        ComboBox<String> roleCB = new ComboBox<>("Benutzerrolle");
-        roleCB.setWidthFull();
-        roleCB.setAllowCustomValue(false);
-        roleCB.setItems(UserRole.getAllValues());
-        roleCB.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
-        roleCB.setRequiredIndicatorVisible(true);
-        roleCB.setRequired(true);
+        Select<String> roleSelect = new Select<>();
+        roleSelect.setLabel("Benutzerrolle");
+        roleSelect.setWidthFull();
+        roleSelect.setItems(UserRole.getAllValues());
+        roleSelect.addThemeVariants(SelectVariant.LUMO_SMALL);
+        roleSelect.setRequiredIndicatorVisible(true);
 
         HorizontalLayout checkboxLayout = new HorizontalLayout();
         checkboxLayout.setAlignItems(Alignment.CENTER);
@@ -266,7 +264,7 @@ public class UserManagementView extends VerticalLayout {
         buttonLayout.add(cancelButton, saveButton);
         buttonLayout.setFlexGrow(1, cancelButton, saveButton);
 
-        layout.add(nameField, emailField, passwordField, securityQuestionField, securityQuestionAnswerField, roleCB,
+        layout.add(nameField, emailField, passwordField, securityQuestionField, securityQuestionAnswerField, roleSelect,
                 checkboxLayout, createValidationLabelLayout(), buttonLayout);
 
         saveButton.addClickListener(clickEvent -> {
@@ -304,7 +302,7 @@ public class UserManagementView extends VerticalLayout {
         binder.bind(passwordField, user -> "", (user, s) -> user.setEncodedPassword(userManager.encodePassword(s)));
         binder.bind(securityQuestionField, User::getSecurityQuestion, User::setSecurityQuestion);
         binder.bind(securityQuestionAnswerField, User::getSecurityQuestionAnswer, User::setSecurityQuestionAnswer);
-        binder.bind(roleCB, User::getRole, User::setRole);
+        binder.bind(roleSelect, User::getRole, User::setRole);
         binder.bind(activeCheckbox, User::isActive,
                 (user, active) -> user.setActive(Objects.requireNonNullElse(active, false)));
         return layout;

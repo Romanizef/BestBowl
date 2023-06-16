@@ -4,7 +4,6 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -14,6 +13,7 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextAreaVariant;
@@ -42,7 +42,7 @@ import java.util.*;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.clearNumberFieldChildren;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createAssociationCB;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createAssociationSelect;
 
 /**
  * Creates a View in which the user can search for a Client.
@@ -150,9 +150,9 @@ public class ClientSearchView extends VerticalLayout {
         cityField.setRequiredIndicatorVisible(true);
         cityLayout.add(postCodeField, cityField);
         cityLayout.setFlexGrow(1, cityField);
-        ComboBox<Association> associationCB = createAssociationCB("Verein");
-        associationCB.setWidthFull();
-        layout.add(firstNameField, lastNameField, emailField, commentArea, streetLayout, cityLayout, associationCB,
+        Select<Association> associationSelect = createAssociationSelect("Verein");
+        associationSelect.setWidthFull();
+        layout.add(firstNameField, lastNameField, emailField, commentArea, streetLayout, cityLayout, associationSelect,
                 createValidationLabelLayout());
         dialog.add(layout);
 
@@ -210,7 +210,7 @@ public class ClientSearchView extends VerticalLayout {
                 ((client, i) -> client.getAddress().setPostCode(Objects.requireNonNullElse(i, 0))));
         binder.bind(cityField, client -> client.getAddress().getCity(),
                 ((client, s) -> client.getAddress().setCity(s)));
-        binder.bind(associationCB,
+        binder.bind(associationSelect,
                 client -> client.getAssociation() == null ? Association.NO_ASSOCIATION : client.getAssociation(),
                 ((client, association) -> {
                     if (association.equals(Association.NO_ASSOCIATION)) {

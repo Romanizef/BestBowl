@@ -3,8 +3,6 @@ package de.softwareprojekt.bestbowl.views.managementViews;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.combobox.ComboBoxVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -15,6 +13,8 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.select.SelectVariant;
 import com.vaadin.flow.component.textfield.*;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -217,9 +217,9 @@ public class ClientManagementView extends VerticalLayout {
         commentArea.setWidthFull();
         commentArea.addThemeVariants(TextAreaVariant.LUMO_SMALL);
 
-        ComboBox<Association> associationCB = createAssociationCB("Verein");
-        associationCB.setWidthFull();
-        associationCB.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
+        Select<Association> associationSelect = createAssociationSelect("Verein");
+        associationSelect.setWidthFull();
+        associationSelect.addThemeVariants(SelectVariant.LUMO_SMALL);
 
         TextField streetField = new TextField("Straße");
         streetField.setWidthFull();
@@ -261,7 +261,7 @@ public class ClientManagementView extends VerticalLayout {
         buttonLayout.add(cancelButton, saveButton);
         buttonLayout.setFlexGrow(1, cancelButton, saveButton);
 
-        layout.add(firstNameField, lastNameField, emailField, commentArea, associationCB, streetField, houseNrField,
+        layout.add(firstNameField, lastNameField, emailField, commentArea, associationSelect, streetField, houseNrField,
                 postCodeField, cityField, checkboxLayout, createValidationLabelLayout(), buttonLayout);
 
         saveButton.addClickListener(clickEvent -> {
@@ -286,7 +286,7 @@ public class ClientManagementView extends VerticalLayout {
         binder.bind(lastNameField, Client::getLastName, Client::setLastName);
         binder.bind(emailField, Client::getEmail, Client::setEmail);
         binder.bind(commentArea, Client::getComment, Client::setComment);
-        binder.bind(associationCB,
+        binder.bind(associationSelect,
                 client -> client.getAssociation() == null ? Association.NO_ASSOCIATION : client.getAssociation(),
                 ((client, association) -> {
                     if (association.equals(Association.NO_ASSOCIATION)) {
