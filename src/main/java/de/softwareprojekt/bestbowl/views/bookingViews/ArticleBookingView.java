@@ -11,6 +11,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabSheet;
@@ -46,9 +47,11 @@ import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
+import static de.softwareprojekt.bestbowl.utils.Utils.toHourOnlyString;
 
 /**
  * Creates a View for the extra bookings, like food, drinks and shoes.
@@ -79,8 +82,8 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     private Div shoeDiv;
     private VerticalLayout foodLayoutForAddItem;
     private VerticalLayout drinkLayoutForAddItem;
-    private Button addItem;
-    private Button goToBill;
+    private Button addItemButton;
+    private Button goToBillButton;
     private Button deleteChangesButton;
     private boolean panelChanges;
     private H1 header;
@@ -124,13 +127,16 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         header = new H1();
-        Component alleyButtonsComponent = createAlleyButtonsComponent();
         Component articlePanelComponent = createArticlePanelComponent();
+        Scroller scroller = new Scroller();
+        scroller.setScrollDirection(Scroller.ScrollDirection.HORIZONTAL);
+        Component alleyButtonsComponent = createAlleyButtonsComponent();
+        scroller.setContent(alleyButtonsComponent);
         Component footerButtons = createFooterButtons();
-        goToBill.setEnabled(false);
-        addItem.setEnabled(false);
+        goToBillButton.setEnabled(false);
+        addItemButton.setEnabled(false);
         deleteChangesButton.setEnabled(false);
-        add(header, alleyButtonsComponent, articlePanelComponent, footerButtons);
+        add(header, alleyButtonsComponent,scroller, articlePanelComponent, footerButtons);
         updateHeader();
     }
 
@@ -138,8 +144,11 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         if (currentBowlingAlleyBooking == null) {
             header.setText("Keine Bahn ausgewählt");
         } else {
-            header.setText("Bahn: " + currentBowlingAlleyBooking.getBowlingAlley().getId() +
-                    "\nKunde: " + currentBowlingAlleyBooking.getClient().getFullName());
+            String text = "Bahn: " + currentBowlingAlleyBooking.getBowlingAlley().getId() + " , " +
+                    currentBowlingAlleyBooking.getClient().getFullName() + " , " +
+                    toDateString(currentBowlingAlleyBooking.getStartTime()) + " - " +
+                    toHourOnlyString(currentBowlingAlleyBooking.getEndTime() + 1);
+            header.setText(text);
         }
     }
 
@@ -157,7 +166,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
                 TabSheetVariant.LUMO_TABS_CENTERED,
                 TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS,
                 TabSheetVariant.MATERIAL_BORDERED);
-        tabs.setHeight("calc(100vh - 360px)");
+        tabs.setHeightFull();
         Tab drink = new Tab(VaadinIcon.COFFEE.create(), new Span("Getränke"));
         Tab food = new Tab(VaadinIcon.CROSS_CUTLERY.create(), new Span("Speisen"));
         Tab shoe = new Tab(VaadinIcon.RETWEET.create(), new Span("Schuhe"));
@@ -182,9 +191,17 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     private Component createShoePanel() {
         shoePanel = new ShoePanel(bowlingShoeRepository, currentBowlingAlleyBooking.getClient());
         shoePanel.getShoeAmountField().addValueChangeListener(integerFieldIntegerComponentValueChangeEvent -> {
-            addItem.setEnabled(true);
+            addItemButton.setEnabled(true);
             deleteChangesButton.setEnabled(true);
-            panelChanges = true;
+            if(integerFieldIntegerComponentValueChangeEvent.getValue()== 0){
+                panelChanges = false;
+                addItemButton.setEnabled(false);
+                deleteChangesButton.setEnabled(false);
+            }else{
+                panelChanges = true;
+                addItemButton.setEnabled(true);
+                deleteChangesButton.setEnabled(true);
+            }
         });
         return shoePanel;
     }
@@ -216,16 +233,23 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
                 drinkPanel.getVariantLayout().getChildren().forEach(component -> {
                     if (component instanceof IntegerField integerField) {
                         integerField.addValueChangeListener(integerFieldIntegerComponentValueChangeEvent -> {
-                            addItem.setEnabled(true);
+                            addItemButton.setEnabled(true);
                             deleteChangesButton.setEnabled(true);
-                            panelChanges = true;
+                            if(integerFieldIntegerComponentValueChangeEvent.getValue()== 0){
+                                panelChanges = false;
+                                addItemButton.setEnabled(false);
+                                deleteChangesButton.setEnabled(false);
+                            }else{
+                                panelChanges = true;
+                                addItemButton.setEnabled(true);
+                                deleteChangesButton.setEnabled(true);
+                            }
                         });
                     }
                 });
                 layout.add(drinkPanel);
             }
         }
-
         drinkLayoutForAddItem = layout;
         return layout;
     }
@@ -246,9 +270,15 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         for (Food food : foodList) {
             FoodPanel foodPanel = new FoodPanel(food, currentBowlingAlleyBooking, foodBookingMap);
             foodPanel.getFoodAmountField().addValueChangeListener(integerFieldIntegerComponentValueChangeEvent -> {
-                addItem.setEnabled(true);
-                deleteChangesButton.setEnabled(true);
-                panelChanges = true;
+                if(integerFieldIntegerComponentValueChangeEvent.getValue()== 0){
+                    panelChanges = false;
+                    addItemButton.setEnabled(false);
+                    deleteChangesButton.setEnabled(false);
+                }else{
+                    panelChanges = true;
+                    addItemButton.setEnabled(true);
+                    deleteChangesButton.setEnabled(true);
+                }
             });
             layout.add(foodPanel);
         }
@@ -286,9 +316,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository
                 .findAllByTimePeriodsOverlapping(System.currentTimeMillis());
 
-        if (bowlingAlleyBookingList.isEmpty()) {
-            Notifications.showError("Es sind zurzeit keine Bahnen gebucht");
-        }
+
 
         for (BowlingAlley bowlingAlley : bowlingAlleyList) {
             Button alleyButton = new Button("Bahn " + bowlingAlley.getId());
@@ -297,12 +325,16 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
             alleyButton.setEnabled(!freeBowlingAlleyHashSet.contains(bowlingAlley.getId()));
             BowlingAlleyBooking tempBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(
                     bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == bowlingAlley.getId()).findFirst().orElse(null);
-
             if (tempBowlingAlleyBooking != null && tempBowlingAlleyBooking.isCompleted()) {
-                alleyButton.setEnabled(false);
+                alleyButton.removeThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                alleyButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
             }
             alleyButton.addClickListener(buttonClickEvent -> {
-                AtomicBoolean dialogAnswer = new AtomicBoolean(false);
+                if (tempBowlingAlleyBooking != null && tempBowlingAlleyBooking.isCompleted()) {
+                    changeTabsCompletedBooking();
+                    header.setText(alleyButton.getText()  +" wurde schon bezahlt");
+                    return;
+                }
                 if (panelChanges) {
                     VaadinUtils.showConfirmationDialog("Änderungen sind nicht gespeichert. Trotzdem Bahn wechseln?", "Ja", "Abbrechen", () -> {
                         alleyButtonOnChange(bowlingAlleyBookingList, alleyButton);
@@ -316,6 +348,15 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         return alleyLayout;
     }
 
+    private void changeTabsCompletedBooking() {
+        drinkDiv.removeAll();
+        foodDiv.removeAll();
+        shoeDiv.removeAll();
+        drinkDiv.add(new Text("Bahn wurde schon bezahlt"));
+        foodDiv.add(new Text("Bahn wurde schon bezahlt"));
+        shoeDiv.add(new Text("Bahn wurde schon bezahlt"));
+    }
+
 
     private void alleyButtonOnChange(List<BowlingAlleyBooking> bowlingAlleyBookingList, Button alleyButton) {
         changePreviousButtonStyle(currentBowlingAlleyId);
@@ -325,11 +366,11 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
                         bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
                 .findFirst()
                 .orElse(null);
-        changeTabs();
+        changeTabsPendingBooking();
         updateHeader();
-        goToBill.setEnabled(true);
+        goToBillButton.setEnabled(true);
         deleteChangesButton.setEnabled(false);
-        addItem.setEnabled(false);
+        addItemButton.setEnabled(false);
         panelChanges = false;
     }
 
@@ -338,7 +379,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
      * selection.
      * Necessary because there is no bowling alley selected at the start
      */
-    private void changeTabs() {
+    private void changeTabsPendingBooking() {
         drinkDiv.removeAll();
         foodDiv.removeAll();
         shoeDiv.removeAll();
@@ -372,32 +413,32 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
      * @return The footer buttons component.
      */
     private Component createFooterButtons() {
-        VerticalLayout layout = new VerticalLayout();
+        HorizontalLayout layout = new HorizontalLayout();
         layout.setWidthFull();
         layout.setAlignItems(Alignment.CENTER);
-        addItem = new Button("Bestellung speichern");
-        goToBill = new Button("Zur Rechnungserstellung");
+        addItemButton = new Button("Bestellung speichern");
+        goToBillButton = new Button("Zur Rechnungserstellung");
         deleteChangesButton = new Button("Änderungen verwerfen");
-        addItem.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        addItemButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         deleteChangesButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        deleteChangesButton.setWidth("50%");
-        addItem.setWidth("55%");
         String bHeight = "55px";
-        addItem.setHeight(bHeight);
-        goToBill.setWidth("40%");
-        goToBill.setHeight(bHeight);
+        addItemButton.setHeight(bHeight);
+        goToBillButton.setHeight(bHeight);
         deleteChangesButton.setHeight(bHeight);
+        layout.expand(addItemButton, deleteChangesButton, goToBillButton);
 
-        addItem.addClickListener(buttonClickEvent -> {
+        addItemButton.addClickListener(buttonClickEvent -> {
             addAllNewDrinkBookings();
             addAllNewFoodBookings();
             addAllNewShoeBookings();
-            changeTabs();
+            changeTabsPendingBooking();
             panelChanges = false;
-            Notifications.showInfo("Buchungen wurden gespeichert");//Todo String mit allen Items vllt
+            deleteChangesButton.setEnabled(false);
+            addItemButton.setEnabled(false);
+            Notifications.showInfo("Buchungen wurden gespeichert");
         });
 
-        goToBill.addClickListener(buttonClickEvent -> {
+        goToBillButton.addClickListener(buttonClickEvent -> {
             addAllNewDrinkBookings();
             addAllNewFoodBookings();
             addAllNewShoeBookings();
@@ -419,9 +460,11 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
             });
             shoePanel.resetIntegerField();
             panelChanges = false;
+            deleteChangesButton.setEnabled(false);
+            addItemButton.setEnabled(false);
         });
 
-        layout.add(addItem, deleteChangesButton, goToBill);
+        layout.add( deleteChangesButton, addItemButton, goToBillButton);
         return layout;
     }
 
@@ -579,25 +622,24 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter Integer parameter) {
         if (parameter == null) {
+            List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository
+                    .findAllByTimePeriodsOverlapping(System.currentTimeMillis());
+
+            if (bowlingAlleyBookingList.isEmpty()) {
+                Notifications.showError("Es sind zurzeit keine Bahnen gebucht");
+            }
             for (Button button : buttonMap.values()) {
                 if (button.isEnabled()) {
                     button.setAutofocus(true);
-                    List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository
-                            .findAllByTimePeriodsOverlapping(System.currentTimeMillis());
-
-                    if (bowlingAlleyBookingList.isEmpty()) {
-                        Notifications.showError("Es sind zurzeit keine Bahnen gebucht");
-                        break;
-                    }
                     currentBowlingAlleyId = Integer.parseInt(button.getText().replaceAll("\\D+(\\d+)", "$1"));
                     changeCurrentButtonStyle(currentBowlingAlleyId);
                     currentBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(
                                     bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
                             .findFirst()
                             .orElse(null);
-                    changeTabs();
+                    changeTabsPendingBooking();
                     updateHeader();
-                    goToBill.setEnabled(true);
+                    goToBillButton.setEnabled(true);
                     break;
                 }
             }
@@ -605,15 +647,15 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         }
         Optional<BowlingAlleyBooking> bowlingAlleyBookingOptional = bowlingAlleyBookingRepository.findById(parameter);
         bowlingAlleyBookingOptional.ifPresent(booking -> {
-            if (booking.isActive()) {
+            if (booking.isActive() && !booking.isCompleted()) {
                 this.currentBowlingAlleyBooking = booking;
                 this.currentBowlingAlleyId = booking.getBowlingAlley().getId();
                 buttonMap.get(currentBowlingAlleyId).setAutofocus(true);
                 changePreviousButtonStyle(currentBowlingAlleyId);
                 changeCurrentButtonStyle(currentBowlingAlleyId);
-                changeTabs();
+                changeTabsPendingBooking();
                 updateHeader();
-                goToBill.setEnabled(true);
+                goToBillButton.setEnabled(true);
             }
         });
     }
