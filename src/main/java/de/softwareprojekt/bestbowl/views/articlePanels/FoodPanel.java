@@ -73,6 +73,10 @@ public class FoodPanel extends HorizontalLayout {
         add(label, foodAmountField);
     }
 
+    public IntegerField getFoodAmountField() {
+        return foodAmountField;
+    }
+
     /**
      * The addCSS function adds CSS styling to the FoodPanel.
      */

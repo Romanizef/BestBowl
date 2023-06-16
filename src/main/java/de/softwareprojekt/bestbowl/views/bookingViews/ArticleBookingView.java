@@ -1,22 +1,12 @@
 package de.softwareprojekt.bestbowl.views.bookingViews;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -25,12 +15,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
-import com.vaadin.flow.router.BeforeEvent;
-import com.vaadin.flow.router.HasUrlParameter;
-import com.vaadin.flow.router.OptionalParameter;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-
+import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.router.*;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
@@ -57,6 +43,12 @@ import de.softwareprojekt.bestbowl.views.articlePanels.DrinkPanel;
 import de.softwareprojekt.bestbowl.views.articlePanels.FoodPanel;
 import de.softwareprojekt.bestbowl.views.articlePanels.ShoePanel;
 import jakarta.annotation.security.PermitAll;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Creates a View for the extra bookings, like food, drinks and shoes.
@@ -78,6 +70,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     private final Map<String, DrinkBooking> drinkBookingMap = new HashMap<>();
     private final Map<String, FoodBooking> foodBookingMap = new HashMap<>();
     private final Map<Integer, Button> buttonMap;
+    private final BowlingCenter bowlingCenter;
     private int currentBowlingAlleyId;
     private BowlingAlleyBooking currentBowlingAlleyBooking;
     private Div drinkDiv;
@@ -88,10 +81,13 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     private VerticalLayout drinkLayoutForAddItem;
     private Button addItem;
     private Button goToBill;
-    private final BowlingCenter bowlingCenter;
+    private Button deleteChangesButton;
+    private boolean panelChanges;
+    private H1 header;
+
 
     /**
-     * Creates a new instance of the ExtrasView.
+     * Creates a new instance of the ArticleBookingView.
      *
      * @param drinkRepository               the repository for drinks
      * @param foodRepository                the repository for food
@@ -105,14 +101,14 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
      */
     @Autowired
     public ArticleBookingView(DrinkRepository drinkRepository,
-            FoodRepository foodRepository,
-            BowlingAlleyRepository bowlingAlleyRepository,
-            BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
-            FoodBookingRepository foodBookingRepository,
-            DrinkBookingRepository drinkBookingRepository,
-            BowlingShoeRepository bowlingShoeRepository,
-            BowlingShoeBookingRepository bowlingShoeBookingRepository,
-            BowlingCenterRepository bowlingCenterRepository) {
+                              FoodRepository foodRepository,
+                              BowlingAlleyRepository bowlingAlleyRepository,
+                              BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
+                              FoodBookingRepository foodBookingRepository,
+                              DrinkBookingRepository drinkBookingRepository,
+                              BowlingShoeRepository bowlingShoeRepository,
+                              BowlingShoeBookingRepository bowlingShoeBookingRepository,
+                              BowlingCenterRepository bowlingCenterRepository) {
         this.bowlingAlleyRepository = bowlingAlleyRepository;
         this.drinkRepository = drinkRepository;
         this.foodRepository = foodRepository;
@@ -123,22 +119,35 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         this.bowlingShoeBookingRepository = bowlingShoeBookingRepository;
         this.bowlingCenter = bowlingCenterRepository.getBowlingCenter();
         this.currentBowlingAlleyId = 1;
+        this.panelChanges = false;
         buttonMap = new HashMap<>();
         setSizeFull();
         setAlignItems(Alignment.CENTER);
+        header = new H1();
         Component alleyButtonsComponent = createAlleyButtonsComponent();
         Component articlePanelComponent = createArticlePanelComponent();
         Component footerButtons = createFooterButtons();
         goToBill.setEnabled(false);
         addItem.setEnabled(false);
-        add(alleyButtonsComponent, articlePanelComponent, footerButtons);
+        deleteChangesButton.setEnabled(false);
+        add(header, alleyButtonsComponent, articlePanelComponent, footerButtons);
+        updateHeader();
+    }
+
+    private void updateHeader() {
+        if (currentBowlingAlleyBooking == null) {
+            header.setText("Keine Bahn ausgewählt");
+        } else {
+            header.setText("Bahn: " + currentBowlingAlleyBooking.getBowlingAlley().getId() +
+                    "\nKunde: " + currentBowlingAlleyBooking.getClient().getFullName());
+        }
     }
 
     /**
      * The createArticlePanelComponent function creates a TabSheet with three tabs,
      * each containing a Div.
      * The Divs are used to display the article panels for drinks, food and shoes.
-     * 
+     *
      * @return The tabs component
      */
     private Component createArticlePanelComponent() {
@@ -167,11 +176,16 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     /**
      * The createShoePanel function creates a new ShoePanel object and assigns it to
      * the shoePanel variable.
-     * 
+     *
      * @return A shoePanel, which is a component
      */
     private Component createShoePanel() {
         shoePanel = new ShoePanel(bowlingShoeRepository, currentBowlingAlleyBooking.getClient());
+        shoePanel.getShoeAmountField().addValueChangeListener(integerFieldIntegerComponentValueChangeEvent -> {
+            addItem.setEnabled(true);
+            deleteChangesButton.setEnabled(true);
+            panelChanges = true;
+        });
         return shoePanel;
     }
 
@@ -180,7 +194,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
      * DrinkPanels for each drink in the database.
      * The function also sets the currentBowlingAlleyBooking and drinkBookingMap
      * fields to their respective parameters.
-     * 
+     *
      * @return A verticallayout
      */
     private Component createDrinkPanel() {
@@ -198,9 +212,20 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
                 }
             }
             if (hasAtLeastOneActiveVariant) {
-                layout.add(new DrinkPanel(drink, currentBowlingAlleyBooking, drinkBookingMap));
+                DrinkPanel drinkPanel = new DrinkPanel(drink, currentBowlingAlleyBooking, drinkBookingMap);
+                drinkPanel.getVariantLayout().getChildren().forEach(component -> {
+                    if (component instanceof IntegerField integerField) {
+                        integerField.addValueChangeListener(integerFieldIntegerComponentValueChangeEvent -> {
+                            addItem.setEnabled(true);
+                            deleteChangesButton.setEnabled(true);
+                            panelChanges = true;
+                        });
+                    }
+                });
+                layout.add(drinkPanel);
             }
         }
+
         drinkLayoutForAddItem = layout;
         return layout;
     }
@@ -219,7 +244,13 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         List<Food> foodList = foodRepository.findAll();
         foodList.sort(Comparator.comparing(Food::getName));
         for (Food food : foodList) {
-            layout.add(new FoodPanel(food, currentBowlingAlleyBooking, foodBookingMap));
+            FoodPanel foodPanel = new FoodPanel(food, currentBowlingAlleyBooking, foodBookingMap);
+            foodPanel.getFoodAmountField().addValueChangeListener(integerFieldIntegerComponentValueChangeEvent -> {
+                addItem.setEnabled(true);
+                deleteChangesButton.setEnabled(true);
+                panelChanges = true;
+            });
+            layout.add(foodPanel);
         }
         foodLayoutForAddItem = layout;
         return layout;
@@ -230,18 +261,18 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
      * containing buttons for each BowlingAlley in the database.
      * The function also adds click listeners to each button, which change the
      * currentBowlingAlleyId and currentBowlingAlleyBooking variables.
-     * 
+     *
      * @return A component
      */
     private final Component createAlleyButtonsComponent() {
         HorizontalLayout alleyLayout; // Todo layout ändern mit 30 buttons/bahnen testen, scrolllayout
-                                      // bildschirmbreite max breite oder %tual
-                                      // https://vaadin.com/docs/latest/components/scroller
+        // bildschirmbreite max breite oder %tual
+        // https://vaadin.com/docs/latest/components/scroller
         alleyLayout = new HorizontalLayout();
         alleyLayout.setPadding(true);
         alleyLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
 
-        List<BowlingAlley> bowlingAlleyList = bowlingAlleyRepository.findAll(); // Todo activeistrue
+        List<BowlingAlley> bowlingAlleyList = bowlingAlleyRepository.findAllByActiveIsTrue();
         if (bowlingAlleyList.isEmpty()) {
             Notifications.showError("Es sind keine Bahnen im System vorhanden.\nBitte trage Bahnen ins System ein.");
         }
@@ -255,37 +286,51 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository
                 .findAllByTimePeriodsOverlapping(System.currentTimeMillis());
 
-        // Todo exception handling wenn keine bahnen
+        if (bowlingAlleyBookingList.isEmpty()) {
+            Notifications.showError("Es sind zurzeit keine Bahnen gebucht");
+        }
 
         for (BowlingAlley bowlingAlley : bowlingAlleyList) {
-            Button alleyButton = new Button("Bahn " + bowlingAlley.getId());// Todo header mit kunde und Start- und
-                                                                            // Endzeit über den Buttons, wie bei
-                                                                            // Rechnung
+            Button alleyButton = new Button("Bahn " + bowlingAlley.getId());
             buttonMap.put(bowlingAlley.getId(), alleyButton);
             alleyButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             alleyButton.setEnabled(!freeBowlingAlleyHashSet.contains(bowlingAlley.getId()));
-            alleyButton.addClickListener(buttonClickEvent -> {
-                // if(){
-                // //Todo set disabled wenn rechnung fertig ist
-                // //Todo update divs
-                // return;
-                // }
-                changePreviousButtonStyle(currentBowlingAlleyId);
-                currentBowlingAlleyId = Integer.parseInt(alleyButton.getText().replaceAll("\\D+(\\d+)", "$1"));
-                changeCurrentButtonStyle(currentBowlingAlleyId);
-                currentBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(
-                        bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
-                        .findFirst()
-                        .orElse(null);
-                changeTabs();
-                goToBill.setEnabled(true);
-                addItem.setEnabled(true);
-            });
+            BowlingAlleyBooking tempBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(
+                    bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == bowlingAlley.getId()).findFirst().orElse(null);
 
+            if (tempBowlingAlleyBooking != null && tempBowlingAlleyBooking.isCompleted()) {
+                alleyButton.setEnabled(false);
+            }
+            alleyButton.addClickListener(buttonClickEvent -> {
+                AtomicBoolean dialogAnswer = new AtomicBoolean(false);
+                if (panelChanges) {
+                    VaadinUtils.showConfirmationDialog("Änderungen sind nicht gespeichert. Trotzdem Bahn wechseln?", "Ja", "Abbrechen", () -> {
+                        alleyButtonOnChange(bowlingAlleyBookingList, alleyButton);
+                    });
+                } else {
+                    alleyButtonOnChange(bowlingAlleyBookingList, alleyButton);
+                }
+            });
             alleyLayout.add(alleyButton);
         }
-
         return alleyLayout;
+    }
+
+
+    private void alleyButtonOnChange(List<BowlingAlleyBooking> bowlingAlleyBookingList, Button alleyButton) {
+        changePreviousButtonStyle(currentBowlingAlleyId);
+        currentBowlingAlleyId = Integer.parseInt(alleyButton.getText().replaceAll("\\D+(\\d+)", "$1"));
+        changeCurrentButtonStyle(currentBowlingAlleyId);
+        currentBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(
+                        bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
+                .findFirst()
+                .orElse(null);
+        changeTabs();
+        updateHeader();
+        goToBill.setEnabled(true);
+        deleteChangesButton.setEnabled(false);
+        addItem.setEnabled(false);
+        panelChanges = false;
     }
 
     /**
@@ -332,18 +377,24 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         layout.setAlignItems(Alignment.CENTER);
         addItem = new Button("Bestellung speichern");
         goToBill = new Button("Zur Rechnungserstellung");
+        deleteChangesButton = new Button("Änderungen verwerfen");
         addItem.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        deleteChangesButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        deleteChangesButton.setWidth("50%");
         addItem.setWidth("55%");
         String bHeight = "55px";
         addItem.setHeight(bHeight);
         goToBill.setWidth("40%");
         goToBill.setHeight(bHeight);
+        deleteChangesButton.setHeight(bHeight);
 
         addItem.addClickListener(buttonClickEvent -> {
             addAllNewDrinkBookings();
             addAllNewFoodBookings();
             addAllNewShoeBookings();
             changeTabs();
+            panelChanges = false;
+            Notifications.showInfo("Buchungen wurden gespeichert");//Todo String mit allen Items vllt
         });
 
         goToBill.addClickListener(buttonClickEvent -> {
@@ -355,15 +406,27 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
             });
         });
 
-        layout.add(addItem, goToBill);
+        deleteChangesButton.addClickListener(buttonClickEvent -> {
+            drinkLayoutForAddItem.getChildren().forEach(component -> {
+                if (component instanceof DrinkPanel drinkPanel) {
+                    drinkPanel.resetIntegerField();
+                }
+            });
+            foodLayoutForAddItem.getChildren().forEach(component -> {
+                if (component instanceof FoodPanel foodPanel) {
+                    foodPanel.resetFoodAmountFieldValue();
+                }
+            });
+            shoePanel.resetIntegerField();
+            panelChanges = false;
+        });
+
+        layout.add(addItem, deleteChangesButton, goToBill);
         return layout;
     }
 
     /**
-     * The addAllNewShoeBookings function adds all new shoe bookings. It does this
-     * by first getting a list of all shoe bookings from the database, and then
-     * mapping them into a map. Then it iterates over each entry in the map and adds
-     * a new shoe booking.
+     * Adds all new shoe bookings for the current bowling alley booking.
      */
     private void addAllNewShoeBookings() {
         int stock = shoePanel.getShoeSizeAmountMap().get(shoePanel.getShoeSizeField().getValue())
@@ -510,18 +573,47 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
      * then we set it as our currentBowlingAlleyBooking variable so that other
      * functions can access it later on.&lt;/code&gt;
      *
-     * @param event   Get the current url
-     * @param Integer parameter Pass the parameter from the url to this function
+     * @param event     Get the current url
+     * @param parameter Pass the parameter from the url to this function
      */
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter Integer parameter) {
         if (parameter == null) {
+            for (Button button : buttonMap.values()) {
+                if (button.isEnabled()) {
+                    button.setAutofocus(true);
+                    List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository
+                            .findAllByTimePeriodsOverlapping(System.currentTimeMillis());
+
+                    if (bowlingAlleyBookingList.isEmpty()) {
+                        Notifications.showError("Es sind zurzeit keine Bahnen gebucht");
+                        break;
+                    }
+                    currentBowlingAlleyId = Integer.parseInt(button.getText().replaceAll("\\D+(\\d+)", "$1"));
+                    changeCurrentButtonStyle(currentBowlingAlleyId);
+                    currentBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(
+                                    bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
+                            .findFirst()
+                            .orElse(null);
+                    changeTabs();
+                    updateHeader();
+                    goToBill.setEnabled(true);
+                    break;
+                }
+            }
             return;
         }
         Optional<BowlingAlleyBooking> bowlingAlleyBookingOptional = bowlingAlleyBookingRepository.findById(parameter);
         bowlingAlleyBookingOptional.ifPresent(booking -> {
             if (booking.isActive()) {
-                currentBowlingAlleyBooking = booking;
+                this.currentBowlingAlleyBooking = booking;
+                this.currentBowlingAlleyId = booking.getBowlingAlley().getId();
+                buttonMap.get(currentBowlingAlleyId).setAutofocus(true);
+                changePreviousButtonStyle(currentBowlingAlleyId);
+                changeCurrentButtonStyle(currentBowlingAlleyId);
+                changeTabs();
+                updateHeader();
+                goToBill.setEnabled(true);
             }
         });
     }

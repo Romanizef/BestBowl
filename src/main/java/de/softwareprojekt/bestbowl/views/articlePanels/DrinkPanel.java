@@ -64,6 +64,10 @@ public class DrinkPanel extends HorizontalLayout {
         add(label, variantLayout);
     }
 
+    public FormLayout getVariantLayout() {
+        return variantLayout;
+    }
+
     /**
      * The createIntegerField function creates an IntegerField for a given
      * DrinkVariant.

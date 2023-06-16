@@ -9,11 +9,14 @@ import org.springframework.stereotype.Repository;
 
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
 
+import java.util.List;
+
 /**
  * The BowlingAlleyRepository is a Spring Data JPA repository for the
  * {@link BowlingAlley} entities.
- * 
+ *
  * @author Matija
+ * @author Ali Cicek
  */
 @Repository
 public interface BowlingAlleyRepository extends JpaRepository<BowlingAlley, Integer> {
@@ -22,7 +25,7 @@ public interface BowlingAlleyRepository extends JpaRepository<BowlingAlley, Inte
      * The findAllByNoBookingOverlapBetweenTimeStamps method returns a list of all
      * {@link BowlingAlley}s that do not overlap with any booking between the given
      * time stamps: lowerBound and upperBound.
-     * 
+     *
      * @param lowerBound
      * @param upperBound
      * @return List of {@link BowlingAlley}s
@@ -35,5 +38,7 @@ public interface BowlingAlleyRepository extends JpaRepository<BowlingAlley, Inte
             "or :lowerBound between bab.startTime and bab.endTime)" +
             ") order by ba.id")
     List<BowlingAlley> findAllByNoBookingOverlapBetweenTimeStamps(@Param("lowerBound") long lowerBound,
-            @Param("upperBound") long upperBound);
+                                                                  @Param("upperBound") long upperBound);
+
+    List<BowlingAlley> findAllByActiveIsTrue();
 }
