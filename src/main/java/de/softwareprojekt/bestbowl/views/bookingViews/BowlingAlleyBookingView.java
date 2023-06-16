@@ -107,9 +107,9 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         add(clientHeader, menuComponent, bookButton, bookingGrid, footerComponent, continueToExtrasButton);
 
         updateInitialComponents();
-        updateGridItems();
         updateLabelAndButtons();
         setBoundsToWholeDay();
+        updateGridItems();
     }
 
     /**
