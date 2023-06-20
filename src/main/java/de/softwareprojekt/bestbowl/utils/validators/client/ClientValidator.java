@@ -9,6 +9,10 @@ import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringValidEmail;
 
+import java.text.DecimalFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * @author Marten
  */
@@ -47,12 +51,31 @@ public class ClientValidator implements Validator<Client> {
         if (client.getAddress().getHouseNr() <= 0) {
             return ValidationResult.error("Hausnummer muss größer als 0 sein");
         }
-        if (client.getAddress().getPostCode() <= 1000 && client.getAddress().getPostCode() > 99_999) {
-            return ValidationResult.error("PLZ muss zwischen 1001 und 99999 sein");
+        String postalRegex = "^([0]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{3}$";
+        Pattern postalCodePattern = Pattern.compile(postalRegex);
+        String postalCode = "" + client.getAddress().getPostCode();
+        if (postalCode.length() == 4)
+            postalCode = "0" + postalCode;
+        if (!isValid(postalCodePattern, postalCode)) {
+            return ValidationResult.error("PLZ muss zwischen 01000 und 99999 sein");
         }
         if (!isStringMinNChars(client.getAddress().getCity(), 3)) {
             return ValidationResult.error("Stadt muss min. 3 Zeichen lang sein");
         }
         return ValidationResult.ok();
+    }
+
+    /**
+     * The isValid function checks if the given postal code matches the pattern for
+     * german postal codes.
+     * 
+     * @param pattern
+     * @param postalCode
+     *
+     * @return A boolean value
+     */
+    public boolean isValid(Pattern pattern, String postalCode) {
+        Matcher postalCodeMatcher = pattern.matcher(postalCode);
+        return postalCodeMatcher.matches();
     }
 }
