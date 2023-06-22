@@ -1,6 +1,7 @@
 package de.softwareprojekt.bestbowl.utils.validators.article;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
+import static de.softwareprojekt.bestbowl.utils.Utils.isStringWithoutDoubleSpaces;
 
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
@@ -29,13 +30,16 @@ public class DrinkValidator implements Validator<Drink> {
     @Override
     public ValidationResult apply(Drink drink, ValueContext context) {
         if (!isStringMinNChars(drink.getName(), 2)) {
-            return ValidationResult.error("Name muss mindestens 2 Zeichen lang sein");
+            return ValidationResult.error("Name muss mindestens 2 Zeichen lang sein!");
         }
         if (drink.getStockInMilliliters() < 0) {
-            return ValidationResult.error("Bestand muss positiv sein");
+            return ValidationResult.error("Bestand muss positiv sein!");
         }
         if (drink.getReorderPoint() < -1) {
-            return ValidationResult.error("Meldebestand muss positiv sein oder -1 für keine Meldung");
+            return ValidationResult.error("Meldebestand muss positiv sein oder -1 für keine Meldung!");
+        }
+        if (!isStringWithoutDoubleSpaces(drink.getName())) {
+            return ValidationResult.error("Getränkename darf nicht leer sein!");
         }
         return ValidationResult.ok();
     }

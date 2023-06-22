@@ -9,8 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
 
-import java.util.List;
-
 /**
  * The BowlingAlleyRepository is a Spring Data JPA repository for the
  * {@link BowlingAlley} entities.

@@ -26,8 +26,8 @@ public class BowlingShoeValidator implements Validator<BowlingShoe> {
      */
     @Override
     public ValidationResult apply(BowlingShoe bowlingShoe, ValueContext context) {
-        if (bowlingShoe.getSize() < 20 || bowlingShoe.getSize() > 70) {
-            return ValidationResult.error("Größe muss zwischen 20 und 70 sein");
+        if (bowlingShoe.getSize() < 30 || bowlingShoe.getSize() > 50) {
+            return ValidationResult.error("Größe muss zwischen 30 und 50 sein");
         }
         return ValidationResult.ok();
     }
