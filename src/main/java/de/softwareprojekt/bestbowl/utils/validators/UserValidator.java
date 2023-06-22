@@ -1,10 +1,10 @@
 package de.softwareprojekt.bestbowl.utils.validators;
 
+import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.isStringOnlyLetters;
+import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.isStringValidEmail;
+import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.isStringWithoutDoubleSpaces;
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
-import static de.softwareprojekt.bestbowl.utils.Utils.isStringOnlyLetters;
-import static de.softwareprojekt.bestbowl.utils.Utils.isStringValidEmail;
-import static de.softwareprojekt.bestbowl.utils.Utils.isStringWithoutDoubleSpaces;
 
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;

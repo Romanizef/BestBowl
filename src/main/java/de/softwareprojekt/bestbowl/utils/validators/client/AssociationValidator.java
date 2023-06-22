@@ -7,7 +7,7 @@ import com.vaadin.flow.data.binder.ValueContext;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Association;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
-import static de.softwareprojekt.bestbowl.utils.Utils.isStringOnlyLettersAndSpecialChars;
+import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.isStringOnlyLettersAndSpecialChars;
 
 /**
  * @author Matija

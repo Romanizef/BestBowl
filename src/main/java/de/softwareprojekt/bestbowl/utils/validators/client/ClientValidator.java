@@ -1,10 +1,10 @@
 package de.softwareprojekt.bestbowl.utils.validators.client;
 
-import static de.softwareprojekt.bestbowl.utils.Utils.createStringPostalcodeForClient;
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
-import static de.softwareprojekt.bestbowl.utils.Utils.isStringOnlyLetters;
-import static de.softwareprojekt.bestbowl.utils.Utils.isStringValidEmail;
-import static de.softwareprojekt.bestbowl.utils.Utils.isStringValidPostalcode;
+import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.createStringPostalcodeForClient;
+import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.isStringOnlyLetters;
+import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.isStringValidEmail;
+import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.isStringValidPostalcode;
 
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;

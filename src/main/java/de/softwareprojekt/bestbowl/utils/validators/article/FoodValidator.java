@@ -1,7 +1,7 @@
 package de.softwareprojekt.bestbowl.utils.validators.article;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
-import static de.softwareprojekt.bestbowl.utils.Utils.isStringOnlyLetters;
+import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.isStringOnlyLetters;
 
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
