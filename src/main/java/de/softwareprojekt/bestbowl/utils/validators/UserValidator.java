@@ -1,8 +1,5 @@
 package de.softwareprojekt.bestbowl.utils.validators;
 
-import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.isStringOnlyLetters;
-import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.isStringValidEmail;
-import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.isStringWithoutDoubleSpaces;
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
 
@@ -15,7 +12,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.User;
 /**
  * @author Marten Voß
  */
-public class UserValidator implements Validator<User> {
+public class UserValidator extends PatternValidator implements Validator<User> {
 
     /**
      * The apply function is used to validate the user input.

@@ -5,14 +5,14 @@ import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.binder.ValueContext;
 
 import de.softwareprojekt.bestbowl.jpa.entities.client.Association;
+import de.softwareprojekt.bestbowl.utils.validators.PatternValidator;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
-import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.isStringOnlyLettersAndSpecialChars;
 
 /**
  * @author Matija
  */
-public class AssociationValidator implements Validator<Association> {
+public class AssociationValidator extends PatternValidator implements Validator<Association> {
 
     /**
      * The apply function is used to validate the input of a user.

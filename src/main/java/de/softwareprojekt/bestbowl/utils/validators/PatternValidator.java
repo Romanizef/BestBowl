@@ -20,9 +20,6 @@ public class PatternValidator {
     private static final Pattern ONLY_LETTERS_AND_CHAR_PATTERN = Pattern.compile("^[a-zA-ZäüößÄÜÖ/.-]+$");
     private static final Pattern NO_DOUBLESPACES_PATTERN = Pattern.compile("^[\s\s]+$");
 
-    private PatternValidator() {
-    }
-
     /**
      * @param s string to be checked
      * @return if the string is a valid email address

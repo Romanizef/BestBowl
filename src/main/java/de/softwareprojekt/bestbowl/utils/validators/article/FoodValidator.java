@@ -1,13 +1,13 @@
 package de.softwareprojekt.bestbowl.utils.validators.article;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
-import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.isStringOnlyLetters;
 
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.binder.ValueContext;
 
 import de.softwareprojekt.bestbowl.jpa.entities.food.Food;
+import de.softwareprojekt.bestbowl.utils.validators.PatternValidator;
 
 /**
  * The FoodValidator class validates the attributes of a Food
@@ -15,7 +15,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.food.Food;
  * 
  * @author Max
  */
-public class FoodValidator implements Validator<Food> {
+public class FoodValidator extends PatternValidator implements Validator<Food> {
 
     /**
      * The apply function is used to validate the Food object.
