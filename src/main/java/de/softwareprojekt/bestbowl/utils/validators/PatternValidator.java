@@ -8,7 +8,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 
 /**
- * 
+ *
  * @author Matija
  */
 public class PatternValidator {
@@ -20,6 +20,9 @@ public class PatternValidator {
     private static final Pattern ONLY_LETTERS_AND_CHAR_PATTERN = Pattern.compile("^[a-zA-ZäüößÄÜÖ/.-]+$");
     private static final Pattern NO_DOUBLESPACES_PATTERN = Pattern.compile("^[\s\s]+$");
     private static final Pattern HOUSE_NUMBER_PATTERN = Pattern.compile("^[1-9]\\d*(?:[ -]?(?:[a-zA-Z]+|[1-9]\\d*))?$");
+
+    private PatternValidator() {
+    }
 
     public static boolean isStringValidHouseNumber(String s) {
         if (isStringNotEmpty(s)) {
@@ -42,7 +45,7 @@ public class PatternValidator {
     /**
      * The isStringOnlyLetters function checks if a given string contains only
      * letters.
-     * 
+     *
      * @param s Check if the string is empty or not
      *
      * @return True if the string contains only letters
@@ -57,7 +60,7 @@ public class PatternValidator {
     /**
      * The isStringOnlyLettersAndSpecialChars function checks if a string contains
      * only letters and special characters.
-     * 
+     *
      * @param s Check if the string is empty or not
      *
      * @return True if the string contains only letters and special characters
@@ -72,7 +75,7 @@ public class PatternValidator {
     /**
      * The isStringWithoutDoubleSpaces function checks if a string contains double
      * spaces.
-     * 
+     *
      * @param s Check if the string is empty or not
      *
      * @return True if the string does not contain double spaces
@@ -87,8 +90,7 @@ public class PatternValidator {
     /**
      * The isValid function checks if the given postal code matches the pattern for
      * german postal codes.
-     * 
-     * @param pattern
+     *
      * @param postalCode
      *
      * @return A boolean value
@@ -104,7 +106,7 @@ public class PatternValidator {
      * The createStringPostalcode function takes a Client object as input and
      * returns the postal code of that client.
      * If the postal code is only 4 digits long, it adds a 0 to the beginning of it.
-     * 
+     *
      * @param client
      *
      * @return A string with the postal code
@@ -121,8 +123,8 @@ public class PatternValidator {
      * object as input and returns the postal code of that bowling center.
      * If the postal code is only 4 digits long, it adds a leading zero to make it 5
      * digits long.
-     * 
-     * @param BowlingCenter bowlingcenter Get the postal code of a bowling center
+     *
+     * @param bowlingcenter Get the postal code of a bowling center
      *
      * @return A string with the postalcode of a bowlingcenter
      */

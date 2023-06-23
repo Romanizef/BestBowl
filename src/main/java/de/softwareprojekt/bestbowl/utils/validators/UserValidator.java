@@ -2,6 +2,7 @@ package de.softwareprojekt.bestbowl.utils.validators;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
+import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.*;
 
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
@@ -12,7 +13,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.User;
 /**
  * @author Marten Voß
  */
-public class UserValidator extends PatternValidator implements Validator<User> {
+public class UserValidator implements Validator<User> {
 
     /**
      * The apply function is used to validate the user input.

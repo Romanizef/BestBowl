@@ -1,6 +1,7 @@
 package de.softwareprojekt.bestbowl.utils.validators;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
+import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.*;
 
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
@@ -11,7 +12,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 /**
  * @author Marten
  */
-public class BowlingCenterValidator extends PatternValidator implements Validator<BowlingCenter> {
+public class BowlingCenterValidator implements Validator<BowlingCenter> {
 
     /**
      * The apply function is used to validate the input of a BowlingCenter object.

@@ -1,18 +1,18 @@
 package de.softwareprojekt.bestbowl.utils.validators.client;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
+import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.*;
 
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.binder.ValueContext;
 
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
-import de.softwareprojekt.bestbowl.utils.validators.PatternValidator;
 
 /**
  * @author Marten
  */
-public class ClientValidator extends PatternValidator implements Validator<Client> {
+public class ClientValidator implements Validator<Client> {
 
     /**
      * The apply function is used to validate the Client object.
