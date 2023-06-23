@@ -44,8 +44,11 @@ public class ClientValidator extends PatternValidator implements Validator<Clien
         if (!isStringMinNChars(client.getAddress().getStreet(), 3)) {
             return ValidationResult.error("Straße muss min. 3 Zeichen lang sein!");
         }
-        if (client.getAddress().getHouseNr() <= 0) {
+        if (client.getAddress().getHouseNr().isEmpty()) {
             return ValidationResult.error("Hausnummer muss größer als 0 sein!");
+        }
+        if (!isStringValidHouseNumber(client.getAddress().getHouseNr())) {
+            return ValidationResult.error("Hausnummer im falschen Format. Z.B.: 10a");
         }
         if (!isStringValidPostalcode(createStringPostalcodeForClient(client))) {
             return ValidationResult.error("PLZ muss zwischen 01000 und 99999 sein!");

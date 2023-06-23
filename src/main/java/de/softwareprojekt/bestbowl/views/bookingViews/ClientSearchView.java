@@ -136,7 +136,7 @@ public class ClientSearchView extends VerticalLayout {
         streetLayout.setWidthFull();
         TextField streetField = new TextField("Straße");
         streetField.setRequiredIndicatorVisible(true);
-        IntegerField houseNrField = new IntegerField("H. NR");
+        TextField houseNrField = new TextField("H. NR");
         houseNrField.setWidth("65px");
         houseNrField.setRequiredIndicatorVisible(true);
         streetLayout.add(streetField, houseNrField);
@@ -152,7 +152,8 @@ public class ClientSearchView extends VerticalLayout {
         cityLayout.setFlexGrow(1, cityField);
         Select<Association> associationSelect = createAssociationSelect("Verein");
         associationSelect.setWidthFull();
-        layout.add(firstNameField, lastNameField, emailField, dialogCommentArea, streetLayout, cityLayout, associationSelect,
+        layout.add(firstNameField, lastNameField, emailField, dialogCommentArea, streetLayout, cityLayout,
+                associationSelect,
                 createValidationLabelLayout());
         dialog.add(layout);
 
@@ -205,7 +206,7 @@ public class ClientSearchView extends VerticalLayout {
         binder.bind(streetField, client -> client.getAddress().getStreet(),
                 ((client, s) -> client.getAddress().setStreet(s)));
         binder.bind(houseNrField, client -> client.getAddress().getHouseNr(),
-                ((client, i) -> client.getAddress().setHouseNr(Objects.requireNonNullElse(i, 0))));
+                ((client, s) -> client.getAddress().setHouseNr(s)));
         binder.bind(postCodeField, client -> client.getAddress().getPostCode(),
                 ((client, i) -> client.getAddress().setPostCode(Objects.requireNonNullElse(i, 0))));
         binder.bind(cityField, client -> client.getAddress().getCity(),
@@ -410,7 +411,8 @@ public class ClientSearchView extends VerticalLayout {
 
         verticalLayout.add(selectedClientLabel, commentLayout, nextStepButton);
 
-        nextStepButton.addClickListener(e -> UI.getCurrent().navigate(BowlingAlleyBookingView.class, selectedClient.getId()));
+        nextStepButton
+                .addClickListener(e -> UI.getCurrent().navigate(BowlingAlleyBookingView.class, selectedClient.getId()));
         saveCommentButton.addClickListener(e -> {
             String comment = commentArea.getValue();
             if (comment == null || comment.length() > 255) {

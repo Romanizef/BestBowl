@@ -226,7 +226,7 @@ public class ClientManagementView extends VerticalLayout {
         streetField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         streetField.setRequiredIndicatorVisible(true);
 
-        IntegerField houseNrField = new IntegerField("Hausnummer");
+        TextField houseNrField = new TextField("Hausnummer (ggf. mit Zusatz)");
         houseNrField.setWidthFull();
         houseNrField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         houseNrField.setRequiredIndicatorVisible(true);
@@ -298,7 +298,7 @@ public class ClientManagementView extends VerticalLayout {
         binder.bind(streetField, client -> client.getAddress().getStreet(),
                 ((client, s) -> client.getAddress().setStreet(s)));
         binder.bind(houseNrField, client -> client.getAddress().getHouseNr(),
-                ((client, i) -> client.getAddress().setHouseNr(Objects.requireNonNullElse(i, 0))));
+                ((client, s) -> client.getAddress().setHouseNr(s)));
         binder.bind(postCodeField, client -> client.getAddress().getPostCode(),
                 ((client, i) -> client.getAddress().setPostCode(Objects.requireNonNullElse(i, 0))));
         binder.bind(cityField, client -> client.getAddress().getCity(),

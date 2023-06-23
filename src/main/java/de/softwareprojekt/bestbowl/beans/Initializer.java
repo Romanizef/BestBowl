@@ -83,7 +83,7 @@ public class Initializer {
         bowlingCenter.setDisplayName("BestBowl");
         bowlingCenter.setBusinessName("BestBowl GmbH");
         bowlingCenter.setStreet("Interaktion");
-        bowlingCenter.setHouseNr(1);
+        bowlingCenter.setHouseNr("1");
         bowlingCenter.setPostCode(33619);
         bowlingCenter.setCity("Bielefeld");
         bowlingCenter.setStartTime(Duration.ofHours(7).toSeconds());

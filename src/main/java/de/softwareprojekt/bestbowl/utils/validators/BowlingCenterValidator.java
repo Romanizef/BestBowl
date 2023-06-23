@@ -33,8 +33,11 @@ public class BowlingCenterValidator extends PatternValidator implements Validato
         if (!isStringMinNChars(bowlingCenter.getStreet(), 2)) {
             return ValidationResult.error("Straße muss mindestens 2 Zeichen lang sein!");
         }
-        if (bowlingCenter.getHouseNr() <= 0) {
+        if (bowlingCenter.getHouseNr().isEmpty()) {
             return ValidationResult.error("Hausnummer muss größer als 0 sein!");
+        }
+        if (!isStringValidHouseNumber(bowlingCenter.getHouseNr())) {
+            return ValidationResult.error("Hausnummer nicht im richtigen Format. Z. B.: 10a!");
         }
         if (!isStringValidPostalcode(createStringPostalcodeForBowlingcenter(bowlingCenter))) {
             return ValidationResult.error("PLZ muss zwischen 01000 und 99999 sein!");

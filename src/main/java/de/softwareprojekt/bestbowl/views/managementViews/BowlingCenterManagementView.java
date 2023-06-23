@@ -64,7 +64,7 @@ public class BowlingCenterManagementView extends Div {
 
         TextField streetField = new TextField("Straße");
         streetField.setRequiredIndicatorVisible(true);
-        IntegerField houseNrField = new IntegerField("Hausnummer");
+        TextField houseNrField = new TextField("Hausnummer (ggf. mit Zusatz)");
         houseNrField.setRequiredIndicatorVisible(true);
         IntegerField postCodeField = new IntegerField("PLZ");
         postCodeField.setRequiredIndicatorVisible(true);
@@ -133,7 +133,7 @@ public class BowlingCenterManagementView extends Div {
         binder.bind(businessNameField, BowlingCenter::getBusinessName, BowlingCenter::setBusinessName);
         binder.bind(streetField, BowlingCenter::getStreet, BowlingCenter::setStreet);
         binder.bind(houseNrField, BowlingCenter::getHouseNr,
-                (bc, i) -> bc.setHouseNr(Objects.requireNonNullElse(i, 0)));
+                (bc, s) -> bc.setHouseNr(s));
         binder.bind(postCodeField, BowlingCenter::getPostCode,
                 (bc, i) -> bc.setPostCode(Objects.requireNonNullElse(i, 0)));
         binder.bind(cityField, BowlingCenter::getCity, BowlingCenter::setCity);

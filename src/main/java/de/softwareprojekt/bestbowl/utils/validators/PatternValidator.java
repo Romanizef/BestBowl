@@ -19,6 +19,14 @@ public class PatternValidator {
     private static final Pattern ONLY_LETTERS_PATTERN = Pattern.compile("^[a-zA-ZäüößÄÜÖ]+$");
     private static final Pattern ONLY_LETTERS_AND_CHAR_PATTERN = Pattern.compile("^[a-zA-ZäüößÄÜÖ/.-]+$");
     private static final Pattern NO_DOUBLESPACES_PATTERN = Pattern.compile("^[\s\s]+$");
+    private static final Pattern HOUSE_NUMBER_PATTERN = Pattern.compile("^[1-9]\\d*(?:[ -]?(?:[a-zA-Z]+|[1-9]\\d*))?$");
+
+    public static boolean isStringValidHouseNumber(String s) {
+        if (isStringNotEmpty(s)) {
+            return HOUSE_NUMBER_PATTERN.matcher(s).matches();
+        }
+        return false;
+    }
 
     /**
      * @param s string to be checked

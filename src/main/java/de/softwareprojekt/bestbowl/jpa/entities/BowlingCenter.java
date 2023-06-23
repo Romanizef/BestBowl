@@ -21,7 +21,7 @@ public class BowlingCenter implements Serializable {
     private String businessName;
     // address
     private String street;
-    private int houseNr;
+    private String houseNr;
     private int postCode;
     private String city;
     // business hours
@@ -134,7 +134,7 @@ public class BowlingCenter implements Serializable {
      *
      * @return The housenr variable
      */
-    public int getHouseNr() {
+    public String getHouseNr() {
         return houseNr;
     }
 
@@ -143,7 +143,7 @@ public class BowlingCenter implements Serializable {
      *
      * @param houseNr Set the housenr variable
      */
-    public void setHouseNr(int houseNr) {
+    public void setHouseNr(String houseNr) {
         this.houseNr = houseNr;
     }
 

@@ -25,7 +25,7 @@ public class Address implements Serializable {
     private int id;
 
     private String street;
-    private int houseNr;
+    private String houseNr;
     private String city;
     private int postCode;
     @OneToOne
@@ -85,9 +85,9 @@ public class Address implements Serializable {
     /**
      * Getter for the house number.
      * 
-     * @return int
+     * @return String
      */
-    public int getHouseNr() {
+    public String getHouseNr() {
         return houseNr;
     }
 
@@ -96,7 +96,7 @@ public class Address implements Serializable {
      * 
      * @param houseNr
      */
-    public void setHouseNr(int houseNr) {
+    public void setHouseNr(String houseNr) {
         this.houseNr = houseNr;
     }
 
