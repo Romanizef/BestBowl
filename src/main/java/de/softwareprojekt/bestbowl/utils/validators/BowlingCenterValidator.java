@@ -60,6 +60,12 @@ public class BowlingCenterValidator implements Validator<BowlingCenter> {
                 && !isStringValidEmail(bowlingCenter.getReceiverEmail())) {
             return ValidationResult.error("Ungültige E-Mail");
         }
+        if (!isStringValidSMTPHost(bowlingCenter.getSmtpHost())) {
+            return ValidationResult.error("Ungültiger SMTP Host. Format: smtp.example.com");
+        }
+        if (!isStringValidSMTPPort(bowlingCenter.getSmtpPort())) {
+            return ValidationResult.error("Ungültiger SMTP Port. Format: 123");
+        }
         if (!isStringOnlyLetters(bowlingCenter.getStreet()) || !isStringOnlyLetters(bowlingCenter.getCity())) {
             return ValidationResult.error("In der Stadt und Straße sind nur Buchstaben erlaubt!");
         }

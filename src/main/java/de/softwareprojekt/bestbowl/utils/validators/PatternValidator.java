@@ -20,10 +20,54 @@ public class PatternValidator {
     private static final Pattern ONLY_LETTERS_AND_CHAR_PATTERN = Pattern.compile("^[a-zA-ZäüößÄÜÖ/.-]+$");
     private static final Pattern NO_DOUBLESPACES_PATTERN = Pattern.compile("^[\s\s]+$");
     private static final Pattern HOUSE_NUMBER_PATTERN = Pattern.compile("^[1-9]\\d*(?:[ -]?(?:[a-zA-Z]+|[1-9]\\d*))?$");
+    private static final Pattern SMTP_HOST_PATTERN = Pattern
+            .compile("^[\\d.a-z-]+\\.[a-z]{2,63}$");
+    private static final Pattern SMTP_PORT_PATTERN = Pattern
+            .compile("^[1-9]{3}+$");
 
     private PatternValidator() {
     }
 
+    /**
+     * The isStringValidSMTPPort function checks if the given String is a valid SMTP
+     * port.
+     * 
+     * @param s Check if the string is empty or not
+     *
+     * @return A boolean value
+     */
+    public static boolean isStringValidSMTPPort(String s) {
+        if (isStringNotEmpty(s)) {
+            return SMTP_PORT_PATTERN.matcher(s).matches();
+        }
+        return false;
+    }
+
+    /**
+     * The isStringValidSMTPHost function checks if a given string is a valid SMTP
+     * host.
+     * 
+     * @param s Check if the string is empty or not
+     *
+     * @return True if the string is not empty and matches the smtp_host_pattern
+     */
+    public static boolean isStringValidSMTPHost(String s) {
+        if (isStringNotEmpty(s)) {
+            return SMTP_HOST_PATTERN.matcher(s).matches();
+        }
+        return false;
+    }
+
+    /**
+     * The isStringValidHouseNumber function checks if a given string is a valid
+     * house number.
+     * A valid house number consists of at least one digit and can be followed by an
+     * optional letter.
+     * 
+     * @param s Check if the string is empty or not
+     *
+     * @return A boolean value
+     */
     public static boolean isStringValidHouseNumber(String s) {
         if (isStringNotEmpty(s)) {
             return HOUSE_NUMBER_PATTERN.matcher(s).matches();
@@ -32,8 +76,12 @@ public class PatternValidator {
     }
 
     /**
-     * @param s string to be checked
-     * @return if the string is a valid email address
+     * The isStringValidEmail function checks if a given string is a valid email
+     * address.
+     * 
+     * @param s Check if the string is empty or not
+     *
+     * @return True if the string is not empty and matches the email_pattern
      */
     public static boolean isStringValidEmail(String s) {
         if (isStringNotEmpty(s)) {
