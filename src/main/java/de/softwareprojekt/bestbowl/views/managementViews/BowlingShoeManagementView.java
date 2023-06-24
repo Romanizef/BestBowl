@@ -26,6 +26,9 @@ import de.softwareprojekt.bestbowl.views.articleForms.BowlingShoeForm;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
@@ -90,10 +93,11 @@ public class BowlingShoeManagementView extends VerticalLayout {
         button.addClickListener(e -> {
             bowlingShoeGrid.deselectAll();
             selectedShoe = new BowlingShoe();
+            selectedShoe.setBoughtAt(LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond() * 1000);
             bowlingShoeBinder.readBean(selectedShoe);
             saveButton.setEnabled(true);
             cancelButton.setEnabled(true);
-            editingNewBowlingShoe = false;
+            editingNewBowlingShoe = true;
             updateEditBowlingShoeLayoutState();
             clearNumberFieldChildren(bowlingShoeForm.getChildren());
         });

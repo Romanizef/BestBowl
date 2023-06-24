@@ -1,24 +1,24 @@
 package de.softwareprojekt.bestbowl.views.articleForms;
 
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Locale;
-import java.util.Objects;
-
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
-
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
 import de.softwareprojekt.bestbowl.utils.validators.article.BowlingShoeValidator;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Creates the Form for the Shoe Entity.
@@ -35,7 +35,15 @@ public class BowlingShoeForm extends FormLayout {
      * @param shoeBinder
      */
     public BowlingShoeForm(Binder<BowlingShoe> shoeBinder) {
-        DateTimePicker boughtAtField = new DateTimePicker("Kaufdatum");
+        HorizontalLayout labelLayout = new HorizontalLayout();
+        labelLayout.setMargin(false);
+        labelLayout.setPadding(false);
+        Label dateLabel = new Label("Kaufdatum");
+        Label timeLabel = new Label("Kaufzeit");
+        labelLayout.add(dateLabel, timeLabel);
+        labelLayout.expand(dateLabel, timeLabel);
+
+        DateTimePicker boughtAtField = new DateTimePicker();
         boughtAtField.setWidthFull();
         boughtAtField.setLocale(Locale.GERMANY);
 
@@ -52,7 +60,7 @@ public class BowlingShoeForm extends FormLayout {
         Checkbox activeCheckbox = new Checkbox("Artikel aktivieren");
         checkboxLayout.add(activeCheckbox);
 
-        add(boughtAtField, sizeField, checkboxLayout);
+        add(labelLayout, boughtAtField, sizeField, checkboxLayout);
 
         shoeBinder.withValidator(new BowlingShoeValidator());
         shoeBinder.bind(boughtAtField, bowlingShoe -> LocalDateTime.ofInstant(Instant.ofEpochMilli(bowlingShoe.getBoughtAt()),
