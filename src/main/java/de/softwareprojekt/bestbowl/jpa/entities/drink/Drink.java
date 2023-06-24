@@ -14,15 +14,8 @@ import java.util.Set;
  */
 @Entity
 public class Drink implements Serializable {
-    public static final Drink NO_DRINK;
     @Serial
     private static final long serialVersionUID = 679638727317395915L;
-
-    static {
-        NO_DRINK = new Drink();
-        NO_DRINK.setId(-1);
-        NO_DRINK.setName("-");
-    }
 
     @Id
     @GeneratedValue

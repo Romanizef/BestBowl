@@ -48,7 +48,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
  */
 @Route(value = "drinkVariantManagement", layout = MainView.class)
 @PageTitle("Getränkevariantenverwaltung")
-@RolesAllowed({UserRole.OWNER})
+@RolesAllowed({ UserRole.OWNER })
 public class DrinkVariantManagementView extends VerticalLayout {
     private final transient DrinkVariantRepository drinkVariantRepository;
     private final Binder<DrinkVariant> drinkVariantBinder = new Binder<>();
@@ -117,7 +117,6 @@ public class DrinkVariantManagementView extends VerticalLayout {
             selectedDrinkVariant = new DrinkVariant();
             drinkVariantBinder.readBean(selectedDrinkVariant);
             editingNewDrinkVariant = true;
-            drinkSelect.setValue(Drink.NO_DRINK);
             updateEditDrinkVariantLayoutState();
             clearNumberFieldChildren(drinkVariantForm.getChildren());
         });
@@ -220,15 +219,8 @@ public class DrinkVariantManagementView extends VerticalLayout {
                 buttonLayout);
 
         drinkVariantBinder.withValidator(new DrinkVariantValidator());
-        drinkVariantBinder.bind(drinkSelect,
-                drinkVariant -> drinkVariant.getDrink() == null ? Drink.NO_DRINK : drinkVariant.getDrink(),
-                ((drinkVariant, drink) -> {
-                    if (drink.equals(Drink.NO_DRINK)) {
-                        drinkVariant.setDrink(null);
-                    } else {
-                        drinkVariant.setDrink(drink);
-                    }
-                }));
+        drinkVariantBinder.bind(drinkSelect, DrinkVariant::getDrink,
+                (drinkVariant, drink) -> drinkVariant.setDrink(drink));
         drinkVariantBinder.bind(priceField, DrinkVariant::getPrice,
                 (drinkVariant, price) -> drinkVariant.setPrice(Objects.requireNonNullElse(price, 0.0)));
         drinkVariantBinder.bind(variantField, DrinkVariant::getMl,
@@ -243,7 +235,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * It is used in the createDrinkVariantForm function to add a drink to a new
      * DrinkVariant.
      *
-     * @return A combobox
+     * @return A Select
      */
     private Select<Drink> createDrinkSelect() {
         Select<Drink> select = new Select<>();
@@ -251,7 +243,6 @@ public class DrinkVariantManagementView extends VerticalLayout {
 
         List<Drink> drinkList = Repos.getDrinkRepository().findAll();
         Set<Drink> drinkSet = new HashSet<>(drinkList.size() + 1);
-        drinkSet.add(Drink.NO_DRINK);
         drinkSet.addAll(drinkList);
         ListDataProvider<Drink> dataProvider = new ListDataProvider<>(drinkSet);
         dataProvider
@@ -259,8 +250,15 @@ public class DrinkVariantManagementView extends VerticalLayout {
 
         select.setWidthFull();
         select.setItems(dataProvider);
-        select.setValue(Drink.NO_DRINK);
-        select.setItemLabelGenerator(Drink::getName);
+        select.setPlaceholder("-");
+        select.setEmptySelectionAllowed(false);
+        // select.setItemLabelGenerator(Drink::getName);
+        select.setItemLabelGenerator(drink -> {
+            if (drink == null) {
+                return "kein Getränk";
+            }
+            return drink.getName();
+        });
         select.setRequiredIndicatorVisible(true);
         select.addThemeVariants(SelectVariant.LUMO_SMALL);
 
@@ -294,7 +292,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * into the form fields.
      *
      * @return True if the DrinkVariant was successfully written to the form fields,
-     * false otherwise
+     *         false otherwise
      */
     private boolean writeBean() {
         try {

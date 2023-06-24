@@ -19,6 +19,7 @@ public class PatternValidator {
     private static final Pattern ONLY_LETTERS_PATTERN = Pattern.compile("^[a-zA-ZäüößÄÜÖ\\s]+$");
     private static final Pattern ONLY_LETTERS_AND_CHAR_PATTERN = Pattern.compile("^[a-zA-ZäüößÄÜÖ/.-]+$");
     private static final Pattern NO_DOUBLESPACES_PATTERN = Pattern.compile("^[\s\s]+$");
+    private static final Pattern NO_SPACES_PATTERN = Pattern.compile("^[\s]+$");
     private static final Pattern HOUSE_NUMBER_PATTERN = Pattern.compile("^[1-9]\\d*(?:[ -]?(?:[a-zA-Z]+|[1-9]\\d*))?$");
     private static final Pattern SMTP_HOST_PATTERN = Pattern
             .compile("^[\\d.a-z-]+\\.[a-z]{2,63}$");
@@ -26,6 +27,13 @@ public class PatternValidator {
             .compile("^[1-9]{3}+$");
 
     private PatternValidator() {
+    }
+
+    public static boolean isStringWithoutSpaces(String s) {
+        if (isStringNotEmpty(s)) {
+            return NO_SPACES_PATTERN.matcher(s).matches();
+        }
+        return false;
     }
 
     /**
