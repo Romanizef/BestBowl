@@ -90,6 +90,8 @@ public class Initializer {
         bowlingCenter.setEndTime(Duration.ofHours(23).toSeconds());
         bowlingCenter.setBowlingAlleyPricePerHour(10);
         bowlingCenter.setBowlingShoePrice(4.99);
+        bowlingCenter.setMinShoeSize(20);
+        bowlingCenter.setMaxShoeSize(60);
         bowlingCenter.setSenderEmail("");
         bowlingCenter.setPassword("");
         bowlingCenter.setSmtpHost("");

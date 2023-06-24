@@ -95,6 +95,14 @@ public class BowlingCenterManagementView extends Div {
         AccordionPanel centerPricePanel = accordion.add("Bahn und Schuhpreise", centerPriceLayout);
         centerPricePanel.addThemeVariants(DetailsVariant.FILLED);
 
+        IntegerField minShoeSizeField = new IntegerField("Minimale Schuhgröße");
+        minShoeSizeField.setRequiredIndicatorVisible(true);
+        IntegerField maxShoeSizeField = new IntegerField("Maximale Schuhgröße");
+        maxShoeSizeField.setRequiredIndicatorVisible(true);
+        VerticalLayout shoeSizeLayout = new VerticalLayout(minShoeSizeField, maxShoeSizeField);
+        AccordionPanel shoeSizePanel = accordion.add("Schuhgrößen", shoeSizeLayout);
+        shoeSizePanel.addThemeVariants(DetailsVariant.FILLED);
+
         TextField senderEmailField = new TextField("Sender E-Mail");
         senderEmailField.setRequiredIndicatorVisible(true);
         PasswordField passwordField = new PasswordField("Sender E-Mail Passwort");
@@ -132,8 +140,7 @@ public class BowlingCenterManagementView extends Div {
         binder.bind(displayNameField, BowlingCenter::getDisplayName, BowlingCenter::setDisplayName);
         binder.bind(businessNameField, BowlingCenter::getBusinessName, BowlingCenter::setBusinessName);
         binder.bind(streetField, BowlingCenter::getStreet, BowlingCenter::setStreet);
-        binder.bind(houseNrField, BowlingCenter::getHouseNr,
-                (bc, s) -> bc.setHouseNr(s));
+        binder.bind(houseNrField, BowlingCenter::getHouseNr, BowlingCenter::setHouseNr);
         binder.bind(postCodeField, BowlingCenter::getPostCode,
                 (bc, i) -> bc.setPostCode(Objects.requireNonNullElse(i, 0)));
         binder.bind(cityField, BowlingCenter::getCity, BowlingCenter::setCity);
@@ -145,6 +152,10 @@ public class BowlingCenterManagementView extends Div {
                 (bc, price) -> bc.setBowlingAlleyPricePerHour(Objects.requireNonNullElse(price, 0.0)));
         binder.bind(bowlingShoePriceField, BowlingCenter::getBowlingShoePrice,
                 (bc, price) -> bc.setBowlingShoePrice(Objects.requireNonNullElse(price, 0.0)));
+        binder.bind(minShoeSizeField, BowlingCenter::getMinShoeSize,
+                (bc, min) -> bc.setMinShoeSize(Objects.requireNonNullElse(min, 0)));
+        binder.bind(maxShoeSizeField, BowlingCenter::getMaxShoeSize,
+                (bc, max) -> bc.setMaxShoeSize(Objects.requireNonNullElse(max, 0)));
         binder.bind(senderEmailField, BowlingCenter::getSenderEmail, BowlingCenter::setSenderEmail);
         binder.bind(receiverEmailField, BowlingCenter::getReceiverEmail, BowlingCenter::setReceiverEmail);
         binder.bind(passwordField, BowlingCenter::getPassword, BowlingCenter::setPassword);

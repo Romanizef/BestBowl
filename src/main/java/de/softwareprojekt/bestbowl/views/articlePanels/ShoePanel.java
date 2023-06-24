@@ -7,6 +7,7 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoe.BowlingShoeRepository;
@@ -28,6 +29,8 @@ public class ShoePanel extends VerticalLayout {
     private final transient BowlingShoeRepository bowlingShoeRepository;
     private final IntegerField shoeSizeField;
     private final IntegerField shoeAmountField;
+    private final int minShoeSize;
+    private final int maxShoeSize;
     private Map<Integer, Integer> shoeSizeAmountMap;
 
     /**
@@ -39,12 +42,14 @@ public class ShoePanel extends VerticalLayout {
      * @see #addCSS()
      * @see #createShoeGrid(Client)
      */
-    public ShoePanel(BowlingShoeRepository bowlingShoeRepository, Client client) {
+    public ShoePanel(BowlingShoeRepository bowlingShoeRepository, Client client, BowlingCenter bowlingCenter) {
         this.bowlingShoeRepository = bowlingShoeRepository;
+        minShoeSize = bowlingCenter.getMinShoeSize();
+        maxShoeSize = bowlingCenter.getMaxShoeSize();
         List<BowlingShoe> shoeList = bowlingShoeRepository.findAllByClientIsNullAndActiveIsTrue();
         int value;
         shoeSizeAmountMap = new HashMap<>();
-        for (int i = 30; i < 51; i++) {
+        for (int i = minShoeSize; i < maxShoeSize; i++) {
             shoeSizeAmountMap.put(i, 0);
         }
         for (BowlingShoe shoe : shoeList) {
@@ -64,9 +69,9 @@ public class ShoePanel extends VerticalLayout {
         sizeLabel.setMinWidth("250px");
         sizeLabel.setMaxWidth("250px");
 
-        shoeSizeField.setMin(30);
-        shoeSizeField.setMax(50);
-        shoeSizeField.setValue(40);
+        shoeSizeField.setMin(minShoeSize);
+        shoeSizeField.setMax(maxShoeSize);
+        shoeSizeField.setValue((minShoeSize + maxShoeSize) / 2);
         shoeSizeField.addValueChangeListener(integerFieldIntegerComponentValueChangeEvent ->
                 shoeAmountField.setMax(shoeSizeAmountMap.get(shoeSizeField.getValue())));
         shoeSizeField.setStepButtonsVisible(true);
@@ -110,7 +115,7 @@ public class ShoePanel extends VerticalLayout {
         List<BowlingShoe> shoeList = bowlingShoeRepository.findAllByClientIsNullAndActiveIsTrue();
         int value;
         shoeSizeAmountMap = new HashMap<>();
-        for (int i = 30; i < 51; i++) {
+        for (int i = minShoeSize; i < maxShoeSize; i++) {
             shoeSizeAmountMap.put(i, 0);
         }
         for (BowlingShoe shoe : shoeList) {

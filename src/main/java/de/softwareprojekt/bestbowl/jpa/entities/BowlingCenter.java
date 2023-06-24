@@ -30,6 +30,9 @@ public class BowlingCenter implements Serializable {
     // prices
     private double bowlingAlleyPricePerHour;
     private double bowlingShoePrice;
+    // shoe sizes
+    private int minShoeSize;
+    private int maxShoeSize;
     // email server data
     private String senderEmail;
     private String receiverEmail;
@@ -259,6 +262,22 @@ public class BowlingCenter implements Serializable {
      */
     public void setBowlingShoePrice(double bowlingShoePrice) {
         this.bowlingShoePrice = bowlingShoePrice;
+    }
+
+    public int getMinShoeSize() {
+        return minShoeSize;
+    }
+
+    public void setMinShoeSize(int minShoeSize) {
+        this.minShoeSize = minShoeSize;
+    }
+
+    public int getMaxShoeSize() {
+        return maxShoeSize;
+    }
+
+    public void setMaxShoeSize(int maxShoeSize) {
+        this.maxShoeSize = maxShoeSize;
     }
 
     /**

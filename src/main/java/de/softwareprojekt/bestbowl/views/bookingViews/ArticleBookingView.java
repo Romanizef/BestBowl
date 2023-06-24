@@ -189,7 +189,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
      * @return A shoePanel, which is a component
      */
     private Component createShoePanel() {
-        shoePanel = new ShoePanel(bowlingShoeRepository, currentBowlingAlleyBooking.getClient());
+        shoePanel = new ShoePanel(bowlingShoeRepository, currentBowlingAlleyBooking.getClient(), bowlingCenter);
         shoePanel.getShoeAmountField().addValueChangeListener(integerFieldIntegerComponentValueChangeEvent -> {
             addItemButton.setEnabled(true);
             deleteChangesButton.setEnabled(true);

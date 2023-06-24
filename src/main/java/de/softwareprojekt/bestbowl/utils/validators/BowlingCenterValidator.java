@@ -1,13 +1,12 @@
 package de.softwareprojekt.bestbowl.utils.validators;
 
-import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
-import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.*;
-
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.binder.ValueContext;
-
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
+
+import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
+import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.*;
 
 /**
  * @author Marten
@@ -17,10 +16,9 @@ public class BowlingCenterValidator implements Validator<BowlingCenter> {
     /**
      * The apply function is used to validate the input of a BowlingCenter object.
      * It checks if all fields are valid and returns an error message if not.
-     * 
+     *
      * @param bowlingCenter Access the values of the fields in the form
      * @param context       Get the current value of the field
-     *
      * @return A validationresult
      */
     @Override
@@ -51,6 +49,15 @@ public class BowlingCenterValidator implements Validator<BowlingCenter> {
         }
         if (bowlingCenter.getBowlingShoePrice() < 0) {
             return ValidationResult.error("Der Bowling Schuh Preis muss positiv sein!");
+        }
+        if (bowlingCenter.getMinShoeSize() < 1) {
+            return ValidationResult.error("Die minimale Schuhgröße muss größer 0 sein!");
+        }
+        if (bowlingCenter.getMaxShoeSize() < 1) {
+            return ValidationResult.error("Die maximale Schuhgröße muss größer 0 sein!");
+        }
+        if (bowlingCenter.getMaxShoeSize() < bowlingCenter.getMinShoeSize()) {
+            return ValidationResult.error("Die maximale Schuhgröße muss größer oder gleich der minimalen Schuhgröße sein!");
         }
         if (bowlingCenter.getSenderEmail() != null && bowlingCenter.getSenderEmail().length() > 0
                 && !isStringValidEmail(bowlingCenter.getSenderEmail())) {

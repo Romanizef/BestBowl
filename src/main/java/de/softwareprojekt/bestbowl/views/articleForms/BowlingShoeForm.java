@@ -11,6 +11,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
+import de.softwareprojekt.bestbowl.beans.Repos;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
 import de.softwareprojekt.bestbowl.utils.validators.article.BowlingShoeValidator;
 
@@ -62,7 +64,8 @@ public class BowlingShoeForm extends FormLayout {
 
         add(labelLayout, boughtAtField, sizeField, checkboxLayout);
 
-        shoeBinder.withValidator(new BowlingShoeValidator());
+        BowlingCenter bowlingCenter = Repos.getBowlingCenterRepository().getBowlingCenter();
+        shoeBinder.withValidator(new BowlingShoeValidator(bowlingCenter.getMinShoeSize(), bowlingCenter.getMaxShoeSize()));
         shoeBinder.bind(boughtAtField, bowlingShoe -> LocalDateTime.ofInstant(Instant.ofEpochMilli(bowlingShoe.getBoughtAt()),
                 ZoneId.systemDefault()), (bowlingShoe, localDateTime) -> {
             bowlingShoe.setBoughtAt(localDateTime.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000);
