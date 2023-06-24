@@ -38,7 +38,7 @@ public class DrinkValidator implements Validator<Drink> {
         if (drink.getReorderPoint() < -1) {
             return ValidationResult.error("Meldebestand muss positiv sein oder -1 für keine Meldung!");
         }
-        if (!isStringWithoutDoubleSpaces(drink.getName())) {
+        if (isStringWithoutDoubleSpaces(drink.getName())) {
             return ValidationResult.error("Getränkename darf nicht leer sein!");
         }
         return ValidationResult.ok();

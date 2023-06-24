@@ -16,7 +16,7 @@ public class PatternValidator {
             "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?",
             Pattern.CASE_INSENSITIVE);
     private static final Pattern POSTAL_CODE_PATTERN = Pattern.compile("^([0]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{3}$");
-    private static final Pattern ONLY_LETTERS_PATTERN = Pattern.compile("^[a-zA-ZäüößÄÜÖ]+$");
+    private static final Pattern ONLY_LETTERS_PATTERN = Pattern.compile("^[a-zA-ZäüößÄÜÖ\\s]+$");
     private static final Pattern ONLY_LETTERS_AND_CHAR_PATTERN = Pattern.compile("^[a-zA-ZäüößÄÜÖ/.-]+$");
     private static final Pattern NO_DOUBLESPACES_PATTERN = Pattern.compile("^[\s\s]+$");
     private static final Pattern HOUSE_NUMBER_PATTERN = Pattern.compile("^[1-9]\\d*(?:[ -]?(?:[a-zA-Z]+|[1-9]\\d*))?$");
