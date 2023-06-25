@@ -34,6 +34,9 @@ public class UserValidator implements Validator<User> {
         if (!isStringNotEmpty(user.getEncodedPassword())) {
             return ValidationResult.error("Passwort darf nicht leer sein!");
         }
+        if (!isStringMinNChars(user.getEncodedPassword(), 5)) {
+            return ValidationResult.error("Passwort muss min. 5 Zeichen lang sein!");
+        }
         if (!isStringMinNChars(user.getSecurityQuestion(), 3)) {
             return ValidationResult.error("Sicherheitsfrage muss min. 3 Zeichen lang sein!");
         }

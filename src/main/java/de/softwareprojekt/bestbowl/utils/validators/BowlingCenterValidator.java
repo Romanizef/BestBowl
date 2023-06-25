@@ -6,6 +6,7 @@ import com.vaadin.flow.data.binder.ValueContext;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
+import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
 import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.*;
 
 /**
@@ -78,12 +79,23 @@ public class BowlingCenterValidator implements Validator<BowlingCenter> {
             return ValidationResult
                     .error("Die maximale Schuhgröße muss größer oder gleich der minimalen Schuhgröße sein!");
         }
-        if (bowlingCenter.getSenderEmail() != null && bowlingCenter.getSenderEmail().length() > 0
-                && !isStringValidEmail(bowlingCenter.getSenderEmail())) {
+        if (!isStringMinNChars(bowlingCenter.getSenderEmail(), 2)) {
+            return ValidationResult.error("Sender E-Mail muss mindestens 2 Zeichen lang sein!");
+        }
+        if (!isStringNotEmpty(bowlingCenter.getSenderEmail())
+                || !isStringValidEmail(bowlingCenter.getSenderEmail())
+                || isStringWithoutDoubleSpaces(bowlingCenter.getSenderEmail())) {
             return ValidationResult.error("Ungültige E-Mail");
         }
-        if (bowlingCenter.getReceiverEmail() != null && bowlingCenter.getReceiverEmail().length() > 0
-                && !isStringValidEmail(bowlingCenter.getReceiverEmail())) {
+        if (!isStringMinNChars(bowlingCenter.getPassword(), 2)) {
+            return ValidationResult.error("E-Mail-Passwort muss mindestens 2 Zeichen lang sein!");
+        }
+        if (!isStringMinNChars(bowlingCenter.getReceiverEmail(), 2)) {
+            return ValidationResult.error("Empfänger E-Mail muss mindestens 2 Zeichen lang sein!");
+        }
+        if (!isStringNotEmpty(bowlingCenter.getReceiverEmail())
+                || !isStringValidEmail(bowlingCenter.getReceiverEmail())
+                || isStringWithoutDoubleSpaces(bowlingCenter.getReceiverEmail())) {
             return ValidationResult.error("Ungültige E-Mail");
         }
         if (!isStringValidSMTPHost(bowlingCenter.getSmtpHost())) {

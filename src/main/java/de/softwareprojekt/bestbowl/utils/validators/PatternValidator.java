@@ -23,7 +23,7 @@ public class PatternValidator {
     private static final Pattern NO_SPACES_PATTERN = Pattern.compile("^[\s]+$");
     private static final Pattern HOUSE_NUMBER_PATTERN = Pattern.compile("^[1-9]\\d*(?:[ -]?(?:[a-zA-Z]+|[1-9]\\d*))?$");
     private static final Pattern SMTP_HOST_PATTERN = Pattern
-            .compile("^[\\d.a-z-]+\\.[a-z]{2,63}$");
+            .compile("^[\\d.a-zA-Z-]+\\.[a-z]{2,63}$");
     private static final Pattern SMTP_PORT_PATTERN = Pattern
             .compile("^[1-9]{3}+$");
 
