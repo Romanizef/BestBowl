@@ -27,6 +27,7 @@ import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoe.BowlingShoeBooki
 import de.softwareprojekt.bestbowl.jpa.repositories.drink.DrinkBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.food.FoodBookingRepository;
 import de.softwareprojekt.bestbowl.utils.VaadinUtils;
+import de.softwareprojekt.bestbowl.utils.email.MailSenderService;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,7 @@ public class PendingBookingView extends VerticalLayout {
     private Button completeButton;
     private List<BowlingAlleyBooking> bookingCache;
     private BowlingAlleyBooking selectedBooking;
+    private final transient MailSenderService mailSenderService;
 
     /**
      * The PendingBookingView function is a constructor for the PendingBookingView
@@ -69,9 +71,9 @@ public class PendingBookingView extends VerticalLayout {
      */
     @Autowired
     public PendingBookingView(BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
-                              DrinkBookingRepository drinkBookingRepository,
-                              FoodBookingRepository foodBookingRepository,
-                              BowlingShoeBookingRepository shoeBookingRepository) {
+            DrinkBookingRepository drinkBookingRepository,
+            FoodBookingRepository foodBookingRepository,
+            BowlingShoeBookingRepository shoeBookingRepository) {
         this.bowlingAlleyBookingRepository = bowlingAlleyBookingRepository;
         this.drinkBookingRepository = drinkBookingRepository;
         this.foodBookingRepository = foodBookingRepository;
@@ -79,6 +81,7 @@ public class PendingBookingView extends VerticalLayout {
         setSizeFull();
         setAlignItems(Alignment.CENTER);
 
+        mailSenderService = new MailSenderService();
         H1 header = new H1("Offene Buchungen");
         modeSelect = createModeSelect();
         Component searchComponent = createSearchComponent();
@@ -216,6 +219,7 @@ public class PendingBookingView extends VerticalLayout {
                 bookingCache.remove(selectedBooking);
                 selectedBooking.setActive(false);
                 bowlingAlleyBookingRepository.save(selectedBooking);
+                mailSenderService.sendBookingCancelationMail(selectedBooking);;
                 updateGridItems();
             });
         });
@@ -250,7 +254,8 @@ public class PendingBookingView extends VerticalLayout {
      * i.e., it adds up the price of all food and drink bookings as well as shoe
      * rentals that were made at the same time for this bowling alley.
      *
-     * @param bowlingAlleyBooking Get the client, bowling alley and start time of a booking
+     * @param bowlingAlleyBooking Get the client, bowling alley and start time of a
+     *                            booking
      * @return A string
      */
     private String calculateBookingTotal(BowlingAlleyBooking bowlingAlleyBooking) {

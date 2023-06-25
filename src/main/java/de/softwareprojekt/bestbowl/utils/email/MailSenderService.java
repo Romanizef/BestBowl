@@ -114,7 +114,7 @@ public class MailSenderService {
         int bookingNumber = booking.getId(); // BookingID as bookingNumber
 
         sender.login(smtphost, smtpport, senderMail, password);
-        String subject = "Ihre Best Bowl Buchungsbestätigung";
+        String subject = "Ihre Best Bowl Stornierung";
         String mailText = "Sehr geehrter " + recepientFirstName + " " + recepientLastName + ",\n"
                 + "\nSchade das sie ihre Buchung mit der Rechnungsnummer: " + bookingNumber + " storniert haben."
                 + "\n\nWir hoffen sie bald bei uns wieder zu sehen\nIhr Best Bowl-Team";

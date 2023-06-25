@@ -1,5 +1,19 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
+import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.clearNumberFieldChildren;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderBoolean;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderInteger;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderString;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -16,6 +30,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoe.BowlingShoeRepository;
 import de.softwareprojekt.bestbowl.utils.Utils;
@@ -24,16 +39,6 @@ import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.articleForms.BowlingShoeForm;
 import jakarta.annotation.security.RolesAllowed;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Optional;
-
-import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * @author Max Ziller
