@@ -26,7 +26,6 @@ public class DrinkValidator implements Validator<Drink> {
      *
      * @return A validationresult
      */
-
     @Override
     public ValidationResult apply(Drink drink, ValueContext context) {
         if (!isStringMinNChars(drink.getName(), 2)) {

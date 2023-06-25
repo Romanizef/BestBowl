@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * @author Ali
+ * @author Max
  */
 @SpringBootApplication
 public class BestBowlApplication {

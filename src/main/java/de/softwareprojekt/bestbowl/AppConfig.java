@@ -20,7 +20,7 @@ import javax.sql.DataSource;
 import java.io.File;
 
 /**
- * @author Ali
+ * @author Matija
  */
 @Configuration
 @EnableWebSecurity

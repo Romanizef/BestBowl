@@ -9,7 +9,7 @@ import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
 import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.*;
 
 /**
- * @author Marten
+ * @author Matija
  */
 public class BowlingCenterValidator implements Validator<BowlingCenter> {
 
