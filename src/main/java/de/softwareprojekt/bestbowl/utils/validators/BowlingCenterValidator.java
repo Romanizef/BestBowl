@@ -26,13 +26,27 @@ public class BowlingCenterValidator implements Validator<BowlingCenter> {
         if (!isStringMinNChars(bowlingCenter.getDisplayName(), 2)) {
             return ValidationResult.error("Anzeigename muss mindestens 2 Zeichen lang sein!");
         }
+        if (!isStringOnlyLettersAndSpecialChars(bowlingCenter.getDisplayName())) {
+            if (isStringWithoutDoubleSpaces(bowlingCenter.getDisplayName()))
+                return ValidationResult
+                        .error("In der Anzeigename sind nur Buchstaben erlaubt! Anzeigename darf nicht leer sein!");
+        }
         if (!isStringMinNChars(bowlingCenter.getBusinessName(), 2)) {
             return ValidationResult.error("Geschäftsname muss mindestens 2 Zeichen lang sein!");
+        }
+        if (!isStringOnlyLettersAndSpecialChars(bowlingCenter.getBusinessName())) {
+            if (isStringWithoutDoubleSpaces(bowlingCenter.getBusinessName()))
+                return ValidationResult
+                        .error("In der Geschäftsnamen sind nur Buchstaben erlaubt! Anzeigename darf nicht leer sein!");
         }
         if (!isStringMinNChars(bowlingCenter.getStreet(), 2)) {
             return ValidationResult.error("Straße muss mindestens 2 Zeichen lang sein!");
         }
-        if (bowlingCenter.getHouseNr().isEmpty()) {
+        if (!isStringOnlyLetters(bowlingCenter.getStreet())) {
+            if (isStringWithoutDoubleSpaces(bowlingCenter.getStreet()))
+                return ValidationResult.error("Im Straßennamen sind nur Buchstaben erlaubt!");
+        }
+        if (bowlingCenter.getHouseNr() == null) {
             return ValidationResult.error("Hausnummer muss größer als 0 sein!");
         }
         if (!isStringValidHouseNumber(bowlingCenter.getHouseNr())) {
@@ -43,6 +57,10 @@ public class BowlingCenterValidator implements Validator<BowlingCenter> {
         }
         if (!isStringMinNChars(bowlingCenter.getCity(), 2)) {
             return ValidationResult.error("Stadt muss mindestens 2 Zeichen lang sein!");
+        }
+        if (!isStringOnlyLetters(bowlingCenter.getCity())) {
+            if (isStringWithoutDoubleSpaces(bowlingCenter.getCity()))
+                return ValidationResult.error("Im Stadtnamen sind nur Buchstaben erlaubt!");
         }
         if (bowlingCenter.getBowlingAlleyPricePerHour() < 0) {
             return ValidationResult.error("Der Bahn Preis pro Stunde muss positiv sein!");
@@ -57,7 +75,8 @@ public class BowlingCenterValidator implements Validator<BowlingCenter> {
             return ValidationResult.error("Die maximale Schuhgröße muss größer 0 sein!");
         }
         if (bowlingCenter.getMaxShoeSize() < bowlingCenter.getMinShoeSize()) {
-            return ValidationResult.error("Die maximale Schuhgröße muss größer oder gleich der minimalen Schuhgröße sein!");
+            return ValidationResult
+                    .error("Die maximale Schuhgröße muss größer oder gleich der minimalen Schuhgröße sein!");
         }
         if (bowlingCenter.getSenderEmail() != null && bowlingCenter.getSenderEmail().length() > 0
                 && !isStringValidEmail(bowlingCenter.getSenderEmail())) {
@@ -72,9 +91,6 @@ public class BowlingCenterValidator implements Validator<BowlingCenter> {
         }
         if (!isStringValidSMTPPort(bowlingCenter.getSmtpPort())) {
             return ValidationResult.error("Ungültiger SMTP Port. Format: 123");
-        }
-        if (!isStringOnlyLetters(bowlingCenter.getStreet()) || !isStringOnlyLetters(bowlingCenter.getCity())) {
-            return ValidationResult.error("In der Stadt und Straße sind nur Buchstaben erlaubt!");
         }
         return ValidationResult.ok();
     }

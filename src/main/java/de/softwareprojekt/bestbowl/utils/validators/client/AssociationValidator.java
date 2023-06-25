@@ -8,6 +8,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.client.Association;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
 import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.isStringOnlyLettersAndSpecialChars;
+import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.isStringWithoutDoubleSpaces;
 
 /**
  * @author Matija
@@ -28,7 +29,9 @@ public class AssociationValidator implements Validator<Association> {
             return ValidationResult.error("Vereinsname muss länger als 2 Buchstaben sein!");
         }
         if (!isStringOnlyLettersAndSpecialChars(association.getName())) {
-            return ValidationResult.error("Nur Buchstaben und die Zeichen / . - im Namen erlaubt!");
+            if (isStringWithoutDoubleSpaces(association.getName()))
+                return ValidationResult
+                        .error("Nur Buchstaben und die Zeichen / . - im Namen erlaubt! Name darf auch nicht leer sein");
         }
         if (association.getDiscount() < 0) {
             return ValidationResult.error("Rabatt muss positiv sein!");

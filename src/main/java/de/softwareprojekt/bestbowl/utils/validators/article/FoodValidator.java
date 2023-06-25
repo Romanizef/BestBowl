@@ -2,6 +2,7 @@ package de.softwareprojekt.bestbowl.utils.validators.article;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
 import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.isStringOnlyLetters;
+import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.isStringWithoutDoubleSpaces;
 
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
@@ -42,7 +43,8 @@ public class FoodValidator implements Validator<Food> {
             return ValidationResult.error("Meldebestand muss positiv sein oder -1 für keine Meldung");
         }
         if (!isStringOnlyLetters(food.getName())) {
-            return ValidationResult.error("Im Namen sind nur Buchstaben erlaubt!");
+            if (isStringWithoutDoubleSpaces(food.getName()))
+                return ValidationResult.error("Im Namen sind nur Buchstaben und Leerzeichen erlaubt! Name darf auch nicht leer sein!");
         }
         return ValidationResult.ok();
     }

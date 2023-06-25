@@ -138,7 +138,7 @@ public class ManagementView extends VerticalLayout {
      */
     private HorizontalLayout createFoodAndShoeRowButtonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
-        Button foodViewButton = new Button("Speise" + VERWALTUNG);
+        Button foodViewButton = new Button("Speisen" + VERWALTUNG);
         foodViewButton.addClickListener(buttonClickEvent -> UI.getCurrent().navigate(FoodManagementView.class));
         Button bowlingShoeViewButton = new Button("Schuh" + VERWALTUNG);
         bowlingShoeViewButton

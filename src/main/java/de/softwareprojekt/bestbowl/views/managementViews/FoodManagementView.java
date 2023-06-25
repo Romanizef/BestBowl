@@ -36,7 +36,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
  * @author Max Ziller
  */
 @Route(value = "foodManagement", layout = MainView.class)
-@PageTitle("Speiesenverwaltung")
+@PageTitle("Speisenverwaltung")
 @RolesAllowed({UserRole.OWNER})
 public class FoodManagementView extends VerticalLayout {
     private final transient FoodRepository foodRepository;

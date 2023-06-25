@@ -56,10 +56,25 @@ public class ClientValidator implements Validator<Client> {
         if (!isStringMinNChars(client.getAddress().getCity(), 3)) {
             return ValidationResult.error("Stadt muss min. 3 Zeichen lang sein!");
         }
-        if (!isStringOnlyLetters(client.getFirstName()) || !isStringOnlyLetters(client.getLastName())
-                || !isStringOnlyLetters(client.getAddress().getCity())
-                || !isStringOnlyLetters(client.getAddress().getStreet())) {
-            return ValidationResult.error("Im Vor/-Nachnamen, in der Stadt und Straße sind nur Buchstaben erlaubt!");
+        if (!isStringOnlyLetters(client.getFirstName())) {
+            if (isStringWithoutDoubleSpaces(client.getFirstName()))
+                return ValidationResult
+                        .error("Im Vornamen sind nur Buchstaben erlaubt! Vorname darf auch nicht leer sein!");
+        }
+        if (!isStringOnlyLetters(client.getLastName())) {
+            if (isStringWithoutDoubleSpaces(client.getLastName()))
+                return ValidationResult
+                        .error("Im Nachnamen sind nur Buchstaben erlaubt! Nachname darf auch nicht leer sein!");
+        }
+        if (!isStringOnlyLetters(client.getAddress().getCity())) {
+            if (isStringWithoutDoubleSpaces(client.getAddress().getCity()))
+                return ValidationResult
+                        .error("Im Stadtnamen sind nur Buchstaben erlaubt! Stadtname darf auch nicht leer sein!");
+        }
+        if (!isStringOnlyLetters(client.getAddress().getStreet())) {
+            if (isStringWithoutDoubleSpaces(client.getAddress().getStreet()))
+                return ValidationResult
+                        .error("Im Straßennamen sind nur Buchstaben erlaubt! Straßenname darf auch nicht leer sein!");
         }
         return ValidationResult.ok();
     }
