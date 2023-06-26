@@ -74,6 +74,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     private final Map<String, FoodBooking> foodBookingMap = new HashMap<>();
     private final Map<Integer, Button> buttonMap;
     private final BowlingCenter bowlingCenter;
+    private final H1 header;
     private int currentBowlingAlleyId;
     private BowlingAlleyBooking currentBowlingAlleyBooking;
     private Div drinkDiv;
@@ -86,7 +87,6 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     private Button goToBillButton;
     private Button deleteChangesButton;
     private boolean panelChanges;
-    private H1 header;
 
 
     /**
@@ -163,7 +163,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
                 TabSheetVariant.LUMO_TABS_CENTERED,
                 TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS,
                 TabSheetVariant.MATERIAL_BORDERED);
-        tabs.setHeightFull();
+        tabs.setHeight("calc(100vh - 328px)");
         Tab drink = new Tab(VaadinIcon.COFFEE.create(), new Span("Getränke"));
         Tab food = new Tab(VaadinIcon.CROSS_CUTLERY.create(), new Span("Speisen"));
         Tab shoe = new Tab(VaadinIcon.RETWEET.create(), new Span("Schuhe"));
@@ -190,11 +190,11 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         shoePanel.getShoeAmountField().addValueChangeListener(integerFieldIntegerComponentValueChangeEvent -> {
             addItemButton.setEnabled(true);
             deleteChangesButton.setEnabled(true);
-            if(integerFieldIntegerComponentValueChangeEvent.getValue()== 0){
+            if (integerFieldIntegerComponentValueChangeEvent.getValue() == 0) {
                 panelChanges = false;
                 addItemButton.setEnabled(false);
                 deleteChangesButton.setEnabled(false);
-            }else{
+            } else {
                 panelChanges = true;
                 addItemButton.setEnabled(true);
                 deleteChangesButton.setEnabled(true);
@@ -232,11 +232,11 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
                         integerField.addValueChangeListener(integerFieldIntegerComponentValueChangeEvent -> {
                             addItemButton.setEnabled(true);
                             deleteChangesButton.setEnabled(true);
-                            if(integerFieldIntegerComponentValueChangeEvent.getValue()== 0){
+                            if (integerFieldIntegerComponentValueChangeEvent.getValue() == 0) {
                                 panelChanges = false;
                                 addItemButton.setEnabled(false);
                                 deleteChangesButton.setEnabled(false);
-                            }else{
+                            } else {
                                 panelChanges = true;
                                 addItemButton.setEnabled(true);
                                 deleteChangesButton.setEnabled(true);
@@ -267,11 +267,11 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         for (Food food : foodList) {
             FoodPanel foodPanel = new FoodPanel(food, currentBowlingAlleyBooking, foodBookingMap);
             foodPanel.getFoodAmountField().addValueChangeListener(integerFieldIntegerComponentValueChangeEvent -> {
-                if(integerFieldIntegerComponentValueChangeEvent.getValue()== 0){
+                if (integerFieldIntegerComponentValueChangeEvent.getValue() == 0) {
                     panelChanges = false;
                     addItemButton.setEnabled(false);
                     deleteChangesButton.setEnabled(false);
-                }else{
+                } else {
                     panelChanges = true;
                     addItemButton.setEnabled(true);
                     deleteChangesButton.setEnabled(true);
@@ -291,16 +291,24 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
      *
      * @return A component
      */
-    private final Component createAlleyButtonsComponent() {
-        HorizontalLayout alleyLayout; // Todo layout ändern mit 30 buttons/bahnen testen, scrolllayout
-        alleyLayout = new HorizontalLayout();
+    private Component createAlleyButtonsComponent() {
+        Scroller scroller = new Scroller();
+        scroller.setScrollDirection(Scroller.ScrollDirection.HORIZONTAL);
+        scroller.setMaxWidth("calc(100vw - 350px");
+        scroller.setWidth("calc(100vw - 350px");
+
+        HorizontalLayout alleyLayout = new HorizontalLayout();
         alleyLayout.setPadding(true);
         alleyLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        alleyLayout.getStyle().set("display", "inline-flex");
+        scroller.setContent(alleyLayout);
 
         List<BowlingAlley> bowlingAlleyList = bowlingAlleyRepository.findAllByActiveIsTrue();
         if (bowlingAlleyList.isEmpty()) {
             Notifications.showError("Es sind keine Bahnen im System vorhanden.\nBitte trage Bahnen ins System ein.");
+            return scroller;
         }
+
         bowlingAlleyList.sort(Comparator.comparingInt(BowlingAlley::getId));
         long currentTime = System.currentTimeMillis();
         List<BowlingAlley> freeBowlingAlleyList = bowlingAlleyRepository
@@ -310,7 +318,6 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
 
         List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository
                 .findAllByTimePeriodsOverlapping(System.currentTimeMillis());
-
 
 
         for (BowlingAlley bowlingAlley : bowlingAlleyList) {
@@ -328,7 +335,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
             alleyButton.addClickListener(buttonClickEvent -> {
                 if (tempBowlingAlleyBooking != null && tempBowlingAlleyBooking.isCompleted()) {
                     changeTabsCompletedBooking();
-                    header.setText(alleyButton.getText()  +" wurde schon bezahlt");
+                    header.setText(alleyButton.getText() + " wurde schon bezahlt");
                     goToBillButton.setEnabled(false);
                     changePreviousButtonStyle(currentBowlingAlleyId);
                     return;
@@ -343,7 +350,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
             });
             alleyLayout.add(alleyButton);
         }
-        return alleyLayout;
+        return scroller;
     }
 
     private void changeTabsCompletedBooking() {
@@ -462,7 +469,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
             addItemButton.setEnabled(false);
         });
 
-        layout.add( deleteChangesButton, addItemButton, goToBillButton);
+        layout.add(deleteChangesButton, addItemButton, goToBillButton);
         return layout;
     }
 
