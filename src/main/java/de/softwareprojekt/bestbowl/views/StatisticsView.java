@@ -278,8 +278,9 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
         bookingGrid.addColumn(new ComponentRenderer<>(booking -> {
             HorizontalLayout horizontalLayout = new HorizontalLayout();
             horizontalLayout.setAlignItems(Alignment.CENTER);
-            horizontalLayout.add(new InvoiceDownloadButton(booking),
-                    new Label(String.valueOf(booking.getId())));
+            InvoiceDownloadButton invoiceDownloadButton = new InvoiceDownloadButton(booking);
+            invoiceDownloadButton.setEnabled(booking.isActive());
+            horizontalLayout.add(invoiceDownloadButton, new Label(String.valueOf(booking.getId())));
             return horizontalLayout;
         })).setHeader("Rechnungsnummer");
         bookingGrid.addColumn(booking -> getBookingStatus(booking).getText()).setHeader("Rechnungsstatus");
@@ -299,6 +300,11 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
      * @return {@code double} total
      */
     private double calculateBookingTotal(BowlingAlleyBooking bowlingAlleyBooking) {
+        //sum 0 if canceled
+        if (!bowlingAlleyBooking.isActive()) {
+            return 0.0;
+        }
+
         List<DrinkBooking> drinkBookingList = drinkBookingRepository
                 .findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(bowlingAlleyBooking.getClient(),
                         bowlingAlleyBooking.getBowlingAlley(), bowlingAlleyBooking.getStartTime());
