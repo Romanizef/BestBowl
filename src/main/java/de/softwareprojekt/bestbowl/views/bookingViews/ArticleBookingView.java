@@ -7,6 +7,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -74,7 +75,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     private final Map<String, FoodBooking> foodBookingMap = new HashMap<>();
     private final Map<Integer, Button> buttonMap;
     private final BowlingCenter bowlingCenter;
-    private final H1 header;
+    private final H3 header;
     private int currentBowlingAlleyId;
     private BowlingAlleyBooking currentBowlingAlleyBooking;
     private Div drinkDiv;
@@ -87,6 +88,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     private Button goToBillButton;
     private Button deleteChangesButton;
     private boolean panelChanges;
+    private List<IntegerField> allIntegerFields;
 
 
     /**
@@ -126,7 +128,8 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         buttonMap = new HashMap<>();
         setSizeFull();
         setAlignItems(Alignment.CENTER);
-        header = new H1();
+        header = new H3();
+        allIntegerFields = new ArrayList<>();
         Component articlePanelComponent = createArticlePanelComponent();
         Component footerButtons = createFooterButtons();
         Component alleyButtonsComponent = createAlleyButtonsComponent();
@@ -136,6 +139,8 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         add(header, alleyButtonsComponent, articlePanelComponent, footerButtons);
         updateHeader();
     }
+
+
 
     private void updateHeader() {
         if (currentBowlingAlleyBooking == null) {
@@ -187,17 +192,21 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
      */
     private Component createShoePanel() {
         shoePanel = new ShoePanel(bowlingShoeRepository, currentBowlingAlleyBooking.getClient(), bowlingCenter);
+        allIntegerFields.add(shoePanel.getShoeAmountField());
         shoePanel.getShoeAmountField().addValueChangeListener(integerFieldIntegerComponentValueChangeEvent -> {
-            addItemButton.setEnabled(true);
-            deleteChangesButton.setEnabled(true);
-            if (integerFieldIntegerComponentValueChangeEvent.getValue() == 0) {
-                panelChanges = false;
-                addItemButton.setEnabled(false);
-                deleteChangesButton.setEnabled(false);
+            for (IntegerField integerField:
+                    allIntegerFields) {
+                if(integerField.getValue() > 0){
+                    panelChanges = true;
+                    break;
+                }else{
+                    panelChanges = false;
+                }
+            }
+            if (panelChanges) {
+                footerButtonToTrue();
             } else {
-                panelChanges = true;
-                addItemButton.setEnabled(true);
-                deleteChangesButton.setEnabled(true);
+                footerButtonToFalse();
             }
         });
         return shoePanel;
@@ -229,17 +238,21 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
                 DrinkPanel drinkPanel = new DrinkPanel(drink, currentBowlingAlleyBooking, drinkBookingMap);
                 drinkPanel.getVariantLayout().getChildren().forEach(component -> {
                     if (component instanceof IntegerField integerField) {
+                        allIntegerFields.add(integerField);
                         integerField.addValueChangeListener(integerFieldIntegerComponentValueChangeEvent -> {
-                            addItemButton.setEnabled(true);
-                            deleteChangesButton.setEnabled(true);
-                            if (integerFieldIntegerComponentValueChangeEvent.getValue() == 0) {
-                                panelChanges = false;
-                                addItemButton.setEnabled(false);
-                                deleteChangesButton.setEnabled(false);
+                            for (IntegerField integerField1:
+                                    allIntegerFields) {
+                                if(integerField1.getValue() > 0){
+                                    panelChanges = true;
+                                    break;
+                                }else{
+                                    panelChanges = false;
+                                }
+                            }
+                            if (panelChanges) {
+                                footerButtonToTrue();
                             } else {
-                                panelChanges = true;
-                                addItemButton.setEnabled(true);
-                                deleteChangesButton.setEnabled(true);
+                                footerButtonToFalse();
                             }
                         });
                     }
@@ -266,21 +279,39 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         foodList.sort(Comparator.comparing(Food::getName));
         for (Food food : foodList) {
             FoodPanel foodPanel = new FoodPanel(food, currentBowlingAlleyBooking, foodBookingMap);
+            allIntegerFields.add(foodPanel.getFoodAmountField());
             foodPanel.getFoodAmountField().addValueChangeListener(integerFieldIntegerComponentValueChangeEvent -> {
-                if (integerFieldIntegerComponentValueChangeEvent.getValue() == 0) {
-                    panelChanges = false;
-                    addItemButton.setEnabled(false);
-                    deleteChangesButton.setEnabled(false);
+                for (IntegerField integerField:
+                        allIntegerFields) {
+                    if(integerField.getValue() > 0){
+                        panelChanges = true;
+                        break;
+                    }else{
+                        panelChanges = false;
+                    }
+                }
+                if (panelChanges) {
+                    footerButtonToTrue();
                 } else {
-                    panelChanges = true;
-                    addItemButton.setEnabled(true);
-                    deleteChangesButton.setEnabled(true);
+                    footerButtonToFalse();
                 }
             });
             layout.add(foodPanel);
         }
         foodLayoutForAddItem = layout;
         return layout;
+    }
+
+    private void footerButtonToTrue() {
+        panelChanges = true;
+        addItemButton.setEnabled(true);
+        deleteChangesButton.setEnabled(true);
+    }
+
+    private void footerButtonToFalse() {
+        panelChanges = false;
+        addItemButton.setEnabled(false);
+        deleteChangesButton.setEnabled(false);
     }
 
     /**
@@ -328,6 +359,8 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
             BowlingAlleyBooking tempBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(
                     bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == bowlingAlley.getId()).findFirst().orElse(null);
             if (tempBowlingAlleyBooking != null && tempBowlingAlleyBooking.isCompleted()) {
+                changeTabsCompletedBooking();
+                header.setText(alleyButton.getText() + " wurde schon bezahlt");
                 alleyButton.removeThemeVariants(ButtonVariant.LUMO_PRIMARY);
                 alleyButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
                 goToBillButton.setEnabled(false);
@@ -353,6 +386,8 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         return scroller;
     }
 
+
+
     private void changeTabsCompletedBooking() {
         drinkDiv.removeAll();
         foodDiv.removeAll();
@@ -371,12 +406,14 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
                         bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
                 .findFirst()
                 .orElse(null);
+        allIntegerFields = new ArrayList<>();
         changeTabsPendingBooking();
         updateHeader();
         goToBillButton.setEnabled(true);
         deleteChangesButton.setEnabled(false);
         addItemButton.setEnabled(false);
         panelChanges = false;
+
     }
 
     /**
@@ -633,6 +670,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
             if (bowlingAlleyBookingList.isEmpty()) {
                 Notifications.showError("Es sind zurzeit keine Bahnen gebucht");
             }
+
             for (Button button : buttonMap.values()) {
                 if (button.isEnabled()) {
                     button.setAutofocus(true);
@@ -644,7 +682,15 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
                             .orElse(null);
                     changeTabsPendingBooking();
                     updateHeader();
-                    goToBillButton.setEnabled(true);
+                    if (currentBowlingAlleyBooking != null && currentBowlingAlleyBooking.isCompleted()) {
+                        button.removeThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                        button.addThemeVariants(ButtonVariant.LUMO_ERROR);
+                        goToBillButton.setEnabled(false);
+                        changeTabsCompletedBooking();
+                        header.setText(button.getText() + " wurde schon bezahlt");
+                    }else {
+                        goToBillButton.setEnabled(true);
+                    }
                     break;
                 }
             }
