@@ -128,15 +128,12 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         setAlignItems(Alignment.CENTER);
         header = new H1();
         Component articlePanelComponent = createArticlePanelComponent();
-        Scroller scroller = new Scroller();
-        scroller.setScrollDirection(Scroller.ScrollDirection.HORIZONTAL);
-        Component alleyButtonsComponent = createAlleyButtonsComponent();
-        scroller.setContent(alleyButtonsComponent);
         Component footerButtons = createFooterButtons();
+        Component alleyButtonsComponent = createAlleyButtonsComponent();
         goToBillButton.setEnabled(false);
         addItemButton.setEnabled(false);
         deleteChangesButton.setEnabled(false);
-        add(header, alleyButtonsComponent,scroller, articlePanelComponent, footerButtons);
+        add(header, alleyButtonsComponent, articlePanelComponent, footerButtons);
         updateHeader();
     }
 
@@ -296,8 +293,6 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
      */
     private final Component createAlleyButtonsComponent() {
         HorizontalLayout alleyLayout; // Todo layout ändern mit 30 buttons/bahnen testen, scrolllayout
-        // bildschirmbreite max breite oder %tual
-        // https://vaadin.com/docs/latest/components/scroller
         alleyLayout = new HorizontalLayout();
         alleyLayout.setPadding(true);
         alleyLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
@@ -328,11 +323,14 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
             if (tempBowlingAlleyBooking != null && tempBowlingAlleyBooking.isCompleted()) {
                 alleyButton.removeThemeVariants(ButtonVariant.LUMO_PRIMARY);
                 alleyButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+                goToBillButton.setEnabled(false);
             }
             alleyButton.addClickListener(buttonClickEvent -> {
                 if (tempBowlingAlleyBooking != null && tempBowlingAlleyBooking.isCompleted()) {
                     changeTabsCompletedBooking();
                     header.setText(alleyButton.getText()  +" wurde schon bezahlt");
+                    goToBillButton.setEnabled(false);
+                    changePreviousButtonStyle(currentBowlingAlleyId);
                     return;
                 }
                 if (panelChanges) {
