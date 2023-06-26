@@ -32,7 +32,7 @@ import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
 /**
  * Class that listens for commands in the command line.
  *
- * @author Marten Voß
+ * @author Ali Cicek
  */
 @Component
 public class CommandLineListener {

@@ -19,9 +19,8 @@ public class InvoiceDownloadButton extends Button {
     private byte[] pdfContent;
 
     /**
-     * Creates a button that wraps an Anchor which gets created only the first time
-     * the button is clicked.
-     * For all consecutive clicks the anchor and content is cached
+     * Creates a button that wraps an Anchor for a file download
+     * The content only gets created after the first button press and is cached for consecutive clicks
      *
      * @param booking
      */

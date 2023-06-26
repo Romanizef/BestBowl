@@ -47,7 +47,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.VAADIN_PRIMARY_BLUE;
  * @author Matija Kopschek
  */
 @Route(value = "statistics", layout = MainView.class)
-@PageTitle("Statistiken")
+@PageTitle("Statistik")
 @RolesAllowed({UserRole.OWNER})
 public class StatisticsView extends VerticalLayout implements HasUrlParameter<Integer> {
     private static final String ALL = "Alle";
@@ -57,7 +57,8 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
     private final transient BowlingShoeBookingRepository shoeBookingRepository;
     private final H1 clientHeader;
     private final H5 sumHeader;
-    Select<String> yearSelect;
+    private Select<Status> statusSelect;
+    private Select<String> yearSelect;
     private Grid<BowlingAlleyBooking> bookingGrid;
     private Client currentClient;
 
@@ -84,7 +85,6 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
         Component footerComponent = createFooterComponent();
         Component headerComponent = createHeaderComponents();
         add(headerComponent, bookingGrid, footerComponent);
-        updateGridItems();
     }
 
     /**
@@ -92,16 +92,28 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
      * clientHeader and year dropdownfilter.
      *
      * @return {@code HorizontalLayout}
-     * @see #createYearDropDown()
+     * @see #createYearSelect()
      */
     private Component createHeaderComponents() {
         HorizontalLayout headerLayout = new HorizontalLayout();
         headerLayout.setAlignItems(Alignment.CENTER);
         headerLayout.expand(clientHeader);
         headerLayout.setWidthFull();
-        yearSelect = createYearDropDown();
-        headerLayout.add(clientHeader, yearSelect);
+        statusSelect = createStatusSelect();
+        yearSelect = createYearSelect();
+        headerLayout.add(clientHeader, statusSelect, yearSelect);
         return headerLayout;
+    }
+
+    private Select<Status> createStatusSelect() {
+        Select<Status> select = new Select<>();
+        select.setLabel("Filtern nach Status");
+        select.getStyle().set("margin-right", "20px");
+        select.setItems(Status.values());
+        select.setValue(Status.ANY);
+        select.setItemLabelGenerator(Status::getText);
+        select.addValueChangeListener(e -> updateGridItems());
+        return select;
     }
 
     /**
@@ -111,14 +123,14 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
      *
      * @return {@code Select<String>}
      */
-    private Select<String> createYearDropDown() {
+    private Select<String> createYearSelect() {
         Select<String> select = new Select<>();
-        select.setLabel("Sortieren nach Jahr");
+        select.setLabel("Filtern nach Jahr");
         select.getStyle().set("margin-right", "80px");
         return select;
     }
 
-    private void initYearDropDown() {
+    private void initYearSelect() {
         List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository.findAllByClientEquals(currentClient);
         List<String> yearList = new ArrayList<>();
 
@@ -136,27 +148,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
 
         yearSelect.setItems(yearList);
         yearSelect.setValue(ALL);
-        yearSelect.addValueChangeListener(e -> {
-            String bookingYear = e.getValue();
-            if (bookingYear.equals(ALL)) {
-                updateGridItems();
-            } else {
-                // start and endtime of the chosen year
-                Calendar cal = Calendar.getInstance();
-                cal.set(Calendar.YEAR, Integer.parseInt(bookingYear));
-                cal.set(Calendar.DAY_OF_YEAR, 1); // 1 = first day of the year
-                Date start = cal.getTime();
-
-                cal.set(Calendar.YEAR, Integer.parseInt(bookingYear));
-                cal.set(Calendar.MONTH, 11); // 11 = december
-                cal.set(Calendar.DAY_OF_MONTH, 31); // 31 = last day of december
-                Date end = cal.getTime();
-
-                long lowerBound = start.getTime();
-                long upperBound = end.getTime();
-                updateGridItems(lowerBound, upperBound);
-            }
-        });
+        yearSelect.addValueChangeListener(e -> updateGridItems());
     }
 
     /**
@@ -169,8 +161,8 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
             UI.getCurrent().navigate(ClientSearchView.class);
         } else {
             clientHeader
-                    .setText("Statistiken für: " + currentClient.getFirstName() + " " + currentClient.getLastName());
-            initYearDropDown();
+                    .setText("Statistik für: KdnNr: " + currentClient.getId() + ", " + currentClient.getFullName());
+            initYearSelect();
         }
     }
 
@@ -184,7 +176,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
         VerticalLayout verticallayout = new VerticalLayout();
         verticallayout.setWidth("80%");
         verticallayout.setAlignItems(Alignment.CENTER);
-        verticallayout.add(createLastViewButton());
+        verticallayout.add(createPreviousViewButton());
 
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.setWidthFull();
@@ -205,7 +197,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
      *
      * @return {@code Button} lastViewButton
      */
-    private Button createLastViewButton() {
+    private Button createPreviousViewButton() {
         Button lastViewButton;
         lastViewButton = new Button("Zurück zu Kundensuche");
         lastViewButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -215,29 +207,60 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
         return lastViewButton;
     }
 
+    private void updateGridItems() {
+        String bookingYear = yearSelect.getValue();
+        if (bookingYear.equals(ALL)) {
+            updateGridItemsA();
+        } else {
+            // start and endtime of the chosen year
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.YEAR, Integer.parseInt(bookingYear));
+            cal.set(Calendar.DAY_OF_YEAR, 1); // 1 = first day of the year
+            Date start = cal.getTime();
+
+            cal.set(Calendar.YEAR, Integer.parseInt(bookingYear));
+            cal.set(Calendar.MONTH, 11); // 11 = december
+            cal.set(Calendar.DAY_OF_MONTH, 31); // 31 = last day of december
+            Date end = cal.getTime();
+
+            long lowerBound = start.getTime();
+            long upperBound = end.getTime();
+            updateGridItemsA(lowerBound, upperBound);
+        }
+    }
+
     /**
      * Updates all the grid items to the matching year.
      *
      * @param lowerBound
      * @param upperBound
      */
-    private void updateGridItems(long lowerBound, long upperBound) {
+    private void updateGridItemsA(long lowerBound, long upperBound) {
         List<BowlingAlleyBooking> bookingList = bowlingAlleyBookingRepository
                 .findAllByStartTimeBetweenAndClientEquals(lowerBound, upperBound, currentClient);
-        updateGridItems(bookingList);
+        updateGridItemsA(bookingList);
         sumHeader.setText("Jahressumme: " + formatDouble(calculateTotal(bookingList)) + "€");
     }
 
     /**
      * Updates all the grid items to the latest state
      */
-    private void updateGridItems() {
+    private void updateGridItemsA() {
         List<BowlingAlleyBooking> bookingList = bowlingAlleyBookingRepository.findAllByClientEquals(currentClient);
-        updateGridItems(bookingList);
+        updateGridItemsA(bookingList);
         sumHeader.setText("Gesamtsumme: " + formatDouble(calculateTotal(bookingList)) + "€");
     }
 
-    private void updateGridItems(List<BowlingAlleyBooking> bookingList) {
+    /**
+     * filters bookings by status if status != any and updates the grid items
+     *
+     * @param bookingList
+     */
+    private void updateGridItemsA(List<BowlingAlleyBooking> bookingList) {
+        Status status = statusSelect.getValue();
+        if (status != Status.ANY) {
+            bookingList.removeIf(booking -> getBookingStatus(booking) != status);
+        }
         GridListDataView<BowlingAlleyBooking> dataView = bookingGrid.setItems(bookingList);
         dataView.setSortOrder(BowlingAlleyBooking::getStartTime, SortDirection.ASCENDING);
     }
@@ -252,24 +275,16 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
         bookingGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
         bookingGrid.removeAllColumns();
 
-        bookingGrid
-                .addColumn(new ComponentRenderer<>(booking -> {
-                    HorizontalLayout horizontalLayout = new HorizontalLayout();
-                    horizontalLayout.setAlignItems(Alignment.CENTER);
-                    horizontalLayout.add(new InvoiceDownloadButton(booking),
-                            new Label(String.valueOf(booking.getId())));
-                    return horizontalLayout;
-                })).setHeader("Rechnungsnummer");
-        bookingGrid
-                .addColumn(booking -> booking.getClient() == null ? "" : booking.getClient().getId())
-                .setHeader("Kundennummer");
-        bookingGrid
-                .addColumn(booking -> booking.getClient() == null ? "" : booking.getClient().getLastName())
-                .setHeader("Kundennachname");
-        bookingGrid
-                .addColumn(booking -> Utils.toDateString(booking.getStartTime())).setHeader("Datum");
-        bookingGrid.addColumn(booking -> formatDouble(calculateBookingTotal(booking)) + "€")
-                .setHeader("Summe");
+        bookingGrid.addColumn(new ComponentRenderer<>(booking -> {
+            HorizontalLayout horizontalLayout = new HorizontalLayout();
+            horizontalLayout.setAlignItems(Alignment.CENTER);
+            horizontalLayout.add(new InvoiceDownloadButton(booking),
+                    new Label(String.valueOf(booking.getId())));
+            return horizontalLayout;
+        })).setHeader("Rechnungsnummer");
+        bookingGrid.addColumn(booking -> getBookingStatus(booking).getText()).setHeader("Rechnungsstatus");
+        bookingGrid.addColumn(booking -> Utils.toDateString(booking.getStartTime())).setHeader("Datum");
+        bookingGrid.addColumn(booking -> formatDouble(calculateBookingTotal(booking)) + "€").setHeader("Summe");
 
         bookingGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
         bookingGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
@@ -333,5 +348,32 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
                 updateGridItems();
             }
         });
+    }
+
+    private Status getBookingStatus(BowlingAlleyBooking booking) {
+        if (!booking.isActive()) {
+            return Status.CANCELED;
+        } else if (booking.isCompleted()) {
+            return Status.COMPLETED;
+        } else {
+            return Status.OPEN;
+        }
+    }
+
+    private enum Status {
+        ANY(ALL),
+        COMPLETED("Bezahlt"),
+        CANCELED("Storniert"),
+        OPEN("Offen");
+
+        private final String text;
+
+        Status(String text) {
+            this.text = text;
+        }
+
+        public String getText() {
+            return text;
+        }
     }
 }
