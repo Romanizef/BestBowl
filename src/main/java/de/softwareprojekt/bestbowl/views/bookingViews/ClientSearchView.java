@@ -41,8 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.*;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.matchAndRemoveIfContains;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.clearNumberFieldChildren;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createAssociationSelect;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * Creates a View in which the user can search for a Client.
@@ -299,6 +298,7 @@ public class ClientSearchView extends VerticalLayout {
             updateClientCache();
             updateGridItems();
         });
+        applyTooltip(refreshCacheButton, "Kundenliste aktualisieren");
         searchLayout.expand(searchField);
         searchLayout.add(searchField, refreshCacheButton);
         return searchLayout;
@@ -403,6 +403,7 @@ public class ClientSearchView extends VerticalLayout {
         commentArea.addThemeVariants(TextAreaVariant.LUMO_SMALL);
         saveCommentButton = new Button();
         saveCommentButton.setIcon(VaadinIcon.CHECK_CIRCLE.create());
+        applyTooltip(saveCommentButton, "Speichern");
         commentLayout.add(commentArea, saveCommentButton);
 
         nextStepButton = new Button("Zur Buchung");

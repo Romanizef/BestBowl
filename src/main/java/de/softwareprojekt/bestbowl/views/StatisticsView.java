@@ -40,6 +40,7 @@ import java.util.*;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.VAADIN_PRIMARY_BLUE;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.applyTooltip;
 
 /**
  * Creates a view for all bookings to be displayed and downloaded
@@ -280,6 +281,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
             horizontalLayout.setAlignItems(Alignment.CENTER);
             InvoiceDownloadButton invoiceDownloadButton = new InvoiceDownloadButton(booking);
             invoiceDownloadButton.setEnabled(booking.isActive());
+            applyTooltip(invoiceDownloadButton, "Rechnung herunterladen");
             horizontalLayout.add(invoiceDownloadButton, new Label(String.valueOf(booking.getId())));
             return horizontalLayout;
         })).setHeader("Rechnungsnummer");

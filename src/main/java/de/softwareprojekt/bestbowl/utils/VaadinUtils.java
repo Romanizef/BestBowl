@@ -210,4 +210,14 @@ public class VaadinUtils {
         }
         return responsiveSteps;
     }
+
+    /**
+     * apply a tooltip to a component
+     *
+     * @param component component to apply the tooltip to
+     * @param tooltip   text of the tooltip
+     */
+    public static void applyTooltip(Component component, String tooltip) {
+        component.getElement().setProperty("title", tooltip);
+    }
 }
