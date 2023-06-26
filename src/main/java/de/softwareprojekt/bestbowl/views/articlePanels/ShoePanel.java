@@ -46,19 +46,7 @@ public class ShoePanel extends VerticalLayout {
         this.bowlingShoeRepository = bowlingShoeRepository;
         minShoeSize = bowlingCenter.getMinShoeSize();
         maxShoeSize = bowlingCenter.getMaxShoeSize();
-        List<BowlingShoe> shoeList = bowlingShoeRepository.findAllByClientIsNullAndActiveIsTrue();
-        int value;
-        shoeSizeAmountMap = new HashMap<>();
-        for (int i = minShoeSize; i < maxShoeSize; i++) {
-            shoeSizeAmountMap.put(i, 0);
-        }
-        for (BowlingShoe shoe : shoeList) {
-            if (shoe.isActive() && (shoeSizeAmountMap.containsKey(shoe.getSize()))) {
-                value = shoeSizeAmountMap.get(shoe.getSize());
-                value++;
-                shoeSizeAmountMap.put(shoe.getSize(), value);
-            }
-        }
+        updateShoeSizeAmountMap();
         VerticalLayout panelLayout = new VerticalLayout();
         shoeAmountField = new IntegerField();
         HorizontalLayout amountLayout = new HorizontalLayout();
@@ -72,8 +60,18 @@ public class ShoePanel extends VerticalLayout {
         shoeSizeField.setMin(minShoeSize);
         shoeSizeField.setMax(maxShoeSize);
         shoeSizeField.setValue((minShoeSize + maxShoeSize) / 2);
-        shoeSizeField.addValueChangeListener(integerFieldIntegerComponentValueChangeEvent ->
-                shoeAmountField.setMax(shoeSizeAmountMap.get(shoeSizeField.getValue())));
+        shoeSizeField.addValueChangeListener(e -> {
+            Integer val = e.getValue();
+            if (val == null) {
+                shoeAmountField.setMax(0);
+            } else {
+                Integer amount = shoeSizeAmountMap.get(val);
+                if (amount == null) {
+                    amount = 0;
+                }
+                shoeAmountField.setMax(amount);
+            }
+        });
         shoeSizeField.setStepButtonsVisible(true);
         sizeLayout.add(sizeLabel, shoeSizeField);
 
@@ -113,15 +111,13 @@ public class ShoePanel extends VerticalLayout {
      */
     public void updateShoeSizeAmountMap() {
         List<BowlingShoe> shoeList = bowlingShoeRepository.findAllByClientIsNullAndActiveIsTrue();
-        int value;
         shoeSizeAmountMap = new HashMap<>();
-        for (int i = minShoeSize; i < maxShoeSize; i++) {
+        for (int i = minShoeSize; i <= maxShoeSize; i++) {
             shoeSizeAmountMap.put(i, 0);
         }
         for (BowlingShoe shoe : shoeList) {
             if (shoe.isActive() && (shoeSizeAmountMap.containsKey(shoe.getSize()))) {
-                value = shoeSizeAmountMap.get(shoe.getSize());
-                value++;
+                int value = shoeSizeAmountMap.get(shoe.getSize()) + 1;
                 shoeSizeAmountMap.put(shoe.getSize(), value);
             }
         }

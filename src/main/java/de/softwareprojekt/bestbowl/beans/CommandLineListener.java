@@ -1,23 +1,8 @@
 package de.softwareprojekt.bestbowl.beans;
 
-import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
-
-import java.security.SecureRandom;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.github.javafaker.Faker;
-
 import de.softwareprojekt.bestbowl.BestBowlApplication;
+import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Address;
@@ -29,10 +14,24 @@ import de.softwareprojekt.bestbowl.jpa.entities.food.Food;
 import de.softwareprojekt.bestbowl.utils.checkers.DuplicateChecker;
 import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.security.SecureRandom;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+
+import static de.softwareprojekt.bestbowl.utils.Utils.startThread;
 
 /**
  * Class that listens for commands in the command line.
- * 
+ *
  * @author Marten Voß
  */
 @Component
@@ -42,7 +41,7 @@ public class CommandLineListener {
 
     /**
      * Initializes the listening method.
-     * 
+     *
      * @see #startCommandLineThread()
      */
     @PostConstruct
@@ -52,7 +51,7 @@ public class CommandLineListener {
 
     /**
      * Scans the command line for commands.
-     * 
+     *
      * @see #generateBowlingAlleys()
      * @see #generateRandomClients(int)
      * @see #generateRandomAssociations(int)
@@ -110,7 +109,7 @@ public class CommandLineListener {
 
     /**
      * Generates a given amount of {@code Client}s with random data.
-     * 
+     *
      * @param count
      */
     private void generateRandomClients(int count) {
@@ -134,7 +133,7 @@ public class CommandLineListener {
 
     /**
      * Generates a given amount of {@code Association}s with random data.
-     * 
+     *
      * @param count
      */
     private void generateRandomAssociations(int count) {
@@ -157,7 +156,7 @@ public class CommandLineListener {
 
     /**
      * Connects a given amount of {@code Client}s to a random {@code Association}.
-     * 
+     *
      * @param count
      */
     private void connectRandomClientsAndAssociations(int count) {
@@ -176,7 +175,7 @@ public class CommandLineListener {
 
     /**
      * Generates a given amount of {@code Food}s with random data.
-     * 
+     *
      * @param count
      */
     private void generateRandomFoods(int count) {
@@ -201,7 +200,7 @@ public class CommandLineListener {
 
     /**
      * Generates a given amount of {@code Drink}s with random data.
-     * 
+     *
      * @param count
      */
     private void generateRandomDrinks(int count) {
@@ -232,16 +231,17 @@ public class CommandLineListener {
 
     /**
      * Generates a given amount of {@code BowlingShoe}s with random data.
-     * 
+     *
      * @param count
      */
     public void generateRandomShoes(int count) {
         List<BowlingShoe> bowlingShoeList = new ArrayList<>(count);
         Faker faker = new Faker();
         long currentTime = System.currentTimeMillis();
+        BowlingCenter bowlingCenter = Repos.getBowlingCenterRepository().getBowlingCenter();
         for (int i = 0; i < count; i++) {
             BowlingShoe bowlingShoe = new BowlingShoe();
-            bowlingShoe.setSize(faker.random().nextInt(30, 50));
+            bowlingShoe.setSize(faker.random().nextInt(bowlingCenter.getMinShoeSize(), bowlingCenter.getMaxShoeSize()));
             bowlingShoe.setBoughtAt(currentTime - faker.random().nextInt(1, 100) * Duration.ofDays(1).toMillis());
             bowlingShoeList.add(bowlingShoe);
         }
@@ -263,7 +263,7 @@ public class CommandLineListener {
 
     /**
      * Setter for {@code UserManager}
-     * 
+     *
      * @param userManager
      */
     @Autowired
