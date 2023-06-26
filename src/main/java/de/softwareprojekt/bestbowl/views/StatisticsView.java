@@ -57,6 +57,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
     private final transient BowlingShoeBookingRepository shoeBookingRepository;
     private final H1 clientHeader;
     private final H5 sumHeader;
+    Select<String> yearSelect;
     private Grid<BowlingAlleyBooking> bookingGrid;
     private Client currentClient;
 
@@ -98,7 +99,8 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
         headerLayout.setAlignItems(Alignment.CENTER);
         headerLayout.expand(clientHeader);
         headerLayout.setWidthFull();
-        headerLayout.add(clientHeader, createYearDropDown());
+        yearSelect = createYearDropDown();
+        headerLayout.add(clientHeader, yearSelect);
         return headerLayout;
     }
 
@@ -109,12 +111,16 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
      *
      * @return {@code Select<String>}
      */
-    private Component createYearDropDown() {
-        List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository.findAllByClientEquals(currentClient);
-        List<String> yearList = new ArrayList<>();
+    private Select<String> createYearDropDown() {
         Select<String> select = new Select<>();
         select.setLabel("Sortieren nach Jahr");
         select.getStyle().set("margin-right", "80px");
+        return select;
+    }
+
+    private void initYearDropDown() {
+        List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository.findAllByClientEquals(currentClient);
+        List<String> yearList = new ArrayList<>();
 
         yearList.add(ALL);
         for (BowlingAlleyBooking bowlingAlleyBooking : bowlingAlleyBookingList) {
@@ -128,9 +134,9 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
         Comparator<String> reverseComparator = Comparator.reverseOrder();
         yearList.sort(reverseComparator);
 
-        select.setItems(yearList);
-        select.setValue(ALL);
-        select.addValueChangeListener(e -> {
+        yearSelect.setItems(yearList);
+        yearSelect.setValue(ALL);
+        yearSelect.addValueChangeListener(e -> {
             String bookingYear = e.getValue();
             if (bookingYear.equals(ALL)) {
                 updateGridItems();
@@ -151,7 +157,6 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
                 updateGridItems(lowerBound, upperBound);
             }
         });
-        return select;
     }
 
     /**
@@ -165,6 +170,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
         } else {
             clientHeader
                     .setText("Statistiken für: " + currentClient.getFirstName() + " " + currentClient.getLastName());
+            initYearDropDown();
         }
     }
 
