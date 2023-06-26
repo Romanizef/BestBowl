@@ -7,15 +7,14 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
+import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
-import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
+import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoeBooking;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoe.BowlingShoeRepository;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_SHOE;
 
@@ -38,11 +37,11 @@ public class ShoePanel extends VerticalLayout {
      * for their client.
      *
      * @param bowlingShoeRepository
-     * @param client
+     * @param booking
+     * @param bowlingCenter
      * @see #addCSS()
-     * @see #createShoeGrid(Client)
      */
-    public ShoePanel(BowlingShoeRepository bowlingShoeRepository, Client client, BowlingCenter bowlingCenter) {
+    public ShoePanel(BowlingShoeRepository bowlingShoeRepository, BowlingAlleyBooking booking, BowlingCenter bowlingCenter) {
         this.bowlingShoeRepository = bowlingShoeRepository;
         minShoeSize = bowlingCenter.getMinShoeSize();
         maxShoeSize = bowlingCenter.getMaxShoeSize();
@@ -87,7 +86,7 @@ public class ShoePanel extends VerticalLayout {
         addCSS();
         setAlignItems(Alignment.CENTER);
         panelLayout.add(sizeLayout, amountLayout);
-        Component shoeGrid = createShoeGrid(client);
+        Component shoeGrid = createShoeGrid(booking);
         add(panelLayout, shoeGrid);
     }
 
@@ -131,16 +130,20 @@ public class ShoePanel extends VerticalLayout {
     }
 
     /**
-     * Creates a {@code Grid} with the {@code BowlingShoe}s of the client.
+     * Creates a {@code Grid} with the {@code BowlingShoe}s of the client´s booking.
      *
-     * @param client
+     * @param bab
      * @return {@code Grid<BowlingShoe>}
      */
-    private Grid<BowlingShoe> createShoeGrid(Client client) {
+    private Grid<BowlingShoe> createShoeGrid(BowlingAlleyBooking bab) {
         Grid<BowlingShoe> grid = new Grid<>(BowlingShoe.class, false);
         grid.addColumn(BowlingShoe::getId).setHeader("Schuh ID");
         grid.addColumn(BowlingShoe::getSize).setHeader("Schuhgröße");
-        List<BowlingShoe> bowlingShoeList = bowlingShoeRepository.findAllByClientEqualsAndActiveIsTrue(client);
+        List<BowlingShoeBooking> bowlingShoeBookingList =
+                Repos.getBowlingShoeBookingRepository().findAllByClientEqualsAndBowlingAlleyEqualsAndTimeStampEquals(
+                        bab.getClient(), bab.getBowlingAlley(), bab.getStartTime());
+        List<BowlingShoe> bowlingShoeList =
+                new ArrayList<>(bowlingShoeBookingList.stream().map(BowlingShoeBooking::getBowlingShoe).toList());
         bowlingShoeList.sort(Comparator.comparingInt(BowlingShoe::getSize));
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS,

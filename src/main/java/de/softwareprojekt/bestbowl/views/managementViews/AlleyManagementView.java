@@ -143,7 +143,6 @@ public class AlleyManagementView extends VerticalLayout {
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", associationFilter::setId));
         headerRow.getCell(activeColumn)
                 .setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", associationFilter::setActive));
-        associationFilter.setActive(true);
 
         grid.addSelectionListener(e -> {
             if (e.isFromClient()) {

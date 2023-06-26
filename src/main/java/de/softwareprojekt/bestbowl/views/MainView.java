@@ -113,7 +113,7 @@ public class MainView extends AppLayout implements AppShellConfigurator {
     private Tab[] createMenuItems() {
         List<Tab> tabList = new ArrayList<>();
         tabList.add(createTab(ClientSearchView.class, "Kundensuche", VaadinIcon.USERS));
-        tabList.add(createTab(ArticleBookingView.class, "Extras bestellen", VaadinIcon.FORM));
+        tabList.add(createTab(ArticleBookingView.class, "Artikelbuchung", VaadinIcon.FORM));
         tabList.add(createTab(PendingBookingView.class, "Offene Buchungen", VaadinIcon.CREDIT_CARD));
         if (securityService.isCurrentUserInRole(UserRole.OWNER)) {
             tabList.add(createTab(ManagementView.class, "Verwaltungen", VaadinIcon.DESKTOP));

@@ -178,6 +178,7 @@ public class ClientSearchView extends VerticalLayout {
                 }
                 clientRepository.save(newClient);
                 clientGrid.getListDataView().addItem(newClient);
+                clientCache.add(newClient);
                 clientGrid.deselectAll();
                 clientGrid.select(newClient);
                 selectedClient = newClient;
@@ -379,6 +380,20 @@ public class ClientSearchView extends VerticalLayout {
         }
         GridListDataView<Client> clientGridListDataView = clientGrid.setItems(clientList);
         clientGridListDataView.setSortOrder(Client::getLastName, SortDirection.ASCENDING);
+
+        if (selectedClient != null) {
+            Client c = null;
+            for (Client client : clientList) {
+                if (client.getId() == selectedClient.getId()) {
+                    c = client;
+                    break;
+                }
+            }
+            if (c != null) {
+                clientGrid.deselectAll();
+                clientGrid.select(c);
+            }
+        }
     }
 
     private void updateClientCache() {

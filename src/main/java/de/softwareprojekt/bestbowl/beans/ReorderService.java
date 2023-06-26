@@ -78,8 +78,8 @@ public class ReorderService {
      * The notification will be displayed if there are any items that have fallen
      * below their reorder level.
      * 
-     * @param int drinks Determine how many drinks are under the reorder level
-     * @param int foods Count the number of foods that are below the reorder level
+     * @param drinks Determine how many drinks are under the reorder level
+     * @param foods Count the number of foods that are below the reorder level
      */
     private void showReorderNotification(int drinks, int foods) {
         String text;

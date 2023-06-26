@@ -9,5 +9,4 @@ class BestBowlApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }

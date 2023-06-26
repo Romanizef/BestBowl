@@ -47,6 +47,7 @@ public class PendingBookingView extends VerticalLayout {
     private final transient DrinkBookingRepository drinkBookingRepository;
     private final transient FoodBookingRepository foodBookingRepository;
     private final transient BowlingShoeBookingRepository shoeBookingRepository;
+    private final transient MailSenderService mailSenderService;
     private final Select<Mode> modeSelect;
     private final Grid<BowlingAlleyBooking> bookingGrid;
     private IntegerField bowlingAlleyField;
@@ -56,7 +57,6 @@ public class PendingBookingView extends VerticalLayout {
     private Button completeButton;
     private List<BowlingAlleyBooking> bookingCache;
     private BowlingAlleyBooking selectedBooking;
-    private final transient MailSenderService mailSenderService;
 
     /**
      * The PendingBookingView function is a constructor for the PendingBookingView
@@ -71,9 +71,9 @@ public class PendingBookingView extends VerticalLayout {
      */
     @Autowired
     public PendingBookingView(BowlingAlleyBookingRepository bowlingAlleyBookingRepository,
-            DrinkBookingRepository drinkBookingRepository,
-            FoodBookingRepository foodBookingRepository,
-            BowlingShoeBookingRepository shoeBookingRepository) {
+                              DrinkBookingRepository drinkBookingRepository,
+                              FoodBookingRepository foodBookingRepository,
+                              BowlingShoeBookingRepository shoeBookingRepository) {
         this.bowlingAlleyBookingRepository = bowlingAlleyBookingRepository;
         this.drinkBookingRepository = drinkBookingRepository;
         this.foodBookingRepository = foodBookingRepository;
@@ -101,9 +101,11 @@ public class PendingBookingView extends VerticalLayout {
         comboBox.setValue(Mode.OVERDUE);
         comboBox.setItemLabelGenerator(Mode::getName);
         comboBox.addValueChangeListener(e -> {
+            selectedBooking = null;
             updateBookingCache(e.getValue());
             updateGridItems();
             completeButton.setVisible(e.getValue() != Mode.UPCOMING);
+            updateComponents();
         });
         return comboBox;
     }
@@ -154,9 +156,11 @@ public class PendingBookingView extends VerticalLayout {
         grid.getColumns().forEach(c -> c.setSortable(true).setResizable(true));
 
         grid.addSelectionListener(e -> {
-            Optional<BowlingAlleyBooking> bowlingAlleyBookingOptional = e.getFirstSelectedItem();
-            selectedBooking = bowlingAlleyBookingOptional.orElse(null);
-            updateComponents();
+            if (e.isFromClient()) {
+                Optional<BowlingAlleyBooking> bowlingAlleyBookingOptional = e.getFirstSelectedItem();
+                selectedBooking = bowlingAlleyBookingOptional.orElse(null);
+                updateComponents();
+            }
         });
         return grid;
     }
@@ -194,6 +198,20 @@ public class PendingBookingView extends VerticalLayout {
         } else {
             clientGridListDataView.setSortOrder(BowlingAlleyBooking::getStartTime, SortDirection.ASCENDING);
         }
+
+        if (selectedBooking != null) {
+            BowlingAlleyBooking bab = null;
+            for (BowlingAlleyBooking booking : bookingList) {
+                if (booking.getId() == selectedBooking.getId()) {
+                    bab = booking;
+                    break;
+                }
+            }
+            if (bab != null) {
+                bookingGrid.deselectAll();
+                bookingGrid.select(bab);
+            }
+        }
     }
 
     private void updateBookingCache(Mode mode) {
@@ -219,7 +237,7 @@ public class PendingBookingView extends VerticalLayout {
                 bookingCache.remove(selectedBooking);
                 selectedBooking.setActive(false);
                 bowlingAlleyBookingRepository.save(selectedBooking);
-                mailSenderService.sendBookingCancelationMail(selectedBooking);;
+                mailSenderService.sendBookingCancelationMail(selectedBooking);
                 updateGridItems();
             });
         });

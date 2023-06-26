@@ -349,7 +349,7 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
      * @return A button
      */
     private Button createArticleBookingViewButton() {
-        Button button = new Button("Weiter zum Artikel buchen");
+        Button button = new Button("Weiter zur Artikelbuchung");
         button.setWidth("55%");
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         button.addClickListener(e -> UI.getCurrent().navigate(ArticleBookingView.class, latestBooking.getId()));

@@ -150,7 +150,6 @@ public class AssociationManagementView extends VerticalLayout {
                 .setComponent(createFilterHeaderString("Rabatt", associationFilter::setDiscount));
         headerRow.getCell(activeColumn)
                 .setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", associationFilter::setActive));
-        associationFilter.setActive(true);
 
         grid.addSelectionListener(e -> {
             if (e.isFromClient()) {

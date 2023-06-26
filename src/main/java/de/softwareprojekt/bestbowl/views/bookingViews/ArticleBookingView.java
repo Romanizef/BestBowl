@@ -6,7 +6,6 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -59,8 +58,8 @@ import static de.softwareprojekt.bestbowl.utils.Utils.toHourOnlyString;
  *
  * @author Ali aus Mali
  */
-@Route(value = "extras", layout = MainView.class)
-@PageTitle("Extras")
+@Route(value = "articleBooking", layout = MainView.class)
+@PageTitle("Artikelbuchung")
 @PermitAll
 public class ArticleBookingView extends VerticalLayout implements HasUrlParameter<Integer> {
     private final transient DrinkRepository drinkRepository;
@@ -89,7 +88,6 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     private Button deleteChangesButton;
     private boolean panelChanges;
     private List<IntegerField> allIntegerFields;
-
 
     /**
      * Creates a new instance of the ArticleBookingView.
@@ -140,8 +138,6 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         updateHeader();
     }
 
-
-
     private void updateHeader() {
         if (currentBowlingAlleyBooking == null) {
             header.setText("Keine Bahn ausgewählt");
@@ -168,7 +164,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
                 TabSheetVariant.LUMO_TABS_CENTERED,
                 TabSheetVariant.LUMO_TABS_EQUAL_WIDTH_TABS,
                 TabSheetVariant.MATERIAL_BORDERED);
-        tabs.setHeight("calc(100vh - 328px)");
+        tabs.setHeight("calc(100vh - 306px)");
         Tab drink = new Tab(VaadinIcon.COFFEE.create(), new Span("Getränke"));
         Tab food = new Tab(VaadinIcon.CROSS_CUTLERY.create(), new Span("Speisen"));
         Tab shoe = new Tab(VaadinIcon.RETWEET.create(), new Span("Schuhe"));
@@ -191,23 +187,18 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
      * @return A shoePanel, which is a component
      */
     private Component createShoePanel() {
-        shoePanel = new ShoePanel(bowlingShoeRepository, currentBowlingAlleyBooking.getClient(), bowlingCenter);
+        shoePanel = new ShoePanel(bowlingShoeRepository, currentBowlingAlleyBooking, bowlingCenter);
         allIntegerFields.add(shoePanel.getShoeAmountField());
         shoePanel.getShoeAmountField().addValueChangeListener(integerFieldIntegerComponentValueChangeEvent -> {
-            for (IntegerField integerField:
-                    allIntegerFields) {
-                if(integerField.getValue() > 0){
+            for (IntegerField integerField : allIntegerFields) {
+                if (integerField.getValue() > 0) {
                     panelChanges = true;
                     break;
-                }else{
+                } else {
                     panelChanges = false;
                 }
             }
-            if (panelChanges) {
-                footerButtonToTrue();
-            } else {
-                footerButtonToFalse();
-            }
+            updateFooterButtons(panelChanges);
         });
         return shoePanel;
     }
@@ -240,20 +231,16 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
                     if (component instanceof IntegerField integerField) {
                         allIntegerFields.add(integerField);
                         integerField.addValueChangeListener(integerFieldIntegerComponentValueChangeEvent -> {
-                            for (IntegerField integerField1:
+                            for (IntegerField integerField1 :
                                     allIntegerFields) {
-                                if(integerField1.getValue() > 0){
+                                if (integerField1.getValue() > 0) {
                                     panelChanges = true;
                                     break;
-                                }else{
+                                } else {
                                     panelChanges = false;
                                 }
                             }
-                            if (panelChanges) {
-                                footerButtonToTrue();
-                            } else {
-                                footerButtonToFalse();
-                            }
+                            updateFooterButtons(panelChanges);
                         });
                     }
                 });
@@ -281,20 +268,15 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
             FoodPanel foodPanel = new FoodPanel(food, currentBowlingAlleyBooking, foodBookingMap);
             allIntegerFields.add(foodPanel.getFoodAmountField());
             foodPanel.getFoodAmountField().addValueChangeListener(integerFieldIntegerComponentValueChangeEvent -> {
-                for (IntegerField integerField:
-                        allIntegerFields) {
-                    if(integerField.getValue() > 0){
+                for (IntegerField integerField : allIntegerFields) {
+                    if (integerField.getValue() > 0) {
                         panelChanges = true;
                         break;
-                    }else{
+                    } else {
                         panelChanges = false;
                     }
                 }
-                if (panelChanges) {
-                    footerButtonToTrue();
-                } else {
-                    footerButtonToFalse();
-                }
+                updateFooterButtons(panelChanges);
             });
             layout.add(foodPanel);
         }
@@ -302,16 +284,10 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         return layout;
     }
 
-    private void footerButtonToTrue() {
-        panelChanges = true;
-        addItemButton.setEnabled(true);
-        deleteChangesButton.setEnabled(true);
-    }
-
-    private void footerButtonToFalse() {
-        panelChanges = false;
-        addItemButton.setEnabled(false);
-        deleteChangesButton.setEnabled(false);
+    private void updateFooterButtons(boolean b) {
+        panelChanges = b;
+        addItemButton.setEnabled(b);
+        deleteChangesButton.setEnabled(b);
     }
 
     /**
@@ -326,7 +302,11 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         Scroller scroller = new Scroller();
         scroller.setScrollDirection(Scroller.ScrollDirection.HORIZONTAL);
         scroller.setMaxWidth("calc(100vw - 350px");
-        scroller.setWidth("calc(100vw - 350px");
+        VerticalLayout layout = new VerticalLayout(scroller);
+        layout.setWidthFull();
+        layout.setAlignItems(Alignment.CENTER);
+        layout.setPadding(false);
+        layout.setMargin(false);
 
         HorizontalLayout alleyLayout = new HorizontalLayout();
         alleyLayout.setPadding(true);
@@ -337,56 +317,70 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         List<BowlingAlley> bowlingAlleyList = bowlingAlleyRepository.findAllByActiveIsTrue();
         if (bowlingAlleyList.isEmpty()) {
             Notifications.showError("Es sind keine Bahnen im System vorhanden.\nBitte trage Bahnen ins System ein.");
-            return scroller;
-        }
+        } else {
+            bowlingAlleyList.sort(Comparator.comparingInt(BowlingAlley::getId));
+            long currentTime = System.currentTimeMillis();
+            List<BowlingAlley> freeBowlingAlleyList = bowlingAlleyRepository
+                    .findAllByNoBookingOverlapBetweenTimeStamps(currentTime, currentTime);
+            Set<Integer> freeBowlingAlleyHashSet = freeBowlingAlleyList.stream().map(BowlingAlley::getId)
+                    .collect(Collectors.toSet());
 
-        bowlingAlleyList.sort(Comparator.comparingInt(BowlingAlley::getId));
-        long currentTime = System.currentTimeMillis();
-        List<BowlingAlley> freeBowlingAlleyList = bowlingAlleyRepository
-                .findAllByNoBookingOverlapBetweenTimeStamps(currentTime, currentTime);
-        Set<Integer> freeBowlingAlleyHashSet = freeBowlingAlleyList.stream().map(BowlingAlley::getId)
-                .collect(Collectors.toSet());
+            List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository
+                    .findAllByTimePeriodsOverlapping(System.currentTimeMillis());
 
-        List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository
-                .findAllByTimePeriodsOverlapping(System.currentTimeMillis());
-
-
-        for (BowlingAlley bowlingAlley : bowlingAlleyList) {
-            Button alleyButton = new Button("Bahn " + bowlingAlley.getId());
-            buttonMap.put(bowlingAlley.getId(), alleyButton);
-            alleyButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-            alleyButton.setEnabled(!freeBowlingAlleyHashSet.contains(bowlingAlley.getId()));
-            BowlingAlleyBooking tempBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(
-                    bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == bowlingAlley.getId()).findFirst().orElse(null);
-            if (tempBowlingAlleyBooking != null && tempBowlingAlleyBooking.isCompleted()) {
-                changeTabsCompletedBooking();
-                header.setText(alleyButton.getText() + " wurde schon bezahlt");
-                alleyButton.removeThemeVariants(ButtonVariant.LUMO_PRIMARY);
-                alleyButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
-                goToBillButton.setEnabled(false);
-            }
-            alleyButton.addClickListener(buttonClickEvent -> {
+            for (BowlingAlley bowlingAlley : bowlingAlleyList) {
+                Button alleyButton = new Button("Bahn " + bowlingAlley.getId());
+                buttonMap.put(bowlingAlley.getId(), alleyButton);
+                alleyButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                alleyButton.setEnabled(!freeBowlingAlleyHashSet.contains(bowlingAlley.getId()));
+                BowlingAlleyBooking tempBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(
+                        bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == bowlingAlley.getId()).findFirst().orElse(null);
                 if (tempBowlingAlleyBooking != null && tempBowlingAlleyBooking.isCompleted()) {
                     changeTabsCompletedBooking();
                     header.setText(alleyButton.getText() + " wurde schon bezahlt");
+                    alleyButton.removeThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                    alleyButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
                     goToBillButton.setEnabled(false);
-                    changePreviousButtonStyle(currentBowlingAlleyId);
-                    return;
                 }
-                if (panelChanges) {
-                    VaadinUtils.showConfirmationDialog("Änderungen sind nicht gespeichert. Trotzdem Bahn wechseln?", "Ja", "Abbrechen", () -> {
+                alleyButton.addClickListener(buttonClickEvent -> {
+                    if (tempBowlingAlleyBooking != null && tempBowlingAlleyBooking.isCompleted()) {
+                        if (panelChanges) {
+                            VaadinUtils.showConfirmationDialog("Änderungen sind nicht gespeichert. Trotzdem Bahn wechseln?", "Ja", "Abbrechen", () -> {
+                                onCompletedButtonClick(alleyButton);
+                            });
+                        } else {
+                            onCompletedButtonClick(alleyButton);
+                        }
+                        return;
+                    }
+                    if (currentBowlingAlleyId == Integer.parseInt(alleyButton.getText().replaceAll("\\D+(\\d+)", "$1"))) {
+                        //nichts machen, wenn auf schon ausgewählte bahn geklickt wird
+                        return;
+                    }
+                    if (panelChanges) {
+                        VaadinUtils.showConfirmationDialog("Änderungen sind nicht gespeichert. Trotzdem Bahn wechseln?", "Ja", "Abbrechen", () -> {
+                            alleyButtonOnChange(bowlingAlleyBookingList, alleyButton);
+                        });
+                    } else {
                         alleyButtonOnChange(bowlingAlleyBookingList, alleyButton);
-                    });
-                } else {
-                    alleyButtonOnChange(bowlingAlleyBookingList, alleyButton);
-                }
-            });
-            alleyLayout.add(alleyButton);
+                    }
+                });
+                alleyLayout.add(alleyButton);
+            }
         }
-        return scroller;
+        return layout;
     }
 
-
+    private void onCompletedButtonClick(Button alleyButton) {
+        changeTabsCompletedBooking();
+        header.setText(alleyButton.getText() + " wurde schon bezahlt");
+        goToBillButton.setEnabled(false);
+        changeButtonStyleToUnselected(currentBowlingAlleyId);
+        panelChanges = false;
+        goToBillButton.setEnabled(true);
+        deleteChangesButton.setEnabled(false);
+        addItemButton.setEnabled(false);
+    }
 
     private void changeTabsCompletedBooking() {
         drinkDiv.removeAll();
@@ -397,11 +391,10 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         shoeDiv.add(new Text("Bahn wurde schon bezahlt"));
     }
 
-
     private void alleyButtonOnChange(List<BowlingAlleyBooking> bowlingAlleyBookingList, Button alleyButton) {
-        changePreviousButtonStyle(currentBowlingAlleyId);
+        changeButtonStyleToUnselected(currentBowlingAlleyId);
         currentBowlingAlleyId = Integer.parseInt(alleyButton.getText().replaceAll("\\D+(\\d+)", "$1"));
-        changeCurrentButtonStyle(currentBowlingAlleyId);
+        changeButtonStyleToSelected(currentBowlingAlleyId);
         currentBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(
                         bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
                 .findFirst()
@@ -413,7 +406,6 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         deleteChangesButton.setEnabled(false);
         addItemButton.setEnabled(false);
         panelChanges = false;
-
     }
 
     /**
@@ -436,7 +428,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
      *
      * @param currentBowlAlleyId The ID of the current bowling alley.
      */
-    private void changePreviousButtonStyle(int currentBowlAlleyId) {
+    private void changeButtonStyleToUnselected(int currentBowlAlleyId) {
         buttonMap.get(currentBowlAlleyId).removeThemeVariants(ButtonVariant.LUMO_SUCCESS);
     }
 
@@ -445,7 +437,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
      *
      * @param currentBowlAlleyId The ID of the current bowling alley.
      */
-    private void changeCurrentButtonStyle(int currentBowlAlleyId) {
+    private void changeButtonStyleToSelected(int currentBowlAlleyId) {
         buttonMap.get(currentBowlAlleyId).addThemeVariants(ButtonVariant.LUMO_SUCCESS);
     }
 
@@ -514,25 +506,31 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
      * Adds all new shoe bookings for the current bowling alley booking.
      */
     private void addAllNewShoeBookings() {
-        int stock = shoePanel.getShoeSizeAmountMap().get(shoePanel.getShoeSizeField().getValue())
-                - shoePanel.getShoeAmountField().getValue();
+        int shoeSize = shoePanel.getShoeSizeField().getValue();
+        int amount = shoePanel.getShoeAmountField().getValue();
+        int stock = shoePanel.getShoeSizeAmountMap().get(shoeSize) - amount;
         if (stock < 0) {
-            Notifications.showError("Nicht genügend Schuhe in Größe: " + shoePanel.getShoeSizeField().getValue());
+            Notifications.showError("Nicht genügend Schuhe in Größe: " + shoeSize);
             return;
         }
-        for (int i = 0; i < shoePanel.getShoeAmountField().getValue(); i++) {
-            List<BowlingShoe> bowlingShoeList = bowlingShoeRepository
-                    .findAllBySizeEqualsAndActiveIsTrueAndClientIsNull(shoePanel.getShoeSizeField().getValue());
-            BowlingShoe bowlingShoeForBooking = bowlingShoeList.get(0);
-            bowlingShoeRepository.updateClientById(bowlingShoeForBooking.getId(),
-                    currentBowlingAlleyBooking.getClient());
-            BowlingShoeBooking bowlingShoeBooking = new BowlingShoeBooking();
-            bowlingShoeBooking.setBowlingAlley(currentBowlingAlleyBooking.getBowlingAlley());
-            bowlingShoeBooking.setClient(currentBowlingAlleyBooking.getClient());
-            bowlingShoeBooking.setTimeStamp(currentBowlingAlleyBooking.getStartTime());
-            bowlingShoeBooking.setBowlingShoe(bowlingShoeForBooking);
-            bowlingShoeBooking.setPrice(bowlingCenter.getBowlingShoePrice());
-            bowlingShoeBookingRepository.save(bowlingShoeBooking);
+        for (int i = 0; i < amount; i++) {
+            Optional<BowlingShoe> bowlingShoeOptional = bowlingShoeRepository
+                    .findFirstBySizeEqualsAndActiveIsTrueAndClientIsNull(shoeSize);
+            if (bowlingShoeOptional.isPresent()) {
+                BowlingShoe bowlingShoe = bowlingShoeOptional.get();
+                bowlingShoeRepository.updateClientById(bowlingShoe.getId(),
+                        currentBowlingAlleyBooking.getClient());
+                BowlingShoeBooking bowlingShoeBooking = new BowlingShoeBooking();
+                bowlingShoeBooking.setBowlingAlley(currentBowlingAlleyBooking.getBowlingAlley());
+                bowlingShoeBooking.setClient(currentBowlingAlleyBooking.getClient());
+                bowlingShoeBooking.setTimeStamp(currentBowlingAlleyBooking.getStartTime());
+                bowlingShoeBooking.setBowlingShoe(bowlingShoe);
+                bowlingShoeBooking.setPrice(bowlingCenter.getBowlingShoePrice());
+                bowlingShoeBookingRepository.save(bowlingShoeBooking);
+            } else {
+                Notifications.showError("Fehler: Keine Schuhe mit Größe " + shoeSize + " frei!");
+                break;
+            }
         }
         shoePanel.updateShoeSizeAmountMap();
         shoePanel.resetIntegerField();
@@ -563,7 +561,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
             // Drink über name rausholen und dann vergleichen wie viel noch da ist
             Drink drink = drinkRepository.findByName(booking.getDrinkName());
             int newStock = drink.getStockInMilliliters() - booking.getAmount() * booking.getMl();
-            if (newStock < 0) { // Todo Booking kriegt noch ml
+            if (newStock < 0) {
                 Notifications.showError("Nicht genügend vom Getränk: " + drink.getName());
                 return;
             } else {
@@ -675,7 +673,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
                 if (button.isEnabled()) {
                     button.setAutofocus(true);
                     currentBowlingAlleyId = Integer.parseInt(button.getText().replaceAll("\\D+(\\d+)", "$1"));
-                    changeCurrentButtonStyle(currentBowlingAlleyId);
+                    changeButtonStyleToSelected(currentBowlingAlleyId);
                     currentBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(
                                     bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
                             .findFirst()
@@ -688,26 +686,26 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
                         goToBillButton.setEnabled(false);
                         changeTabsCompletedBooking();
                         header.setText(button.getText() + " wurde schon bezahlt");
-                    }else {
+                    } else {
                         goToBillButton.setEnabled(true);
                     }
                     break;
                 }
             }
-            return;
+        } else {
+            Optional<BowlingAlleyBooking> bowlingAlleyBookingOptional = bowlingAlleyBookingRepository.findById(parameter);
+            bowlingAlleyBookingOptional.ifPresent(booking -> {
+                if (booking.isActive() && !booking.isCompleted()) {
+                    this.currentBowlingAlleyBooking = booking;
+                    this.currentBowlingAlleyId = booking.getBowlingAlley().getId();
+                    buttonMap.get(currentBowlingAlleyId).setAutofocus(true);
+                    changeButtonStyleToUnselected(currentBowlingAlleyId);
+                    changeButtonStyleToSelected(currentBowlingAlleyId);
+                    changeTabsPendingBooking();
+                    updateHeader();
+                    goToBillButton.setEnabled(true);
+                }
+            });
         }
-        Optional<BowlingAlleyBooking> bowlingAlleyBookingOptional = bowlingAlleyBookingRepository.findById(parameter);
-        bowlingAlleyBookingOptional.ifPresent(booking -> {
-            if (booking.isActive() && !booking.isCompleted()) {
-                this.currentBowlingAlleyBooking = booking;
-                this.currentBowlingAlleyId = booking.getBowlingAlley().getId();
-                buttonMap.get(currentBowlingAlleyId).setAutofocus(true);
-                changePreviousButtonStyle(currentBowlingAlleyId);
-                changeCurrentButtonStyle(currentBowlingAlleyId);
-                changeTabsPendingBooking();
-                updateHeader();
-                goToBillButton.setEnabled(true);
-            }
-        });
     }
 }
