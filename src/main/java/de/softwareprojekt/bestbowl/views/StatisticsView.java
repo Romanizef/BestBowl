@@ -110,7 +110,7 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
      * @return {@code Select<String>}
      */
     private Component createYearDropDown() {
-        List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository.findAll();
+        List<BowlingAlleyBooking> bowlingAlleyBookingList = bowlingAlleyBookingRepository.findAllByClientEquals(currentClient);
         List<String> yearList = new ArrayList<>();
         Select<String> select = new Select<>();
         select.setLabel("Sortieren nach Jahr");
