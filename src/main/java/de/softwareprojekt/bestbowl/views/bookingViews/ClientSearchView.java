@@ -328,7 +328,9 @@ public class ClientSearchView extends VerticalLayout {
         grid.addColumn(new ComponentRenderer<>(client -> {
             HorizontalLayout horizontalLayout = new HorizontalLayout();
             horizontalLayout.setAlignItems(Alignment.BASELINE);
-            horizontalLayout.add(createStatisticButton(client), new Label(String.valueOf(client.getId())));
+            Button statisticButton = createStatisticButton(client);
+            applyTooltip(statisticButton, "Statistik anzeigen");
+            horizontalLayout.add(statisticButton, new Label(String.valueOf(client.getId())));
             return horizontalLayout;
         })).setHeader("Kundennummer");
         grid.addColumn("firstName").setHeader("Vorname");
