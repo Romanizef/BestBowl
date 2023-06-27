@@ -11,7 +11,8 @@ rechnung
 db
 
 ### Vaading generated ###
-frontend
+frontend/generated
+frontend/index.html
 package.json
 package-lock.json
 tsconfig.json

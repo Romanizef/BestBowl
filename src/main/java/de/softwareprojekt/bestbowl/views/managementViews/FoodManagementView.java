@@ -3,6 +3,7 @@ package de.softwareprojekt.bestbowl.views.managementViews;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -38,6 +39,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 @Route(value = "foodManagement", layout = MainView.class)
 @PageTitle("Speisenverwaltung")
 @RolesAllowed({UserRole.OWNER})
+@CssImport(value = "./styles/styles.css", themeFor = "vaadin-grid")
 public class FoodManagementView extends VerticalLayout {
     private final transient FoodRepository foodRepository;
     private final Binder<Food> foodBinder = new Binder<>();
@@ -304,6 +306,13 @@ public class FoodManagementView extends VerticalLayout {
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setWidth("75%");
         grid.setHeight("100%");
+        grid.setClassNameGenerator(food -> {
+            if (food.getStock() < food.getReorderPoint() && food.isActive()) {
+                return "highlighted";
+            } else {
+                return "normal";
+            }
+        });
         List<Food> foodList = foodRepository.findAll();
         GridListDataView<Food> dataView = grid.setItems(foodList);
 
