@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @author Marten Voß
+ * @author Ali
  */
 @SpringBootTest
 class UtilsTests {
