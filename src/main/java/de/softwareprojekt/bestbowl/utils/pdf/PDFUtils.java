@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
+import static de.softwareprojekt.bestbowl.utils.Utils.toHoursString;
 import static java.awt.Color.LIGHT_GRAY;
 import static java.awt.Color.WHITE;
 import static org.apache.pdfbox.pdmodel.font.PDType1Font.*;
@@ -113,7 +114,8 @@ public class PDFUtils {
         int posNrCounter = 1;
         // Bahn
         InvoiceLine bookingInvoiceLine = new InvoiceLine(posNrCounter + " ",
-                " Bahn: " + booking.getBowlingAlley().getId(), 1, booking.getPrice());
+                " Bahn: " + booking.getBowlingAlley().getId() + "   Dauer: " + toHoursString(booking.getDuration()),
+                1, booking.getPrice());
         invoiceLineList.add(bookingInvoiceLine);
         posNrCounter++;
 
@@ -128,7 +130,7 @@ public class PDFUtils {
 
         for (DrinkBooking drinkBooking : drinkBookingList) {
             InvoiceLine invoiceLine = new InvoiceLine(posNrCounter + " ",
-                    " " + drinkBooking.getName(),
+                    " " + drinkBooking.getName() + "ml",
                     drinkBooking.getAmount(), drinkBooking.getPrice());
             invoiceLineList.add(invoiceLine);
             posNrCounter++;

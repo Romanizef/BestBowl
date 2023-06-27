@@ -187,7 +187,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
                 new Article("Bowling Bahn (Anteil in %)", 100,
                         booking.getPriceWithDiscount() / 100, PANEL_COLOR_ALLEY));
         for (DrinkBooking drinkBooking : drinkBookingList) {
-            articleMap.put(sortIndex++, new Article(drinkBooking.getName(), drinkBooking.getAmount(),
+            articleMap.put(sortIndex++, new Article(drinkBooking.getName() + "ml", drinkBooking.getAmount(),
                     drinkBooking.getPrice(), PANEL_COLOR_DRINK));
         }
         for (FoodBooking foodBooking : foodBookingList) {
