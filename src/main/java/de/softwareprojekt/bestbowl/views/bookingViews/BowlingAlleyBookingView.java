@@ -36,10 +36,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
 import static de.softwareprojekt.bestbowl.utils.Utils.toHoursString;
@@ -56,6 +53,7 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
     private final transient SecurityService securityService;
     private final transient AlleyBookingChecker alleyBookingChecker = new AlleyBookingChecker();
     private final H1 clientHeader;
+    private final Label gridInfoLabel;
     private final Grid<BowlingAlleyBooking> bookingGrid;
     private final Button bookButton;
     private final Button continueToExtrasButton;
@@ -100,15 +98,17 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         clientHeader = new H1();
         Component menuComponent = createMenuComponent();
         bookButton = createBookButton();
+        gridInfoLabel = new Label();
         bookingGrid = createBookingGrid();
         Component footerComponent = createFooterComponent();
         continueToExtrasButton = createArticleBookingViewButton();
 
-        add(clientHeader, menuComponent, bookButton, bookingGrid, footerComponent, continueToExtrasButton);
+        add(clientHeader, menuComponent, bookButton, gridInfoLabel, bookingGrid, footerComponent, continueToExtrasButton);
 
         updateInitialComponents();
         updateLabelAndButtons();
         setBoundsToWholeDay();
+        updateGridInfoLabel();
         updateGridItems();
     }
 
@@ -125,7 +125,7 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
             startLDT = startLDT.minus(java.time.Duration.ofDays(1));
         }
         gridLowerBound = startLDT.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L;
-        gridUpperBound = gridLowerBound + java.time.Duration.ofDays(1).toMillis();
+        gridUpperBound = gridLowerBound + java.time.Duration.ofDays(1).toMillis() - 1;
     }
 
     /**
@@ -174,6 +174,7 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
             if (alleyBookingChecker.checkTime(securityService)) {
                 gridLowerBound = alleyBookingChecker.getStartTime();
                 gridUpperBound = alleyBookingChecker.getEndTime();
+                updateGridInfoLabel();
                 if (alleyBookingChecker.checkAvailability()) {
                     Notifications.showInfo("Freie Bahn: Nr. " + alleyBookingChecker.getAvailableAlleyId());
                 } else {
@@ -184,6 +185,7 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         });
         wholeDayButton.addClickListener(e -> {
             setBoundsToWholeDay();
+            updateGridInfoLabel();
             updateGridItems();
         });
 
@@ -265,6 +267,7 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
             if (alleyBookingChecker.checkTime(securityService)) {
                 gridLowerBound = alleyBookingChecker.getStartTime();
                 gridUpperBound = alleyBookingChecker.getEndTime();
+                updateGridInfoLabel();
                 BowlingAlleyBooking newBooking = alleyBookingChecker.book();
                 if (newBooking != null) {
                     latestBooking = newBooking;
@@ -323,11 +326,22 @@ public class BowlingAlleyBookingView extends VerticalLayout implements HasUrlPar
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.addColumn(booking -> booking.getBowlingAlley().getId()).setHeader("Bahn");
         grid.addColumn(booking -> booking.getClient().getFullName()).setHeader("Kunde");
-        grid.addColumn(booking -> toDateString(booking.getStartTime())).setHeader("Startzeit");
-        grid.addColumn(booking -> toHoursString(booking.getDuration())).setHeader("Dauer");
-        grid.addColumn(booking -> toDateString(booking.getEndTime() + 1)).setHeader("Endzeit");
+        grid.addColumn(booking -> toDateString(booking.getStartTime()))
+                .setComparator(Comparator.comparingLong(BowlingAlleyBooking::getStartTime)).setHeader("Startzeit");
+        grid.addColumn(booking -> toHoursString(booking.getDuration()))
+                .setComparator(Comparator.comparingLong(BowlingAlleyBooking::getDuration)).setHeader("Dauer");
+        grid.addColumn(booking -> toDateString(booking.getEndTime() + 1))
+                .setComparator(Comparator.comparingLong(BowlingAlleyBooking::getEndTime)).setHeader("Endzeit");
         grid.getColumns().forEach(c -> c.setSortable(true).setResizable(true).setAutoWidth(true));
         return grid;
+    }
+
+    /**
+     * updates the gridInfoLabel to display the current time window
+     */
+    private void updateGridInfoLabel() {
+        gridInfoLabel.setText("Tabelle zeigt den Zeitraum: " +
+                toDateString(gridLowerBound) + " - " + toDateString(gridUpperBound + 1));
     }
 
     /**

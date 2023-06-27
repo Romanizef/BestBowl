@@ -23,7 +23,6 @@ import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.function.SerializableComparator;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -48,14 +47,13 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
  */
 @Route(value = "drinkVariantManagement", layout = MainView.class)
 @PageTitle("Getränkevariantenverwaltung")
-@RolesAllowed({ UserRole.OWNER })
+@RolesAllowed({UserRole.OWNER})
 public class DrinkVariantManagementView extends VerticalLayout {
     private final transient DrinkVariantRepository drinkVariantRepository;
     private final Binder<DrinkVariant> drinkVariantBinder = new Binder<>();
     private final Binder<Drink> drinkBinder = new Binder<>();
     private Grid<DrinkVariant> drinkVariantGrid;
     private FormLayout drinkVariantForm;
-    private Select<Drink> drinkSelect;
     private DrinkVariant selectedDrinkVariant = null;
     private Label validationErrorLabel;
     private boolean editingNewDrinkVariant = false;
@@ -166,6 +164,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * @see #saveToDbAndUpdateDrinkVariant()
      */
     private FormLayout drinkVariantForm() {
+        Select<Drink> drinkSelect;
         FormLayout drinkVariantLayout = new FormLayout();
         drinkVariantLayout.setWidth("25%");
 
@@ -252,13 +251,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
         select.setItems(dataProvider);
         select.setPlaceholder("-");
         select.setEmptySelectionAllowed(false);
-        // select.setItemLabelGenerator(Drink::getName);
-        select.setItemLabelGenerator(drink -> {
-            if (drink == null) {
-                return "kein Getränk";
-            }
-            return drink.getName();
-        });
+        select.setItemLabelGenerator(Drink::getName);
         select.setRequiredIndicatorVisible(true);
         select.addThemeVariants(SelectVariant.LUMO_SMALL);
 
@@ -292,7 +285,7 @@ public class DrinkVariantManagementView extends VerticalLayout {
      * into the form fields.
      *
      * @return True if the DrinkVariant was successfully written to the form fields,
-     *         false otherwise
+     * false otherwise
      */
     private boolean writeBean() {
         try {
@@ -397,7 +390,8 @@ public class DrinkVariantManagementView extends VerticalLayout {
                 .setHeader("Getränk");
         Grid.Column<DrinkVariant> mlColumn = grid.addColumn(DrinkVariant::getMl).setHeader("Variante (ml)");
         Grid.Column<DrinkVariant> priceColumn = grid
-                .addColumn(drinkVariant -> formatDouble(drinkVariant.getPrice()) + "€").setHeader("Preis");
+                .addColumn(drinkVariant -> formatDouble(drinkVariant.getPrice()) + "€")
+                .setComparator(Comparator.comparingDouble(DrinkVariant::getPrice)).setHeader("Preis");
         Grid.Column<DrinkVariant> activeColumn = grid
                 .addColumn(drinkVariant -> drinkVariant.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
@@ -407,8 +401,10 @@ public class DrinkVariantManagementView extends VerticalLayout {
 
         List<DrinkVariant> drinkVariantList = drinkVariantRepository.findAll();
         GridListDataView<DrinkVariant> dataView = grid.setItems(drinkVariantList);
-        dataView.setSortOrder(drinkVariant -> drinkVariant.getDrink().getName() + drinkVariant.getMl(),
-                SortDirection.ASCENDING);
+        dataView.setSortComparator((SerializableComparator<DrinkVariant>) (o1, o2) -> {
+            int c = o1.getDrink().getName().compareTo(o2.getDrink().getName());
+            return c == 0 ? o1.getMl() - o2.getMl() : c;
+        });
 
         DrinkVariantFilter drinkVariantFilter = new DrinkVariantFilter(dataView);
         grid.getHeaderRows().clear();

@@ -29,10 +29,7 @@ import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
 import static de.softwareprojekt.bestbowl.utils.Utils.matches;
@@ -132,7 +129,8 @@ public class AssociationManagementView extends VerticalLayout {
         Grid.Column<Association> idColumn = grid.addColumn("id").setHeader("ID");
         Grid.Column<Association> nameColumn = grid.addColumn("name").setHeader("Name");
         Grid.Column<Association> discountColumn = grid
-                .addColumn(association -> formatDouble(association.getDiscount()) + "%").setHeader("Rabatt");
+                .addColumn(association -> formatDouble(association.getDiscount()) + "%")
+                .setComparator(Comparator.comparingDouble(Association::getDiscount)).setHeader("Rabatt");
         Grid.Column<Association> activeColumn = grid
                 .addColumn(association -> association.isActive() ? "Aktiv" : "Inaktiv").setHeader("Aktiv");
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));

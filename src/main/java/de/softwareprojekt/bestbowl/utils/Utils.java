@@ -146,10 +146,6 @@ public class Utils {
         return toDateString(ms, "dd.MM.yyyy HH:mm");
     }
 
-    public static String toDateStringYearFirst(Long ms) {
-        return toDateString(ms, "yyyy.MM.dd HH:mm");
-    }
-
     /**
      * @param ms unix timestamp
      * @return date string with day, month, year

@@ -26,6 +26,7 @@ import de.softwareprojekt.bestbowl.views.articleForms.FoodForm;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -299,7 +300,7 @@ public class FoodManagementView extends VerticalLayout {
         Grid.Column<Food> stockColumn = grid.addColumn("stock").setHeader("Bestand (Stück)");
         Grid.Column<Food> reorderPointColumn = grid.addColumn("reorderPoint").setHeader("Meldebestand (Stück)");
         Grid.Column<Food> priceColumn = grid.addColumn(food -> formatDouble(food.getPrice()) + "€")
-                .setHeader("Preis");
+                .setComparator(Comparator.comparingDouble(Food::getPrice)).setHeader("Preis");
         Grid.Column<Food> activeColumn = grid.addColumn(food -> food.isActive() ? "Aktiv" : "Inaktiv")
                 .setHeader("Aktiv");
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));

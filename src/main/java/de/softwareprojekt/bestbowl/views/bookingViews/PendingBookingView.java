@@ -149,9 +149,12 @@ public class PendingBookingView extends VerticalLayout {
 
         grid.addColumn(booking -> booking.getBowlingAlley().getId()).setHeader("Bahn");
         grid.addColumn(booking -> booking.getClient().getFullName()).setHeader("Kunde");
-        grid.addColumn(booking -> toDateString(booking.getStartTime())).setHeader("Startzeit");
-        grid.addColumn(booking -> toHoursString(booking.getDuration())).setHeader("Dauer");
-        grid.addColumn(booking -> toDateString(booking.getEndTime() + 1)).setHeader("Endzeit");
+        grid.addColumn(booking -> toDateString(booking.getStartTime()))
+                .setComparator(Comparator.comparingLong(BowlingAlleyBooking::getStartTime)).setHeader("Startzeit");
+        grid.addColumn(booking -> toHoursString(booking.getDuration()))
+                .setComparator(Comparator.comparingLong(BowlingAlleyBooking::getDuration)).setHeader("Dauer");
+        grid.addColumn(booking -> toDateString(booking.getEndTime() + 1))
+                .setComparator(Comparator.comparingLong(BowlingAlleyBooking::getEndTime)).setHeader("Endzeit");
         grid.addColumn(this::calculateBookingTotal).setHeader("Summe");
         grid.getColumns().forEach(c -> c.setSortable(true).setResizable(true));
 

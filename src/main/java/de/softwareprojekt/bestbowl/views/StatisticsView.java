@@ -286,7 +286,8 @@ public class StatisticsView extends VerticalLayout implements HasUrlParameter<In
             return horizontalLayout;
         })).setHeader("Rechnungsnummer");
         bookingGrid.addColumn(booking -> getBookingStatus(booking).getText()).setHeader("Rechnungsstatus");
-        bookingGrid.addColumn(booking -> Utils.toDateString(booking.getStartTime())).setHeader("Datum");
+        bookingGrid.addColumn(booking -> Utils.toDateString(booking.getStartTime()))
+                .setComparator(Comparator.comparingLong(BowlingAlleyBooking::getStartTime)).setHeader("Datum");
         bookingGrid.addColumn(booking -> formatDouble(calculateBookingTotal(booking)) + "€").setHeader("Summe");
 
         bookingGrid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));

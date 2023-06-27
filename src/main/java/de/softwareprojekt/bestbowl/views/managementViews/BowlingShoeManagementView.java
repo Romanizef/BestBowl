@@ -27,11 +27,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
-import static de.softwareprojekt.bestbowl.utils.Utils.toDateStringYearFirst;
 import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
@@ -279,8 +279,8 @@ public class BowlingShoeManagementView extends VerticalLayout {
         shoeGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
         shoeGrid.removeAllColumns();
         Grid.Column<BowlingShoe> idColumn = shoeGrid.addColumn("id").setHeader("ID");
-        Grid.Column<BowlingShoe> boughtAtColumn = shoeGrid.addColumn(s -> toDateStringYearFirst(s.getBoughtAt()))
-                .setHeader("Kaufdatum");
+        Grid.Column<BowlingShoe> boughtAtColumn = shoeGrid.addColumn(s -> toDateString(s.getBoughtAt()))
+                .setComparator(Comparator.comparingLong(BowlingShoe::getBoughtAt)).setHeader("Kaufdatum");
         Grid.Column<BowlingShoe> sizeColumn = shoeGrid.addColumn("size").setHeader("Größe");
         Grid.Column<BowlingShoe> activeColumn = shoeGrid.addColumn(s -> s.isActive() ? "Aktiv" : "Inaktiv")
                 .setHeader("Aktiv");
