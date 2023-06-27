@@ -1,25 +1,6 @@
 package de.softwareprojekt.bestbowl.views.bookingViews;
 
-import static de.softwareprojekt.bestbowl.utils.Utils.formatDouble;
-import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
-import static de.softwareprojekt.bestbowl.utils.Utils.toHourOnlyString;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_ALLEY;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_DRINK;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_FOOD;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.PANEL_COLOR_SHOE;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.VAADIN_PRIMARY_BLUE;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Div;
@@ -34,12 +15,7 @@ import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.component.tabs.TabVariant;
 import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.router.BeforeEvent;
-import com.vaadin.flow.router.HasUrlParameter;
-import com.vaadin.flow.router.OptionalParameter;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-
+import com.vaadin.flow.router.*;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoeBooking;
@@ -51,10 +27,17 @@ import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoe.BowlingShoeRepos
 import de.softwareprojekt.bestbowl.jpa.repositories.drink.DrinkBookingRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.food.FoodBookingRepository;
 import de.softwareprojekt.bestbowl.utils.VaadinUtils;
+import de.softwareprojekt.bestbowl.utils.components.InvoiceDownloadButton;
 import de.softwareprojekt.bestbowl.utils.email.MailSenderService;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import jakarta.annotation.security.PermitAll;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.*;
+
+import static de.softwareprojekt.bestbowl.utils.Utils.*;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * Creates a view for all booked elements to be displayed in an invoice and paid
@@ -156,7 +139,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
                 bowlingAlleyBookingRepository.save(booking);
                 mailSenderService.sendInvoiceMail(booking);
                 Notifications.showInfo("Rechnung abgeschlossen");
-                UI.getCurrent().navigate(ArticleBookingView.class);
+                updateComponents();
             });
         });
         return button;
@@ -175,7 +158,7 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
     }
 
     /**
-     * Creates a {@code Div} tabContent that shows all the conents of a tab
+     * Creates a {@code Div} tabContent
      *
      * @return {@code Div}
      * @see #replaceTabContent(int)
@@ -332,14 +315,9 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
         }
         Optional<BowlingAlleyBooking> bowlingAlleyBookingOptional = bowlingAlleyBookingRepository.findById(parameter);
         if (bowlingAlleyBookingOptional.isPresent()) {
-            BowlingAlleyBooking bowlingAlleyBooking = bowlingAlleyBookingOptional.get();
-            if (bowlingAlleyBooking.isActive() && !bowlingAlleyBooking.isCompleted()) {
-                this.booking = bowlingAlleyBooking;
-                getBookingDataFromDB();
-                initializeComponents();
-            } else {
-                header.setText("Diese Rechnung ist bereits abgeschlossen");
-            }
+            booking = bowlingAlleyBookingOptional.get();
+            getBookingDataFromDB();
+            updateComponents();
         } else {
             header.setText("Es existiert keine Rechnung mit dieser ID");
         }
@@ -365,14 +343,30 @@ public final class InvoiceView extends VerticalLayout implements HasUrlParameter
     }
 
     /**
-     * Initializes the components of the view.
+     * Initializes/updates the components of the view.
      *
      * @see #createTotalTab()
      * @see #createTotalTabContent()
      * @see #createPartialTab()
      * @see #createPartialTabContent()
      */
-    private void initializeComponents() {
+    private void updateComponents() {
+        if (!booking.isActive()) {
+            header.setText("Diese Rechnung ist storniert");
+            invoiceTabSheet.setVisible(false);
+            return;
+        }
+        if (booking.isCompleted()) {
+            header.setText("Die Rechnung " + booking.getId() + " ist bezahlt");
+            invoiceTabSheet.setVisible(false);
+            completeInvoiceButton.setVisible(false);
+            InvoiceDownloadButton downloadButton = new InvoiceDownloadButton(booking);
+            downloadButton.setText("Rechnung herunterladen");
+            downloadButton.removeThemeVariants(ButtonVariant.LUMO_SMALL);
+            downloadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            add(downloadButton);
+            return;
+        }
         String text = "Rechnung Nr: " + booking.getId() + " , " +
                 booking.getClient().getFullName() + " , " +
                 "Bahn: " + booking.getBowlingAlley().getId() + " , " +

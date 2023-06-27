@@ -1,10 +1,10 @@
 package de.softwareprojekt.bestbowl.utils.email;
 
-import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
-
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
+
+import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
 
 /**
  * MailSenderService is a class that is used to send emails.
@@ -12,6 +12,7 @@ import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking
  * @author Matija Kopschek
  */
 public class MailSenderService {
+    private static final String DISCLAIMER = "\n\n\nDISCLAIMER: This e-mail is from an educational project and has no real-world meaning";
     private final MailSenderUtil sender = new MailSenderUtil();
     private BowlingCenter bowlingCenter;
 
@@ -34,19 +35,22 @@ public class MailSenderService {
         String smtphost = bowlingCenter.getSmtpHost(); // smtp.gmail.com: host is gmail.com
         String smtpport = bowlingCenter.getSmtpPort(); // 465: is the port number for SSL, if TLS is being used then 587
 
-        // String recepientMail = booking.getClient().getEmail(); // From class Customer
-        String recepientMail = bowlingCenter.getReceiverEmail(); // Nur zu test Zwecken
+        String recepientMail = bowlingCenter.getReceiverEmail();
+        if (!isStringNotEmpty(recepientMail)) {
+            recepientMail = booking.getClient().getEmail();
+        }
         String recepientLastName = booking.getClient().getLastName(); // From class Customer
         String recepientFirstName = booking.getClient().getFirstName(); // From class Customer
         int invoiceNumber = booking.getId(); // BookingID as invoiceNumber
 
         sender.login(smtphost, smtpport, senderMail, password);
-        String subject = "Ihre Best Bowl Rechnung";
-        String mailText = "Sehr geehrter " + recepientFirstName + " " + recepientLastName + ",\n"
-                + "\nDanke für Ihren Einkauf!\nIhre Rechnungsnummer ist:" + invoiceNumber;
+        String subject = "Ihre " + bowlingCenter.getDisplayName() + " Rechnung";
+        String mailText = "Sehr geehrte(r) " + recepientFirstName + " " + recepientLastName + ",\n"
+                + "\nDanke für Ihren Einkauf!\nIhre Rechnungsnummer ist: " + invoiceNumber
+                + DISCLAIMER;
 
         try {
-            sender.sendAttachmentMail(senderMail, "Best Bowl", recepientMail, subject, mailText, booking);
+            sender.sendAttachmentMail(senderMail, bowlingCenter.getDisplayName(), recepientMail, subject, mailText, booking);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -70,20 +74,23 @@ public class MailSenderService {
         String smtphost = bowlingCenter.getSmtpHost(); // smtp.gmail.com: host is gmail.com
         String smtpport = bowlingCenter.getSmtpPort(); // 465: is the port number for SSL, if TLS is being used then 587
 
-        // String recepientMail = booking.getClient().getEmail(); // From class Customer
-        String recepientMail = bowlingCenter.getReceiverEmail(); // Nur zu test Zwecken
+        String recepientMail = bowlingCenter.getReceiverEmail();
+        if (!isStringNotEmpty(recepientMail)) {
+            recepientMail = booking.getClient().getEmail();
+        }
         String recepientLastName = booking.getClient().getLastName(); // From class Customer
         String recepientFirstName = booking.getClient().getFirstName(); // From class Customer
         int bookingNumber = booking.getId(); // BookingID as bookingNumber
 
         sender.login(smtphost, smtpport, senderMail, password);
-        String subject = "Ihre Best Bowl Buchungsbestätigung";
-        String mailText = "Sehr geehrter " + recepientFirstName + " " + recepientLastName + ",\n"
-                + "\nIhre Buchung wurde bei uns vermerkt!\nIhre Rechnungsnummer ist:" + bookingNumber + "."
-                + "\n\nVielen Dank für ihren Einkauf\nIhr Best Bowl-Team";
+        String subject = "Ihre " + bowlingCenter.getDisplayName() + " Buchungsbestätigung";
+        String mailText = "Sehr geehrte(r) " + recepientFirstName + " " + recepientLastName + ",\n"
+                + "\nIhre Buchung wurde bei uns vermerkt!\nIhre Rechnungsnummer ist: " + bookingNumber + "."
+                + "\n\nVielen Dank für ihren Einkauf\nIhr " + bowlingCenter.getDisplayName() + "-Team"
+                + DISCLAIMER;
 
         try {
-            sender.sendMessageOnlyMail(senderMail, "Best Bowl", recepientMail, subject, mailText);
+            sender.sendMessageOnlyMail(senderMail, bowlingCenter.getDisplayName(), recepientMail, subject, mailText);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -107,20 +114,23 @@ public class MailSenderService {
         String smtphost = bowlingCenter.getSmtpHost(); // smtp.gmail.com: host is gmail.com
         String smtpport = bowlingCenter.getSmtpPort(); // 465: is the port number for SSL, if TLS is being used then 587
 
-        // String recepientMail = booking.getClient().getEmail(); // From class Customer
-        String recepientMail = bowlingCenter.getReceiverEmail(); // Nur zu test Zwecken
+        String recepientMail = bowlingCenter.getReceiverEmail();
+        if (!isStringNotEmpty(recepientMail)) {
+            recepientMail = booking.getClient().getEmail();
+        }
         String recepientLastName = booking.getClient().getLastName(); // From class Customer
         String recepientFirstName = booking.getClient().getFirstName(); // From class Customer
         int bookingNumber = booking.getId(); // BookingID as bookingNumber
 
         sender.login(smtphost, smtpport, senderMail, password);
-        String subject = "Ihre Best Bowl Stornierung";
-        String mailText = "Sehr geehrter " + recepientFirstName + " " + recepientLastName + ",\n"
+        String subject = "Ihre " + bowlingCenter.getDisplayName() + " Stornierung";
+        String mailText = "Sehr geehrte(r) " + recepientFirstName + " " + recepientLastName + ",\n"
                 + "\nSchade das sie ihre Buchung mit der Rechnungsnummer: " + bookingNumber + " storniert haben."
-                + "\n\nWir hoffen sie bald bei uns wieder zu sehen\nIhr Best Bowl-Team";
+                + "\n\nWir hoffen sie bald bei uns wieder zu sehen\nIhr " + bowlingCenter.getDisplayName() + "-Team"
+                + DISCLAIMER;
 
         try {
-            sender.sendMessageOnlyMail(senderMail, "Best Bowl", recepientMail, subject, mailText);
+            sender.sendMessageOnlyMail(senderMail, bowlingCenter.getDisplayName(), recepientMail, subject, mailText);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -129,7 +139,7 @@ public class MailSenderService {
     /**
      * The getConnectionParameters function is used to retrieve the connection
      * parameters from the database.
-     * 
+     *
      * @return A boolean value
      */
     private boolean getConnectionParameters() {
