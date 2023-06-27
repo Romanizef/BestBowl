@@ -150,6 +150,18 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         }
     }
 
+    private void updateHeaderCompletedBooking() {
+        if (currentBowlingAlleyBooking == null) {
+            header.setText("Keine Bahn ausgewählt");
+        } else {
+            String text = "Bahn: " + currentBowlingAlleyBooking.getBowlingAlley().getId() + " , " +
+                    currentBowlingAlleyBooking.getClient().getFullName() + " , " +
+                    toDateString(currentBowlingAlleyBooking.getStartTime()) + " - " +
+                    toHourOnlyString(currentBowlingAlleyBooking.getEndTime() + 1)+ " wurde bezahlt.";
+            header.setText(text);
+        }
+    }
+
     /**
      * The createArticlePanelComponent function creates a TabSheet with three tabs,
      * each containing a Div.
@@ -337,7 +349,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
                         bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == bowlingAlley.getId()).findFirst().orElse(null);
                 if (tempBowlingAlleyBooking != null && tempBowlingAlleyBooking.isCompleted()) {
                     changeTabsCompletedBooking();
-                    header.setText(alleyButton.getText() + " wurde schon bezahlt");
+                    updateHeaderCompletedBooking();
                     alleyButton.removeThemeVariants(ButtonVariant.LUMO_PRIMARY);
                     alleyButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
                     goToBillButton.setEnabled(false);
@@ -353,7 +365,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
                         }
                         return;
                     }
-                    if (currentBowlingAlleyId == Integer.parseInt(alleyButton.getText().replaceAll("\\D+(\\d+)", "$1"))) {
+                    if (currentBowlingAlleyBooking.getId() == Integer.parseInt(alleyButton.getText().replaceAll("\\D+(\\d+)", "$1"))) {
                         //nichts machen, wenn auf schon ausgewählte bahn geklickt wird
                         return;
                     }
@@ -373,11 +385,11 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
 
     private void onCompletedButtonClick(Button alleyButton) {
         changeTabsCompletedBooking();
-        header.setText(alleyButton.getText() + " wurde schon bezahlt");
+        updateHeaderCompletedBooking();
         goToBillButton.setEnabled(false);
         changeButtonStyleToUnselected(currentBowlingAlleyId);
         panelChanges = false;
-        goToBillButton.setEnabled(true);
+        goToBillButton.setEnabled(false);
         deleteChangesButton.setEnabled(false);
         addItemButton.setEnabled(false);
     }
@@ -685,7 +697,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
                         button.addThemeVariants(ButtonVariant.LUMO_ERROR);
                         goToBillButton.setEnabled(false);
                         changeTabsCompletedBooking();
-                        header.setText(button.getText() + " wurde schon bezahlt");
+                        updateHeaderCompletedBooking();
                     } else {
                         goToBillButton.setEnabled(true);
                     }
