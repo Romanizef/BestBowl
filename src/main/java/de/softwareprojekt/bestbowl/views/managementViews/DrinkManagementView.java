@@ -56,8 +56,8 @@ public class DrinkManagementView extends VerticalLayout {
      * allows users to manage drinks.
      * It creates a button that allows users to create new drinks, and it also
      * creates a grid of all existing drinks.
-     * The grid contains buttons for editing and deleting each drink, as well as
-     * buttons for adding or removing variants from each drink.
+     * The grid contains buttons for editing each drink, as well as
+     * buttons for adding variants from each drink.
      *
      * @param drinkRepository
      * @see #createNewDrinkButton()
@@ -76,7 +76,7 @@ public class DrinkManagementView extends VerticalLayout {
 
     /**
      * The createNewDrinkButton function creates a new Button object with the text
-     * &quot;Neues Getränk hinzufügen&quot;.
+     * "Neues Getränk hinzufügen".
      * The button is used to create new drinks.
      *
      * @return A button

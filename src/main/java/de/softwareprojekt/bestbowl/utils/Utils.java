@@ -1,5 +1,8 @@
 package de.softwareprojekt.bestbowl.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -7,9 +10,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The Utils class contains all the utility methods used throughout the program.
@@ -146,6 +146,10 @@ public class Utils {
         return toDateString(ms, "dd.MM.yyyy HH:mm");
     }
 
+    public static String toDateStringYearFirst(Long ms) {
+        return toDateString(ms, "yyyy.MM.dd HH:mm");
+    }
+
     /**
      * @param ms unix timestamp
      * @return date string with day, month, year
@@ -188,7 +192,7 @@ public class Utils {
 
     /**
      * @return a LocalDateTime of the current time with the minute rounded to the
-     *         previous 1/4 hour
+     * previous 1/4 hour
      */
     public static LocalDateTime getCurrentDateTimeRounded() {
         LocalDateTime localDateTime = LocalDateTime.now();

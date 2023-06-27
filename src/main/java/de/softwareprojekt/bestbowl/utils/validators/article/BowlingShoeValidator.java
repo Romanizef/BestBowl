@@ -34,6 +34,9 @@ public class BowlingShoeValidator implements Validator<BowlingShoe> {
         if (bowlingShoe.getSize() < minShoeSize || bowlingShoe.getSize() > maxShoeSize) {
             return ValidationResult.error("Größe muss zwischen " + minShoeSize + " und " + maxShoeSize + " sein");
         }
+        if (bowlingShoe.getBoughtAt() < 0) {
+            return ValidationResult.error("Das Datum muss vor dem 1.1.1970 sein!");
+        }
         return ValidationResult.ok();
     }
 }

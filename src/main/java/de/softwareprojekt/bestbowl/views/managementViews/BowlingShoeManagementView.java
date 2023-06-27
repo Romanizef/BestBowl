@@ -1,19 +1,5 @@
 package de.softwareprojekt.bestbowl.views.managementViews;
 
-import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.clearNumberFieldChildren;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderBoolean;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderInteger;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.createFilterHeaderString;
-import static de.softwareprojekt.bestbowl.utils.VaadinUtils.setChildrenEnabled;
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -30,15 +16,23 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
 import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoe.BowlingShoeRepository;
-import de.softwareprojekt.bestbowl.utils.Utils;
 import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
 import de.softwareprojekt.bestbowl.views.articleForms.BowlingShoeForm;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.Optional;
+
+import static de.softwareprojekt.bestbowl.utils.Utils.toDateString;
+import static de.softwareprojekt.bestbowl.utils.Utils.toDateStringYearFirst;
+import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 
 /**
  * @author Max Ziller
@@ -79,12 +73,12 @@ public class BowlingShoeManagementView extends VerticalLayout {
 
     /**
      * The createNewBowlingShoeButton function creates a new Button object with the
-     * text &quot;Neue Schuhe hinzufügen&quot; and sets its width to 100%.
+     * text "Neue Schuhe hinzufügen" and sets its width to 100%.
      * It then adds the LUMO_PRIMARY theme variant to it.
      * When clicked, it deselects all items in the bowlingShoeGrid, creates a new
      * BowlingShoe object called selectedShoe and reads this into bowlingShoeBinder.
-     * The saveButton is enabled while cancelButton is disabled.
-     * editingNewBowlingShoe is set to false and updateEditBowlingShoeLayoutState()
+     * The saveButton and the cancelButton are enabled.
+     * editingNewBowlingShoe is set to true and updateEditBowlingShoeLayoutState()
      * as well as clearNumberFieldChildren(bowlingShoeForm.getChildren()) are
      * called.
      *
@@ -284,8 +278,8 @@ public class BowlingShoeManagementView extends VerticalLayout {
         Grid<BowlingShoe> shoeGrid = new Grid<>(BowlingShoe.class);
         shoeGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
         shoeGrid.removeAllColumns();
-        Grid.Column<BowlingShoe> idColumn = shoeGrid.addColumn(BowlingShoe::getId).setHeader("ID");
-        Grid.Column<BowlingShoe> boughtAtColumn = shoeGrid.addColumn(s -> toDateString(s.getBoughtAt()), "dd mm yyyy")
+        Grid.Column<BowlingShoe> idColumn = shoeGrid.addColumn("id").setHeader("ID");
+        Grid.Column<BowlingShoe> boughtAtColumn = shoeGrid.addColumn(s -> toDateStringYearFirst(s.getBoughtAt()))
                 .setHeader("Kaufdatum");
         Grid.Column<BowlingShoe> sizeColumn = shoeGrid.addColumn("size").setHeader("Größe");
         Grid.Column<BowlingShoe> activeColumn = shoeGrid.addColumn(s -> s.isActive() ? "Aktiv" : "Inaktiv")
@@ -357,7 +351,7 @@ public class BowlingShoeManagementView extends VerticalLayout {
          */
         public boolean test(BowlingShoe shoe) {
             boolean matchesId = matches(String.valueOf(shoe.getId()), id);
-            boolean matchesBoughtAt = matches(Utils.toDateString(shoe.getBoughtAt()), boughtAt);
+            boolean matchesBoughtAt = matches(toDateString(shoe.getBoughtAt()), boughtAt);
             boolean matchesSize = matches(String.valueOf(shoe.getSize()), size);
             boolean matchesActive = active == null || active == shoe.isActive();
             return matchesId && matchesBoughtAt && matchesSize && matchesActive;
@@ -401,6 +395,7 @@ public class BowlingShoeManagementView extends VerticalLayout {
 
         /**
          * The setSize function is used to filter the grid by size.
+         * It then refreshes all data in the dataView object.
          *
          * @param size
          */
@@ -411,6 +406,7 @@ public class BowlingShoeManagementView extends VerticalLayout {
 
         /**
          * The setActive function is used to set the active state of a bowling shoe.
+         * It then refreshes all data in the dataView object.
          *
          * @param active Set the active variable to true or false
          */

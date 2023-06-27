@@ -19,6 +19,7 @@ import de.softwareprojekt.bestbowl.utils.validators.article.BowlingShoeValidator
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -48,6 +49,7 @@ public class BowlingShoeForm extends FormLayout {
         DateTimePicker boughtAtField = new DateTimePicker();
         boughtAtField.setWidthFull();
         boughtAtField.setLocale(Locale.GERMANY);
+        boughtAtField.setMin(LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC));
 
         IntegerField sizeField = new IntegerField("Größe");
         sizeField.setWidthFull();
