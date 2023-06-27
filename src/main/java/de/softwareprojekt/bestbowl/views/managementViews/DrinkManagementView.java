@@ -4,6 +4,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -39,6 +40,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
 @Route(value = "drinkManagement", layout = MainView.class)
 @PageTitle("Getränkeverwaltung")
 @RolesAllowed({UserRole.OWNER})
+@CssImport(value = "./styles/styles.css", themeFor = "vaadin-grid")
 public class DrinkManagementView extends VerticalLayout {
     private final transient DrinkRepository drinkRepository;
     private final Binder<Drink> drinkBinder = new Binder<>();
@@ -340,6 +342,13 @@ public class DrinkManagementView extends VerticalLayout {
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setWidth("75%");
         grid.setHeight("100%");
+        grid.setClassNameGenerator(drink -> {
+            if (drink.getStockInMilliliters() < drink.getReorderPoint() && drink.isActive()) {
+                return "highlighted";
+            } else {
+                return "normal";
+            }
+        });
         List<Drink> drinkList = drinkRepository.findAll();
         GridListDataView<Drink> dataView = grid.setItems(drinkList);
 
