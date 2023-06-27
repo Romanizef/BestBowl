@@ -6,7 +6,10 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -103,18 +106,19 @@ public class BowlingCenterManagementView extends Div {
         AccordionPanel shoeSizePanel = accordion.add("Schuhgrößen", shoeSizeLayout);
         shoeSizePanel.addThemeVariants(DetailsVariant.FILLED);
 
+        Label emailInfoLabel = new Label("Damit das System E-Mails senden kann, müssen die folgenden Felder gefüllt sein:");
         TextField senderEmailField = new TextField("Sender E-Mail");
-        senderEmailField.setRequiredIndicatorVisible(true);
         PasswordField passwordField = new PasswordField("Sender E-Mail Passwort");
-        passwordField.setRequiredIndicatorVisible(true);
         TextField receiverEmailField = new TextField("Empfänger E-Mail (Test)");
-        receiverEmailField.setRequiredIndicatorVisible(true);
+        Label receiverInfoLabel = new Label("Wenn dieses Feld gefüllt ist, wird jede E-Mail an diese Adresse gesendet.");
+        HorizontalLayout receiverLayout = new HorizontalLayout(receiverEmailField, receiverInfoLabel);
+        receiverLayout.setAlignItems(FlexComponent.Alignment.BASELINE);
+        receiverLayout.setPadding(false);
+        receiverLayout.setMargin(false);
         TextField smtpHostField = new TextField("SMTP Host");
-        smtpHostField.setRequiredIndicatorVisible(true);
         TextField smtpPortField = new TextField("SMTP Port");
-        smtpPortField.setRequiredIndicatorVisible(true);
-        VerticalLayout centerEmailLayout = new VerticalLayout(senderEmailField, passwordField,
-                receiverEmailField, smtpHostField, smtpPortField);
+        VerticalLayout centerEmailLayout = new VerticalLayout(emailInfoLabel, senderEmailField, passwordField,
+                receiverLayout, smtpHostField, smtpPortField);
         AccordionPanel centerEmailPanel = accordion.add("E-Mail Server Daten", centerEmailLayout);
         centerEmailPanel.addThemeVariants(DetailsVariant.FILLED);
 

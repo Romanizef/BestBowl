@@ -88,7 +88,7 @@ public class FoodManagementView extends VerticalLayout {
             foodBinder.readBean(selectedFood);
             saveButton.setEnabled(true);
             cancelButton.setEnabled(true);
-            editingNewFood = false;
+            editingNewFood = true;
             updateEditFoodLayoutState();
             clearNumberFieldChildren(foodForm.getChildren());
         });

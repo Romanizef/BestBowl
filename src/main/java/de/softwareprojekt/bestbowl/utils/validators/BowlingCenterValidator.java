@@ -6,7 +6,6 @@ import com.vaadin.flow.data.binder.ValueContext;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringMinNChars;
-import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
 import static de.softwareprojekt.bestbowl.utils.validators.PatternValidator.*;
 
 /**
@@ -27,25 +26,24 @@ public class BowlingCenterValidator implements Validator<BowlingCenter> {
         if (!isStringMinNChars(bowlingCenter.getDisplayName(), 2)) {
             return ValidationResult.error("Anzeigename muss mindestens 2 Zeichen lang sein!");
         }
-        if (!isStringOnlyLettersAndSpecialChars(bowlingCenter.getDisplayName())) {
-            if (isStringWithoutDoubleSpaces(bowlingCenter.getDisplayName()))
-                return ValidationResult
-                        .error("In der Anzeigename sind nur Buchstaben erlaubt! Anzeigename darf nicht leer sein!");
+        if (!isStringOnlyLettersAndSpecialChars(bowlingCenter.getDisplayName()) &&
+                isStringWithoutDoubleSpaces(bowlingCenter.getDisplayName())) {
+            return ValidationResult
+                    .error("In der Anzeigename sind nur Buchstaben erlaubt! Anzeigename darf nicht leer sein!");
         }
         if (!isStringMinNChars(bowlingCenter.getBusinessName(), 2)) {
             return ValidationResult.error("Geschäftsname muss mindestens 2 Zeichen lang sein!");
         }
-        if (!isStringOnlyLettersAndSpecialChars(bowlingCenter.getBusinessName())) {
-            if (isStringWithoutDoubleSpaces(bowlingCenter.getBusinessName()))
-                return ValidationResult
-                        .error("In der Geschäftsnamen sind nur Buchstaben erlaubt! Anzeigename darf nicht leer sein!");
+        if (!isStringOnlyLettersAndSpecialChars(bowlingCenter.getBusinessName()) &&
+                isStringWithoutDoubleSpaces(bowlingCenter.getBusinessName())) {
+            return ValidationResult
+                    .error("In der Geschäftsnamen sind nur Buchstaben erlaubt! Anzeigename darf nicht leer sein!");
         }
         if (!isStringMinNChars(bowlingCenter.getStreet(), 2)) {
             return ValidationResult.error("Straße muss mindestens 2 Zeichen lang sein!");
         }
-        if (!isStringOnlyLetters(bowlingCenter.getStreet())) {
-            if (isStringWithoutDoubleSpaces(bowlingCenter.getStreet()))
-                return ValidationResult.error("Im Straßennamen sind nur Buchstaben erlaubt!");
+        if (!isStringOnlyLetters(bowlingCenter.getStreet()) && isStringWithoutDoubleSpaces(bowlingCenter.getStreet())) {
+            return ValidationResult.error("Im Straßennamen sind nur Buchstaben erlaubt!");
         }
         if (bowlingCenter.getHouseNr() == null) {
             return ValidationResult.error("Hausnummer muss größer als 0 sein!");
@@ -59,9 +57,8 @@ public class BowlingCenterValidator implements Validator<BowlingCenter> {
         if (!isStringMinNChars(bowlingCenter.getCity(), 2)) {
             return ValidationResult.error("Stadt muss mindestens 2 Zeichen lang sein!");
         }
-        if (!isStringOnlyLetters(bowlingCenter.getCity())) {
-            if (isStringWithoutDoubleSpaces(bowlingCenter.getCity()))
-                return ValidationResult.error("Im Stadtnamen sind nur Buchstaben erlaubt!");
+        if (!isStringOnlyLetters(bowlingCenter.getCity()) && isStringWithoutDoubleSpaces(bowlingCenter.getCity())) {
+            return ValidationResult.error("Im Stadtnamen sind nur Buchstaben erlaubt!");
         }
         if (bowlingCenter.getBowlingAlleyPricePerHour() < 0) {
             return ValidationResult.error("Der Bahn Preis pro Stunde muss positiv sein!");
@@ -79,29 +76,34 @@ public class BowlingCenterValidator implements Validator<BowlingCenter> {
             return ValidationResult
                     .error("Die maximale Schuhgröße muss größer oder gleich der minimalen Schuhgröße sein!");
         }
-        if (!isStringMinNChars(bowlingCenter.getSenderEmail(), 2)) {
-            return ValidationResult.error("Sender E-Mail muss mindestens 2 Zeichen lang sein!");
+        String senderEmail = bowlingCenter.getSenderEmail();
+        if (senderEmail != null && !senderEmail.equals("")) {
+            if (!isStringMinNChars(senderEmail, 2)) {
+                return ValidationResult.error("Sender E-Mail muss mindestens 2 Zeichen lang sein!");
+            }
+            if (!isStringValidEmail(senderEmail) || isStringWithoutDoubleSpaces(senderEmail)) {
+                return ValidationResult.error("Ungültige E-Mail");
+            }
         }
-        if (!isStringNotEmpty(bowlingCenter.getSenderEmail())
-                || !isStringValidEmail(bowlingCenter.getSenderEmail())
-                || isStringWithoutDoubleSpaces(bowlingCenter.getSenderEmail())) {
-            return ValidationResult.error("Ungültige E-Mail");
-        }
-        if (!isStringMinNChars(bowlingCenter.getPassword(), 2)) {
+        if (bowlingCenter.getPassword() != null && !bowlingCenter.getPassword().equals("") &&
+                !isStringMinNChars(bowlingCenter.getPassword(), 2)) {
             return ValidationResult.error("E-Mail-Passwort muss mindestens 2 Zeichen lang sein!");
         }
-        if (!isStringMinNChars(bowlingCenter.getReceiverEmail(), 2)) {
-            return ValidationResult.error("Empfänger E-Mail muss mindestens 2 Zeichen lang sein!");
+        String receiverEmail = bowlingCenter.getReceiverEmail();
+        if (receiverEmail != null && !receiverEmail.equals("")) {
+            if (!isStringMinNChars(receiverEmail, 2)) {
+                return ValidationResult.error("Empfänger E-Mail muss mindestens 2 Zeichen lang sein!");
+            }
+            if (!isStringValidEmail(receiverEmail) || isStringWithoutDoubleSpaces(receiverEmail)) {
+                return ValidationResult.error("Ungültige E-Mail");
+            }
         }
-        if (!isStringNotEmpty(bowlingCenter.getReceiverEmail())
-                || !isStringValidEmail(bowlingCenter.getReceiverEmail())
-                || isStringWithoutDoubleSpaces(bowlingCenter.getReceiverEmail())) {
-            return ValidationResult.error("Ungültige E-Mail");
-        }
-        if (!isStringValidSMTPHost(bowlingCenter.getSmtpHost())) {
+        if (bowlingCenter.getSmtpHost() != null && !bowlingCenter.getSmtpHost().equals("") &&
+                !isStringValidSMTPHost(bowlingCenter.getSmtpHost())) {
             return ValidationResult.error("Ungültiger SMTP Host. Format: smtp.example.com");
         }
-        if (!isStringValidSMTPPort(bowlingCenter.getSmtpPort())) {
+        if (bowlingCenter.getSmtpPort() != null && !bowlingCenter.getSmtpPort().equals("") &&
+                !isStringValidSMTPPort(bowlingCenter.getSmtpPort())) {
             return ValidationResult.error("Ungültiger SMTP Port. Format: 123");
         }
         return ValidationResult.ok();
