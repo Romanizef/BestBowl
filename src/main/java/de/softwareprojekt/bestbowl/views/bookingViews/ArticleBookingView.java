@@ -75,7 +75,6 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     private final Map<Integer, Button> buttonMap;
     private final BowlingCenter bowlingCenter;
     private final H3 header;
-    private int currentBowlingAlleyId;
     private BowlingAlleyBooking currentBowlingAlleyBooking;
     private Div drinkDiv;
     private Div foodDiv;
@@ -121,7 +120,6 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         this.drinkBookingRepository = drinkBookingRepository;
         this.bowlingShoeBookingRepository = bowlingShoeBookingRepository;
         this.bowlingCenter = bowlingCenterRepository.getBowlingCenter();
-        this.currentBowlingAlleyId = 1;
         this.panelChanges = false;
         buttonMap = new HashMap<>();
         setSizeFull();
@@ -358,14 +356,14 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
                     if (tempBowlingAlleyBooking != null && tempBowlingAlleyBooking.isCompleted()) {
                         if (panelChanges) {
                             VaadinUtils.showConfirmationDialog("Änderungen sind nicht gespeichert. Trotzdem Bahn wechseln?", "Ja", "Abbrechen", () -> {
-                                onCompletedButtonClick(alleyButton);
+                                onCompletedButtonClick(bowlingAlleyBookingList, alleyButton);
                             });
                         } else {
-                            onCompletedButtonClick(alleyButton);
+                            onCompletedButtonClick(bowlingAlleyBookingList, alleyButton);
                         }
                         return;
                     }
-                    if (currentBowlingAlleyBooking.getId() == Integer.parseInt(alleyButton.getText().replaceAll("\\D+(\\d+)", "$1"))) {
+                    if (currentBowlingAlleyBooking.getBowlingAlley().getId() == Integer.parseInt(alleyButton.getText().replaceAll("\\D+(\\d+)", "$1"))) {
                         //nichts machen, wenn auf schon ausgewählte bahn geklickt wird
                         return;
                     }
@@ -383,11 +381,15 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         return layout;
     }
 
-    private void onCompletedButtonClick(Button alleyButton) {
+    private void onCompletedButtonClick(List<BowlingAlleyBooking> bowlingAlleyBookingList, Button alleyButton) {
         changeTabsCompletedBooking();
+        changeButtonStyleToUnselected(currentBowlingAlleyBooking.getBowlingAlley().getId());
+        int currentBowlingAlleyID = Integer.parseInt(alleyButton.getText().replaceAll("\\D+(\\d+)", "$1"));
+        currentBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(
+                        bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyID)
+                .findFirst()
+                .orElse(null);
         updateHeaderCompletedBooking();
-        goToBillButton.setEnabled(false);
-        changeButtonStyleToUnselected(currentBowlingAlleyId);
         panelChanges = false;
         goToBillButton.setEnabled(false);
         deleteChangesButton.setEnabled(false);
@@ -404,11 +406,11 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     }
 
     private void alleyButtonOnChange(List<BowlingAlleyBooking> bowlingAlleyBookingList, Button alleyButton) {
-        changeButtonStyleToUnselected(currentBowlingAlleyId);
-        currentBowlingAlleyId = Integer.parseInt(alleyButton.getText().replaceAll("\\D+(\\d+)", "$1"));
-        changeButtonStyleToSelected(currentBowlingAlleyId);
+        changeButtonStyleToUnselected(currentBowlingAlleyBooking.getBowlingAlley().getId());
+        int currentBowlingAlleyID = Integer.parseInt(alleyButton.getText().replaceAll("\\D+(\\d+)", "$1"));
+        changeButtonStyleToSelected(currentBowlingAlleyID);
         currentBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(
-                        bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
+                        bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyID)
                 .findFirst()
                 .orElse(null);
         allIntegerFields = new ArrayList<>();
@@ -684,7 +686,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
             for (Button button : buttonMap.values()) {
                 if (button.isEnabled()) {
                     button.setAutofocus(true);
-                    currentBowlingAlleyId = Integer.parseInt(button.getText().replaceAll("\\D+(\\d+)", "$1"));
+                    int currentBowlingAlleyId = Integer.parseInt(button.getText().replaceAll("\\D+(\\d+)", "$1"));
                     changeButtonStyleToSelected(currentBowlingAlleyId);
                     currentBowlingAlleyBooking = bowlingAlleyBookingList.stream().filter(
                                     bowlingAlleyBooking -> bowlingAlleyBooking.getBowlingAlley().getId() == currentBowlingAlleyId)
@@ -709,7 +711,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
             bowlingAlleyBookingOptional.ifPresent(booking -> {
                 if (booking.isActive() && !booking.isCompleted()) {
                     this.currentBowlingAlleyBooking = booking;
-                    this.currentBowlingAlleyId = booking.getBowlingAlley().getId();
+                    int currentBowlingAlleyId = booking.getBowlingAlley().getId();
                     buttonMap.get(currentBowlingAlleyId).setAutofocus(true);
                     changeButtonStyleToUnselected(currentBowlingAlleyId);
                     changeButtonStyleToSelected(currentBowlingAlleyId);
