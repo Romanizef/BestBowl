@@ -376,7 +376,7 @@ public class UserManagementView extends VerticalLayout {
             // there must be 1 active admin user in the system
             List<User> adminUserList = userRepository.findAllByRoleEquals(UserRole.ADMIN);
             if (adminUserList.size() == 1 && selectedUser.getId() == adminUserList.get(0).getId()
-                    && !selectedUser.isActive()) {
+                    && (!selectedUser.isActive() || !selectedUser.getRole().equals(UserRole.ADMIN))) {
                 validationErrorLabel.setText("Es muss 1 aktiver Admin Benutzer im System existieren");
                 return false;
             }
