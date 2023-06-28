@@ -37,6 +37,8 @@ public interface FoodRepository extends JpaRepository<Food, Integer> {
     @Query("from Food f where f.active = true and f.reorderPoint > f.stock")
     List<Food> findAllByReorderThresholdReached();
 
+    List<Food> findALlByActiveEquals(boolean active);
+
     /**
      * The findByName method returns food with the given name.
      *

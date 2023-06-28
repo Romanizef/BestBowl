@@ -155,7 +155,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
             String text = "Bahn: " + currentBowlingAlleyBooking.getBowlingAlley().getId() + " , " +
                     currentBowlingAlleyBooking.getClient().getFullName() + " , " +
                     toDateString(currentBowlingAlleyBooking.getStartTime()) + " - " +
-                    toHourOnlyString(currentBowlingAlleyBooking.getEndTime() + 1)+ " wurde bezahlt.";
+                    toHourOnlyString(currentBowlingAlleyBooking.getEndTime() + 1) + " wurde bezahlt.";
             header.setText(text);
         }
     }
@@ -225,7 +225,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
         layout.setAlignItems(Alignment.CENTER);
-        List<Drink> drinkList = drinkRepository.findAll();
+        List<Drink> drinkList = drinkRepository.findAllByActiveEquals(true);
         drinkList.sort(Comparator.comparing(Drink::getName));
         for (Drink drink : drinkList) {
             boolean hasAtLeastOneActiveVariant = false;
@@ -272,7 +272,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
         layout.setAlignItems(Alignment.CENTER);
-        List<Food> foodList = foodRepository.findAll();
+        List<Food> foodList = foodRepository.findALlByActiveEquals(true);
         foodList.sort(Comparator.comparing(Food::getName));
         for (Food food : foodList) {
             FoodPanel foodPanel = new FoodPanel(food, currentBowlingAlleyBooking, foodBookingMap);

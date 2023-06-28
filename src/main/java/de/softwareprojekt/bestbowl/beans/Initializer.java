@@ -124,7 +124,7 @@ public class Initializer {
     private User createDefaultAdminUser() {
         User user = new User();
         user.setName("admin");
-        user.setEmail("-");
+        user.setEmail("admin@bestbowl.de");
         user.setEncodedPassword(userManager.encodePassword(DEFAULT_ADMIN_PASSWORD));
         user.setSecurityQuestion("admin");
         user.setSecurityQuestionAnswer("admin");

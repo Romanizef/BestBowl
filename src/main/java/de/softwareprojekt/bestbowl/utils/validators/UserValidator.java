@@ -49,8 +49,8 @@ public class UserValidator implements Validator<User> {
         if (!isStringOnlyLetters(user.getName())) {
             return ValidationResult.error("Nur Buchstaben sind im Namen erlaubt!");
         }
-        if (!isStringWithoutDoubleSpaces(user.getSecurityQuestion())
-                || !isStringWithoutDoubleSpaces(user.getSecurityQuestionAnswer())) {
+        if (isStringWithoutDoubleSpaces(user.getSecurityQuestion())
+                || isStringWithoutDoubleSpaces(user.getSecurityQuestionAnswer())) {
             return ValidationResult.error("Sicherheitsfrage und Antwort dürfen nicht leer sein!");
         }
         return ValidationResult.ok();
