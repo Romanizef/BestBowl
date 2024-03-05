@@ -1,6 +1,6 @@
 package de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlley;
 
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_alley.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -1,6 +1,6 @@
 package de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoe;
 
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_shoe.BowlingShoe;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

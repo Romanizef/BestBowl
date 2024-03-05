@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views.managementViews;
+package de.softwareprojekt.bestbowl.views.management_views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -22,7 +22,7 @@ import de.softwareprojekt.bestbowl.jpa.repositories.food.FoodRepository;
 import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
-import de.softwareprojekt.bestbowl.views.articleForms.FoodForm;
+import de.softwareprojekt.bestbowl.views.article_forms.FoodForm;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 

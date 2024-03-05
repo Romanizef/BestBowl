@@ -2,7 +2,7 @@ package de.softwareprojekt.bestbowl.utils.email;
 
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_alley.BowlingAlleyBooking;
 
 import static de.softwareprojekt.bestbowl.utils.Utils.isStringNotEmpty;
 

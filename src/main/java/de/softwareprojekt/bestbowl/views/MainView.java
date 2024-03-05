@@ -25,10 +25,11 @@ import de.softwareprojekt.bestbowl.beans.ReorderService;
 import de.softwareprojekt.bestbowl.beans.SecurityService;
 import de.softwareprojekt.bestbowl.beans.UserManager;
 import de.softwareprojekt.bestbowl.utils.constants.UserRole;
-import de.softwareprojekt.bestbowl.views.bookingViews.ArticleBookingView;
-import de.softwareprojekt.bestbowl.views.bookingViews.ClientSearchView;
-import de.softwareprojekt.bestbowl.views.bookingViews.PendingBookingView;
-import de.softwareprojekt.bestbowl.views.managementViews.ManagementView;
+import de.softwareprojekt.bestbowl.views.booking_views.ArticleBookingView;
+import de.softwareprojekt.bestbowl.views.booking_views.ClientSearchView;
+import de.softwareprojekt.bestbowl.views.booking_views.PendingBookingView;
+import de.softwareprojekt.bestbowl.views.management_views.ManagementView;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 

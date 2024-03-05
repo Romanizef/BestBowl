@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley;
+package de.softwareprojekt.bestbowl.jpa.entities.bowling_alley;
 
 import java.io.Serial;
 import java.io.Serializable;

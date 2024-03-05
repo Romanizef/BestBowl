@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views.bookingViews;
+package de.softwareprojekt.bestbowl.views.booking_views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -17,8 +17,8 @@ import com.vaadin.flow.router.*;
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.beans.SecurityService;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_alley.BowlingAlley;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_alley.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 import de.softwareprojekt.bestbowl.jpa.repositories.BowlingCenterRepository;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlley.BowlingAlleyBookingRepository;

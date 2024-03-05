@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views.articlePanels;
+package de.softwareprojekt.bestbowl.views.article_panels;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.grid.Grid;
@@ -9,9 +9,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoeBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_alley.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_shoe.BowlingShoe;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_shoe.BowlingShoeBooking;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingShoe.BowlingShoeRepository;
 
 import java.util.*;
@@ -31,6 +31,7 @@ public class ShoePanel extends VerticalLayout {
     private final int minShoeSize;
     private final int maxShoeSize;
     private Map<Integer, Integer> shoeSizeAmountMap;
+    private static final String WIDTH = "250px";
 
     /**
      * The ShoePanel function creates a panel that allows the user to select shoes
@@ -53,8 +54,8 @@ public class ShoePanel extends VerticalLayout {
         shoeSizeField = new IntegerField();
         Label sizeLabel = new Label("Schuhgröße");
         HorizontalLayout sizeLayout = new HorizontalLayout();
-        sizeLabel.setMinWidth("250px");
-        sizeLabel.setMaxWidth("250px");
+        sizeLabel.setMinWidth(WIDTH);
+        sizeLabel.setMaxWidth(WIDTH);
 
         shoeSizeField.setMin(minShoeSize);
         shoeSizeField.setMax(maxShoeSize);
@@ -74,8 +75,8 @@ public class ShoePanel extends VerticalLayout {
         shoeSizeField.setStepButtonsVisible(true);
         sizeLayout.add(sizeLabel, shoeSizeField);
 
-        amountLabel.setMinWidth("250px");
-        amountLabel.setMaxWidth("250px");
+        amountLabel.setMinWidth(WIDTH);
+        amountLabel.setMaxWidth(WIDTH);
 
         shoeAmountField.setValue(0);
         shoeAmountField.setMin(0);

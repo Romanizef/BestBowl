@@ -1,6 +1,6 @@
 package de.softwareprojekt.bestbowl.utils.email;
 
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_alley.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.utils.pdf.PDFUtils;
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;

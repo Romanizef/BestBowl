@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views.managementViews;
+package de.softwareprojekt.bestbowl.views.management_views;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -19,7 +19,8 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
+
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_alley.BowlingAlley;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlley.BowlingAlleyRepository;
 import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;

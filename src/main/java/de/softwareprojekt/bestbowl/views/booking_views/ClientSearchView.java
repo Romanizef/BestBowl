@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views.bookingViews;
+package de.softwareprojekt.bestbowl.views.booking_views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -149,9 +149,12 @@ public class ClientSearchView extends VerticalLayout {
         cityField.setRequiredIndicatorVisible(true);
         cityLayout.add(postCodeField, cityField);
         cityLayout.setFlexGrow(1, cityField);
+        TextField ibanField = new TextField("IBAN");
+        ibanField.setWidthFull();
+        ibanField.setRequiredIndicatorVisible(true);
         Select<Association> associationSelect = createAssociationSelect("Verein");
         associationSelect.setWidthFull();
-        layout.add(firstNameField, lastNameField, emailField, dialogCommentArea, streetLayout, cityLayout,
+        layout.add(firstNameField, lastNameField, emailField, dialogCommentArea, streetLayout, cityLayout, ibanField,
                 associationSelect,
                 createValidationLabelLayout());
         dialog.add(layout);
@@ -211,6 +214,7 @@ public class ClientSearchView extends VerticalLayout {
                 ((client, i) -> client.getAddress().setPostCode(Objects.requireNonNullElse(i, 0))));
         binder.bind(cityField, client -> client.getAddress().getCity(),
                 ((client, s) -> client.getAddress().setCity(s)));
+        binder.bind(ibanField, Client::getIban, Client::setIban);
         binder.bind(associationSelect,
                 client -> client.getAssociation() == null ? Association.NO_ASSOCIATION : client.getAssociation(),
                 ((client, association) -> {
@@ -339,6 +343,7 @@ public class ClientSearchView extends VerticalLayout {
         grid.addColumn("email").setHeader("E-Mail");
         grid.addColumn(client -> client.getAssociation() == null ? "" : client.getAssociation().getName())
                 .setHeader("Vereinsname").setSortable(true);
+        grid.addColumn("iban").setHeader("IBAN");
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true));
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         grid.setSizeFull();

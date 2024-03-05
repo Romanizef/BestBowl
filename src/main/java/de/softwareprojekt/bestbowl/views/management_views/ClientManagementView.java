@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views.managementViews;
+package de.softwareprojekt.bestbowl.views.management_views;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -47,7 +47,7 @@ import static de.softwareprojekt.bestbowl.utils.VaadinUtils.*;
  */
 @Route(value = "clientManagement", layout = MainView.class)
 @PageTitle("Kundenverwaltung")
-@RolesAllowed({UserRole.OWNER})
+@RolesAllowed({ UserRole.OWNER })
 public class ClientManagementView extends VerticalLayout {
     private final transient ClientRepository clientRepository;
     private final Binder<Client> binder = new Binder<>();
@@ -56,6 +56,16 @@ public class ClientManagementView extends VerticalLayout {
     private Label validationErrorLabel;
     private Client selectedClient = null;
     private boolean editingNewClient = false;
+    private static final String STREET = "Straße";
+    private static final String ASSOCIATION = "Verein";
+    private static final String LASTNAME = "Nachname";
+    private static final String FIRSTNAME = "Vorname";
+    private static final String COMMENT = "Kommentar";
+    private static final String EMAIL = "E-Mail";
+    private static final String CITY = "Stadt";
+    private static final String IBAN = "IBAN";
+    private static final String PLZ = "PLZ";
+    private static final String HOUSENUMBER = "Hausnummer";
 
     /**
      * Constructor for the Client Management View.
@@ -128,20 +138,21 @@ public class ClientManagementView extends VerticalLayout {
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         grid.removeAllColumns();
         Grid.Column<Client> idColumn = grid.addColumn("id").setHeader("ID");
-        Grid.Column<Client> firstNameColumn = grid.addColumn("firstName").setHeader("Vorname");
-        Grid.Column<Client> lastNameColumn = grid.addColumn("lastName").setHeader("Nachname");
-        Grid.Column<Client> emailColumn = grid.addColumn("email").setHeader("E-Mail");
-        Grid.Column<Client> commentColumn = grid.addColumn(Client::getComment).setHeader("Kommentar");
+        Grid.Column<Client> firstNameColumn = grid.addColumn("firstName").setHeader(FIRSTNAME);
+        Grid.Column<Client> lastNameColumn = grid.addColumn("lastName").setHeader(LASTNAME);
+        Grid.Column<Client> emailColumn = grid.addColumn("email").setHeader(EMAIL);
+        Grid.Column<Client> commentColumn = grid.addColumn(Client::getComment).setHeader(COMMENT);
         Grid.Column<Client> associationColumn = grid
                 .addColumn(client -> client.getAssociation() == null ? "" : client.getAssociation().getName())
-                .setHeader("Verein");
+                .setHeader(ASSOCIATION);
         Grid.Column<Client> streetColumn = grid.addColumn(client -> client.getAddress().getStreet())
-                .setHeader("Straße");
+                .setHeader(STREET);
         Grid.Column<Client> houseNrColumn = grid.addColumn(client -> client.getAddress().getHouseNr())
-                .setHeader("Hausnummer");
+                .setHeader(HOUSENUMBER);
         Grid.Column<Client> postCodeColumn = grid.addColumn(client -> client.getAddress().getPostCodeString())
-                .setHeader("PLZ");
-        Grid.Column<Client> cityColumn = grid.addColumn(client -> client.getAddress().getCity()).setHeader("Stadt");
+                .setHeader(PLZ);
+        Grid.Column<Client> cityColumn = grid.addColumn(client -> client.getAddress().getCity()).setHeader(CITY);
+        Grid.Column<Client> ibanColumn = grid.addColumn("iban").setHeader(IBAN);
         Grid.Column<Client> activeColumn = grid.addColumn(client -> client.isActive() ? "Aktiv" : "Inaktiv")
                 .setHeader("Aktiv");
         grid.getColumns().forEach(c -> c.setResizable(true).setAutoWidth(true).setSortable(true));
@@ -156,17 +167,18 @@ public class ClientManagementView extends VerticalLayout {
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(idColumn).setComponent(createFilterHeaderInteger("ID", clientFilter::setId));
         headerRow.getCell(firstNameColumn)
-                .setComponent(createFilterHeaderString("Vorname", clientFilter::setFirstName));
-        headerRow.getCell(lastNameColumn).setComponent(createFilterHeaderString("Nachname", clientFilter::setLastName));
-        headerRow.getCell(emailColumn).setComponent(createFilterHeaderString("E-Mail", clientFilter::setEmail));
-        headerRow.getCell(commentColumn).setComponent(createFilterHeaderString("Kommentar", clientFilter::setComment));
+                .setComponent(createFilterHeaderString(FIRSTNAME, clientFilter::setFirstName));
+        headerRow.getCell(lastNameColumn).setComponent(createFilterHeaderString(LASTNAME, clientFilter::setLastName));
+        headerRow.getCell(emailColumn).setComponent(createFilterHeaderString(EMAIL, clientFilter::setEmail));
+        headerRow.getCell(commentColumn).setComponent(createFilterHeaderString(COMMENT, clientFilter::setComment));
         headerRow.getCell(associationColumn)
-                .setComponent(createFilterHeaderString("Verein", clientFilter::setAssociationName));
-        headerRow.getCell(streetColumn).setComponent(createFilterHeaderString("Straße", clientFilter::setStreet));
+                .setComponent(createFilterHeaderString(ASSOCIATION, clientFilter::setAssociationName));
+        headerRow.getCell(streetColumn).setComponent(createFilterHeaderString(STREET, clientFilter::setStreet));
         headerRow.getCell(houseNrColumn)
-                .setComponent(createFilterHeaderInteger("Hausnummer", clientFilter::setHouseNr));
-        headerRow.getCell(postCodeColumn).setComponent(createFilterHeaderInteger("PLZ", clientFilter::setPostCode));
-        headerRow.getCell(cityColumn).setComponent(createFilterHeaderString("Stadt", clientFilter::setCity));
+                .setComponent(createFilterHeaderInteger(HOUSENUMBER, clientFilter::setHouseNr));
+        headerRow.getCell(postCodeColumn).setComponent(createFilterHeaderInteger(PLZ, clientFilter::setPostCode));
+        headerRow.getCell(cityColumn).setComponent(createFilterHeaderString(CITY, clientFilter::setCity));
+        headerRow.getCell(ibanColumn).setComponent(createFilterHeaderString(IBAN, clientFilter::setIban));
         headerRow.getCell(activeColumn)
                 .setComponent(createFilterHeaderBoolean("Aktiv", "Inaktiv", clientFilter::setActive));
 
@@ -198,48 +210,53 @@ public class ClientManagementView extends VerticalLayout {
         FormLayout layout = new FormLayout();
         layout.setWidth("25%");
 
-        TextField firstNameField = new TextField("Vorname");
+        TextField firstNameField = new TextField(FIRSTNAME);
         firstNameField.setWidthFull();
         firstNameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         firstNameField.setRequiredIndicatorVisible(true);
 
-        TextField lastNameField = new TextField("Nachname");
+        TextField lastNameField = new TextField(LASTNAME);
         lastNameField.setWidthFull();
         lastNameField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         lastNameField.setRequiredIndicatorVisible(true);
 
-        TextField emailField = new TextField("E-Mail");
+        TextField emailField = new TextField(EMAIL);
         emailField.setWidthFull();
         emailField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         emailField.setRequiredIndicatorVisible(true);
 
-        TextArea commentArea = new TextArea("Kommentar");
+        TextArea commentArea = new TextArea(COMMENT);
         commentArea.setWidthFull();
         commentArea.addThemeVariants(TextAreaVariant.LUMO_SMALL);
 
-        Select<Association> associationSelect = createAssociationSelect("Verein");
+        Select<Association> associationSelect = createAssociationSelect(ASSOCIATION);
         associationSelect.setWidthFull();
         associationSelect.addThemeVariants(SelectVariant.LUMO_SMALL);
 
-        TextField streetField = new TextField("Straße");
+        TextField streetField = new TextField(STREET);
         streetField.setWidthFull();
         streetField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         streetField.setRequiredIndicatorVisible(true);
 
-        TextField houseNrField = new TextField("Hausnummer (ggf. mit Zusatz)");
+        TextField houseNrField = new TextField(HOUSENUMBER + " (ggf. mit Zusatz)");
         houseNrField.setWidthFull();
         houseNrField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         houseNrField.setRequiredIndicatorVisible(true);
 
-        IntegerField postCodeField = new IntegerField("PLZ");
+        IntegerField postCodeField = new IntegerField(PLZ);
         postCodeField.setWidthFull();
         postCodeField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         postCodeField.setRequiredIndicatorVisible(true);
 
-        TextField cityField = new TextField("Stadt");
+        TextField cityField = new TextField(CITY);
         cityField.setWidthFull();
         cityField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         cityField.setRequiredIndicatorVisible(true);
+
+        TextField ibanField = new TextField(IBAN);
+        ibanField.setWidthFull();
+        ibanField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        ibanField.setRequiredIndicatorVisible(true);
 
         HorizontalLayout checkboxLayout = new HorizontalLayout();
         checkboxLayout.setAlignItems(Alignment.CENTER);
@@ -262,7 +279,7 @@ public class ClientManagementView extends VerticalLayout {
         buttonLayout.setFlexGrow(1, cancelButton, saveButton);
 
         layout.add(firstNameField, lastNameField, emailField, commentArea, associationSelect, streetField, houseNrField,
-                postCodeField, cityField, checkboxLayout, createValidationLabelLayout(), buttonLayout);
+                postCodeField, cityField, ibanField, checkboxLayout, createValidationLabelLayout(), buttonLayout);
 
         saveButton.addClickListener(clickEvent -> {
             String uneditedEmail = Objects.requireNonNullElse(selectedClient.getEmail(), "");
@@ -303,6 +320,7 @@ public class ClientManagementView extends VerticalLayout {
                 ((client, i) -> client.getAddress().setPostCode(Objects.requireNonNullElse(i, 0))));
         binder.bind(cityField, client -> client.getAddress().getCity(),
                 ((client, s) -> client.getAddress().setCity(s)));
+        binder.bind(ibanField, Client::getIban, Client::setIban);
         binder.bind(activeCheckbox, Client::isActive,
                 (client, active) -> client.setActive(Objects.requireNonNullElse(active, false)));
         return layout;
@@ -404,6 +422,7 @@ public class ClientManagementView extends VerticalLayout {
         private String houseNr;
         private String postCode;
         private String city;
+        private String iban;
         private Boolean active;
 
         /**
@@ -434,10 +453,11 @@ public class ClientManagementView extends VerticalLayout {
             boolean matchesHouseNr = matches(String.valueOf(client.getAddress().getHouseNr()), houseNr);
             boolean matchesPostCode = matches(client.getAddress().getPostCodeString(), postCode);
             boolean matchesCity = matches(client.getAddress().getCity(), city);
+            boolean matchesIBAN = matches(client.getIban(), iban);
             boolean matchesActive = active == null || active == client.isActive();
             return matchesId && matchesFirstName && matchesLastName && matchesEmail && matchesComment
                     && matchesAssociationName && matchesStreet && matchesHouseNr
-                    && matchesPostCode && matchesCity && matchesActive;
+                    && matchesPostCode && matchesCity && matchesIBAN && matchesActive;
         }
 
         /**
@@ -539,6 +559,16 @@ public class ClientManagementView extends VerticalLayout {
          */
         public void setCity(String city) {
             this.city = city;
+            dataView.refreshAll();
+        }
+
+        /**
+         * The setIban function sets the iban of a client.
+         *
+         * @param iban
+         */
+        public void setIban(String iban) {
+            this.iban = iban;
             dataView.refreshAll();
         }
 

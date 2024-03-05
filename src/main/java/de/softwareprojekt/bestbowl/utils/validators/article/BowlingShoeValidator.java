@@ -3,7 +3,8 @@ package de.softwareprojekt.bestbowl.utils.validators.article;
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.binder.ValueContext;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
+
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_shoe.BowlingShoe;
 
 /**
  * The BowlingShoeValidator class validates the attributes of a BowlingShoe

@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views.articleForms;
+package de.softwareprojekt.bestbowl.views.article_forms;
 
 
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -13,7 +13,7 @@ import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_shoe.BowlingShoe;
 import de.softwareprojekt.bestbowl.utils.validators.article.BowlingShoeValidator;
 
 import java.time.Instant;

@@ -1,11 +1,12 @@
-package de.softwareprojekt.bestbowl.views.articlePanels;
+package de.softwareprojekt.bestbowl.views.article_panels;
 
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
+
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_alley.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.drink.Drink;
 import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkVariant;

@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views.managementViews;
+package de.softwareprojekt.bestbowl.views.management_views;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;

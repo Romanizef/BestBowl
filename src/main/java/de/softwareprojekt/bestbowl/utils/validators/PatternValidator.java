@@ -26,6 +26,8 @@ public class PatternValidator {
             .compile("^[\\d.a-zA-Z-]+\\.[a-z]{2,63}$");
     private static final Pattern SMTP_PORT_PATTERN = Pattern
             .compile("^[1-9]{3}+$");
+    private static final Pattern IBAN_PATTERN = Pattern.compile(
+            "^([A-Z]{2}[ \\-]?[0-9]{2})(?=(?:[ \\-]?[A-Z0-9]){9,30}$)((?:[ \\-]?[A-Z0-9]{3,5}){2,7})([ \\-]?[A-Z0-9]{1,3})?$");
 
     private PatternValidator() {
     }
@@ -155,6 +157,21 @@ public class PatternValidator {
     public static boolean isStringValidPostalcode(String postalCode) {
         if (isStringNotEmpty(postalCode)) {
             return POSTAL_CODE_PATTERN.matcher(postalCode).matches();
+        }
+        return false;
+    }
+
+    /**
+     * The isValid function checks if the given IBAN matches the pattern for
+     * IBANs.
+     *
+     * @param iban
+     *
+     * @return A boolean value
+     */
+    public static boolean isStringValidIban(String iban) {
+        if (isStringNotEmpty(iban)) {
+            return IBAN_PATTERN.matcher(iban).matches();
         }
         return false;
     }

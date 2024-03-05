@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views.articleForms;
+package de.softwareprojekt.bestbowl.views.article_forms;
 
 
 import com.vaadin.flow.component.checkbox.Checkbox;

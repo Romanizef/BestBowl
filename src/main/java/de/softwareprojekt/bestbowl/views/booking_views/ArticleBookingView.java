@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views.bookingViews;
+package de.softwareprojekt.bestbowl.views.booking_views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
@@ -19,10 +19,10 @@ import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.*;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoeBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_alley.BowlingAlley;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_alley.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_shoe.BowlingShoe;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_shoe.BowlingShoeBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.drink.Drink;
 import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkVariant;
@@ -40,9 +40,9 @@ import de.softwareprojekt.bestbowl.jpa.repositories.food.FoodRepository;
 import de.softwareprojekt.bestbowl.utils.VaadinUtils;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
-import de.softwareprojekt.bestbowl.views.articlePanels.DrinkPanel;
-import de.softwareprojekt.bestbowl.views.articlePanels.FoodPanel;
-import de.softwareprojekt.bestbowl.views.articlePanels.ShoePanel;
+import de.softwareprojekt.bestbowl.views.article_panels.DrinkPanel;
+import de.softwareprojekt.bestbowl.views.article_panels.FoodPanel;
+import de.softwareprojekt.bestbowl.views.article_panels.ShoePanel;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -87,6 +87,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
     private Button deleteChangesButton;
     private boolean panelChanges;
     private List<IntegerField> allIntegerFields;
+    private static final String NOALLEY = "Keine Bahn ausgewählt";
 
     /**
      * Creates a new instance of the ArticleBookingView.
@@ -138,7 +139,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
 
     private void updateHeader() {
         if (currentBowlingAlleyBooking == null) {
-            header.setText("Keine Bahn ausgewählt");
+            header.setText(NOALLEY);
         } else {
             String text = "Bahn: " + currentBowlingAlleyBooking.getBowlingAlley().getId() + " , " +
                     currentBowlingAlleyBooking.getClient().getFullName() + " , " +
@@ -150,7 +151,7 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
 
     private void updateHeaderCompletedBooking() {
         if (currentBowlingAlleyBooking == null) {
-            header.setText("Keine Bahn ausgewählt");
+            header.setText(NOALLEY);
         } else {
             String text = "Bahn: " + currentBowlingAlleyBooking.getBowlingAlley().getId() + " , " +
                     currentBowlingAlleyBooking.getClient().getFullName() + " , " +
@@ -178,9 +179,9 @@ public class ArticleBookingView extends VerticalLayout implements HasUrlParamete
         Tab drink = new Tab(VaadinIcon.COFFEE.create(), new Span("Getränke"));
         Tab food = new Tab(VaadinIcon.CROSS_CUTLERY.create(), new Span("Speisen"));
         Tab shoe = new Tab(VaadinIcon.RETWEET.create(), new Span("Schuhe"));
-        drinkDiv = new Div(new Text("Keine Bahn ausgewählt"));
-        foodDiv = new Div(new Text("Keine Bahn ausgewählt"));
-        shoeDiv = new Div(new Text("Keine Bahn ausgewählt"));
+        drinkDiv = new Div(new Text(NOALLEY));
+        foodDiv = new Div(new Text(NOALLEY));
+        shoeDiv = new Div(new Text(NOALLEY));
         shoeDiv.getStyle().set("text-align", "center");
         foodDiv.getStyle().set("text-align", "center");
         drinkDiv.getStyle().set("text-align", "center");

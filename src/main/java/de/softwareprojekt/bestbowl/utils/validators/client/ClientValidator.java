@@ -53,6 +53,9 @@ public class ClientValidator implements Validator<Client> {
         if (!isStringValidPostalcode(createStringPostalcodeForClient(client))) {
             return ValidationResult.error("PLZ muss zwischen 01000 und 99999 sein!");
         }
+        if(!isStringValidIban(client.getIban())) {
+            return ValidationResult.error("Keine IBAN! Bitte nur bis zu 30 Zahlen oder Großbuchstaben hinzufügen.");
+        }
         if (!isStringMinNChars(client.getAddress().getCity(), 3)) {
             return ValidationResult.error("Stadt muss min. 3 Zeichen lang sein!");
         }

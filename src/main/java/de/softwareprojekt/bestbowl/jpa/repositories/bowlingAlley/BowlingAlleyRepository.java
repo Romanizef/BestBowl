@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_alley.BowlingAlley;
 
 /**
  * The BowlingAlleyRepository is a Spring Data JPA repository for the

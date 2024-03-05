@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley;
+package de.softwareprojekt.bestbowl.jpa.entities.bowling_alley;
 
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 import jakarta.persistence.Entity;

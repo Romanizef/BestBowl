@@ -2,8 +2,8 @@ package de.softwareprojekt.bestbowl.utils.pdf;
 
 import de.softwareprojekt.bestbowl.beans.Repos;
 import de.softwareprojekt.bestbowl.jpa.entities.BowlingCenter;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoeBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_alley.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_shoe.BowlingShoeBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.food.FoodBooking;
 import de.softwareprojekt.bestbowl.utils.Utils;

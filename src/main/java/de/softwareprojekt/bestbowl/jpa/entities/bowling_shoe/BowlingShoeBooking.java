@@ -1,9 +1,9 @@
-package de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe;
+package de.softwareprojekt.bestbowl.jpa.entities.bowling_shoe;
 
 import java.io.Serial;
 import java.io.Serializable;
 
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_alley.BowlingAlley;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 import de.softwareprojekt.bestbowl.jpa.idclasses.BowlingShoeBookingId;
 import jakarta.persistence.Entity;

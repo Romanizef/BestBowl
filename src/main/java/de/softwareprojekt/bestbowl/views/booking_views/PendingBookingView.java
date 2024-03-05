@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views.bookingViews;
+package de.softwareprojekt.bestbowl.views.booking_views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -18,8 +18,9 @@ import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoeBooking;
+
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_alley.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_shoe.BowlingShoeBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.food.FoodBooking;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlley.BowlingAlleyBookingRepository;

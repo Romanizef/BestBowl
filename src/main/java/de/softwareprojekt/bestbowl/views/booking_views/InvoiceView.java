@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views.bookingViews;
+package de.softwareprojekt.bestbowl.views.booking_views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -16,9 +16,10 @@ import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.component.tabs.TabVariant;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.*;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoe;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe.BowlingShoeBooking;
+
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_alley.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_shoe.BowlingShoe;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_shoe.BowlingShoeBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.drink.DrinkBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.food.FoodBooking;
 import de.softwareprojekt.bestbowl.jpa.repositories.bowlingAlley.BowlingAlleyBookingRepository;

@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.views.managementViews;
+package de.softwareprojekt.bestbowl.views.management_views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -24,7 +24,7 @@ import de.softwareprojekt.bestbowl.jpa.repositories.drink.DrinkRepository;
 import de.softwareprojekt.bestbowl.utils.constants.UserRole;
 import de.softwareprojekt.bestbowl.utils.messages.Notifications;
 import de.softwareprojekt.bestbowl.views.MainView;
-import de.softwareprojekt.bestbowl.views.articleForms.DrinkForm;
+import de.softwareprojekt.bestbowl.views.article_forms.DrinkForm;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 

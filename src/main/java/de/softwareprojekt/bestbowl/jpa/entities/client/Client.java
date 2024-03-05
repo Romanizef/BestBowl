@@ -28,6 +28,15 @@ public class Client implements Serializable {
     @ManyToOne
     private Association association;
     private String comment;
+    private String iban;
+
+    public String getIban() {
+        return iban;
+    }
+
+    public void setIban(String iban) {
+        this.iban = iban;
+    }
 
     private boolean active;
 

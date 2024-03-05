@@ -1,7 +1,7 @@
 package de.softwareprojekt.bestbowl.jpa.entities.drink;
 
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlley;
-import de.softwareprojekt.bestbowl.jpa.entities.bowlingAlley.BowlingAlleyBooking;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_alley.BowlingAlley;
+import de.softwareprojekt.bestbowl.jpa.entities.bowling_alley.BowlingAlleyBooking;
 import de.softwareprojekt.bestbowl.jpa.entities.client.Client;
 import de.softwareprojekt.bestbowl.jpa.idclasses.DrinkBookingId;
 import jakarta.persistence.Entity;

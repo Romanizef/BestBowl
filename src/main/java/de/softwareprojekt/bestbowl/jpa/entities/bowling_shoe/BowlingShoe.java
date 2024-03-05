@@ -1,4 +1,4 @@
-package de.softwareprojekt.bestbowl.jpa.entities.bowlingShoe;
+package de.softwareprojekt.bestbowl.jpa.entities.bowling_shoe;
 
 import java.io.Serial;
 import java.io.Serializable;
