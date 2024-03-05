@@ -187,8 +187,9 @@ public class PatternValidator {
      */
     public static String createStringPostalcodeForClient(Client client) {
         String postalCode = "" + client.getAddress().getPostCode();
-        if (postalCode.length() == 4)
+        if (postalCode.length() == 4) {
             postalCode = "0" + postalCode;
+        }
         return postalCode;
     }
 
@@ -204,8 +205,9 @@ public class PatternValidator {
      */
     public static String createStringPostalcodeForBowlingcenter(BowlingCenter bowlingcenter) {
         String postalCode = "" + bowlingcenter.getPostCode();
-        if (postalCode.length() == 4)
+        if (postalCode.length() == 4) {
             postalCode = "0" + postalCode;
+        }
         return postalCode;
     }
 }

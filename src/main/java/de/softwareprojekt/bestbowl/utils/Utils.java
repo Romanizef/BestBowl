@@ -44,15 +44,11 @@ public class Utils {
      * @return if the directory was created or is present
      */
     public static boolean createDirectoryIfMissing(File dir) {
-        if (!dir.exists() || !dir.isDirectory()) {
-            if (dir.mkdirs()) {
-                return true;
-            } else {
-                LOGGER.error("error creating directory: " + dir.getName());
-                return false;
-            }
-        } else {
+        if (dir.mkdirs() || dir.isDirectory()) {
             return true;
+        } else {
+            LOGGER.error("error creating directory: " + dir.getName());
+            return false;
         }
     }
 
@@ -188,7 +184,7 @@ public class Utils {
 
     /**
      * @return a LocalDateTime of the current time with the minute rounded to the
-     * previous 1/4 hour
+     *         previous 1/4 hour
      */
     public static LocalDateTime getCurrentDateTimeRounded() {
         LocalDateTime localDateTime = LocalDateTime.now();
